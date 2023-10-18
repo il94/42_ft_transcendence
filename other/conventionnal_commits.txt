@@ -1,0 +1,32 @@
+(Extension VSCode pour voir le .txt mis en page : ColorTXT)
+
+Types de commits :
+
+-build: changements qui affectent le système de build ou des dépendances externes (npm, make…)
+-ci: changements concernant les fichiers et scripts d'intégration ou de configuration (Travis, Ansible, BrowserStack…)
+-feat: ajout d'une nouvelle fonctionnalité
+-fix: correction d'un bug
+-perf: amélioration des performances
+-refactor: modification qui n'apporte ni nouvelle fonctionalité ni d'amélioration de performances
+-style: changement qui n'apporte aucune alteration fonctionnelle ou sémantique (indentation, mise en forme, ajout d'espace, renommante d'une variable…)
+-docs: rédaction ou mise à jour de documentation
+-test: ajout ou modification de tests
+
+Utiliser l'impératif présent en permanance (add au lieu de added, change au lieu de changed ect)
+Pas de majuscules en début de texte ni de points à la fin
+Deux points puis un espace pour séparer le type du sujet
+Penser à ajouter un body le plus souvent possible !
+
+Exemples/ :
+
+	Style: remove "other" folder -> KO
+	style: Remove "other" folder -> KO
+	style : remove "other" folder -> KO
+	style remove "other" folder -> KO
+	style: remove "other" folder -> OK
+	
+	build: added docker files (empty) -> KO
+	build: add docker files (empty) -> OK
+
+Source :
+	https://buzut.net/cours/versioning-avec-git/bien-nommer-ses-commits
