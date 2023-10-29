@@ -19,11 +19,11 @@ export const WelcomeWindow = styled.div`
 	width: 400px;
 	margin-top: 25vh;
 	margin-bottom: 25vh;
-	background-color: ${colors.backgroundWindow};
+	background-color: ${colors.popup};
 
 	border-style: solid;
 	border-width: 15px;
-	border-color: ${colors.backgroundWindow};
+	border-color: ${colors.popup};
 	box-shadow: 10px;
 
 	clip-path: ${effects.pixelateBorder};

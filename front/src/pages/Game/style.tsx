@@ -31,6 +31,6 @@ export const GameWrapper = styled.div`
 		height: 720px;
 	*/
 	
-	background-color: ${colors.backgroundWindow};
+	background-color: ${colors.popup};
 	clip-path: ${effects.pixelateBorder};
 `
