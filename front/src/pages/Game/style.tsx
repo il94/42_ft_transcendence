@@ -36,12 +36,13 @@ export const GameWrapper = styled.div`
 	width: 95%;
 	height: 95%;
 
-	clip-path: ${effects.pixelateBorder};
+	${effects.pixelateWindow};
 
 	/* @media (min-width: 1280px) { */
 
-		grid-template-columns: 19.74% 80.26%;
-		grid-template-rows: 7.75% 92.25%;
+		// Tailles définitives
+		/* grid-template-columns: 19.74% 80.26%;
+		grid-template-rows: 7.75% 92.25%; */
 
 		// Tailles de référence (pas responsive !)
 		grid-template-columns: 240px 976px;

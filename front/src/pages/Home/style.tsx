@@ -26,7 +26,7 @@ export const WelcomeWindow = styled.div`
 	border-color: ${colors.popup};
 	box-shadow: 10px;
 
-	clip-path: ${effects.pixelateBorder};
+	${effects.pixelateWindow};
 `
 
 export const StyledMainTitle = styled.h1`
@@ -59,10 +59,9 @@ export const StyledLink = styled(Link)`
 	cursor: pointer;
 
 	text-decoration: none;
-	border-style: solid;
-	border-width: 5px;
-	border-color: ${colors.button} ${colors.shadowButton} ${colors.shadowButton} ${colors.button};
-	clip-path: ${effects.pixelateBorder};
+	${effects.shadowButton};
+
+	${effects.pixelateWindow};
 	
 	&:hover {
 		transform: scale(1.015);
