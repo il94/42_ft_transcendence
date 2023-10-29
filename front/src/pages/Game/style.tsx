@@ -17,16 +17,19 @@ export const GamePage = styled.div`
 
 export const GameWrapper = styled.div`
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);
-	grid-template-rows: 48px 802px;
+	grid-template-columns: 19.4% 80.6%;
+	grid-template-rows: 7.75% 92.25%;
 	grid-column-gap: 0px;
 	grid-row-gap: 0px;
 
-	width: 1850px;
-	height: 850px;
+	width: 95%;
+	height: 95%;
 
-	/* width: 95%;
-	height: 95%; */
+	/*
+		Base :
+		width: 1280px;
+		height: 720px;
+	*/
 	
 	background-color: ${colors.backgroundWindow};
 	clip-path: ${effects.pixelateBorder};

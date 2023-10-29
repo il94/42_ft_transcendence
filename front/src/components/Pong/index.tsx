@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
 const Style = styled.div`
-	grid-area: 2 / 2 / 3 / 5;
+	grid-area: 2 / 2 / 3 / 3;
 	background-color: #FD994F;
 `
 
