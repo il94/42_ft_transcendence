@@ -14,7 +14,7 @@ export const GamePage = styled.div`
 		width: 100%;
 		height: 100%;
 
-		/* Tailles de référence (pas responsive !) */
+		// Tailles de référence (pas responsive !)
 		/* width: 1280px;
 		height: 720px; */
 
@@ -38,27 +38,27 @@ export const GameWrapper = styled.div`
 
 	clip-path: ${effects.pixelateBorder};
 
-	@media (min-width: 1280px) {
+	/* @media (min-width: 1280px) { */
 
 		grid-template-columns: 19.74% 80.26%;
 		grid-template-rows: 7.75% 92.25%;
 
-		/* Tailles de référence (pas responsive !) */
-		/* grid-template-columns: 240px 976px;
-		grid-template-rows: 53px 631px; */
+		// Tailles de référence (pas responsive !)
+		grid-template-columns: 240px 976px;
+		grid-template-rows: 53px 631px;
 
 
 		/* min-width: à définir par rapport au Pong */
 		/* min-height: 212px; */
 
-	}
+	/* } */
 
-	@media (min-width: 0px) and (max-width: 1280px) {
+	/* @media (min-width: 0px) and (max-width: 1280px) {
 
-		/* Tailles de référence (pas responsive !) */
+		// Tailles de référence (pas responsive !)
 		grid-template-columns: 976px;
 		grid-template-rows: 53px 631px;
 
-	}
+	} */
 
 `

@@ -6,12 +6,12 @@ export const Style = styled.div`
 
 	background-color: #B197FA;
 
-	@media (min-width: 1280px) {
+	/* @media (min-width: 1280px) { */
 		grid-area: 1 / 2 / 2 / 3;
-	}
+	/* } */
 
-	@media (min-width: 0px) and (max-width: 1280px) {
+	/* @media (min-width: 0px) and (max-width: 1280px) {
 		grid-area: 1 / 1 / 2 / 2 ;
-	}
+	} */
 
 `
