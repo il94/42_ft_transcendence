@@ -9,7 +9,7 @@ export const Style = styled.div`
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
-	height: 7.75%;
+	height: 53px;
 	min-height: 53px;
 
 	background-color: ${colors.profile};
