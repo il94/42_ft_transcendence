@@ -5,12 +5,15 @@ import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
 export const HomerWapper = styled.div`
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+
 `
 
 export const WelcomeWindow = styled.div`
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -27,26 +30,39 @@ export const WelcomeWindow = styled.div`
 	box-shadow: 10px;
 
 	${effects.pixelateWindow};
+
 `
 
 export const StyledMainTitle = styled.h1`
+
 	font-size: 80px;
+
+	cursor: default;
+	user-select: none;
 
 	&:hover {
 		transform: scale(1.015);
 	}
+
 `
 
 export const StyledTitle = styled.h2`
+
 	margin: 10px;
+
 	font-size: 45px;
+
+	cursor: default;
+	user-select: none;
 
 	&:hover {
 		transform: scale(1.015);
 	}
+
 `
 
 export const StyledLink = styled(Link)`
+
 	font-size: 40px;
 	margin: 10px;
 	padding: 1px;
@@ -72,4 +88,5 @@ export const StyledLink = styled(Link)`
 		background-color: ${colors.shadowButton};
 		border-color: ${colors.shadowButton};
 	}
+
 `

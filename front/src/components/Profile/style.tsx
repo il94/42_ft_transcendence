@@ -27,14 +27,21 @@ export const ProfilWrapper = styled.div`
 	width: 63.96%;
 	height: 100%;
 
+	// a definir
+	/* &:hover {
+		cursor: pointer;
+		background-color: #9E5B29;
+
+
+		${effects.pixelateWindow};
+	} */
+
 `
 
 export const ProfilePicture = styled.div`
 	
 	width: 22.19%;
 	height: 60.38%;
-
-	/* margin-left: 5.58%; */
 
 	background-color: ${colors.profilePicture};
 
@@ -44,10 +51,6 @@ export const ProfilePicture = styled.div`
 
 export const ProfileName = styled.p`
 	
-	/* width: 24.58%; */
-
-	/* font-size: 100%; */
-
 	margin-left: 5.58%;
 
 `
