@@ -29,7 +29,7 @@ export const ButtonsWrapper = styled.div`
 
 `
 
-export const StyledImg = styled.img`
+export const Icon = styled.img`
 
 	width: 37px;
 	width: 39.78%;

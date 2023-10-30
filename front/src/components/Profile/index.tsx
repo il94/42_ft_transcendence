@@ -1,5 +1,6 @@
-import { Style, StyledImg, ButtonsWrapper } from "./style"
+import { Style, Icon, ButtonsWrapper } from "./style"
 
+import profilePicture from "../../assets/default_blue.png"
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 
@@ -8,8 +9,8 @@ function Profile() {
 		<Style>
 			Profile
 			<ButtonsWrapper>
-				<StyledImg src={settingsIcon} alt="Settings button" />
-				<StyledImg src={deconnexionIcon} alt="Deconnexion button" />
+				<Icon src={settingsIcon} alt="Settings button" />
+				<Icon src={deconnexionIcon} alt="Deconnexion button" />
 			</ButtonsWrapper>
 		</Style>
 	)
