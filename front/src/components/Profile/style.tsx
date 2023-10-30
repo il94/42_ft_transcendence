@@ -11,9 +11,45 @@ export const Style = styled.div`
 	width: 100%;
 	height: 7.75%;
 	min-height: 53px;
-	
+
 	background-color: ${colors.profile};
 	
+`
+
+export const ProfilWrapper = styled.div`
+	
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
+	margin-left: 3.34%;
+
+	width: 63.96%;
+	height: 100%;
+
+`
+
+export const ProfilePicture = styled.div`
+	
+	width: 22.19%;
+	height: 60.38%;
+
+	/* margin-left: 5.58%; */
+
+	background-color: ${colors.profilePicture};
+
+	border-radius: 50%;
+
+`
+
+export const ProfileName = styled.p`
+	
+	/* width: 24.58%; */
+
+	/* font-size: 100%; */
+
+	margin-left: 5.58%;
+
 `
 
 export const ButtonsWrapper = styled.div`
