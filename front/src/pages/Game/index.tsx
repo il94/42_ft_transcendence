@@ -1,4 +1,4 @@
-import { GamePage, GameWrapper } from './style'
+import { GamePage, GameWrapper, LeftWrapper, RightWrapper } from './style'
 
 import Logo from '../../components/Logo'
 import Info from '../../components/Info'
@@ -9,10 +9,14 @@ function Game() {
 	return (
 		<GamePage>
 			<GameWrapper>
-				<Logo />
-				<Info />
-				<Social />
-				<Pong />
+				<LeftWrapper>
+					<Logo />
+					<Social />
+				</LeftWrapper>
+				<RightWrapper>
+					<Info />
+					<Pong />
+				</RightWrapper>
 			</GameWrapper>
 		</GamePage>
 	)

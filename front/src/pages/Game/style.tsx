@@ -14,27 +14,14 @@ export const GamePage = styled.div`
 
 	background-color: ${colors.background}; 
 
-	// A paramétrer plus tard pour changer la disposition sous 1280px
-	/* @media (min-width: 0px) and (max-width: 1280px) {
-	} */
-
 `
 
 export const GameWrapper = styled.div`
 
-	display: grid;
-	grid-template-columns: 240px 80.26%;
-	grid-template-rows: 53px 92.25%;
-
-	// Tailles de référence responsives
-	/* grid-template-columns: 19.74% 80.26%;
-	grid-template-rows: 7.75% 92.25%; */
-
-	// Tailles de référence pas responsives
-	/* grid-template-columns: 240px 976px;
-	grid-template-rows: 53px 631px; */
-
-
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
 	width: 95%;
 	height: 95%;
 	/* min-width: à définir par rapport au Pong */
@@ -42,12 +29,25 @@ export const GameWrapper = styled.div`
 
 	${effects.pixelateWindow};
 
-	/* @media (min-width: 0px) and (max-width: 1280px) {
+`
 
-		// Tailles de référence (pas responsive !)
-		grid-template-columns: 976px;
-		grid-template-rows: 53px 631px;
+export const LeftWrapper = styled.div`
 
-	} */
+	display: flex;
+	flex-direction: column;
+
+	width: 240px;
+	min-width: 240px;
+	height: 100%;
+
+`
+
+export const RightWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 80.26%;
+	height: 100%;
 
 `
