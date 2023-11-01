@@ -1,4 +1,8 @@
 import styled from "styled-components"
+import { Link } from 'react-router-dom'
+
+import colors from "../../utils/colors"
+import effects from "../../utils/effects"
 
 export const Style = styled.div`
 
@@ -8,4 +12,12 @@ export const Style = styled.div`
 
 	background-color: #FDE14F;
 
+`
+
+export const StyledLink = styled(Link)`
+
+	color: ${colors.text};
+
+	text-decoration: none;
+	
 `

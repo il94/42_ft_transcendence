@@ -1,9 +1,9 @@
-import { Style } from "./style"
+import { Style, StyledLink } from "./style"
 
 function Logo() {
 	return (
 		<Style>
-			Logo
+			<StyledLink to="/">Logo</StyledLink>
 		</Style>
 	)
 }
