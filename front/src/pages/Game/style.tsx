@@ -47,7 +47,7 @@ export const RightWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 
-	width: 80.26%;
+	width: calc(100% - 240px);
 	height: 100%;
 
 `
