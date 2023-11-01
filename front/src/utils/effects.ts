@@ -1,6 +1,7 @@
 import colors from "./colors"
 
 const effects = {
+
 	pixelateWindow : `
 		clip-path : polygon(
 		0px 8px,

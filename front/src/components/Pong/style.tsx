@@ -2,7 +2,7 @@ import styled from "styled-components"
 
 export const Style = styled.div`
 
-	width: auto;
+	width: 100%;
 	height: 100%;
 
 	background-color: #FD994F;
