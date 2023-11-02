@@ -19,10 +19,11 @@ export class AuthService {
 
 				email: dto.email,
 				hash,
-				avatar: 'truc',
-				nickname: 'machin',
-			}
-		})
+				avatar: dto.avatar,
+				nickname: dto.nickname,
+			},
+		});
+		delete user.hash;
 		//return saved user
 		return user;
 		return {msg: "Yop signup"};

@@ -14,12 +14,23 @@ model User {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  email String
+  email String @unique
   hash String
 
-  nickname String
+  nickname String 
   avatar String
   tel String?
+
+  @map("users")
 }
+
+model Game {
+  id    Int     @id @default(autoincrement())
+  level Int
+  createdAt DateTime @default(now())
+  player_oneUser    @relation(fields: [authorId], references: [id])
+  player_two 
+}
+
 
 
