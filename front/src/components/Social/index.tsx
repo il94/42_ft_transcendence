@@ -1,6 +1,6 @@
 import MediaQuery from 'react-responsive'
 
-import { Style, ReduceButton } from "./style"
+import { Style, ReduceButton, TopWrapper } from "./style"
 
 import Profile from "../Profile"
 
@@ -11,12 +11,18 @@ import reduceIcon from '../../assets/deconnexion.png' // a changer
 function Social({ setSocial }: { setSocial?: React.Dispatch<React.SetStateAction<boolean>> }) {
 	return (
 		<Style>
-			<div>
-				Social
-				<MediaQuery query={breakpoints.smallDesktop}>
+
+			<MediaQuery query={breakpoints.smallDesktop}>
+				<TopWrapper>
 					<ReduceButton src={reduceIcon} onClick={() => setSocial && setSocial(true)} alt="Reduce button" />
-				</MediaQuery>
-			</div>
+				</TopWrapper>
+			</MediaQuery>
+
+			<MediaQuery query={breakpoints.bigDesktop}>
+				{/* temporaire */}
+				<div />
+			</MediaQuery>
+			
 			<Profile />
 		</Style>
 	)

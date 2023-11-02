@@ -18,16 +18,27 @@ export const Style = styled.div`
 
 `
 
+export const TopWrapper = styled.div`
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 100%;
+	height: 53px;
+
+	background-color: ${colors.buttonBrown};
+`
+
 export const ReduceButton = styled.img`
 
-	width: 37px;
-	width: 39.78%;
+	width: 32px;
+	height: 32px;
 
 	cursor: pointer;
 
 	${effects.pixelateIcon};
 	${effects.shadowButton};
-
 
 	border-width: 0.2em; // a definir
 	/* border-width: 2.5px; */

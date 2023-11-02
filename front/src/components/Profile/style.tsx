@@ -22,12 +22,12 @@ export const ProfilWrapper = styled.div`
 	justify-content: flex-start;
 	align-items: center;
 
-	margin-left: 3.34%;
+	margin-left: 8px;
 
 	width: 63.96%;
 	height: 100%;
 
-	// a definir
+	// survol du username a definir
 	/* &:hover {
 		cursor: pointer;
 		background-color: #9E5B29;
@@ -40,8 +40,8 @@ export const ProfilWrapper = styled.div`
 
 export const ProfilePicture = styled.div`
 	
-	width: 22.19%;
-	height: 60.38%;
+	width: 32px;
+	height: 32px;
 
 	background-color: ${colors.profilePicture};
 
@@ -51,7 +51,7 @@ export const ProfilePicture = styled.div`
 
 export const ProfileName = styled.p`
 	
-	margin-left: 5.58%;
+	margin-left: 8px;
 
 `
 
@@ -61,7 +61,7 @@ export const ButtonsWrapper = styled.div`
 	justify-content: space-between;
 	align-items: center;
 
-	padding-right: 2.71%;
+	padding-right: 6.5px;
 
 	width: 36.04%;
 	height: 100%;
@@ -70,8 +70,8 @@ export const ButtonsWrapper = styled.div`
 
 export const Icon = styled.img`
 
-	width: 37px;
-	width: 39.78%;
+	width: 32px;
+	height: 32px;
 
 	cursor: pointer;
 
