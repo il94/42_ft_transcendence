@@ -32,22 +32,6 @@ export const BigGameWrapper = styled.div`
 
 `
 
-export const LittleGameWrapper = styled.div`
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	
-	width: 95%;
-	height: 95%;
-	/* min-width: à définir par rapport au Pong */
-	min-height: 212px;
-
-	${effects.pixelateWindow};
-
-`
-
 export const LeftWrapper = styled.div`
 
 	display: flex;
@@ -68,5 +52,59 @@ export const RightWrapper = styled.div<{ $smallScreen?: boolean}>`
 	height: 100%;
 
 	${props => props.$smallScreen && effects.pixelateWindow}
+
+`
+
+export const LittleGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	width: 95%;
+	height: 95%;
+	/* min-width: à définir par rapport au Pong */
+	min-height: 212px;
+
+	${effects.pixelateWindow};
+
+`
+
+export const TopGameWrapper = styled.div`
+	
+	display: flex;
+
+	width: 100%;
+	height: 53px;
+	/* min-width: à définir par rapport au Pong */
+	min-height: 53px;
+
+`
+
+export const BottomGameWrapper = styled.div`
+	
+	display: flex;
+
+	width: 100%;
+	height: calc(100% - 53px);
+	/* min-width: à définir par rapport au Pong */
+	min-height: 159px;
+
+`
+
+export const Icon = styled.img`
+
+	width: 37px;
+	width: 39.78%;
+
+	cursor: pointer;
+
+	${effects.pixelateIcon};
+	${effects.shadowButton};
+
+
+	border-width: 0.2em; // a definir
+	/* border-width: 2.5px; */
 
 `

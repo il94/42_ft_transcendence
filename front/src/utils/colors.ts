@@ -17,6 +17,7 @@ const colors = {
 	button: "#DB6045",
 	buttonRed: "#D34221",
 	buttonGreen: "#2FAE1B",
+	buttonBrown: "#9A5F33",
 	shadowButton: "#7a3525",
 
 	/* Scrolling bar */

@@ -1,15 +1,25 @@
+import { useState } from 'react'
 import MediaQuery from 'react-responsive'
 
-import { GamePage, BigGameWrapper, LeftWrapper, RightWrapper, LittleGameWrapper } from './style'
+import { GamePage,
+			BigGameWrapper,
+			LeftWrapper,
+			RightWrapper,
+			LittleGameWrapper,
+			TopGameWrapper,
+			BottomGameWrapper } from './style'
 
 import Logo from '../../components/Logo'
 import Info from '../../components/Info'
 import Social from '../../components/Social'
+import SocialReduce from '../../SocialReduce'
 import Pong from '../../components/Pong'
 
 import breakpoints from '../../utils/breakpoints'
 
 function Game() {
+
+	const [social, setSocial] = useState<boolean>(true)
 
 	return (
 		<GamePage>
@@ -29,8 +39,17 @@ function Game() {
 
 			<MediaQuery query={breakpoints.smallDesktop}>
 				<LittleGameWrapper>
-					<Info />
-					<Pong />
+					<TopGameWrapper>
+						<Logo />
+						<Info />
+					</TopGameWrapper>
+					<BottomGameWrapper>
+						{
+							social	? <SocialReduce setSocial={setSocial} />
+									: <Social setSocial={setSocial} />
+						}
+						<Pong />
+					</BottomGameWrapper>
 				</LittleGameWrapper>
 			</MediaQuery>
 
