@@ -4,7 +4,8 @@ function SocialReduce({ setReduce }: { setReduce?: React.Dispatch<React.SetState
 	return (
 		<Style>
 			<Interface />
-			<ReduceButton onClick={() => setReduce && setReduce(false)}/>
+			<ReduceButton	onClick={() => setReduce && setReduce(false)}
+							title="Extend" />
 		</Style>
 	)
 }

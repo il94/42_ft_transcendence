@@ -13,8 +13,8 @@ function Profile() {
 				</ProfileName>
 			</ProfilWrapper>
 			<ButtonsWrapper>
-				<Icon src={settingsIcon} alt="Settings button" />
-				<Icon src={deconnexionIcon} alt="Deconnexion button" />
+				<Icon src={settingsIcon} alt="Settings button" title="Settings" />
+				<Icon src={deconnexionIcon} alt="Deconnexion button" title="Deconnexion" />
 			</ButtonsWrapper>
 		</Style>
 	)

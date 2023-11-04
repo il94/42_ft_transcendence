@@ -3,7 +3,7 @@ import { Style, StyledLink } from "./style"
 function LogoReduce() {
 	return (
 		<Style>
-			<StyledLink to="/">Logo</StyledLink>
+			<StyledLink to="/" title="Main menu" />
 		</Style>
 	)
 }

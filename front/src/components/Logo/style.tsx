@@ -1,8 +1,6 @@
 import styled from "styled-components"
 import { Link } from 'react-router-dom'
 
-import colors from "../../utils/colors"
-
 export const Style = styled.div`
 
 	width: 240px;
@@ -16,8 +14,10 @@ export const Style = styled.div`
 
 export const StyledLink = styled(Link)`
 
-	color: ${colors.text};
-
-	text-decoration: none;
+	padding-right: 100%;
+	padding-bottom: 33px; // ???
 	
+	&:hover {
+		background-color: #ffe76e;
+	}
 `

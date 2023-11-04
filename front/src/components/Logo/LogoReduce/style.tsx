@@ -16,8 +16,11 @@ export const Style = styled.div`
 
 export const StyledLink = styled(Link)`
 
-	color: ${colors.text};
+	padding-right: 100%;
+	padding-bottom: 33px; // ???
 
-	text-decoration: none;
-	
+	&:hover {
+		background-color: #ffe76e;
+	}
+
 `
