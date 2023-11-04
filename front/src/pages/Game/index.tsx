@@ -26,8 +26,8 @@ function Game() {
 				</TopGameWrapper>
 				<BottomGameWrapper>
 					{
-						social ? <SocialReduce setSocial={setSocial} />
-							: <Social setSocial={setSocial} />
+						social ? <Social setSocial={setSocial} />
+							: <SocialReduce setSocial={setSocial} />
 					}
 					<Pong />
 				</BottomGameWrapper>
