@@ -8,7 +8,9 @@ export const Style = styled.div`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	width: 100%;
+
+	width: 240px;
+	min-width: 240px;
 	height: 53px;
 	min-height: 53px;
 

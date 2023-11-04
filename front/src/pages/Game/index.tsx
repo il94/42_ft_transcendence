@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
 	GamePage,
@@ -8,10 +8,12 @@ import {
 } from './style'
 
 import Logo from '../../components/Logo'
+import LogoReduce from '../../components/LogoReduce'
 import Info from '../../components/Info'
 import Social from '../../components/Social'
 import SocialReduce from '../../components/SocialReduce'
 import Pong from '../../components/Pong'
+import Profile from '../../components/Profile'
 
 function Game() {
 
@@ -21,8 +23,12 @@ function Game() {
 		<GamePage>
 			<GameWrapper>
 				<TopGameWrapper>
-					<Logo />
+					{
+						social ? <Logo />
+							: <LogoReduce />
+					}
 					<Info />
+					<Profile />
 				</TopGameWrapper>
 				<BottomGameWrapper>
 					{
