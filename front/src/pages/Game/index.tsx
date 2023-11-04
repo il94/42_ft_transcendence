@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
 	GamePage,
@@ -18,13 +18,23 @@ import Social from '../../components/Social'
 import SocialReduce from '../../components/SocialReduce'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
+import MediaQuery, { useMediaQuery } from 'react-responsive'
+import breakpoints from '../../utils/breakpoints'
 
 function Game() {
 
 	const [reduceLeft, setReduce] = useState<boolean>(false)
 
+	const isSmallDesktop = useMediaQuery({ query: '(min-width: 0px) and (max-width: 1279px)' })
+
+	useEffect(() => {
+		if (isSmallDesktop === true)
+			setReduce(true)
+	}, [])
+
 	return (
 		<GamePage>
+		<MediaQuery query={breakpoints.bigDesktop} onChange={ (isSmallWindow) => setReduce(!isSmallWindow) } />
 		{
 			reduceLeft ?
 				<GameWrapper>
