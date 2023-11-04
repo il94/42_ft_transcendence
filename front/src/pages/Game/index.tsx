@@ -12,7 +12,7 @@ import { GamePage,
 import Logo from '../../components/Logo'
 import Info from '../../components/Info'
 import Social from '../../components/Social'
-import SocialReduce from '../../SocialReduce'
+import SocialReduce from '../../components/SocialReduce'
 import Pong from '../../components/Pong'
 
 import breakpoints from '../../utils/breakpoints'

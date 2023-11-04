@@ -1,7 +1,6 @@
 import styled from "styled-components"
 
 import colors from "../../utils/colors"
-import effects from "../../utils/effects"
 
 export const Style = styled.div`
 
@@ -18,29 +17,25 @@ export const Style = styled.div`
 
 `
 
-export const TopWrapper = styled.div`
+export const ReduceButton = styled.button`
 	
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
 	width: 100%;
-	height: 53px;
+	height: 15px;
 
-	background-color: ${colors.buttonBrown};
-`
-
-export const ReduceButton = styled.img`
-
-	width: 32px;
-	height: 32px;
+	margin: 0;
+	padding: 0;
+	border: 0;
 
 	cursor: pointer;
 
-	${effects.pixelateIcon};
-	${effects.shadowButton};
+	background-color: ${colors.buttonBrown};
 
-	border-width: 0.2em; // a definir
-	/* border-width: 2.5px; */
+	&:hover {
+		
+		cursor: pointer;
+
+		background-color: #A05014;
+
+	}
 
 `

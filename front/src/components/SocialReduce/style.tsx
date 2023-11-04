@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-import colors from "../utils/colors"
+import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
@@ -24,7 +24,7 @@ export const Interface = styled.div`
 
 `
 
-export const Button = styled.button`
+export const ReduceButton = styled.button`
 
 	width: 10px;
 	height: 100%;
