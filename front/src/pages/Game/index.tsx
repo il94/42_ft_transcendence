@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
 	GamePage,
 	GameWrapper,
 	TopGameWrapper,
-	BottomGameWrapper
+	BottomGameWrapper,
+	LeftGameWrapper,
+	RightGameWrapper,
+	ReduceLeftGameWrapper,
+	ExtendRightGameWrapper
 } from './style'
 
 import Logo from '../../components/Logo'
@@ -17,28 +21,44 @@ import Profile from '../../components/Profile'
 
 function Game() {
 
-	const [social, setSocial] = useState<boolean>(true)
+	const [reduceLeft, setReduce] = useState<boolean>(false)
 
 	return (
 		<GamePage>
-			<GameWrapper>
-				<TopGameWrapper>
-					{
-						social ? <Logo />
-							: <LogoReduce />
-					}
-					<Info />
-					<Profile />
-				</TopGameWrapper>
-				<BottomGameWrapper>
-					{
-						social ? <Social setSocial={setSocial} />
-							: <SocialReduce setSocial={setSocial} />
-					}
-					<Pong />
-				</BottomGameWrapper>
-			</GameWrapper>
-
+		{
+			reduceLeft ?
+				<GameWrapper>
+					<ReduceLeftGameWrapper>
+						<LogoReduce />
+						<SocialReduce setReduce={setReduce} />
+					</ReduceLeftGameWrapper>
+					<ExtendRightGameWrapper>
+						<TopGameWrapper>
+							<Info />
+							<Profile />
+						</TopGameWrapper>
+						<BottomGameWrapper>
+							<Pong />
+						</BottomGameWrapper>
+					</ExtendRightGameWrapper>
+				</GameWrapper>
+				:
+				<GameWrapper>
+					<LeftGameWrapper>
+						<Logo />
+						<Social setReduce={setReduce} />
+					</LeftGameWrapper>
+					<RightGameWrapper>
+						<TopGameWrapper>
+							<Info />
+							<Profile />
+						</TopGameWrapper>
+						<BottomGameWrapper>
+							<Pong />
+						</BottomGameWrapper>
+					</RightGameWrapper>
+				</GameWrapper>
+			}
 		</GamePage>
 	)
 

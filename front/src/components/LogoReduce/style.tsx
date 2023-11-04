@@ -6,9 +6,9 @@ import colors from "../../utils/colors"
 export const Style = styled.div`
 
 	width: 58px;
-	height: 100%;
+	height: 58px;
 	min-width: 58px;
-	min-height: 159px;
+	min-height: 58px;
 
 	background-color: #FDE14F;
 

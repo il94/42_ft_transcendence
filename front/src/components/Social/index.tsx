@@ -1,9 +1,9 @@
 import { Style, ReduceButton } from "./style"
 
-function Social({ setSocial }: { setSocial?: React.Dispatch<React.SetStateAction<boolean>> }) {
+function Social({ setReduce }: { setReduce?: React.Dispatch<React.SetStateAction<boolean>> }) {
 	return (
 		<Style>
-			<ReduceButton onClick={() => setSocial && setSocial(false)} />
+			<ReduceButton onClick={() => setReduce && setReduce(true)} />
 		</Style>
 	)
 }

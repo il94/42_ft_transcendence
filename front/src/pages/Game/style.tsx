@@ -20,9 +20,7 @@ export const GamePage = styled.div`
 export const GameWrapper = styled.div`
 
 	display: flex;
-	flex-direction: column;
 	justify-content: center;
-	align-items: center;
 	
 	width: 95%;
 	height: 95%;
@@ -30,6 +28,50 @@ export const GameWrapper = styled.div`
 	min-height: 212px;
 
 	${effects.pixelateWindow};
+
+`
+
+export const LeftGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 240px;
+	min-width: 240px;
+	height: 100%;
+
+`
+
+export const ReduceLeftGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 58px;
+	min-width: 58px;
+	height: 100%;
+
+`
+
+export const RightGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	/* min-width: à définir par rapport au Pong */
+	height: 100%;
+
+`
+
+export const ExtendRightGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	/* min-width: à définir par rapport au Pong */
+	height: 100%;
 
 `
 
