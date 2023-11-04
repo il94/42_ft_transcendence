@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import MediaQuery, { useMediaQuery } from 'react-responsive'
 
 import {
 	GamePage,
@@ -12,13 +13,13 @@ import {
 } from './style'
 
 import Logo from '../../components/Logo'
-import LogoReduce from '../../components/LogoReduce'
+import LogoReduce from '../../components/Logo/LogoReduce'
 import Info from '../../components/Info'
 import Social from '../../components/Social'
-import SocialReduce from '../../components/SocialReduce'
+import SocialReduce from '../../components/Social/SocialReduce'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
-import MediaQuery, { useMediaQuery } from 'react-responsive'
+
 import breakpoints from '../../utils/breakpoints'
 
 function Game() {
