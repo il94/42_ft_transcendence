@@ -11,26 +11,39 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  email String @unique
-  hash String
+  // profile data
+  email     String @unique
+  hash      String 
+  nickname  String @unique
+  avatar    String 
+  tel       String?
 
-  nickname String 
-  avatar String
-  tel String?
+  //game data
+  //status    String?
+  //chart     Int?
+  //Badges    String?
 
-  @map("users")
+  // friendship data
+  // Many-to-many self relation (implicit relation table)
+  hasFriend   User[] @relation("UserFriendship")
+  isFriend    User[] @relation("UserFriendship")
+
+  //  games     UsersOnGames[]
+  //  channels  UsersOnChannel[]
+
+//  @map("users")
 }
 
-model Game {
-  id    Int     @id @default(autoincrement())
-  level Int
-  createdAt DateTime @default(now())
-  player_oneUser    @relation(fields: [authorId], references: [id])
-  player_two 
-}
+//model Game {
+//  id    Int     @id @default(autoincrement())
+//  level Int
+//  createdAt DateTime @default(now())
+//  player_oneUser    @relation(fields: [authorId], references: [id])
+//  player_two 
+//}
 
 
 

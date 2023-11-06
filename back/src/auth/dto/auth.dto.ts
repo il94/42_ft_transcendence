@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty } from "class-validator";
+import { IsEmail, IsString, IsNotEmpty, IsMobilePhone, IsOptional } from "class-validator";
 
 export class AuthDto {
 	@IsEmail()
@@ -9,7 +9,15 @@ export class AuthDto {
 	@IsNotEmpty()
 	password: string;
 
+	@IsString()
+	@IsNotEmpty()
 	nickname: string;
 
-	avatar: string;
+	@IsOptional()
+//	avatar: string = process.env.AVATAR; // pas d erreur mais ne renvoie rien!
+	avatar: string = "../other/stitch-logo.com.png"
+
+	@IsMobilePhone()
+	tel: string;
+
 }
