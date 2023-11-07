@@ -28,7 +28,7 @@ function Game() {
 	const [scrollValue, setScrollValue] = useState<number>(0)
 
 
-	const isSmallDesktop = useMediaQuery({ query: '(min-width: 0px) and (max-width: 1279px)' })
+	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
 	useEffect(() => {
 		if (isSmallDesktop === true)

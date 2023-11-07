@@ -1,5 +1,4 @@
 import { Style, ProfileWrapper, ButtonsWrapper, Icon, ProfileName, ProfilePicture } from "./style"
-
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 

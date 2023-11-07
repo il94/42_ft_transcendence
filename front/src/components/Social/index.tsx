@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react"
-
 import { Style, ReduceButton, FriendsWrapper } from "./style"
-
 import Friend from "../Friend"
-
 import colors from "../../utils/colors"
 
 function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.Dispatch<React.SetStateAction<boolean>>, scrollValue: number, setScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
