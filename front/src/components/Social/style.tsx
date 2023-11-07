@@ -4,50 +4,35 @@ import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
-	width: 240px;
-	height: 100%;
-	min-width: 240px;
-	min-height: 159px;
-
 	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
+
+	width: 250px;
+	height: 100%;
+	min-width: 250px;
+	min-height: 159px;
 
 	background-color: ${colors.module};
 
 `
 
-export const ReduceButton = styled.button`
-	
-	width: 100%;
-	height: 15px;
-	min-height: 15px;
-
-	margin: 0;
-	padding: 0;
-	border: 0;
-
-	cursor: pointer;
-
-	background-color: ${colors.reduceButton};
-
-	&:hover {
-		
-		cursor: pointer;
-
-		background-color: ${colors.reduceButtonHover};
-
-	}
-
-`
-
 export const FriendsWrapper = styled.div `
 
+	width: 240px;
+	height: 100%;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	background-color: ${colors.module};
+
+	&:not(:hover) {
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+
 	&:hover {
 		
-		overflow-x: hidden;
-		overflow-y: auto;
-	
 		&::-webkit-scrollbar {
 			width: 5px;
 			-webkit-appearance: none;
@@ -57,6 +42,29 @@ export const FriendsWrapper = styled.div `
 			background-color: ${colors.scrollingBar};
 		}
 		
+	}
+
+`
+
+export const ReduceButton = styled.button`
+
+	width: 10px;
+	height: 100%;
+	min-width: 10px;
+	min-height: 159px;
+
+	margin: 0;
+	padding: 0;
+	border: 0;
+
+	background-color: ${colors.reduceButton};
+
+	&:hover {
+		
+		cursor: pointer;
+
+		background-color: ${colors.reduceButtonHover};
+
 	}
 
 `

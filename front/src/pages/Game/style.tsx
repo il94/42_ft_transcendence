@@ -36,8 +36,8 @@ export const LeftGameWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 
-	width: 240px;
-	min-width: 240px;
+	width: 250px;
+	min-width: 250px;
 	height: 100%;
 
 `

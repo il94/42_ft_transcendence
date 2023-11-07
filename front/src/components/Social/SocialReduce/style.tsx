@@ -11,16 +11,40 @@ export const Style = styled.div`
 	min-width: 58px;
 	min-height: 159px;
 
+	background-color: ${colors.module};
+
 `
 
-export const Interface = styled.div`
+export const FriendsWrapper = styled.div`
 
 	width: 48px;
 	height: 100%;
 	min-width: 48px;
 	min-height: 159px;
 
+	overflow-y: auto;
+	overflow-x: hidden;
+
 	background-color: ${colors.module};
+
+	&:not(:hover) {
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+
+	&:hover {
+		
+		&::-webkit-scrollbar {
+			width: 5px;
+			-webkit-appearance: none;
+		}
+	
+		&::-webkit-scrollbar-thumb {
+			background-color: ${colors.scrollingBar};
+		}
+		
+	}
 
 `
 

@@ -25,6 +25,8 @@ import breakpoints from '../../utils/breakpoints'
 function Game() {
 
 	const [reduceLeft, setReduce] = useState<boolean>(false)
+	const [scrollValue, setScrollValue] = useState<number>(0)
+
 
 	const isSmallDesktop = useMediaQuery({ query: '(min-width: 0px) and (max-width: 1279px)' })
 
@@ -41,7 +43,7 @@ function Game() {
 				<GameWrapper>
 					<ReduceLeftGameWrapper>
 						<LogoReduce />
-						<SocialReduce setReduce={setReduce} />
+						<SocialReduce setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
 					</ReduceLeftGameWrapper>
 					<ExtendRightGameWrapper>
 						<TopGameWrapper>
@@ -57,7 +59,7 @@ function Game() {
 				<GameWrapper>
 					<LeftGameWrapper>
 						<Logo />
-						<Social setReduce={setReduce} />
+						<Social setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
 					</LeftGameWrapper>
 					<RightGameWrapper>
 						<TopGameWrapper>
