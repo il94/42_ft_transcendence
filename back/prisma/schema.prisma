@@ -33,8 +33,9 @@ model User {
 
   //  games     UsersOnGames[]
   //  channels  UsersOnChannel[]
+  
+  @@map("users")
 
-//  @map("users")
 }
 
 //model Game {

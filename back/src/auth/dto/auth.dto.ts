@@ -14,8 +14,7 @@ export class AuthDto {
 	nickname: string;
 
 	@IsOptional()
-//	avatar: string = process.env.AVATAR; // pas d erreur mais ne renvoie rien!
-	avatar: string = "../other/stitch-logo.com.png"
+	avatar: string;
 
 	@IsMobilePhone()
 	tel: string;

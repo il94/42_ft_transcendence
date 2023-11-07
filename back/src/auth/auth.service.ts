@@ -4,16 +4,32 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { AuthDto } from "./dto";
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { JwtService } from '@nestjs/jwt';
 
-// les services contiennent la logique metier cad les actions a executer selon la requete envoyee
+// A service contains business logic : the action to do regarding the request sent
+// AuthService's job : retrieving a user verifying the password
 @Injectable()
 export class AuthService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private jwt: JwtService
+	) {}
+
+	//signin and signup logics should be implemented with third part API42 authentication 
+	
+	async signToken(userId: number, email: string): Promise<{ access_token: string }> {
+		const payload = {
+			sub: userId,
+			email
+		};
+		const token =  await this.jwt.signAsync(payload, { expiresIn: '15m', secret: process.env.JWT_SECRET })
+		return { access_token: token, }
+	}
 
 	async signup(dto: AuthDto) {
 		//generate password hash
 		const hash = await argon.hash(dto.password);
-		console.log(hash);
+		if (!dto.avatar) { console.log("YEP"); dto.avatar = process.env.AVATAR };
 		//save new user in db
 		try {
 			const user = await this.prisma.user.create({
@@ -26,8 +42,7 @@ export class AuthService {
 					tel: dto.tel,
 				},
 			});
-			delete user.hash;
-			return user;
+			return this.signToken(user.id, user.email);
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -42,17 +57,16 @@ export class AuthService {
 	async signin(dto: AuthDto) {
 		// find the user by email
 		const user = await this.prisma.user.findUnique({
-			where: {
-				email: dto.email,
-			},
+			where: { email: dto.email, },
 		});
-		if (!user) throw new ForbiddenException('Credentials incorrect');
+		if (!user) 
+			throw new ForbiddenException('Credentials incorrect');
+		
 		// compare password
 		const pwdMatch = await argon.verify(user.hash, dto.password);
-		if (!pwdMatch) throw new ForbiddenException('Credentials incorrect');
-		delete user.hash;
-
-		return user;
+		if (!pwdMatch) 
+			throw new ForbiddenException('Credentials incorrect');
+		return this.signToken(user.id, user.email);
 	}
 }
 
