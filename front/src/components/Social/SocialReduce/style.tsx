@@ -7,7 +7,7 @@ export const Style = styled.div`
 	display: flex;
 
 	width: 58px;
-	height: calc(100% - 58px);
+	height: 100%;
 	min-width: 58px;
 	min-height: 159px;
 
