@@ -17,12 +17,12 @@ const colors = {
 	button: "#DB6045",
 	buttonRed: "#D34221",
 	buttonGreen: "#2FAE1B",
-	buttonBrown: "#9A5F33",
+	reduceButton: "#bb8054",
+	reduceButtonHover: "#be9473",
 	shadowButton: "#7a3525",
 
 	/* Scrolling bar */
-	scrolling: "#B8B6B6",
-	bar: "#D9D9D9",
+	scrollingBar: "#804400",
 
 	/* Ranks */
 	rankGold: "#FFE175",

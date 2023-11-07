@@ -35,13 +35,13 @@ export const ReduceButton = styled.button`
 	padding: 0;
 	border: 0;
 
-	background-color: ${colors.buttonBrown};
+	background-color: ${colors.reduceButton};
 
 	&:hover {
 		
 		cursor: pointer;
 
-		background-color: #A05014;
+		background-color: ${colors.reduceButtonHover};
 
 	}
 

@@ -14,8 +14,8 @@ export const Style = styled.div`
 	height: 53px;
 	min-height: 53px;
 
-	background-color: ${colors.profile};
-	
+	background-color: ${(props) => props.color};
+
 `
 
 export const ProfileWrapper = styled.div`
@@ -26,7 +26,7 @@ export const ProfileWrapper = styled.div`
 
 	margin-left: 8px;
 
-	width: 63.96%;
+	width: 100%;
 	height: 100%;
 
 	// survol du username a definir
@@ -51,37 +51,26 @@ export const ProfilePicture = styled.div`
 
 `
 
-export const ProfileName = styled.p`
-	
-	margin-left: 8px;
+export const ProfileInfo = styled.div`
 
-`
-
-export const ButtonsWrapper = styled.div`
-	
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	flex-direction: column;
 
-	padding-right: 6.5px;
+	margin-left: 8px;
 
-	width: 36.04%;
-	height: 100%;
+	width: calc(100% - 32px);
+	height: 32px;
+`
+
+export const ProfileName = styled.p`
+	
+	font-size: 13px;
 
 `
 
-export const Icon = styled.img`
-
-	width: 32px;
-	height: 32px;
-
-	cursor: pointer;
-
-	${effects.pixelateIcon};
-	${effects.shadowButton};
-
-
-	border-width: 0.2em; // a definir
-	/* border-width: 2.5px; */
-
+export const ProfileStatus = styled.p`
+	
+	font-size: 10px;
+	
 `

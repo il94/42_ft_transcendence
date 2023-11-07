@@ -11,7 +11,7 @@ export const Style = styled.div`
 
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: flex-start;
 
 	background-color: ${colors.module};
 
@@ -21,6 +21,7 @@ export const ReduceButton = styled.button`
 	
 	width: 100%;
 	height: 15px;
+	min-height: 15px;
 
 	margin: 0;
 	padding: 0;
@@ -28,14 +29,34 @@ export const ReduceButton = styled.button`
 
 	cursor: pointer;
 
-	background-color: ${colors.buttonBrown};
+	background-color: ${colors.reduceButton};
 
 	&:hover {
 		
 		cursor: pointer;
 
-		background-color: #A05014;
+		background-color: ${colors.reduceButtonHover};
 
+	}
+
+`
+
+export const FriendsWrapper = styled.div `
+
+	&:hover {
+		
+		overflow-x: hidden;
+		overflow-y: auto;
+	
+		&::-webkit-scrollbar {
+			width: 5px;
+			-webkit-appearance: none;
+		}
+	
+		&::-webkit-scrollbar-thumb {
+			background-color: ${colors.scrollingBar};
+		}
+		
 	}
 
 `
