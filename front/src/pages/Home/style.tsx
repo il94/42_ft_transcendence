@@ -36,9 +36,6 @@ export const StyledMainTitle = styled.h1`
 
 	font-size: 80px;
 
-	cursor: default;
-	user-select: none;
-
 	&:hover {
 		transform: scale(1.015);
 	}
@@ -50,9 +47,6 @@ export const StyledTitle = styled.h2`
 	margin: 10px;
 
 	font-size: 45px;
-
-	cursor: default;
-	user-select: none;
 
 	&:hover {
 		transform: scale(1.015);
