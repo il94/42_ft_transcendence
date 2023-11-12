@@ -35,6 +35,11 @@ const Style = createGlobalStyle`
 		height: 100%;
 	}
 
+	p {
+		cursor: default;
+		user-select: none;
+	}
+
 `
 
 function GlobalStyle() {
