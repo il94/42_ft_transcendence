@@ -25,50 +25,50 @@ export const ChatWindow = styled.div`
 
 `
 
-export const Banner = styled.div`
+// export const Banner = styled.div`
 
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+// 	display: flex;
+// 	justify-content: space-between;
+// 	align-items: center;
 
-	width: 100%;
-	height: 12.35%;
+// 	width: 100%;
+// 	height: 12.35%;
 
-	background-color: ${colors.chatBanner};
+// 	background-color: ${colors.chatBanner};
 
-`
+// `
 
-export const ChannelName = styled.p`
+// export const ChannelName = styled.p`
 
-	width: 100%;
+// 	width: 100%;
 
-	text-align: center;
+// 	text-align: center;
 
-`
+// `
 
-export const ReduceButton = styled.img`
+// export const ReduceButton = styled.img`
 
-	width: 18.11px;
-	height: 18.11px;
+// 	width: 18.11px;
+// 	height: 18.11px;
 
-	margin-right: 6.5px;
+// 	margin-right: 6.5px;
 
-	cursor: pointer;
+// 	cursor: pointer;
 
-	${effects.pixelateIcon};
-	${effects.shadowButton};
+// 	${effects.pixelateIcon};
+// 	${effects.shadowButton};
 
 
-	border-width: 0.2em; // a definir
-	/* border-width: 2.5px; */
+// 	border-width: 0.2em; // a definir
+// 	/* border-width: 2.5px; */
 
-`
+// `
 
-export const DiscussionInterface = styled.div`
+// export const DiscussionInterface = styled.div`
 
-	display: flex;
+// 	display: flex;
 
-	width: 100%;
-	height: 87.65%;
+// 	width: 100%;
+// 	height: 87.65%;
 
-`
+// `
