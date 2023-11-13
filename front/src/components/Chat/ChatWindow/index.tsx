@@ -1,17 +1,11 @@
-import { Style, Banner, ChannelName, ReduceButton, DiscussionInterface } from "./style"
+import { Style, DiscussionInterface } from "./style"
 import TextInput from "./TextInput"
-import ReduceIcon from "../../../assets/reduce.png"
+import Banner from "./Banner"
 
 function ChatWindow({ displayChat }: { displayChat: React.Dispatch<React.SetStateAction<boolean>> }) {
 	return (
 		<Style>
-			<Banner>
-				<ChannelName>
-					Example
-				</ChannelName>
-				<ReduceButton src={ReduceIcon} onClick={() => displayChat(false)}
-					alt="Reduce button" title="Reduce" />
-			</Banner>
+			<Banner displayChat={displayChat} />
 			<DiscussionInterface />
 			<TextInput />
 		</Style>
