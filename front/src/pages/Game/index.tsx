@@ -26,6 +26,7 @@ function Game() {
 
 	const [reduceLeft, setReduce] = useState<boolean>(false)
 	const [scrollValue, setScrollValue] = useState<number>(0)
+	const [chat, displayChat] = useState<boolean>(false)
 
 
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
@@ -51,7 +52,7 @@ function Game() {
 							<Profile />
 						</TopGameWrapper>
 						<BottomGameWrapper>
-							<Pong />
+							<Pong chat={chat} displayChat={displayChat} />
 						</BottomGameWrapper>
 					</ExtendRightGameWrapper>
 				</GameWrapper>
@@ -67,7 +68,7 @@ function Game() {
 							<Profile />
 						</TopGameWrapper>
 						<BottomGameWrapper>
-							<Pong />
+							<Pong chat={chat} displayChat={displayChat} />
 						</BottomGameWrapper>
 					</RightGameWrapper>
 				</GameWrapper>

@@ -1,7 +1,7 @@
 import { Banner, ChannelName, ChatWindow, ContactList, DiscussionInterface, ReduceButton, Style } from "./style"
 import ReduceIcon from "../../assets/reduce.png"
 
-function Chat({ displayChat } : { displayChat: React.Dispatch<React.SetStateAction<boolean>>}) {
+function Chat({ displayChat } : { displayChat: React.Dispatch<React.SetStateAction<boolean>>} ) {
 	return (
 		<Style>
 			<ContactList />

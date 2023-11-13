@@ -1,11 +1,8 @@
-import { useState } from "react"
 import { ChatButton, Style } from "./style"
 import Chat from "../Chat"
 import ChatIcon from "../../assets/chat.png"
 
-function Pong() {
-
-	const [chat, displayChat] = useState<boolean>(false)
+function Pong({ chat, displayChat } : { chat: boolean, displayChat: React.Dispatch<React.SetStateAction<boolean>>} ) {
 
 	return (
 		<Style>
@@ -13,7 +10,8 @@ function Pong() {
 			chat ?
 				<Chat displayChat={displayChat} />
 				:
-				<ChatButton src={ChatIcon} onClick={() => displayChat(true)}/>
+				<ChatButton src={ChatIcon} onClick={() => displayChat(true)}
+					alt="Chat button" title="Chat" />
 		}
 		</Style>
 	)
