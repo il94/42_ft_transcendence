@@ -8,10 +8,13 @@ const colors = {
 	/* Sections */
 	section: "#AA6736",
 	sectionAlt: "#995C2F",
+	sectionTransparent: "#aa6736b3",
+	sectionAltTransparent: "#995c2fb3",
 
 	/* Texts */
 	text: "#FFFFFF",
 	textAlt: "#000000",
+	textTransparent: "#ffffff80",
 
 	/* Buttons */
 	button: "#DB6045",
@@ -23,6 +26,7 @@ const colors = {
 
 	/* Scrolling bar */
 	scrollingBar: "#804400",
+	scrollingBarTransparent: "#80440080",
 
 	/* Ranks */
 	rankGold: "#FFE175",
@@ -35,9 +39,10 @@ const colors = {
 	profilePicture: "#524FFD",
 
 	/* Chat */
-	chat: "#F3A760",
-	chatBanner: "#545454",
-	chatInput: "#B77A41",
+	chatWindow: "#f3a76080",
+	chatBanner: "#54545480",
+	chatInput: "#b77a41b3",
+	contactList: "#85522c80",
 	messageUser: "#FAD7A3",
 	messageBanner: "#FFCB9A",
 	messageFriend: "#FFD6B0",

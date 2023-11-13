@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import effects from "../../utils/effects"
+import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
@@ -10,22 +11,7 @@ export const Style = styled.div`
 
 	${effects.pixelateWindow};
 
-	background-color: rgba(243, 167, 96, 0.15);
-
 `
-
-// export const ContactList = styled.div`
-
-// 	display: flex;
-
-// 	width: 33.42%;
-// 	height: 100%;
-
-
-// 	background-color: rgba(133, 82, 44, 0.5);
-
-
-// `
 
 export const ChatWindow = styled.div`
 
@@ -35,7 +21,7 @@ export const ChatWindow = styled.div`
 	width: 66.58%;
 	height: 100%;
 
-	background-color: rgba(243, 167, 96, 0.5);
+	background-color: ${colors.chatWindow};
 
 `
 
@@ -48,7 +34,7 @@ export const Banner = styled.div`
 	width: 100%;
 	height: 12.35%;
 
-	background-color: rgba(84, 84, 84, 0.5);
+	background-color: ${colors.chatBanner};
 
 `
 

@@ -33,7 +33,6 @@ export const ContactName = styled.p`
 
 	font-size: 12px;
 
-	/* line-height: 1.5;
-	text-align: center; */
+	color: ${colors.text};
 
 `

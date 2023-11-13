@@ -5,14 +5,14 @@ import colors from "../../../utils/colors"
 function ContactList() {
 	return (
 		<Style>
-			<Contact color={colors.section} />
-			<Contact color={colors.sectionAlt} />
-			<Contact color={colors.section} />
-			<Contact color={colors.sectionAlt} />
-			<Contact color={colors.section} />
-			<Contact color={colors.sectionAlt} />
-			<Contact color={colors.section} />
-			<Contact color={colors.sectionAlt} />
+			<Contact color={colors.sectionTransparent} />
+			<Contact color={colors.sectionAltTransparent} />
+			<Contact color={colors.sectionTransparent} />
+			<Contact color={colors.sectionAltTransparent} />
+			<Contact color={colors.sectionTransparent} />
+			<Contact color={colors.sectionAltTransparent} />
+			<Contact color={colors.sectionTransparent} />
+			<Contact color={colors.sectionAltTransparent} />
 		</Style>
 	)
 }

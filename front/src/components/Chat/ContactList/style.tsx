@@ -12,7 +12,7 @@ export const Style = styled.div`
 	overflow-y: auto;
 	overflow-x: hidden;
 
-	background-color: rgba(133, 82, 44, 0.5);
+	background-color: ${colors.contactList};
 
 	&:not(:hover) {
 		&::-webkit-scrollbar {
@@ -28,7 +28,7 @@ export const Style = styled.div`
 		}
 	
 		&::-webkit-scrollbar-thumb {
-			background-color: ${colors.scrollingBar};
+			background-color: ${colors.scrollingBarTransparent};
 		}
 		
 	}

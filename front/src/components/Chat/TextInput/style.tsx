@@ -22,7 +22,7 @@ export const Style = styled.input`
 
 		font-size: 10px;
 
-		color: ${colors.text};
+		color: ${colors.textTransparent};
 	}
 
 	&:focus {
