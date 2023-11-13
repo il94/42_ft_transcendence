@@ -14,18 +14,18 @@ export const Style = styled.div`
 
 `
 
-export const ContactList = styled.div`
+// export const ContactList = styled.div`
 
-	display: flex;
+// 	display: flex;
 
-	width: 33.42%;
-	height: 100%;
-
-
-	background-color: rgba(133, 82, 44, 0.5);
+// 	width: 33.42%;
+// 	height: 100%;
 
 
-`
+// 	background-color: rgba(133, 82, 44, 0.5);
+
+
+// `
 
 export const ChatWindow = styled.div`
 

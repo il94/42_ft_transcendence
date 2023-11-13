@@ -2,13 +2,13 @@ import {
 	Banner,
 	ChannelName,
 	ChatWindow,
-	ContactList,
 	DiscussionInterface,
 	ReduceButton,
 	Style
 } from "./style"
 
 import TextInput from "./TextInput"
+import ContactList from "./ContactList"
 
 import ReduceIcon from "../../assets/reduce.png"
 
@@ -19,7 +19,7 @@ function Chat({ displayChat }: { displayChat: React.Dispatch<React.SetStateActio
 			<ChatWindow>
 				<Banner>
 					<ChannelName>
-						Channel 1
+						Example
 					</ChannelName>
 					<ReduceButton src={ReduceIcon} onClick={() => displayChat(false)}
 						alt="Reduce button" title="Reduce" />
