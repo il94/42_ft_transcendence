@@ -26,6 +26,8 @@ const Style = createGlobalStyle`
 		
 		overflow-y: hidden;
 
+		user-select: none;
+
 		color: ${colors.text};
 		background-color: ${colors.background};
 	}
@@ -37,7 +39,6 @@ const Style = createGlobalStyle`
 
 	p {
 		cursor: default;
-		user-select: none;
 	}
 
 `
