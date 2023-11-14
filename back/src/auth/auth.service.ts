@@ -15,8 +15,13 @@ export class AuthService {
 		private jwt: JwtService
 	) {}
 
+	async getHello() {
+		return "Coucou!";
+	}
+
 	//signin and signup logics should be implemented with third part API42 authentication 
 	
+	// JWT LOGIC
 	async signToken(userId: number, email: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,
@@ -26,6 +31,7 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
+	// NO MANDATORY
 	async signup(dto: AuthDto) {
 		//generate password hash
 		const hash = await argon.hash(dto.password);
@@ -54,6 +60,7 @@ export class AuthService {
 		}
 	}
 
+	// NO MANDATORY
 	async signin(dto: AuthDto) {
 		// find the user by email
 		const user = await this.prisma.user.findUnique({

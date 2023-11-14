@@ -9,11 +9,23 @@ import { AuthDto } from "./dto";
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
+	@Get('/42api/login')
+	handleLogin() {
+		return {msg: 'api42 Authentication'};
+	}
+
+	@Get('api42/redirect') 
+	handleRedirect() {
+		return {msg: 'ok'};
+	}
+
+	// Registering a new user => no mandatory 
 	@Post('signup')
 	signup(@Body() dto:AuthDto) {
 		return this.authService.signup(dto);
 	}
 
+	// loging as a user => no mandatory
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')
 	signin(@Body() dto:AuthDto) {
@@ -21,9 +33,9 @@ export class AuthController {
 	}
 
 	@HttpCode(HttpStatus.OK)
-	@Get('signin')
-	signin42(@Body() dto:AuthDto) {
-		return this.authService.signin(dto);
+	@Get()
+	getHello() {
+		return this.authService.getHello();
 	}
 
 	@UseGuards(AuthGuard)
