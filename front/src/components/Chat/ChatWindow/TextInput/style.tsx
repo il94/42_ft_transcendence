@@ -7,6 +7,7 @@ export const Style = styled.input`
 
 	width: 100%;
 	height: 25px;
+	min-height: 25px;
 
 	padding: 0;
 	border: none;
