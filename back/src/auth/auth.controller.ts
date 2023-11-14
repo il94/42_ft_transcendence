@@ -20,6 +20,12 @@ export class AuthController {
 		return this.authService.signin(dto);
 	}
 
+	@HttpCode(HttpStatus.OK)
+	@Get('signin')
+	signin42(@Body() dto:AuthDto) {
+		return this.authService.signin(dto);
+	}
+
 	@UseGuards(AuthGuard)
 	@Get('profile')
 	getProfile(@Request() req) {
