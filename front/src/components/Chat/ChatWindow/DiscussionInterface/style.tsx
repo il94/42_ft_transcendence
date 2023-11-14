@@ -2,10 +2,9 @@ import styled from "styled-components"
 
 export const Style = styled.div`
 
-	width: 100%;
-	height: 53px;
-	min-height: 53px;
+	display: flex;
 
-	background-color: #B197FA;
+	width: 100%;
+	height: 87.65%;
 
 `
