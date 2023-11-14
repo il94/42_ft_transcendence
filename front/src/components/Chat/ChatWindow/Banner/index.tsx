@@ -1,7 +1,12 @@
 import { ChannelName, ReduceButton, Style } from "./style"
 import ReduceIcon from "../../../../assets/reduce.png"
+import { useContext } from "react"
+import { ChatContext } from "../../../../pages/Game"
 
-function Banner({ displayChat }: { displayChat: React.Dispatch<React.SetStateAction<boolean>> }) {
+function Banner() {
+
+	const { displayChat } = useContext(ChatContext)!
+
 	return (
 		<Style>
 			<ChannelName>

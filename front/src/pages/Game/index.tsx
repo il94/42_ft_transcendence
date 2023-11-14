@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import MediaQuery, { useMediaQuery } from 'react-responsive'
 
 import {
@@ -22,12 +22,13 @@ import Profile from '../../components/Profile'
 
 import breakpoints from '../../utils/breakpoints'
 
+export const ChatContext = createContext<{ chat: boolean, displayChat: React.Dispatch<React.SetStateAction<boolean>> } | undefined>(undefined)
+
 function Game() {
 
 	const [reduceLeft, setReduce] = useState<boolean>(false)
 	const [scrollValue, setScrollValue] = useState<number>(0)
 	const [chat, displayChat] = useState<boolean>(false)
-
 
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
@@ -37,43 +38,49 @@ function Game() {
 	}, [])
 
 	return (
+
 		<GamePage>
-		<MediaQuery query={breakpoints.bigDesktop} onChange={ (isSmallWindow) => setReduce(!isSmallWindow) } />
-		{
-			reduceLeft ?
-				<GameWrapper>
-					<ReduceLeftGameWrapper>
-						<LogoReduce />
-						<SocialReduce setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
-					</ReduceLeftGameWrapper>
-					<ExtendRightGameWrapper>
-						<TopGameWrapper>
-							<Info />
-							<Profile />
-						</TopGameWrapper>
-						<BottomGameWrapper>
-							<Pong chat={chat} displayChat={displayChat} />
-						</BottomGameWrapper>
-					</ExtendRightGameWrapper>
-				</GameWrapper>
-				:
-				<GameWrapper>
-					<LeftGameWrapper>
-						<Logo />
-						<Social setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
-					</LeftGameWrapper>
-					<RightGameWrapper>
-						<TopGameWrapper>
-							<Info />
-							<Profile />
-						</TopGameWrapper>
-						<BottomGameWrapper>
-							<Pong chat={chat} displayChat={displayChat} />
-						</BottomGameWrapper>
-					</RightGameWrapper>
-				</GameWrapper>
+			<MediaQuery query={breakpoints.bigDesktop} onChange={(isSmallWindow) => setReduce(!isSmallWindow)} />
+			{
+				reduceLeft ?
+					<GameWrapper>
+						<ReduceLeftGameWrapper>
+							<LogoReduce />
+							<SocialReduce setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
+						</ReduceLeftGameWrapper>
+						<ExtendRightGameWrapper>
+							<TopGameWrapper>
+								<Info />
+								<Profile />
+							</TopGameWrapper>
+							<BottomGameWrapper>
+								<ChatContext.Provider value={{ chat, displayChat }}>
+									<Pong />
+								</ChatContext.Provider>
+							</BottomGameWrapper>
+						</ExtendRightGameWrapper>
+					</GameWrapper>
+					:
+					<GameWrapper>
+						<LeftGameWrapper>
+							<Logo />
+							<Social setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
+						</LeftGameWrapper>
+						<RightGameWrapper>
+							<TopGameWrapper>
+								<Info />
+								<Profile />
+							</TopGameWrapper>
+							<BottomGameWrapper>
+								<ChatContext.Provider value={{ chat, displayChat }}>
+									<Pong />
+								</ChatContext.Provider>
+							</BottomGameWrapper>
+						</RightGameWrapper>
+					</GameWrapper>
 			}
 		</GamePage>
+
 	)
 
 }
