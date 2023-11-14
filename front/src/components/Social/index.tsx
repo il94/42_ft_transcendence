@@ -10,9 +10,8 @@ function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.D
 	useEffect(() => {
 		const scrollContainer: any = scrollContainerRef.current
 
-		if (scrollContainer) {
-			scrollContainer.scrollTo({ top: scrollValue})
-		}
+		if (scrollContainer)
+			scrollContainer.scrollTop = scrollValue
 	}, [])
 
 	function handleScroll(event: any) {

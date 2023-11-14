@@ -22,13 +22,22 @@ import Profile from '../../components/Profile'
 
 import breakpoints from '../../utils/breakpoints'
 
-export const ChatContext = createContext<{ chat: boolean, displayChat: React.Dispatch<React.SetStateAction<boolean>> } | undefined>(undefined)
+export const ChatContext = createContext<{
+	chat: boolean,
+	displayChat: React.Dispatch<React.SetStateAction<boolean>>,
+	chatScrollValue: number,
+	setChatScrollValue: React.Dispatch<React.SetStateAction<number>>,
+	chatRender: boolean,
+	setChatRender: React.Dispatch<React.SetStateAction<boolean>>
+} | undefined>(undefined)
 
 function Game() {
 
 	const [reduceLeft, setReduce] = useState<boolean>(false)
 	const [scrollValue, setScrollValue] = useState<number>(0)
 	const [chat, displayChat] = useState<boolean>(false)
+	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
+	const [chatRender, setChatRender] = useState<boolean>(false)
 
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
@@ -53,7 +62,7 @@ function Game() {
 								<Profile />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								<ChatContext.Provider value={{ chat, displayChat }}>
+								<ChatContext.Provider value={{ chat, displayChat, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 									<Pong />
 								</ChatContext.Provider>
 							</BottomGameWrapper>
@@ -71,7 +80,7 @@ function Game() {
 								<Profile />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								<ChatContext.Provider value={{ chat, displayChat }}>
+								<ChatContext.Provider value={{ chat, displayChat, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 									<Pong />
 								</ChatContext.Provider>
 							</BottomGameWrapper>
