@@ -10,7 +10,12 @@ export const Style = styled.div`
 	height: 40px;
 	min-height: 40px;
 
-	background-color: ${(props) => props.color}
+	background-color: ${(props) => props.color};
+
+	&:hover {
+		cursor: pointer;
+		background-color: ${colors.sectionHover};
+	}
 
 `
 

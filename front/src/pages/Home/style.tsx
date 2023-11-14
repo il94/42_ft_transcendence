@@ -3,11 +3,21 @@ import { Link } from 'react-router-dom'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-export const HomerWapper = styled.div`
+export const HomePage = styled.div`
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+
+`
+
+export const StyledMainTitle = styled.h1`
+
+	font-size: 80px;
+
+	&:hover {
+		transform: scale(1.015);
+	}
 
 `
 
@@ -29,16 +39,6 @@ export const WelcomeWindow = styled.div`
 	box-shadow: 10px;
 
 	${effects.pixelateWindow};
-
-`
-
-export const StyledMainTitle = styled.h1`
-
-	font-size: 80px;
-
-	&:hover {
-		transform: scale(1.015);
-	}
 
 `
 

@@ -31,7 +31,7 @@ export const FriendsWrapper = styled.div `
 	}
 
 	&:hover {
-		
+
 		&::-webkit-scrollbar {
 			width: 5px;
 			-webkit-appearance: none;
@@ -59,11 +59,8 @@ export const ReduceButton = styled.button`
 	background-color: ${colors.reduceButton};
 
 	&:hover {
-		
 		cursor: pointer;
-
 		background-color: ${colors.reduceButtonHover};
-
 	}
 
 `

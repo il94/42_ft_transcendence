@@ -8,6 +8,7 @@ const colors = {
 	/* Sections */
 	section: "#AA6736",
 	sectionAlt: "#995C2F",
+	sectionHover: "#d68215",
 	sectionTransparent: "#aa6736b3",
 	sectionAltTransparent: "#995c2fb3",
 

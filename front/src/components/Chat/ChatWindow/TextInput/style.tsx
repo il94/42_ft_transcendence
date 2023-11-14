@@ -19,9 +19,7 @@ export const Style = styled.input`
 	background-color: ${colors.chatInput};
 
 	&::placeholder {
-
 		font-size: 10px;
-
 		color: ${colors.textTransparent};
 	}
 

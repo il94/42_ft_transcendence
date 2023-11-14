@@ -14,6 +14,11 @@ export const Style = styled.div`
 
 	background-color: ${(props) => props.color};
 
+	&:hover {
+		cursor: pointer;
+		background-color: ${colors.sectionHover};
+	}
+
 `
 
 export const ProfilePicture = styled.div`

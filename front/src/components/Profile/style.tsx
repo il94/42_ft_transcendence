@@ -22,20 +22,21 @@ export const ProfileWrapper = styled.div`
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
+	
+	width: calc(63.96% - 2px);
+	height: calc(100% - 7px);
 
-	margin-left: 8px;
+	margin-top: 3.5px;
+	margin-bottom: 3.5px;
+	margin-left: 3.5px;
+	margin-right: 3.5px;
 
-	width: 63.96%;
-	height: 100%;
-
-	// survol du username a definir
-	/* &:hover {
+	&:hover {
 		cursor: pointer;
 		background-color: #9E5B29;
 
-
 		${effects.pixelateWindow};
-	} */
+	}
 
 `
 
@@ -43,6 +44,8 @@ export const ProfilePicture = styled.div`
 	
 	width: 32px;
 	height: 32px;
+
+	margin-left: 4.5px;
 
 	background-color: ${colors.profilePicture};
 

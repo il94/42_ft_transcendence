@@ -30,17 +30,6 @@ export const GameWrapper = styled.div`
 
 `
 
-export const LeftGameWrapper = styled.div`
-
-	display: flex;
-	flex-direction: column;
-
-	width: 250px;
-	min-width: 250px;
-	height: 100%;
-
-`
-
 export const ReduceLeftGameWrapper = styled.div`
 
 	display: flex;
@@ -48,17 +37,6 @@ export const ReduceLeftGameWrapper = styled.div`
 
 	width: 58px;
 	min-width: 58px;
-	height: 100%;
-
-`
-
-export const RightGameWrapper = styled.div`
-
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-	/* min-width: à définir par rapport au Pong */
 	height: 100%;
 
 `
@@ -93,5 +71,27 @@ export const BottomGameWrapper = styled.div`
 	height: calc(100% - 53px);
 	/* min-width: à définir par rapport au Pong */
 	min-height: 159px;
+
+`
+
+export const LeftGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 250px;
+	min-width: 250px;
+	height: 100%;
+
+`
+
+export const RightGameWrapper = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	/* min-width: à définir par rapport au Pong */
+	height: 100%;
 
 `

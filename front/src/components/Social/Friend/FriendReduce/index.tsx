@@ -1,9 +1,9 @@
 import { Style, ProfilePicture } from "./style"
 
-function FriendReduce({ color } : {color: string}) {
+function FriendReduce({ color } : { color: string }) {
 	return (
 		<Style color={color}>
-				<ProfilePicture />
+			<ProfilePicture />
 		</Style>
 	)
 }

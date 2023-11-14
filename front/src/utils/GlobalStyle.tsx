@@ -1,5 +1,4 @@
 import { createGlobalStyle } from "styled-components"
-
 import colors from "./colors"
 
 const Style = createGlobalStyle`
@@ -23,7 +22,9 @@ const Style = createGlobalStyle`
 	body {
 		width: 100%;
 		height: 100vh;
-		
+
+		cursor: default;
+
 		overflow-y: hidden;
 
 		user-select: none;
@@ -35,10 +36,6 @@ const Style = createGlobalStyle`
 	#root {
 		width: 100%;
 		height: 100%;
-	}
-
-	p {
-		cursor: default;
 	}
 
 `

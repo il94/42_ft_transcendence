@@ -5,9 +5,9 @@ export const Style = styled.div`
 
 	display: flex;
 
-	width: 58px;
+	width: 100%;
 	height: 100%;
-	min-width: 58px;
+	min-width: 100%;
 	min-height: 159px;
 
 	background-color: ${colors.module};
@@ -26,23 +26,8 @@ export const FriendsWrapper = styled.div`
 
 	background-color: ${colors.module};
 
-	&:not(:hover) {
-		&::-webkit-scrollbar {
-			display: none;
-		}
-	}
-
-	&:hover {
-		
-		&::-webkit-scrollbar {
-			width: 5px;
-			-webkit-appearance: none;
-		}
-	
-		&::-webkit-scrollbar-thumb {
-			background-color: ${colors.scrollingBar};
-		}
-		
+	&::-webkit-scrollbar {
+		display: none;
 	}
 
 `
@@ -61,11 +46,8 @@ export const ReduceButton = styled.button`
 	background-color: ${colors.reduceButton};
 
 	&:hover {
-		
 		cursor: pointer;
-
 		background-color: ${colors.reduceButtonHover};
-
 	}
 
 `

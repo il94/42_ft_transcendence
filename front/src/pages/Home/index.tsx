@@ -1,14 +1,16 @@
-import { HomerWapper, StyledMainTitle, WelcomeWindow, StyledTitle, StyledLink } from './style'
+import { HomePage, StyledMainTitle, WelcomeWindow, StyledTitle, StyledLink } from './style'
 
 function Home() {
 	return (
-		<HomerWapper>
-			<StyledMainTitle>Transcendance</StyledMainTitle>
+		<HomePage>
+			<StyledMainTitle>
+				Transcendance
+			</StyledMainTitle>
 			<WelcomeWindow>
 				<StyledTitle>Welcome</StyledTitle>
 				<StyledLink to="/game" >Login</StyledLink>
 			</WelcomeWindow>
-		</HomerWapper>
+		</HomePage>
 	)
 }
 

@@ -38,7 +38,6 @@ function Game() {
 	}, [])
 
 	return (
-
 		<GamePage>
 			<MediaQuery query={breakpoints.bigDesktop} onChange={(isSmallWindow) => setReduce(!isSmallWindow)} />
 			{
@@ -80,9 +79,7 @@ function Game() {
 					</GameWrapper>
 			}
 		</GamePage>
-
 	)
-
 }
 
 export default Game
