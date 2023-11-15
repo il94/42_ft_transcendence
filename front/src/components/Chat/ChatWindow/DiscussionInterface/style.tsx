@@ -33,13 +33,9 @@ export const MessagesWrapper = styled.div`
 		&::-webkit-scrollbar-thumb {
 			background-color: ${colors.scrollingBar};
 		}
-		
+
+		& .userMessages {
+			margin-right: 1px;
+		}
 	}
-`
-
-export const MiniSpace = styled.div`
-
-	width: 100%;
-	height: 3px;
-	
 `

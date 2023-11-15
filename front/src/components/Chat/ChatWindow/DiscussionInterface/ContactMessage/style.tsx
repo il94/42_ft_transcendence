@@ -69,6 +69,6 @@ export const Text = styled.p`
 	font-size: 10px;
 
 	color: ${colors.textAlt};
-	background-color: ${colors.messageUser};
+	background-color: ${colors.messageFriend};
 
 `

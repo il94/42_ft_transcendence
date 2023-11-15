@@ -1,6 +1,7 @@
-import { useContext, useEffect, useRef, useState } from "react"
-import { MessagesWrapper, MiniSpace, Style } from "./style"
-import Message from "./Message"
+import { useContext, useEffect, useRef } from "react"
+import { MessagesWrapper, Style } from "./style"
+import ContactMessage from "./ContactMessage"
+import UserMessage from "./UserMessage"
 import { ChatContext } from "../../../../pages/Game"
 
 function DiscussionInterface(){
@@ -35,12 +36,13 @@ function DiscussionInterface(){
 	return (
 		<Style>
 			<MessagesWrapper onScroll={handleScroll} ref={scrollContainerRef}>
-				<Message userName={"i"} content={"iiiiiiii"} />
-				<Message userName={"Claire zer"} content={"Kikou"} />
-				<Message userName={"Adouay"} content={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna lol a  aliqua."} />
-				<Message userName={"Test"} content={"Jde fais un test car c'estl"} />
-				<Message userName={"Test"} content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
-				<MiniSpace />
+				<ContactMessage userName={"i"} content={"iiiiiiii"} />
+				<ContactMessage userName={"Claire zer"} content={"Kikou"} />
+				<ContactMessage userName={"Adouay"} content={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna lol a  aliqua."} />
+				<UserMessage content={"salut"} />
+				<ContactMessage userName={"Test"} content={"Jde fais un test car c'estl"} />
+				<ContactMessage userName={"Test"} content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
+				<UserMessage content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
 			</MessagesWrapper>
 		</Style>
 	)

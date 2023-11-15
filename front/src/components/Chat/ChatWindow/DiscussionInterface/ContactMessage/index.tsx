@@ -1,6 +1,6 @@
 import { ProfilePicture, Style, UserName, Text, MessageContent } from "./style"
 
-function Message({ userName, content } : { userName: string, content: string }) {
+function ContactMessage({ userName, content } : { userName: string, content: string }) {
 	return (
 		<Style>
 			<ProfilePicture />
@@ -16,4 +16,4 @@ function Message({ userName, content } : { userName: string, content: string }) 
 	)
 }
 
-export default Message
+export default ContactMessage
