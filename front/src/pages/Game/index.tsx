@@ -25,6 +25,8 @@ import breakpoints from '../../utils/breakpoints'
 export const ChatContext = createContext<{
 	chat: boolean,
 	displayChat: React.Dispatch<React.SetStateAction<boolean>>,
+	contactListScrollValue: number,
+	setContactListScrollValue: React.Dispatch<React.SetStateAction<number>>,
 	chatScrollValue: number,
 	setChatScrollValue: React.Dispatch<React.SetStateAction<number>>,
 	chatRender: boolean,
@@ -36,6 +38,7 @@ function Game() {
 	const [reduceLeft, setReduce] = useState<boolean>(false)
 	const [scrollValue, setScrollValue] = useState<number>(0)
 	const [chat, displayChat] = useState<boolean>(false)
+	const [contactListScrollValue, setContactListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
 
@@ -62,7 +65,7 @@ function Game() {
 								<Profile />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								<ChatContext.Provider value={{ chat, displayChat, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+								<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 									<Pong />
 								</ChatContext.Provider>
 							</BottomGameWrapper>
@@ -80,7 +83,7 @@ function Game() {
 								<Profile />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								<ChatContext.Provider value={{ chat, displayChat, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+								<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 									<Pong />
 								</ChatContext.Provider>
 							</BottomGameWrapper>

@@ -2,6 +2,8 @@ import styled from "styled-components"
 import colors from "../../../utils/colors"
 
 import Contact from "./Contact"
+import { useContext, useEffect, useRef } from "react"
+import { ChatContext } from "../../../pages/Game"
 
 const Style = styled.div`
 
@@ -35,12 +37,26 @@ const Style = styled.div`
 		
 	}
 
-
 `
 
 function ContactList() {
+
+	const { contactListScrollValue, setContactListScrollValue } = useContext(ChatContext)!
+	const scrollContainerRef = useRef(null)
+
+	useEffect(() => {
+		const scrollContainer: any = scrollContainerRef.current
+
+		if (scrollContainer)
+			scrollContainer.scrollTop = contactListScrollValue
+	}, [])
+
+	function handleScroll(event: any) {
+		setContactListScrollValue(event.currentTarget.scrollTop);
+	}
+
 	return (
-		<Style>
+		<Style onScroll={handleScroll} ref={scrollContainerRef}>
 			<Contact color={colors.sectionTransparent} />
 			<Contact color={colors.sectionAltTransparent} />
 			<Contact color={colors.sectionTransparent} />
