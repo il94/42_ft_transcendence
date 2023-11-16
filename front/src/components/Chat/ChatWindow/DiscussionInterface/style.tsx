@@ -14,6 +14,9 @@ export const Style = styled.div`
 
 export const MessagesWrapper = styled.div`
 
+	width: 100%;
+	min-height: 188px;
+
 	overflow-y: auto;
 	overflow-x: hidden;
 

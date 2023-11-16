@@ -42,7 +42,6 @@ function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.D
 			</FriendsWrapper>
 			<ReduceButton	onClick={() => setReduce(true)}
 							title="Reduce" />
-
 		</Style>
 	)
 }

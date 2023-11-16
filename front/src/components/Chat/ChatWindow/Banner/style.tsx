@@ -9,7 +9,8 @@ export const Style = styled.div`
 	align-items: center;
 
 	width: 100%;
-	height: 12.35%;
+	height: 30px;
+	min-height: 30px;
 
 	background-color: ${colors.chatBanner};
 
