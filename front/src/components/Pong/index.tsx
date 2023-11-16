@@ -1,22 +1,37 @@
 import { useContext } from "react"
-import { ChatButton, Style } from "./style"
+import styled from "styled-components"
 import Chat from "../Chat"
-import { ChatContext } from "../../pages/Game"
-import ChatIcon from "../../assets/chat.png"
+import ChatButton from "../Chat/ChatButton"
+import Card from "../Card"
+import { CardContext, ChatContext } from "../../pages/Game"
+
+const Style = styled.div`
+
+	position: relative;
+
+	width: 100%;
+	height: 100%;
+
+	background-color: #FD994F;
+
+`
 
 function Pong() {
 	
-	const { chat, displayChat } = useContext(ChatContext)!
+	const { card } = useContext(CardContext)!
+	const { chat } = useContext(ChatContext)!
 
 	return (
 		<Style>
-		{
-			chat ?
-				<Chat />
-				:
-				<ChatButton src={ChatIcon} onClick={() => displayChat(true)}
-					alt="Chat button" title="Chat" />
-		}
+			{
+				card && <Card />
+			}
+			{
+				chat ?
+					<Chat />
+					:
+					<ChatButton />
+			}
 		</Style>
 	)
 }

@@ -8,6 +8,10 @@ const Style = styled.div`
 
 	display: flex;
 
+	position: absolute;
+	right: 0;
+	bottom: 0;
+
 	width: 368px;
 	height: 243px;
 

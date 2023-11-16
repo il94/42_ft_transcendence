@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { Style, ReduceButton, FriendsWrapper } from "./style"
 import Friend from "./Friend"
 import colors from "../../utils/colors"
+import { CardContext } from "../../pages/Game"
 
 function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.Dispatch<React.SetStateAction<boolean>>, scrollValue: number, setScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
 
@@ -13,6 +14,13 @@ function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.D
 		if (scrollContainer)
 			scrollContainer.scrollTop = scrollValue
 	}, [])
+
+	const { displayCard } = useContext(CardContext)!
+
+	function reduceSocial() {
+		displayCard(false)
+		setReduce(true)
+	}
 
 	function handleScroll(event: any) {
 		setScrollValue(event.currentTarget.scrollTop);
@@ -40,8 +48,7 @@ function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.D
 				<Friend color={colors.section}/>
 				<Friend color={colors.sectionAlt}/>
 			</FriendsWrapper>
-			<ReduceButton	onClick={() => setReduce(true)}
-							title="Reduce" />
+			<ReduceButton	onClick={reduceSocial} title="Reduce" />
 		</Style>
 	)
 }

@@ -20,6 +20,18 @@ export const Style = styled.div`
 
 `
 
+export const TempStyle = styled.div`
+
+	display: flex;
+	align-items: center;
+
+	width: 240px;
+	min-width: 240px;
+	height: 53px;
+	min-height: 53px;
+
+`
+
 export const ProfilePicture = styled.div`
 	
 	width: 32px;

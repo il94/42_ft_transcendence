@@ -33,14 +33,28 @@ export const ChatContext = createContext<{
 	setChatRender: React.Dispatch<React.SetStateAction<boolean>>
 } | undefined>(undefined)
 
-function Game() {
+export const CardContext = createContext<{
+	card: boolean,
+	displayCard: React.Dispatch<React.SetStateAction<boolean>>,
+	cardPosition: number,
+	setCardPosition: React.Dispatch<React.SetStateAction<number>>
+} | undefined >(undefined)
 
+
+
+
+
+function Game() {
+	
 	const [reduceLeft, setReduce] = useState<boolean>(false)
 	const [scrollValue, setScrollValue] = useState<number>(0)
 	const [chat, displayChat] = useState<boolean>(false)
 	const [contactListScrollValue, setContactListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
+	const [card, displayCard] = useState<boolean>(false)
+	const [cardPosition, setCardPosition] = useState<number>(0)
+
 
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
@@ -51,45 +65,53 @@ function Game() {
 
 	return (
 		<GamePage>
-			<MediaQuery query={breakpoints.bigDesktop} onChange={(isSmallWindow) => setReduce(!isSmallWindow)} />
-			{
-				reduceLeft ?
-					<GameWrapper>
-						<ReduceLeftGameWrapper>
-							<LogoReduce />
-							<SocialReduce setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
-						</ReduceLeftGameWrapper>
-						<ExtendRightGameWrapper>
-							<TopGameWrapper>
-								<Info />
-								<Profile />
-							</TopGameWrapper>
-							<BottomGameWrapper>
-								<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-									<Pong />
-								</ChatContext.Provider>
-							</BottomGameWrapper>
-						</ExtendRightGameWrapper>
-					</GameWrapper>
-					:
-					<GameWrapper>
-						<LeftGameWrapper>
-							<Logo />
-							<Social setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
-						</LeftGameWrapper>
-						<RightGameWrapper>
-							<TopGameWrapper>
-								<Info />
-								<Profile />
-							</TopGameWrapper>
-							<BottomGameWrapper>
-								<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-									<Pong />
-								</ChatContext.Provider>
-							</BottomGameWrapper>
-						</RightGameWrapper>
-					</GameWrapper>
-			}
+				<MediaQuery query={breakpoints.bigDesktop} onChange={(window) => {setReduce(!window); if (!window) displayCard(false)}} />
+				{
+					reduceLeft ?
+						<GameWrapper>
+							<ReduceLeftGameWrapper>
+								<LogoReduce />
+								<CardContext.Provider value={{card, displayCard, cardPosition, setCardPosition}}>
+									<SocialReduce setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
+								</CardContext.Provider>
+							</ReduceLeftGameWrapper>
+							<ExtendRightGameWrapper>
+								<TopGameWrapper>
+									<Info />
+									<Profile />
+								</TopGameWrapper>
+								<BottomGameWrapper>
+									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+										<CardContext.Provider value={{card, displayCard, cardPosition, setCardPosition}}>
+											<Pong />
+										</CardContext.Provider>
+									</ChatContext.Provider>
+								</BottomGameWrapper>
+							</ExtendRightGameWrapper>
+						</GameWrapper>
+						:
+						<GameWrapper>
+							<LeftGameWrapper>
+								<Logo />
+								<CardContext.Provider value={{card, displayCard, cardPosition, setCardPosition}}>
+									<Social setReduce={setReduce} scrollValue={scrollValue} setScrollValue={setScrollValue} />
+								</CardContext.Provider>
+							</LeftGameWrapper>
+							<RightGameWrapper>
+								<TopGameWrapper>
+									<Info />
+									<Profile />
+								</TopGameWrapper>
+								<BottomGameWrapper>
+									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+										<CardContext.Provider value={{card, displayCard, cardPosition, setCardPosition}}>
+											<Pong />
+										</CardContext.Provider>
+									</ChatContext.Provider>
+								</BottomGameWrapper>
+							</RightGameWrapper>
+						</GameWrapper>
+				}
 		</GamePage>
 	)
 }
