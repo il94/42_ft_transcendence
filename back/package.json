@@ -45,7 +45,6 @@
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
-    "@types/passport-42": "^1.1.1",
     "@types/passport-jwt": "^3.0.13",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

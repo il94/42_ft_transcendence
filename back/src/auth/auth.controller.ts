@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, HttpCode, HttpStatus, Request, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { AuthGuard } from './auth.guard';
+import { Api42AuthGuard } from './auth.guard';
 import { AuthDto } from "./dto";
 
 
@@ -9,12 +9,14 @@ import { AuthDto } from "./dto";
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-	@Get('/42api/login')
+	@Get('/api42/login')
+	@UseGuards(Api42AuthGuard)
 	handleLogin() {
 		return {msg: 'api42 Authentication'};
 	}
 
-	@Get('api42/redirect') 
+	@Get('api42/redirect')
+	@UseGuards(Api42AuthGuard)
 	handleRedirect() {
 		return {msg: 'ok'};
 	}
@@ -38,7 +40,7 @@ export class AuthController {
 		return this.authService.getHello();
 	}
 
-	@UseGuards(AuthGuard)
+	//@UseGuards(AuthGuard)
 	@Get('profile')
 	getProfile(@Request() req) {
 	  return req.user;

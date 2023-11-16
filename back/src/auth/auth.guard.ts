@@ -2,9 +2,11 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, } fro
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
   
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate {
 	constructor(private jwtService: JwtService) {}
   
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -29,3 +31,13 @@ export class AuthGuard implements CanActivate {
 	  return type === 'Bearer' ? token : undefined;
 	}
   }
+
+@Injectable()
+export class Api42AuthGuard extends AuthGuard('42') {
+	async canActivate(context: ExecutionContext): Promise<boolean> {
+		const activate = (await super.canActivate(context)) as boolean;
+		const request = context.switchToHttp().getRequest();
+		await super.logIn(request);
+		return activate; 
+	}
+}
