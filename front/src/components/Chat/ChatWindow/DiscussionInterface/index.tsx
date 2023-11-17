@@ -13,19 +13,17 @@ function DiscussionInterface(){
 		const scrollContainer: any = scrollContainerRef.current
 
 		if (scrollContainer)
-			scrollContainer.scrollTop = chatScrollValue
-	}, [])
-
-	useEffect(() => {
-		const scrollContainer: any = scrollContainerRef.current
-
-		if (!chatRender)
 		{
-			setChatRender(true)
-			setTimeout(() => {
-				if (scrollContainer)
-					scrollContainer.scrollTop = scrollContainer.scrollHeight
-			}, 10)
+			if (chatRender)
+				scrollContainer.scrollTop = chatScrollValue
+			else
+			{
+				setChatRender(true)
+				setTimeout(() => {
+					if (scrollContainer)
+						scrollContainer.scrollTop = scrollContainer.scrollHeight
+				}, 10)
+			}
 		}
 	}, [])
 
