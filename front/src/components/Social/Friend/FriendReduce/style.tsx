@@ -1,7 +1,8 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
+import { RefObject } from "react"
 
-export const Style = styled.div`
+export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 
 	display: flex;
 	justify-content: center;

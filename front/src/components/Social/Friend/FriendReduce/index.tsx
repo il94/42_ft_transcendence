@@ -1,27 +1,34 @@
-import { useContext } from "react"
+import { RefObject, useContext, useRef } from "react"
 import { Style, ProfilePicture } from "./style"
 import { CardContext } from "../../../../pages/Game"
 
 function FriendReduce({ color } : { color: string }) {
 
 	const { displayCard, setCardPosition } = useContext(CardContext)!
+	const friendContainerRef : RefObject<HTMLElement> = useRef(null)
 
-	function showCard(target: HTMLElement) {
+	function showCard() {
 		
-		const topCurrentElement = target.getBoundingClientRect().top
-		const { top: topParentElement, height: heightParentElement } = target.parentElement!.getBoundingClientRect()
-		
-		const topMax = heightParentElement - 371 // taille de la carte
+		const friendcontainer = friendContainerRef.current
 
-		const topCard = topCurrentElement - topParentElement > topMax ? topMax : topCurrentElement - topParentElement // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+		if (friendcontainer)
+		{
+			const topCurrentElement = friendcontainer.getBoundingClientRect().top
+			const { top: topParentElement, height: heightParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
+			
+			const topMax = heightParentElement - 371 // taille de la carte
 	
-		setCardPosition(topCard)
-		displayCard(true)
+			const topCard = topCurrentElement - topParentElement > topMax ? topMax : topCurrentElement - topParentElement // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+		
+			setCardPosition(topCard)
+			displayCard(true)
+		}
+		
 	}
 
 	return (
-		<Style onClick={(event) => showCard(event.target)} color={color}>
-			<ProfilePicture onClick={(event) => {showCard(event.target.parentElement); event.stopPropagation()}} />
+		<Style onClick={showCard} color={color} ref={friendContainerRef}>
+			<ProfilePicture />
 		</Style>
 	)
 }
