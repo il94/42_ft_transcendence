@@ -30,18 +30,18 @@ export const GameWrapper = styled.div`
 
 `
 
-export const ReduceLeftGameWrapper = styled.div`
+export const LeftGameWrapper = styled.div<{ $social: boolean }>`
 
 	display: flex;
 	flex-direction: column;
 
-	width: 58px;
-	min-width: 58px;
+	width: ${(props) => props.$social ? 58 : 250}px;
+	min-width: ${(props) => props.$social ? 58 : 250}px;
 	height: 100%;
 
 `
 
-export const ExtendRightGameWrapper = styled.div`
+export const RightGameWrapper = styled.div`
 
 	display: flex;
 	flex-direction: column;
@@ -65,7 +65,7 @@ export const TopGameWrapper = styled.div`
 
 export const BottomGameWrapper = styled.div`
 	
-	display: flex;
+	position: relative;
 
 	width: 100%;
 	height: calc(100% - 53px);
@@ -74,24 +74,4 @@ export const BottomGameWrapper = styled.div`
 
 `
 
-export const LeftGameWrapper = styled.div`
 
-	display: flex;
-	flex-direction: column;
-
-	width: 250px;
-	min-width: 250px;
-	height: 100%;
-
-`
-
-export const RightGameWrapper = styled.div`
-
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-	/* min-width: à définir par rapport au Pong */
-	height: 100%;
-
-`

@@ -4,6 +4,8 @@ import effects from "../../utils/effects"
 import ContactList from "./ContactList"
 import ChatWindow from "./ChatWindow"
 
+import { ChatContext } from "../../pages/Game"
+
 const Style = styled.div`
 
 	display: flex;
@@ -22,8 +24,10 @@ const Style = styled.div`
 function Chat() {
 	return (
 		<Style>
+							{/* <ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}> */}
 			<ContactList />
 			<ChatWindow />
+			{/* </ChatContext.Provider> */}
 		</Style>
 	)
 }

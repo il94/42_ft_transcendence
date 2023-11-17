@@ -5,7 +5,7 @@ export const Style = styled.div<{$top: number}>`
 
 	display: flex;
 
-	position: relative;
+	position: absolute;
 	top: ${(props) => props.$top}px;
 
 	width: 240px;
