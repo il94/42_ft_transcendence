@@ -4,7 +4,7 @@ import Friend from "./Friend"
 import colors from "../../utils/colors"
 import { CardContext } from "../../pages/Game"
 
-function Social({ displaySocial, socialScrollValue, setSocialScrollValue }: { displaySocial: React.Dispatch<React.SetStateAction<boolean>>, socialScrollValue: number, setSocialScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
+function Social({ social, displaySocial, socialScrollValue, setSocialScrollValue }: { social: boolean, displaySocial: React.Dispatch<React.SetStateAction<boolean>>, socialScrollValue: number, setSocialScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
 
 	const scrollContainerRef = useRef(null)
 
@@ -18,8 +18,9 @@ function Social({ displaySocial, socialScrollValue, setSocialScrollValue }: { di
 	const { displayCard } = useContext(CardContext)!
 
 	function reduceSocial() {
-		displayCard(false)
-		displaySocial(true)
+		displaySocial(!social)
+			if (!social)
+				displayCard(false)
 	}
 
 	function handleScroll(event: any) {
@@ -29,24 +30,24 @@ function Social({ displaySocial, socialScrollValue, setSocialScrollValue }: { di
 	return (
 		<Style>
 			<FriendsWrapper onScroll={handleScroll} ref={scrollContainerRef}>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
-				<Friend color={colors.section}/>
-				<Friend color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
+				<Friend social={social} color={colors.section}/>
+				<Friend social={social} color={colors.sectionAlt}/>
 			</FriendsWrapper>
 			<ReduceButton	onClick={reduceSocial} title="Reduce" />
 		</Style>

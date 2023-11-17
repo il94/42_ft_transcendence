@@ -5,9 +5,8 @@ export const Style = styled.div`
 
 	display: flex;
 
-	width: 250px;
+	width: 100%;
 	height: 100%;
-	min-width: 250px;
 	min-height: 159px;
 
 	background-color: ${colors.module};
@@ -16,7 +15,7 @@ export const Style = styled.div`
 
 export const FriendsWrapper = styled.div `
 
-	width: 240px;
+	width: 100%;
 	height: 100%;
 
 	overflow-y: auto;

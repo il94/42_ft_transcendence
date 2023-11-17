@@ -1,34 +1,23 @@
-import styled from "styled-components"
-import effects from "../../utils/effects"
-
+import { useContext } from "react"
+import { Style, ChatButton } from "./style"
 import ContactList from "./ContactList"
 import ChatWindow from "./ChatWindow"
-
 import { ChatContext } from "../../pages/Game"
-
-const Style = styled.div`
-
-	display: flex;
-
-	position: absolute;
-	right: 0;
-	bottom: 0;
-
-	width: 368px;
-	height: 243px;
-
-	${effects.pixelateWindow};
-
-`
+import ChatIcon from "../../assets/chat.png"
 
 function Chat() {
+
+	const { chat, displayChat } = useContext(ChatContext)!
+
 	return (
+		chat ?
 		<Style>
-							{/* <ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}> */}
 			<ContactList />
 			<ChatWindow />
-			{/* </ChatContext.Provider> */}
 		</Style>
+		:
+		<ChatButton src={ChatIcon} onClick={() => displayChat(true)}
+			alt="Chat button" title="Chat"/>
 	)
 }
 

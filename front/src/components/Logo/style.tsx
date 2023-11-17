@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 
 export const Style = styled.div`
 
-	width: 250px;
+	width: 100%;
 	height: 53px;
-	min-width: 250px;
+	min-width: 100%;
 	min-height: 53px;
 
 	background-color: #FDE14F;

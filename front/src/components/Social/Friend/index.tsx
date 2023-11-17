@@ -11,7 +11,7 @@ import {
 import { CardContext } from "../../../pages/Game" 
 
 
-function Friend({ color } : { color: string }) {
+function Friend({ social, color } : { social: boolean, color: string }) {
 
 	const { displayCard, setCardPosition } = useContext(CardContext)!
 	const friendContainerRef : RefObject<HTMLElement> = useRef(null)
@@ -38,6 +38,8 @@ function Friend({ color } : { color: string }) {
 	return (
 		<Style onClick={showCard} color={color} ref={friendContainerRef}>
 			<ProfilePicture />
+			{
+				!social &&
 			<ProfileInfo>
 				<ProfileName>
 					Example
@@ -46,6 +48,7 @@ function Friend({ color } : { color: string }) {
 					En recherche de partie...
 				</ProfileStatus>
 			</ProfileInfo>
+			}
 
 		</Style>
 	)

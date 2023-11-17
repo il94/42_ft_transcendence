@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components"
 
 const Style = styled.div`
@@ -13,9 +14,21 @@ const Style = styled.div`
 
 function Pong() {
 	
+	const [counter, setCounter] = useState(0);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+		  setCounter((counter) => counter + 1);
+		}, 1000);
+	
+		return () => {
+		  clearInterval(interval);
+		};
+	  }, []);
+
 	return (
 		<Style>
-
+			{counter}
 		</Style>
 	)
 }

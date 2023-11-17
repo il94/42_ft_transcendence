@@ -5,10 +5,11 @@ import { RefObject } from "react"
 export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 
 	display: flex;
+	justify-content: center;
 	align-items: center;
 
-	width: 240px;
-	min-width: 240px;
+	width: 100%;
+	min-width: 100%;
 	height: 53px;
 	min-height: 53px;
 
@@ -21,18 +22,6 @@ export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 
 `
 
-export const TempStyle = styled.div`
-
-	display: flex;
-	align-items: center;
-
-	width: 240px;
-	min-width: 240px;
-	height: 53px;
-	min-height: 53px;
-
-`
-
 export const ProfilePicture = styled.div`
 	
 	width: 32px;
@@ -40,6 +29,7 @@ export const ProfilePicture = styled.div`
 	min-width: 32px;
 
 	margin-left: 8px;
+	margin-right: auto;
 
 	border-radius: 50%;
 	

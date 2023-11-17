@@ -1,10 +1,6 @@
 import { Style } from "./style"
-import { CardContext } from "../../pages/Game"
-import { useContext } from "react"
 
-function Card() {
-
-	const { cardPosition } = useContext(CardContext)!
+function Card({ cardPosition } : { cardPosition: number }) {
 
 	return (
 		<Style $top={cardPosition} />
