@@ -11,7 +11,8 @@ export class AuthController {
 
 	@Get('/api42/login')
 	@UseGuards(Api42AuthGuard)
-	handleLogin() {
+	handleLogin(dto: AuthDto) {
+		return this.authService.validateUser(dto);
 		return {msg: 'api42 Authentication'};
 	}
 
@@ -31,7 +32,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')
 	signin(@Body() dto:AuthDto) {
-		return this.authService.signin(dto);
+		return this.authService.validateUser(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)

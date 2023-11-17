@@ -19,9 +19,29 @@ export class AuthService {
 		return "Coucou!";
 	}
 
-	//signin and signup logics should be implemented with third part API42 authentication 
+	// PB : COMMENT MAPPER l'objet dto avec l'objet profile de api42 strategy ?
+	async validateUser(dto: AuthDto) {
+		console.log('AuthServive');
+		console.log(dto);
+		console.log("STOP");
+		//find the user by username
+		const user = await this.prisma.user.findUnique({
+			where: { email: dto.email }, // dto.email is undifined
+		});
+		// create user if not found
+		if (!user)
+			this.signup(dto);
+			//throw new ForbiddenException('Credentials incorrect');
+		console.log(user);
+
+		// compare password
+		//const pwdMatch = await argon.verify(user.hash, dto.password);
+		//if (!pwdMatch) 
+		//	throw new ForbiddenException('Credentials incorrect');
+		return this.signToken(user.id, user.email);
+	}
 	
-	// JWT LOGIC
+	// Generate acces token
 	async signToken(userId: number, email: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,
@@ -31,18 +51,18 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
-	// NO MANDATORY
+
 	async signup(dto: AuthDto) {
 		//generate password hash
-		const hash = await argon.hash(dto.password);
+		//const hash = await argon.hash(dto.password);
 		if (!dto.avatar) { dto.avatar = process.env.AVATAR };
 		//save new user in db
 		try {
 			const user = await this.prisma.user.create({
 				data: {
-	
+					id: 42,
 					email: dto.email,
-					hash,
+					hash: "123",
 					nickname: dto.nickname,
 					avatar: dto.avatar,
 					tel: dto.tel,
@@ -52,28 +72,11 @@ export class AuthService {
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002') {
+				if (error.code === 'P2002')
 					throw new ForbiddenException('Credentials taken');
-				}
 			}
 			throw error;
 		}
 	}
 
-	// NO MANDATORY
-	async signin(dto: AuthDto) {
-		// find the user by email
-		const user = await this.prisma.user.findUnique({
-			where: { email: dto.email, },
-		});
-		if (!user) 
-			throw new ForbiddenException('Credentials incorrect');
-		
-		// compare password
-		const pwdMatch = await argon.verify(user.hash, dto.password);
-		if (!pwdMatch) 
-			throw new ForbiddenException('Credentials incorrect');
-		return this.signToken(user.id, user.email);
-	}
 }
-

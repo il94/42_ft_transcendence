@@ -17,7 +17,7 @@ import { Api42Strategy } from "./strategy/api42.strategy";
 		//	signOptions: { expiresIn: '60s' }
 		}),
 	],
-	providers: [AuthService, JwtStrategy, Api42Strategy],
+	providers: [JwtStrategy, Api42Strategy, AuthService],
 	controllers: [AuthController],
 	exports: [AuthService],
 })
