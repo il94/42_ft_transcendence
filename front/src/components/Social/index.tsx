@@ -4,7 +4,7 @@ import Friend from "./Friend"
 import colors from "../../utils/colors"
 import { CardContext } from "../../pages/Game"
 
-function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.Dispatch<React.SetStateAction<boolean>>, scrollValue: number, setScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
+function Social({ displaySocial, socialScrollValue, setSocialScrollValue }: { displaySocial: React.Dispatch<React.SetStateAction<boolean>>, socialScrollValue: number, setSocialScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
 
 	const scrollContainerRef = useRef(null)
 
@@ -12,18 +12,18 @@ function Social({ setReduce, scrollValue, setScrollValue }: { setReduce: React.D
 		const scrollContainer: any = scrollContainerRef.current
 
 		if (scrollContainer)
-			scrollContainer.scrollTop = scrollValue
+			scrollContainer.scrollTop = socialScrollValue
 	}, [])
 
 	const { displayCard } = useContext(CardContext)!
 
 	function reduceSocial() {
 		displayCard(false)
-		setReduce(true)
+		displaySocial(true)
 	}
 
 	function handleScroll(event: any) {
-		setScrollValue(event.currentTarget.scrollTop);
+		setSocialScrollValue(event.currentTarget.scrollTop);
 	}
 
 	return (

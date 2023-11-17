@@ -3,7 +3,7 @@ import { ReduceButton, Style, FriendsWrapper } from "./style"
 import FriendReduce from "../Friend/FriendReduce"
 import colors from "../../../utils/colors"
 
-function SocialReduce({ setReduce, scrollValue, setScrollValue }: { setReduce: React.Dispatch<React.SetStateAction<boolean>>, scrollValue: number, setScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
+function SocialReduce({ displaySocial, socialScrollValue, setSocialScrollValue }: { displaySocial: React.Dispatch<React.SetStateAction<boolean>>, socialScrollValue: number, setSocialScrollValue: React.Dispatch<React.SetStateAction<number>> }) {
 
 	const scrollContainerRef = useRef(null)
 
@@ -11,11 +11,11 @@ function SocialReduce({ setReduce, scrollValue, setScrollValue }: { setReduce: R
 		const scrollContainer: any = scrollContainerRef.current
 
 		if (scrollContainer)
-			scrollContainer.scrollTop = scrollValue
+			scrollContainer.scrollTop = socialScrollValue
 	}, [])
 
 	function handleScroll(event: any) {
-		setScrollValue(event.currentTarget.scrollTop);
+		setSocialScrollValue(event.currentTarget.scrollTop);
 	}
 
 	return (
@@ -40,7 +40,7 @@ function SocialReduce({ setReduce, scrollValue, setScrollValue }: { setReduce: R
 				<FriendReduce color={colors.section}/>
 				<FriendReduce color={colors.sectionAlt}/>
 			</FriendsWrapper>
-			<ReduceButton	onClick={() => setReduce(false)}
+			<ReduceButton	onClick={() => displaySocial(false)}
 							title="Extend" />
 		</Style>
 	)
