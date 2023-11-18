@@ -29,7 +29,7 @@ function Friend({ social, color } : { social: boolean, color: string }) {
 	
 			const topCard = topCurrentElement - topParentElement > topMax ? topMax : topCurrentElement - topParentElement // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 		
-			setCardPosition(topCard)
+			setCardPosition({ top: topCard, left: 0})
 			displayCard(true)
 		}
 		

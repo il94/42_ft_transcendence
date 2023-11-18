@@ -16,7 +16,6 @@ import Social from '../../components/Social'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
-import ChatButton from '../../components/Chat/ChatButton'
 import Card from '../../components/Card'
 
 import breakpoints from '../../utils/breakpoints'
@@ -35,7 +34,7 @@ export const ChatContext = createContext<{
 export const CardContext = createContext<{
 	card: boolean,
 	displayCard: React.Dispatch<React.SetStateAction<boolean>>,
-	setCardPosition: React.Dispatch<React.SetStateAction<number>>
+	setCardPosition: React.Dispatch<React.SetStateAction<{ top: number, left: number }>>
 } | undefined>(undefined)
 
 function Game() {
@@ -49,7 +48,7 @@ function Game() {
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<number>(0)
+	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0})
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
@@ -70,7 +69,7 @@ function Game() {
 					<RightGameWrapper>
 						<TopGameWrapper>
 							<Info />
-							<Profile />
+							<Profile displayCard={displayCard} setCardPosition={setCardPosition} />
 						</TopGameWrapper>
 						<BottomGameWrapper>
 							<Pong />
