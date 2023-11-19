@@ -17,6 +17,7 @@ export class AuthDto {
 	avatar: string;
 
 	@IsMobilePhone()
+	@IsOptional()
 	tel: string;
 
 }

@@ -12,6 +12,7 @@ export class AuthController {
 	@Get('/api42/login')
 	@UseGuards(Api42AuthGuard)
 	handleLogin(dto: AuthDto) {
+		console.log("ICI");
 		return this.authService.validateUser(dto);
 		return {msg: 'api42 Authentication'};
 	}
@@ -25,6 +26,7 @@ export class AuthController {
 	// Registering a new user => no mandatory 
 	@Post('signup')
 	signup(@Body() dto:AuthDto) {
+		console.log("ICI");
 		return this.authService.signup(dto);
 	}
 

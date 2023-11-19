@@ -6,7 +6,7 @@ export class UserController {
 	
 	// TODO 
 	// in pogress from jwt authentication stratgy
-	@UseGuards(AuthGuard('jwt'))
+	@UseGuards(AuthGuard('jwt42'))
 	@Get('me')
 	getMe() {
 		return "user info";
