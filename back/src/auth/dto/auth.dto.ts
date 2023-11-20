@@ -1,22 +1,27 @@
 import { IsEmail, IsString, IsNotEmpty, IsMobilePhone, IsOptional } from "class-validator";
 
 export class AuthDto {
-	@IsEmail()
-	@IsNotEmpty()
+
+	//@IsNotEmpty()
+	id42: string;
+
+	//@IsString()
+	//@IsNotEmpty()
+	username: string;
+
+	//@IsEmail()
+	//@IsNotEmpty()
 	email: string;
 
-	@IsString()
-	@IsNotEmpty()
-	password: string;
+	//@IsString()
+	@IsOptional()
+	hash: string;
 
-	@IsString()
-	@IsNotEmpty()
-	nickname: string;
-
+	//@IsString()
 	@IsOptional()
 	avatar: string;
 
-	@IsMobilePhone()
+	//@IsMobilePhone()
 	@IsOptional()
 	tel: string;
 

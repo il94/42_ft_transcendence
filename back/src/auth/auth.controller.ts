@@ -12,8 +12,8 @@ export class AuthController {
 	@Get('/api42/login')
 	@UseGuards(Api42AuthGuard)
 	handleLogin(dto: AuthDto) {
-		console.log("ICI");
-		return this.authService.validateUser(dto);
+		console.log("Iapi42 Authentication");
+		//return this.authService.validateUser(dto);
 		return {msg: 'api42 Authentication'};
 	}
 
@@ -26,7 +26,8 @@ export class AuthController {
 	// Registering a new user => no mandatory 
 	@Post('signup')
 	signup(@Body() dto:AuthDto) {
-		console.log("ICI");
+		console.log("dto dans auth/signup")
+		console.log(dto);
 		return this.authService.signup(dto);
 	}
 
@@ -34,7 +35,9 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')
 	signin(@Body() dto:AuthDto) {
-		return this.authService.validateUser(dto);
+		console.log("dto dans auth/signin")
+		console.log(dto);
+		return this.authService.signin(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)

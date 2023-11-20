@@ -3,7 +3,7 @@ import { ExtractJwt,Strategy } from 'passport-jwt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt42') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
 		jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -12,6 +12,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt42') {
   }
 
   validate(payload: any) {
+    console.log("dans validate");
     console.log({payload,});
+    return payload;
   }
 }

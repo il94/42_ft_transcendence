@@ -1,12 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from '../auth/auth.guard';
 
 @Controller('users')
 export class UserController {
 	
-	// TODO 
-	// in pogress from jwt authentication stratgy
-	@UseGuards(AuthGuard('jwt42'))
+	@UseGuards(JwtGuard)
 	@Get('me')
 	getMe() {
 		return "user info";

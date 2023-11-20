@@ -19,57 +19,69 @@ export class AuthService {
 		return "Coucou!";
 	}
 
-	// PB : COMMENT MAPPER l'objet dto avec l'objet profile de api42 strategy ?
-	async validateUser(dto: AuthDto) {
-		console.log('AuthServive');
+	async signin(dto: AuthDto) {
+		console.log('in signin');
 		console.log(dto);
 		console.log("STOP");
-		//find the user by username
 		const user = await this.prisma.user.findUnique({
-			where: { email: dto.email }, // dto.email is undifined
+			where: { username: "claich", },
 		});
 		// create user if not found
 		if (!user)
-			this.signup(dto);
-			//throw new ForbiddenException('Credentials incorrect');
-		console.log(user);
-
+			throw new ForbiddenException('Credentials incorrect');
+		console.log("user : ", user);
 		// compare password
-		//const pwdMatch = await argon.verify(user.hash, dto.password);
-		//if (!pwdMatch) 
-		//	throw new ForbiddenException('Credentials incorrect');
-		return this.signToken(user.id, user.email);
+//		const pwdMatch = await argon.verify(user.hash, dto.hash);
+//		if (!pwdMatch) 
+//			throw new ForbiddenException('Credentials incorrect');
+		return this.signToken(user.id, user.username);
+	}
+
+	// PB : COMMENT MAPPER l'objet dto avec l'objet profile de api42 strategy ?
+	// TODO proteger avec un try catch
+	async validateUser(profile: any) {
+		console.log('in validateUser');
+		console.log(profile);
+		console.log("STOP");
+		const user = await this.prisma.user.findUnique({
+			where: { username: profile.username, },
+		});
+		// create user if not found
+		if (!user) {
+			console.log("jai pas trouve le user");
+			return this.signup(profile);
+		}
+			//throw new ForbiddenException('Credentials incorrect');
+		console.log("user data: ", user);
+		return this.signToken(user.id, user.username);
 	}
 	
-	// Generate acces token
-	async signToken(userId: number, email: string): Promise<{ access_token: string }> {
+	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,
-			email
+			username
 		};
-		const token =  await this.jwt.signAsync(payload, { expiresIn: '15m', secret: process.env.JWT_SECRET })
+		const token =  await this.jwt.signAsync(payload, { expiresIn: '50m', secret: process.env.JWT_SECRET })
 		return { access_token: token, }
 	}
 
 
-	async signup(dto: AuthDto) {
-		//generate password hash
-		//const hash = await argon.hash(dto.password);
-		console.log("ICI");
-		if (!dto.avatar) { dto.avatar = process.env.AVATAR };
-		//save new user in db
+	async signup(profile: any) {
+		const hash = await argon.hash('123');
+		console.log('in signup');
+		console.log(profile);
+		//if (!dto.avatar) { dto.avatar = process.env.AVATAR };
 		try {
 			const user = await this.prisma.user.create({
 				data: {
-					id: 42,
-					email: "claire@gmail.com",
-					hash: "123",
-					nickname: "cléclé",
-					avatar: "",
-					tel: "",
+					email: profile.emails[0].value,
+					hash,
+					avatar: process.env.AVATAR,
+					id42: profile.id,
+					username: profile.username,
 				},
 			});
-			return this.signToken(user.id, user.email);
+			return this.signToken(user.id, user.username);
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {

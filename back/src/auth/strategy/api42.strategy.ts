@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport";
-import moduleDefaultExport from 'passport-42';
+import moduleDefaultExport from "passport-42";
 import { AuthService } from "../auth.service";
 
 @Injectable() 
@@ -12,11 +12,11 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
             callbackURL: 'http://localhost:3333/api/auth/api42/redirect',
         });
     }
-    async validate (accessToken: string, refreshToken: string, profile: any) {
-        console.log("access token: ", accessToken);
-        console.log("refresh token: ", refreshToken);
-        console.log(profile);
-        this.authService.validateUser(profile);
+    async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
+        console.log("access token : ", accessToken);
+		console.log("refresh token : ", accessToken);
+		console.log("profile: ", profile);
+        const user = this.authService.validateUser(profile);
     }
 }
 
