@@ -15,12 +15,12 @@ model User {
   createdAt DateTime @default(now())
 
   // profile data
-  id42      String  @unique
-  username  String  @unique
-  email     String  @unique
-  hash      String?
-  avatar    String
-  tel       String?
+  id42        String?  @unique
+  username    String  @unique
+  email       String  @unique
+  hash        String?
+  avatar      String
+  tel         String?
 
   //game data
   //status    String?

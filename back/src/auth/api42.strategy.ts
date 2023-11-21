@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport";
 import moduleDefaultExport from "passport-42";
-import { AuthService } from "../auth.service";
+import { AuthService } from "./auth.service";
 
 @Injectable() 
 export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy) {

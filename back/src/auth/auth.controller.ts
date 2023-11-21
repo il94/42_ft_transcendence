@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, HttpCode, HttpStatus, Request, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { Api42AuthGuard } from './auth.guard';
-import { AuthDto } from "./dto";
+import { Api42AuthGuard, JwtGuard } from './auth.guard';
+import { AuthDto } from "./auth.dto";
 
 
 // separer la logique metier : le controller execute les requetes https
@@ -12,7 +12,6 @@ export class AuthController {
 	@Get('/api42/login')
 	@UseGuards(Api42AuthGuard)
 	handleLogin(dto: AuthDto) {
-		console.log("api42 Authentication");
 		return {msg: 'api42 Authentication'};
 	}
 
@@ -25,7 +24,6 @@ export class AuthController {
 	// Registering a new user => no mandatory 
 	@Post('signup')
 	signup(@Body() dto:AuthDto) {
-		console.log("dto dans auth/signup")
 		console.log(dto);
 		return this.authService.signup(dto);
 	}
@@ -33,8 +31,8 @@ export class AuthController {
 	// loging as a user => no mandatory
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')
+	@UseGuards(JwtGuard)
 	signin(@Body() dto:AuthDto) {
-		console.log("dto dans auth/signin")
 		console.log(dto);
 		return this.authService.signin(dto);
 	}

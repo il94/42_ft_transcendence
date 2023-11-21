@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaClient, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { AuthDto } from "./dto";
+import { AuthDto } from "./auth.dto";
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from '@nestjs/jwt';
@@ -18,27 +18,19 @@ export class AuthService {
 	}
 
 	async signin(dto: AuthDto) {
-		console.log('in signin');
-		console.log(dto);
-		console.log("STOP");
 		const user = await this.prisma.user.findUnique({
-			where: { username: "claich", },
+			where: { username: dto.username, },
 		});
-		// create user if not found
 		if (!user)
-			throw new ForbiddenException('Credentials incorrect');
-		console.log("user : ", user);
-		// compare password
-//		const pwdMatch = await argon.verify(user.hash, dto.hash);
-//		if (!pwdMatch) 
-//			throw new ForbiddenException('Credentials incorrect');
+			throw new ForbiddenException('user not found');
+		const pwdMatch = await argon.verify(user.hash, dto.hash);
+		if (!pwdMatch) 
+			throw new ForbiddenException('incorrect password');
 		return this.signToken(user.id, user.username);
 	}
 
-	// PB : COMMENT MAPPER l'objet dto avec l'objet profile de api42 strategy ?
 	// TODO proteger avec un try catch
 	async validateUser(profile: any) { // profile: any => profile: AuthDTO
-		console.log('in validateUser');
 		const user = await this.prisma.user.findUnique({
 			where: { username: profile.username, },
 		});
@@ -59,19 +51,9 @@ export class AuthService {
 			//throw new ForbiddenException('Credentials incorrect');
 		console.log("user data: ", user);
 		return user;
-		//return this.signToken(user.id, user.username);
 	}
 
-	async findUser(id: number) {
-		const user = await this.prisma.user.findUnique({
-			where: { id: id},
-		})
-	}
-	
-	// TODO (dans dossier user)
-	async createUser (profile: any) { } 
-	async updateUser (profile: any) { }
-	async deleteUser (profile: any) { }
+
 	
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
 		const payload = {

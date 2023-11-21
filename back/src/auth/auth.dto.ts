@@ -3,25 +3,26 @@ import { IsEmail, IsString, IsNotEmpty, IsMobilePhone, IsOptional } from "class-
 export class AuthDto {
 
 	//@IsNotEmpty()
+	@IsString()
 	id42: string;
 
-	//@IsString()
-	//@IsNotEmpty()
+	@IsString()
+	@IsNotEmpty()
 	username: string;
 
-	//@IsEmail()
-	//@IsNotEmpty()
+	@IsEmail()
+	@IsNotEmpty()
 	email: string;
 
-	//@IsString()
+	@IsString()
 	@IsOptional()
 	hash: string;
 
-	//@IsString()
+	@IsString()
 	@IsOptional()
 	avatar: string;
 
-	//@IsMobilePhone()
+	@IsMobilePhone()
 	@IsOptional()
 	tel: string;
 

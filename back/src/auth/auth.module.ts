@@ -5,7 +5,7 @@ import { PrismaModule } from "src/prisma/prisma.module";
 import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy';
-import { Api42Strategy } from "./strategy/api42.strategy";
+import { Api42Strategy } from "./api42.strategy";
 import { SessionSerializer } from "./Serializer";
 
 @Module ({
