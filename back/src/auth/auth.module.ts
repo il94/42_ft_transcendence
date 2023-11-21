@@ -6,6 +6,7 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy';
 import { Api42Strategy } from "./strategy/api42.strategy";
+import { SessionSerializer } from "./Serializer";
 
 @Module ({
 	imports: [
@@ -17,7 +18,7 @@ import { Api42Strategy } from "./strategy/api42.strategy";
 		//	signOptions: { expiresIn: '60s' }
 		}),
 	],
-	providers: [JwtStrategy, Api42Strategy, AuthService],
+	providers: [JwtStrategy, Api42Strategy, AuthService, SessionSerializer],
 	controllers: [AuthController],
 	exports: [AuthService],
 })

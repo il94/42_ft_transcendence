@@ -12,8 +12,7 @@ export class AuthController {
 	@Get('/api42/login')
 	@UseGuards(Api42AuthGuard)
 	handleLogin(dto: AuthDto) {
-		console.log("Iapi42 Authentication");
-		//return this.authService.validateUser(dto);
+		console.log("api42 Authentication");
 		return {msg: 'api42 Authentication'};
 	}
 
@@ -49,6 +48,12 @@ export class AuthController {
 	//@UseGuards(AuthGuard)
 	@Get('profile')
 	getProfile(@Request() req) {
-	  return req.user;
+		console.log(req.user);
+		if (req.user) {
+			return { msg: 'Authenticated' };
+		} else { 
+			return { msg: 'NOT Authenticated' };
+		}
+
 	}
 }

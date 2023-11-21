@@ -5,7 +5,7 @@ import { AuthService } from "../auth.service";
 
 @Injectable() 
 export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy) {
-    constructor(@Inject(AuthService) private authService: AuthService) {
+    constructor(@Inject(AuthService) private readonly authService: AuthService) {
         super({
             clientID: process.env.FORTYTWO_APP_ID,
             clientSecret: process.env.FORTYTWO_APP_SECRET,
@@ -15,8 +15,9 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
     async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
         console.log("access token : ", accessToken);
 		console.log("refresh token : ", accessToken);
-		console.log("profile: ", profile);
-        const user = this.authService.validateUser(profile);
+        const user = this.authService.validateUser({ email: profile.emails[0].value, username: profile.username, id42: profile.id }); 
+        console.log ("User valide : ", user);
+        return user || null;
     }
 }
 

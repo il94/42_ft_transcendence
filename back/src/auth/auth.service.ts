@@ -6,8 +6,6 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from '@nestjs/jwt';
 
-// A service contains business logic : the action to do regarding the request sent
-// AuthService's job : retrieving a user verifying the password
 @Injectable()
 export class AuthService {
 	constructor(
@@ -39,22 +37,41 @@ export class AuthService {
 
 	// PB : COMMENT MAPPER l'objet dto avec l'objet profile de api42 strategy ?
 	// TODO proteger avec un try catch
-	async validateUser(profile: any) {
+	async validateUser(profile: any) { // profile: any => profile: AuthDTO
 		console.log('in validateUser');
-		console.log(profile);
-		console.log("STOP");
 		const user = await this.prisma.user.findUnique({
 			where: { username: profile.username, },
 		});
 		// create user if not found
 		if (!user) {
-			console.log("jai pas trouve le user");
-			return this.signup(profile);
+			console.log ("jai pas trouve le user");
+			const newUser = await this.prisma.user.create({
+				data: {
+					email: profile.email,
+					hash: "00",
+					avatar: process.env.AVATAR,
+					id42: profile.id42,
+					username: profile.username,
+				},
+			});
+			return newUser;
 		}
 			//throw new ForbiddenException('Credentials incorrect');
 		console.log("user data: ", user);
-		return this.signToken(user.id, user.username);
+		return user;
+		//return this.signToken(user.id, user.username);
 	}
+
+	async findUser(id: number) {
+		const user = await this.prisma.user.findUnique({
+			where: { id: id},
+		})
+	}
+	
+	// TODO (dans dossier user)
+	async createUser (profile: any) { } 
+	async updateUser (profile: any) { }
+	async deleteUser (profile: any) { }
 	
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
 		const payload = {
@@ -69,7 +86,6 @@ export class AuthService {
 	async signup(profile: any) {
 		const hash = await argon.hash('123');
 		console.log('in signup');
-		console.log(profile);
 		//if (!dto.avatar) { dto.avatar = process.env.AVATAR };
 		try {
 			const user = await this.prisma.user.create({
@@ -81,7 +97,8 @@ export class AuthService {
 					username: profile.username,
 				},
 			});
-			return this.signToken(user.id, user.username);
+			return user;
+			//return this.signToken(user.id, user.username);
 		}
 		catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
