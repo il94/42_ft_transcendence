@@ -40,7 +40,7 @@ function Profile({ displayCard, setCardPosition} : ProfileProps ) {
 			<ProfileWrapper onClick={showCard} ref={profileContainerRef}>
 				<ProfilePicture />
 				<ProfileName>
-					Example
+					WWWWWWWW
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>

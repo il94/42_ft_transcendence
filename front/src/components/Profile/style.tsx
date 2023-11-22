@@ -10,8 +10,6 @@ export const Style = styled.div`
 
 	width: 240px;
 	min-width: 240px;
-	height: 53px;
-	min-height: 53px;
 
 	background-color: ${colors.profile};
 	
@@ -23,12 +21,7 @@ export const ProfileWrapper = styled.div`
 	justify-content: flex-start;
 	align-items: center;
 	
-	width: calc(63.96% - 2px);
-	height: calc(100% - 7px);
-
-	margin-top: 3.5px;
-	margin-bottom: 3.5px;
-	margin-left: 3.5px;
+	padding-right: 7px;
 
 	&:hover {
 		cursor: pointer;
@@ -44,7 +37,7 @@ export const ProfilePicture = styled.div`
 	width: 32px;
 	height: 32px;
 
-	margin-left: 4.5px;
+	margin-left: 7px;
 
 	background-color: ${colors.profilePicture};
 
@@ -54,7 +47,10 @@ export const ProfilePicture = styled.div`
 
 export const ProfileName = styled.p`
 	
-	margin-left: 8px;
+	margin-left: 6px;
+
+	text-align: center;
+	font-size: 14px;
 
 `
 
@@ -64,7 +60,7 @@ export const ButtonsWrapper = styled.div`
 	justify-content: space-between;
 	align-items: center;
 
-	padding-right: 6.5px;
+	margin-right: 6.5px;
 
 	width: 82px;
 	min-width: 82px;
