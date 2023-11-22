@@ -17,7 +17,7 @@ const Style = styled.div`
 
 `
 
-function Score() {
+function ScoreResume() {
 	return (
 		<Style>
 			<Win value={0} />
@@ -27,4 +27,4 @@ function Score() {
 	)
 }
 
-export default Score
+export default ScoreResume

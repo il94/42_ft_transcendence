@@ -1,6 +1,6 @@
 import { ProfilePicture, Style, UserName } from "./style"
 import MatchHistory from "./MatchHistory"
-import Score from "./Score"
+import ScoreResume from "./ScoreResume"
 
 function Card({ cardPosition } : { cardPosition: { top: number, left: number} }) {
 
@@ -8,9 +8,9 @@ function Card({ cardPosition } : { cardPosition: { top: number, left: number} })
 		<Style $top={cardPosition.top} $left={cardPosition.left}>
 			<ProfilePicture />
 			<UserName>
-				Example
+				WWWWWWWW
 			</UserName>
-			<Score />
+			<ScoreResume />
 			<MatchHistory />
 		</Style>
 	)

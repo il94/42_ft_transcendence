@@ -1,9 +1,22 @@
-import { Style } from "./style"
+import Score from "./Score"
+import { Opponent, Style, Username } from "./style"
 
-function Match({ color } : { color: string }) {
+type MatchProps = {
+	username: string,
+	opponent: string,
+	color: string
+}
+
+function Match({ username, opponent, color } : MatchProps ) {
 	return (
 		<Style color={color}>
-
+			<Username>
+				{username}
+			</Username>
+			<Score />
+			<Opponent>
+				{opponent}
+			</Opponent>
 		</Style>
 	)
 }
