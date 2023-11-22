@@ -1,5 +1,6 @@
-import { ProfilePicture, Score, Style, UserName } from "./style"
+import { ProfilePicture, Style, UserName } from "./style"
 import MatchHistory from "./MatchHistory"
+import Score from "./Score"
 
 function Card({ cardPosition } : { cardPosition: { top: number, left: number} }) {
 
@@ -9,9 +10,7 @@ function Card({ cardPosition } : { cardPosition: { top: number, left: number} })
 			<UserName>
 				Example
 			</UserName>
-			<Score>
-				0W 0D 0L
-			</Score>
+			<Score />
 			<MatchHistory />
 		</Style>
 	)

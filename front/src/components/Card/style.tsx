@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import colors from "../../utils/colors"
+import effects from "../../utils/effects"
 
 export const Style = styled.div<{$top: number, $left: number}>`
 
@@ -17,6 +18,8 @@ export const Style = styled.div<{$top: number, $left: number}>`
 	height: 371px;
 	min-width: 240px;
 	min-height: 371px;
+
+	${effects.pixelateWindow};
 
 	background-color: ${colors.module};
 	
@@ -43,13 +46,5 @@ export const UserName = styled.p`
 	margin-top: 5px;
 
 	font-size: 27px;
-
-`
-
-export const Score = styled.p`
-
-	margin-top: 8px;
-
-	font-size: 15px;
 
 `
