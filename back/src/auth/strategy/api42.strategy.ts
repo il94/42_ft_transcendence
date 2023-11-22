@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport";
 import moduleDefaultExport from "passport-42";
-import { AuthService } from "./auth.service";
+import { AuthService } from "../auth.service";
 
 @Injectable() 
 export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy) {
@@ -14,7 +14,7 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
     }
     async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
         console.log("access token : ", accessToken);
-		console.log("refresh token : ", accessToken);
+		console.log("refresh token : ", refreshToken);
         const user = this.authService.validateUser({ email: profile.emails[0].value, username: profile.username, id42: profile.id }); 
         console.log ("User valide : ", user);
         return user || null;

@@ -21,13 +21,6 @@ export class AuthController {
 		return {msg: 'ok'};
 	}
 
-	// Registering a new user => no mandatory 
-	@Post('signup')
-	signup(@Body() dto:AuthDto) {
-		console.log(dto);
-		return this.authService.signup(dto);
-	}
-
 	// loging as a user => no mandatory
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')

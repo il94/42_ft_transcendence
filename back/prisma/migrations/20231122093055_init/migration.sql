@@ -2,10 +2,10 @@
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "id42" TEXT NOT NULL,
+    "id42" TEXT,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "hash" TEXT,
+    "hash" TEXT NOT NULL,
     "avatar" TEXT NOT NULL,
     "tel" TEXT,
 
