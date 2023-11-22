@@ -29,7 +29,6 @@ export const ProfileWrapper = styled.div`
 	margin-top: 3.5px;
 	margin-bottom: 3.5px;
 	margin-left: 3.5px;
-	margin-right: 3.5px;
 
 	&:hover {
 		cursor: pointer;
@@ -67,7 +66,8 @@ export const ButtonsWrapper = styled.div`
 
 	padding-right: 6.5px;
 
-	width: 36.04%;
+	width: 82px;
+	min-width: 82px;
 	height: 100%;
 
 `

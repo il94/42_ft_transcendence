@@ -41,7 +41,7 @@ function Friend({ social, color } : { social: boolean, color: string }) {
 				!social &&
 			<ProfileInfo>
 				<ProfileName>
-					Example
+					WWWWWWWW
 				</ProfileName>
 				<ProfileStatus>
 					En recherche de partie...

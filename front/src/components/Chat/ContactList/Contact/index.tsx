@@ -5,7 +5,7 @@ function Contact({ color } : {color: string}) {
 		<Style color={color}>
 			<ProfilePicture />
 			<ContactName>
-				Example
+				WWWWWWWW
 			</ContactName>
 		</Style>
 	)

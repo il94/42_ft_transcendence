@@ -10,7 +10,7 @@ function Banner() {
 	return (
 		<Style>
 			<ChannelName>
-				Example
+				WWWWWWWW
 			</ChannelName>
 			<ReduceButton src={ReduceIcon} onClick={() => displayChat(false)}
 				alt="Reduce button" title="Reduce" />
