@@ -1,4 +1,4 @@
-import { RefObject, useContext, useRef } from "react"
+import { useContext, useRef, RefObject } from "react"
 
 import {
 	Style,
@@ -8,8 +8,7 @@ import {
 	ProfileStatus
 } from "./style"
 
-import { CardContext } from "../../../pages/Game" 
-
+import CardContext from "../../../contexts/CardContext"
 
 function Friend({ social, color } : { social: boolean, color: string }) {
 

@@ -1,9 +1,23 @@
-import { Style, ProfileWrapper, ButtonsWrapper, Icon, ProfileName, ProfilePicture } from "./style"
+import { useRef, RefObject, SetStateAction, Dispatch } from "react"
+
+import {
+	Style,
+	ProfileWrapper,
+	ButtonsWrapper,
+	Icon,
+	ProfileName,
+	ProfilePicture
+} from "./style"
+
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
-import { RefObject, useRef } from "react"
 
-function Profile({ displayCard, setCardPosition} : { displayCard: React.Dispatch<React.SetStateAction<boolean>>, setCardPosition: React.Dispatch<React.SetStateAction<{ top: number, left: number }>>}) {
+type ProfileProps = {
+	displayCard: Dispatch<SetStateAction<boolean>>,
+	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>
+}
+
+function Profile({ displayCard, setCardPosition} : ProfileProps ) {
 
 	const profileContainerRef : RefObject<HTMLElement> = useRef(null)
 

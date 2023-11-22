@@ -1,8 +1,11 @@
 import { useContext } from "react"
+
 import { Style, ChatButton } from "./style"
+
 import ContactList from "./ContactList"
 import ChatWindow from "./ChatWindow"
-import { ChatContext } from "../../pages/Game"
+import ChatContext from "../../contexts/ChatContext"
+
 import ChatIcon from "../../assets/chat.png"
 
 function Chat() {

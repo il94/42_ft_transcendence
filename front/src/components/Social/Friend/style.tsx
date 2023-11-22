@@ -1,6 +1,6 @@
+import { RefObject } from "react"
 import styled from "styled-components"
 import colors from "../../../utils/colors"
-import { RefObject } from "react"
 
 export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 

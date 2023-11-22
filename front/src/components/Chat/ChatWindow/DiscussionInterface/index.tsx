@@ -1,17 +1,15 @@
 import { useContext, useEffect } from "react"
+
 import { Style } from "./style"
+
 import ContactMessage from "./ContactMessage"
 import UserMessage from "./UserMessage"
 import ScrollBar from "../../../ScrollBar"
-import { ChatContext } from "../../../../pages/Game"
+import ChatContext from "../../../../contexts/ChatContext"
 
 function DiscussionInterface(){
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
-
-	useEffect(() => {
-		// console.log(setChatRender)
-	})
 
 	return (
 		<Style>

@@ -1,10 +1,9 @@
 import styled from "styled-components"
-import colors from "../../../utils/colors"
 
 import Contact from "./Contact"
-import { useContext, useEffect, useRef } from "react"
-import { ChatContext } from "../../../pages/Game"
 import ScrollBar from "../../ScrollBar"
+
+import colors from "../../../utils/colors"
 
 const Style = styled.div`
 

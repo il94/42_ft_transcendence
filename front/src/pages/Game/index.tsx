@@ -1,4 +1,8 @@
-import React, { createContext, useEffect, useState } from 'react'
+import {
+	useEffect,
+	useState
+} from 'react'
+
 import { useMediaQuery } from 'react-responsive'
 
 import {
@@ -10,6 +14,9 @@ import {
 	RightGameWrapper
 } from './style'
 
+import CardContext from '../../contexts/CardContext'
+import ChatContext from '../../contexts/ChatContext'
+
 import Logo from '../../components/Logo'
 import Info from '../../components/Info'
 import Social from '../../components/Social'
@@ -19,23 +26,6 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 
 import breakpoints from '../../utils/breakpoints'
-
-export const ChatContext = createContext<{
-	chat: boolean,
-	displayChat: React.Dispatch<React.SetStateAction<boolean>>,
-	contactListScrollValue: number,
-	setContactListScrollValue: React.Dispatch<React.SetStateAction<number>>,
-	chatScrollValue: number,
-	setChatScrollValue: React.Dispatch<React.SetStateAction<number>>,
-	chatRender: boolean,
-	setChatRender: React.Dispatch<React.SetStateAction<boolean>>
-} | undefined>(undefined)
-
-export const CardContext = createContext<{
-	card: boolean,
-	displayCard: React.Dispatch<React.SetStateAction<boolean>>,
-	setCardPosition: React.Dispatch<React.SetStateAction<{ top: number, left: number }>>
-} | undefined>(undefined)
 
 function Game() {
 

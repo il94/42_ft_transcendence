@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 import styled from "styled-components"
 
 const Style = styled.div`
@@ -14,6 +14,7 @@ const Style = styled.div`
 
 function Pong() {
 	
+	// Code temporaire pour tests
 	const [counter, setCounter] = useState(0);
 
 	useEffect(() => {

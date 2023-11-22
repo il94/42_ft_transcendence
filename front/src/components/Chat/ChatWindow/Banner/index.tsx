@@ -1,7 +1,7 @@
-import { ChannelName, ReduceButton, Style } from "./style"
-import ReduceIcon from "../../../../assets/reduce.png"
 import { useContext } from "react"
-import { ChatContext } from "../../../../pages/Game"
+import { ChannelName, ReduceButton, Style } from "./style"
+import ChatContext from "../../../../contexts/ChatContext"
+import ReduceIcon from "../../../../assets/reduce.png"
 
 function Banner() {
 

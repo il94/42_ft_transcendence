@@ -1,12 +1,22 @@
-import React, { ReactNode, SetStateAction, UIEvent, useEffect, useRef, useState } from "react"
+import {
+	useEffect,
+	useRef,
+	useState,
+	ReactNode,
+	UIEvent,
+	SetStateAction,
+	Dispatch
+} from "react"
+
 import { Scrollbars } from "react-custom-scrollbars"
+
 import styled from "styled-components"
 import colors from "../../utils/colors"
 
 const ThumbVertical = styled.div`
 
 	background-color: ${colors.scrollingBarTransparent};
-
+	
 `
 
 const TrackVertical = styled.div<{$onMouse: boolean}>`
@@ -21,10 +31,13 @@ const TrackVertical = styled.div<{$onMouse: boolean}>`
 
 `
 
-function ScrollBar({ state, firstRenderState, children }
-		: { state: { value: number, setter: React.Dispatch<SetStateAction<number>> },
-			firstRenderState: { value: boolean, setter: React.Dispatch<SetStateAction<boolean>> },
-			children: ReactNode } ) {
+type ScrollBarProps = {
+	state?: { value: number, setter: Dispatch<SetStateAction<number>> },
+	firstRenderState?: { value: boolean, setter: Dispatch<SetStateAction<boolean>> },
+	children: ReactNode
+}
+
+function ScrollBar({ state, firstRenderState, children } : ScrollBarProps ) {
 
 	const scrollBarRef = useRef<Scrollbars>(null)
 	const [onMouse, setOnMouse] = useState<boolean>(false)
@@ -37,7 +50,7 @@ function ScrollBar({ state, firstRenderState, children }
 		}
 	}, [])
 
-	function setFirstPosition() {
+	function setFirstPosition() { // Definit la position de depart de la scrollbar
 		if (firstRenderState && !firstRenderState.value)
 		{
 			scrollBarRef.current!.scrollToBottom()
@@ -45,12 +58,12 @@ function ScrollBar({ state, firstRenderState, children }
 		}
 	}
 
-	function setCurrentPosition() {
+	function setCurrentPosition() { // Place la scrollbar a la position gardee en memoire
 		if (state && state.value)
 			scrollBarRef.current!.scrollTop(state.value)
 	}
 
-	function handleScrollPosition(event: UIEvent) {
+	function handleScrollPosition(event: UIEvent) { // Garde en memoire la position de la scrollbar
 		if (state && state.setter)
 			state.setter((event.target as HTMLElement).scrollTop)
 	}

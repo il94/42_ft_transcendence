@@ -1,11 +1,16 @@
 import { useContext } from "react"
 import { Style, ReduceButton } from "./style"
 import Friend from "./Friend"
-import colors from "../../utils/colors"
-import { CardContext } from "../../pages/Game"
 import ScrollBar from "../ScrollBar"
+import CardContext from "../../contexts/CardContext"
+import colors from "../../utils/colors"
 
-function Social({ social, displaySocial }: { social: boolean, displaySocial: React.Dispatch<React.SetStateAction<boolean>> }) {
+type SocialProps = {
+	social: boolean,
+	displaySocial: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+function Social({ social, displaySocial }: SocialProps ) {
 
 	const { displayCard } = useContext(CardContext)!
 

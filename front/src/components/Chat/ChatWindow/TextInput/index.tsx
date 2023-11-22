@@ -1,13 +1,13 @@
-import React from "react"
+import { FocusEvent } from "react"
 import { Style } from "./style"
 
 function TextInput() {
 
-	function removePlaceHolder(event: React.FocusEvent<HTMLInputElement>) {
+	function removePlaceHolder(event: FocusEvent<HTMLInputElement>) {
 		event.target.placeholder = ""
 	}
 
-	function setPlaceHolder(event: React.FocusEvent<HTMLInputElement>) {
+	function setPlaceHolder(event: FocusEvent<HTMLInputElement>) {
 		if (event.target.placeholder === "")
 			event.target.placeholder = "Type here..."
 	}

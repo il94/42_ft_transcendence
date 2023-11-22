@@ -1,6 +1,11 @@
 import { ProfilePicture, Style, UserName, Text, MessageContent } from "./style"
 
-function ContactMessage({ userName, content } : { userName: string, content: string }) {
+type ContactProps = {
+	userName: string,
+	content: string
+}
+
+function ContactMessage({ userName, content } : ContactProps ) {
 	return (
 		<Style>
 			<ProfilePicture />

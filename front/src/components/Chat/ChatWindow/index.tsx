@@ -1,9 +1,10 @@
 import styled from "styled-components"
-import colors from "../../../utils/colors"
 
 import TextInput from "./TextInput"
 import DiscussionInterface from "./DiscussionInterface"
 import Banner from "./Banner"
+
+import colors from "../../../utils/colors"
 
 const Style = styled.div`
 

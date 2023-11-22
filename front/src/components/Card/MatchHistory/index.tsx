@@ -1,6 +1,8 @@
 import { Style } from "./style"
+
 import Match from "./Match"
 import ScrollBar from "../../ScrollBar"
+
 import colors from "../../../utils/colors"
 
 function MatchHistory() {

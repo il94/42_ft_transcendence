@@ -73,5 +73,3 @@ export const BottomGameWrapper = styled.div`
 	min-height: 159px;
 
 `
-
-

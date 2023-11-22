@@ -1,4 +1,10 @@
-import { HomePage, StyledMainTitle, WelcomeWindow, StyledTitle, StyledLink } from './style'
+import {
+	HomePage,
+	StyledMainTitle,
+	WelcomeWindow,
+	StyledTitle,
+	StyledLink
+} from './style'
 
 function Home() {
 	return (
@@ -14,4 +20,4 @@ function Home() {
 	)
 }
 
-export default Home;
+export default Home
