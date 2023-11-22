@@ -11,34 +11,3 @@ export const Style = styled.div`
 	min-height: 188px;
 
 `
-
-export const MessagesWrapper = styled.div`
-
-	width: 100%;
-	min-height: 188px;
-
-	overflow-y: auto;
-	overflow-x: hidden;
-
-	&:not(:hover) {
-		&::-webkit-scrollbar {
-			display: none;
-		}
-	}
-
-	&:hover {
-
-		&::-webkit-scrollbar {
-			width: 5px;
-			-webkit-appearance: none;
-		}
-	
-		&::-webkit-scrollbar-thumb {
-			background-color: ${colors.scrollingBar};
-		}
-
-		& .userMessages {
-			margin-right: 1px;
-		}
-	}
-`

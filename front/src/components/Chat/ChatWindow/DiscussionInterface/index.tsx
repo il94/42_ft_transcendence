@@ -1,39 +1,22 @@
-import { useContext, useEffect, useRef } from "react"
-import { MessagesWrapper, Style } from "./style"
+import { useContext, useEffect } from "react"
+import { Style } from "./style"
 import ContactMessage from "./ContactMessage"
 import UserMessage from "./UserMessage"
+import ScrollBar from "../../../ScrollBar"
 import { ChatContext } from "../../../../pages/Game"
 
 function DiscussionInterface(){
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
-	const scrollContainerRef = useRef(null)
 
 	useEffect(() => {
-		const scrollContainer: any = scrollContainerRef.current
-
-		if (scrollContainer)
-		{
-			if (chatRender)
-				scrollContainer.scrollTop = chatScrollValue
-			else
-			{
-				setChatRender(true)
-				setTimeout(() => {
-					if (scrollContainer)
-						scrollContainer.scrollTop = scrollContainer.scrollHeight
-				}, 10)
-			}
-		}
-	}, [])
-
-	function handleScroll(event: any) {
-		setChatScrollValue(event.currentTarget.scrollTop);
-	}
+		// console.log(setChatRender)
+	})
 
 	return (
 		<Style>
-			<MessagesWrapper onScroll={handleScroll} ref={scrollContainerRef}>
+				<ScrollBar state={{value: chatScrollValue, setter: setChatScrollValue}} firstRenderState={{value: chatRender, setter: setChatRender}}>
+
 				<ContactMessage userName={"i"} content={"iiiiiiii"} />
 				<ContactMessage userName={"Claire zer"} content={"Kikou"} />
 				<ContactMessage userName={"Adouay"} content={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna lol a  aliqua."} />
@@ -41,7 +24,8 @@ function DiscussionInterface(){
 				<ContactMessage userName={"Test"} content={"Jde fais un test car c'estl"} />
 				<ContactMessage userName={"Test"} content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
 				<UserMessage content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
-			</MessagesWrapper>
+				<div style={{ marginTop: "3px" }} />
+				</ScrollBar>
 		</Style>
 	)
 }

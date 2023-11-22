@@ -13,43 +13,11 @@ export const Style = styled.div`
 
 `
 
-export const FriendsWrapper = styled.div `
-
-	width: 100%;
-	height: 100%;
-
-	overflow-y: auto;
-	overflow-x: hidden;
-
-	background-color: ${colors.module};
-
-	&:not(:hover) {
-		&::-webkit-scrollbar {
-			display: none;
-		}
-	}
-
-	&:hover {
-
-		&::-webkit-scrollbar {
-			width: 5px;
-			-webkit-appearance: none;
-		}
-	
-		&::-webkit-scrollbar-thumb {
-			background-color: ${colors.scrollingBar};
-		}
-		
-	}
-
-`
-
 export const ReduceButton = styled.button`
 
 	width: 10px;
 	height: 100%;
 	min-width: 10px;
-	min-height: 159px;
 
 	margin: 0;
 	padding: 0;

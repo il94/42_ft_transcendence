@@ -12,6 +12,8 @@ export const Style = styled.div`
 	height: 150px;
 	border: 5px solid ${colors.historyBorder};
 
+	overflow-y: hidden;
+
 	background-color: ${colors.history};
 
 `

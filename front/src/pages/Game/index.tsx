@@ -42,7 +42,6 @@ function Game() {
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
 	const [social, displaySocial] = useState<boolean>(true)
-	const [socialScrollValue, setSocialScrollValue] = useState<number>(0)
 	const [chat, displayChat] = useState<boolean>(false)
 	const [contactListScrollValue, setContactListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
@@ -63,7 +62,7 @@ function Game() {
 					<LeftGameWrapper $social={social}>
 						<Logo />
 						<CardContext.Provider value={{ card, displayCard, setCardPosition }}>
-							<Social social={social} displaySocial={displaySocial} socialScrollValue={socialScrollValue} setSocialScrollValue={setSocialScrollValue} />
+							<Social social={social} displaySocial={displaySocial} />
 						</CardContext.Provider>
 					</LeftGameWrapper>
 					<RightGameWrapper>

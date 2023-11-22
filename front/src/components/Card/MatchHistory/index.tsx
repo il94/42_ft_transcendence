@@ -4,6 +4,7 @@ import ScrollBar from "../../ScrollBar"
 import colors from "../../../utils/colors"
 
 function MatchHistory() {
+
 	return (
 		<Style>
 			<ScrollBar>
@@ -12,7 +13,6 @@ function MatchHistory() {
 				<Match color={colors.historyLoose}/>
 				<Match color={colors.historyDraw}/>
 				<Match color={colors.historyWin}/>
-				<Match color={colors.historyLoose}/>
 				<Match color={colors.historyLoose}/>
 			</ScrollBar>
 		</Style>
