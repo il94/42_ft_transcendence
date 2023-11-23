@@ -11,7 +11,7 @@ export class AuthController {
 
 	@Get('/api42/login')
 	@UseGuards(Api42AuthGuard)
-	handleLogin(dto: AuthDto) {
+	handleLogin() {
 		return {msg: 'api42 Authentication'};
 	}
 
