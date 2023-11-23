@@ -10,7 +10,7 @@ const Style = styled.div`
 	display: flex;
 	flex-direction: column;
 
-	width: 33.42%;
+	width: 128px;
 	height: 100%;
 
 	background-color: ${colors.contactList};

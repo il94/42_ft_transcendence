@@ -11,7 +11,7 @@ const Style = styled.div`
 	display: flex;
 	flex-direction: column;
 
-	width: 66.58%;
+	width: 245px;
 	height: 100%;
 
 	background-color: ${colors.chatWindow};

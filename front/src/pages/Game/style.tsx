@@ -68,7 +68,7 @@ export const BottomGameWrapper = styled.div`
 	position: relative;
 
 	width: 100%;
-	height: calc(100% - 53px);
+	height: 100%;
 	/* min-width: à définir par rapport au Pong */
 	min-height: 159px;
 

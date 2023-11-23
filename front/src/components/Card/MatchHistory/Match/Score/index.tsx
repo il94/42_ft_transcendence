@@ -1,11 +1,14 @@
 import styled from "styled-components"
+import colors from "../../../../../utils/colors"
 
 const Style = styled.div`
 
 	display: flex;
 	align-items: center;
 
-	color: black;
+	font-size: 11px;
+
+	color: ${colors.textAlt};
 
 `
 

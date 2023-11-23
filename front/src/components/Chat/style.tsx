@@ -9,7 +9,7 @@ export const Style = styled.div`
 	right: 0;
 	bottom: 0;
 
-	width: 368px;
+	width: 373px;
 	height: 243px;
 
 	${effects.pixelateWindow};

@@ -21,6 +21,8 @@ export const ProfileWrapper = styled.div`
 	justify-content: flex-start;
 	align-items: center;
 	
+	height: 49px;
+
 	padding-right: 7px;
 
 	&:hover {
