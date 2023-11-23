@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // profile data
+  id42        String? @unique
+  username    String  @unique
+  email       String  @unique
+  hash        String
+  avatar      String
+  tel         String?
+
+  //game data
+  //status    String?
+  //chart     Int?
+  //Badges    String?
+
+  // friendship data
+  // Many-to-many self relation (implicit relation table)
+  hasFriend   User[] @relation("UserFriendship")
+  isFriend    User[] @relation("UserFriendship")
+
+  //  games     UsersOnGames[]
+  //  channels  UsersOnChannel[]
+  
+  @@map("users")
+
+}
+
+//model Game {
+//  id    Int     @id @default(autoincrement())
+//  level Int
+//  createdAt DateTime @default(now())
+//  player_oneUser    @relation(fields: [authorId], references: [id])
+//  player_two 
+//}
+
+
+

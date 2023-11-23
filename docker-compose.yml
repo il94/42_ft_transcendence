@@ -1,0 +1,28 @@
+version: "3.6"
+
+services:
+#  back:
+#    build: /back/
+#   ports:
+#      - 3333:3333
+#    env_file: /back/.env
+
+  db:
+    image: postgres:16.0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password 
+      POSTGRES_DB: nest
+    ports:
+      - 5432:5432
+    networks:
+      - transcendence
+#    volumes:
+#      - db-data:/var/lib/postgresql/data
+
+#volumes:
+#  db-data
+networks:
+  transcendence:
+
+      
