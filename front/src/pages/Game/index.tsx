@@ -16,6 +16,7 @@ import {
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
+import ZIndexContext from '../../contexts/ZIndexContext'
 
 import Logo from '../../components/Logo'
 import Info from '../../components/Info'
@@ -27,6 +28,7 @@ import Card from '../../components/Card'
 
 import breakpoints from '../../utils/breakpoints'
 
+
 function Game() {
 
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
@@ -37,7 +39,10 @@ function Game() {
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0})
+	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+
+	const [zCardIndex, setZCardIndex] = useState<number>(100000)
+	const [zChatIndex, setZChatIndex] = useState<number>(100000)
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
@@ -49,30 +54,34 @@ function Game() {
 		<GamePage>
 			{
 				<GameWrapper>
-					<LeftGameWrapper $social={social}>
-						<Logo />
-						<CardContext.Provider value={{ card, displayCard, setCardPosition }}>
-							<Social social={social} displaySocial={displaySocial} />
-						</CardContext.Provider>
-					</LeftGameWrapper>
-					<RightGameWrapper>
-						<TopGameWrapper>
-							<Info />
-							<Profile displayCard={displayCard} setCardPosition={setCardPosition} />
-						</TopGameWrapper>
-						<BottomGameWrapper>
-							<Pong />
-							{
-								card &&
-								<Card cardPosition={cardPosition} />
-							}
-							{
-								<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-									<Chat />
-								</ChatContext.Provider>
-							}
-						</BottomGameWrapper>
-					</RightGameWrapper>
+					<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
+						<LeftGameWrapper $social={social}>
+							<Logo />
+							<CardContext.Provider value={{ card, displayCard, setCardPosition }}>
+								<Social social={social} displaySocial={displaySocial} />
+							</CardContext.Provider>
+						</LeftGameWrapper>
+						<RightGameWrapper>
+							<TopGameWrapper>
+								<Info />
+								<Profile displayCard={displayCard} setCardPosition={setCardPosition} />
+							</TopGameWrapper>
+							<BottomGameWrapper>
+								<Pong />
+								{
+									card &&
+									<CardContext.Provider value={{ card, displayCard, setCardPosition }}>
+										<Card cardPosition={cardPosition} />
+									</CardContext.Provider>
+								}
+								{
+									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+										<Chat />
+									</ChatContext.Provider>
+								}
+							</BottomGameWrapper>
+						</RightGameWrapper>
+					</ZIndexContext.Provider>
 				</GameWrapper>
 			}
 		</GamePage>
