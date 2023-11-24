@@ -12,16 +12,16 @@ import ChatIcon from "../../assets/chat.png"
 function Chat() {
 
 	const { chat, displayChat } = useContext(ChatContext)!
-	const { zCardIndex, setZChatIndex } = useContext(ZIndexContext)!
+	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(ZIndexContext)!
 
 	return (
 		chat ?
-		<Style onClick={() => {setZChatIndex(zCardIndex - 1)}} $zIndex={zCardIndex - 1}>
+		<Style onClick={() => {setZChatIndex(zCardIndex + 1)}} $zIndex={zChatIndex}>
 			<ContactList />
 			<ChatWindow />
 		</Style>
 		:
-		<ChatButton src={ChatIcon} onClick={() => {displayChat(true); setZChatIndex(zCardIndex - 1)}}
+		<ChatButton src={ChatIcon} onClick={() => {displayChat(true); setZChatIndex(zChatIndex + 1)}} $zIndex={zChatIndex + 1}
 			alt="Chat button" title="Chat"/>
 	)
 }

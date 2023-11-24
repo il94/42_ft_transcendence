@@ -4,6 +4,7 @@ import { Button,
 	ButtonWrapper,
 	CloseButton,
 	ProfilePicture,
+	PseudoStyle,
 	Setting,
 	SettingInfo,
 	SettingTtile,
@@ -17,6 +18,8 @@ import CloseIcon from "../../assets/base.png"
 function SettingsPopup({ displaySettings } : { displaySettings: Dispatch<SetStateAction<boolean>> }) {
 
 	return (
+		<PseudoStyle>
+		
 		<Style>
 			<ButtonWrapper>
 				<CloseButton src={CloseIcon} onClick={() => displaySettings(false)}
@@ -55,6 +58,7 @@ function SettingsPopup({ displaySettings } : { displaySettings: Dispatch<SetStat
 				</Button>
 			</Setting>
 		</Style>
+		</PseudoStyle>
 	)
 
 }

@@ -41,9 +41,10 @@ function Game() {
 	const [chatRender, setChatRender] = useState<boolean>(false)
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+	const [cardUsername, setCardUserName] = useState<string>("")
 
-	const [zCardIndex, setZCardIndex] = useState<number>(100000)
-	const [zChatIndex, setZChatIndex] = useState<number>(100000)
+	const [zCardIndex, setZCardIndex] = useState<number>(10)
+	const [zChatIndex, setZChatIndex] = useState<number>(10)
 
 	const [settings, displaySettings] = useState<boolean>(false)
 
@@ -53,6 +54,15 @@ function Game() {
 			displayCard(false)
 	}, [isSmallDesktop])
 
+
+	useEffect(() => {
+		if (zCardIndex > 1 && zChatIndex > 1)
+		{
+			setZCardIndex(zCardIndex - 1)
+			setZChatIndex(zChatIndex - 1)
+		}
+	}, [zCardIndex, zChatIndex])
+
 	return (
 		<GamePage>
 			{
@@ -60,21 +70,21 @@ function Game() {
 					<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
 						<LeftGameWrapper $social={social}>
 							<Logo />
-							<CardContext.Provider value={{ card, displayCard, setCardPosition }}>
+							<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
 								<Social social={social} displaySocial={displaySocial} />
 							</CardContext.Provider>
 						</LeftGameWrapper>
 						<RightGameWrapper>
 							<TopGameWrapper>
 								<Info />
-								<Profile displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displaySettings={displaySettings} />
+								<Profile username={cardUsername ? cardUsername : "LOL"} displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displaySettings={displaySettings} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								<Pong />
 								{
 									card &&
-									<CardContext.Provider value={{ card, displayCard, setCardPosition }}>
-										<Card cardPosition={cardPosition} />
+									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
+										<Card username={cardUsername} cardPosition={cardPosition} />
 									</CardContext.Provider>
 								}
 								{

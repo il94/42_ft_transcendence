@@ -23,24 +23,24 @@ function Social({ social, displaySocial }: SocialProps ) {
 	return (
 		<Style>
 			<ScrollBar>
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
-				<Friend social={social} color={colors.section} />
-				<Friend social={social} color={colors.sectionAlt} />
+				<Friend username={"WWWWWWWW"} social={social} color={colors.section} />
+				<Friend username={"ilandols"} social={social} color={colors.sectionAlt} />
+				<Friend username={"cchapon"} social={social} color={colors.section} />
+				<Friend username={"adouay"} social={social} color={colors.sectionAlt} />
+				<Friend username={"sbelabba"} social={social} color={colors.section} />
+				<Friend username={"xniel"} social={social} color={colors.sectionAlt} />
+				<Friend username={"YOP YOP"} social={social} color={colors.section} />
+				<Friend username={"ahahaaaa"} social={social} color={colors.sectionAlt} />
+				<Friend username={"a"} social={social} color={colors.section} />
+				<Friend username={"il"} social={social} color={colors.sectionAlt} />
+				<Friend username={"faut"} social={social} color={colors.section} />
+				<Friend username={"des"} social={social} color={colors.sectionAlt} />
+				<Friend username={"noms"} social={social} color={colors.section} />
+				<Friend username={"mais"} social={social} color={colors.sectionAlt} />
+				<Friend username={"jai"} social={social} color={colors.section} />
+				<Friend username={"la"} social={social} color={colors.sectionAlt} />
+				<Friend username={"flemme"} social={social} color={colors.section} />
+				<Friend username={"finito"} social={social} color={colors.sectionAlt} />
 			</ScrollBar>
 			<ReduceButton onClick={reduceSocial} title="Reduce" />
 		</Style>
