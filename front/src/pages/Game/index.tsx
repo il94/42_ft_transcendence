@@ -27,6 +27,7 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 
 import breakpoints from '../../utils/breakpoints'
+import SettingsPopup from '../../components/SettingsPopup'
 
 
 function Game() {
@@ -43,6 +44,8 @@ function Game() {
 
 	const [zCardIndex, setZCardIndex] = useState<number>(100000)
 	const [zChatIndex, setZChatIndex] = useState<number>(100000)
+
+	const [settings, displaySettings] = useState<boolean>(false)
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
@@ -64,7 +67,7 @@ function Game() {
 						<RightGameWrapper>
 							<TopGameWrapper>
 								<Info />
-								<Profile displayCard={displayCard} setCardPosition={setCardPosition} />
+								<Profile displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displaySettings={displaySettings} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								<Pong />
@@ -78,6 +81,10 @@ function Game() {
 									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 										<Chat />
 									</ChatContext.Provider>
+								}
+								{
+									settings &&
+									<SettingsPopup displaySettings={displaySettings} />
 								}
 							</BottomGameWrapper>
 						</RightGameWrapper>

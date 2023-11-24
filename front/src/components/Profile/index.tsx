@@ -14,10 +14,12 @@ import settingsIcon from "../../assets/settings.png"
 
 type ProfileProps = {
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>
+	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
+	settings: boolean,
+	displaySettings: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ displayCard, setCardPosition} : ProfileProps ) {
+function Profile({ displayCard, setCardPosition, settings, displaySettings } : ProfileProps ) {
 
 	const profileContainerRef : RefObject<HTMLElement> = useRef(null)
 
@@ -44,7 +46,7 @@ function Profile({ displayCard, setCardPosition} : ProfileProps ) {
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>
-				<Icon src={settingsIcon} alt="Settings button" title="Settings" />
+				<Icon src={settingsIcon} onClick={() => displaySettings(!settings)} alt="Settings button" title="Settings" />
 				<Icon src={deconnexionIcon} alt="Deconnexion button" title="Deconnexion" />
 			</ButtonsWrapper>
 		</Style>
