@@ -21,6 +21,7 @@ const colors = {
 	button: "#DB6045",
 	buttonRed: "#D34221",
 	buttonGreen: "#2FAE1B",
+	buttonGray: "#705A56",
 	reduceButton: "#bb8054",
 	reduceButtonHover: "#be9473",
 	shadowButton: "#7a3525",

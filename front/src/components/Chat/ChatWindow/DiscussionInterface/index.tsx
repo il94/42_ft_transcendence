@@ -1,11 +1,15 @@
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 
 import { Style } from "./style"
 
 import ContactMessage from "./ContactMessage"
 import UserMessage from "./UserMessage"
 import ScrollBar from "../../../ScrollBar"
+import ContactDuelInvitation from "./ContactDuelInvitation"
+import UserDuelInvitation from "./UserDuelInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
+
+import status from "../../../../utils/status"
 
 function DiscussionInterface(){
 
@@ -22,6 +26,13 @@ function DiscussionInterface(){
 				<ContactMessage userName={"Test"} content={"Jde fais un test car c'estl"} />
 				<ContactMessage userName={"Test"} content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
 				<UserMessage content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
+				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.PENDING} />
+				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.IN_PROGRESS} />
+				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.FINISHED} />
+				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.ACCEPTED} />
+				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.CANCELLED} />
+				<UserDuelInvitation opponent={"WWWWWWWW"} state={status.PENDING} />
+				<UserDuelInvitation opponent={"WWWWWWWW"} state={status.CANCELLED} />
 				<div style={{ marginTop: "3px" }} />
 				</ScrollBar>
 		</Style>
