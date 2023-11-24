@@ -7,7 +7,6 @@ export const Style = styled.div<{$top: number, $left: number, $zIndex: number}>`
 	display: flex;
 
 	flex-direction: column;
-	justify-content: flex-start;
 	align-items: center;
 
 	position: absolute;
@@ -26,6 +25,38 @@ export const Style = styled.div<{$top: number, $left: number, $zIndex: number}>`
 	
 `
 
+export const TopWrapper = styled.div`
+
+	display: flex;
+	justify-content: flex-end;
+
+	width: 100%;
+	height: 121px;
+	min-width: 100%;
+	min-height: 121px;
+
+`
+
+export const CloseButton = styled.img`
+
+
+	width: 18.11px;
+	height: 18.11px;
+
+	margin-top: 6.5px;
+	margin-right: 6.5px;
+
+	cursor: pointer;
+
+	${effects.pixelateIcon};
+	${effects.shadowButton};
+
+
+	border-width: 0.2em; // a definir
+	/* border-width: 2.5px; */
+
+`
+
 export const ProfilePicture = styled.div`
 
 	width: 92px;
@@ -34,6 +65,8 @@ export const ProfilePicture = styled.div`
 	min-height: 92px;
 
 	margin-top: 9px;
+	margin-left: 64px;
+	margin-right: auto;
 	border: 10px solid ${colors.rankGold};
 
 	border-radius: 50%;
