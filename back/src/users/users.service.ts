@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -46,6 +46,8 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({
 			where: { id: id },
 		})
+	if (!user)
+		throw new NotFoundException(`Article with ${id} does not exist.`);
     return user;
   }
 

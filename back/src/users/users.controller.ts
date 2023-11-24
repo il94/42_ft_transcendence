@@ -1,27 +1,33 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, 
-  UseGuards, NotFoundException, ParseIntPipe } from '@nestjs/common';
+  UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtGuard } from '../auth/auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { UserEntity } from './entities/user.entity';
 
 @Controller('users')
+@ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @ApiCreatedResponse({ type: UserEntity })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return new UserEntity(await this.usersService.create(createUserDto));
   }
 
   @Get()
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+  @ApiOkResponse({ type: UserEntity })
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+    return new UserEntity(await this.usersService.findOne(id));
   }
 
   @UseGuards(JwtGuard)
@@ -31,12 +37,14 @@ export class UsersController {
 	}
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @ApiCreatedResponse({ type: UserEntity })
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+    return new UserEntity(await this.usersService.update(id, updateUserDto));
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  @ApiOkResponse({ type: UserEntity })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return new UserEntity(await this.usersService.remove(id));
   }
 }
