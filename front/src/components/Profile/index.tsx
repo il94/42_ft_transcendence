@@ -13,13 +13,14 @@ import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 
 type ProfileProps = {
+	username: string,
 	displayCard: Dispatch<SetStateAction<boolean>>,
 	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
 	settings: boolean,
 	displaySettings: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ displayCard, setCardPosition, settings, displaySettings } : ProfileProps ) {
+function Profile({ username, displayCard, setCardPosition, settings, displaySettings } : ProfileProps ) {
 
 	const profileContainerRef : RefObject<HTMLElement> = useRef(null)
 
@@ -42,7 +43,7 @@ function Profile({ displayCard, setCardPosition, settings, displaySettings } : P
 			<ProfileWrapper onClick={showCard} ref={profileContainerRef}>
 				<ProfilePicture />
 				<ProfileName>
-					WWWWWWWW
+					{username}
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>

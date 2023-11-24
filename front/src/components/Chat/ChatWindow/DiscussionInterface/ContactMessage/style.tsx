@@ -8,9 +8,10 @@ export const Style = styled.div`
 
 	min-width: 31px;
 	max-width: 182px;
-	min-height: 29px;
+	min-height: 35px;
 
 	margin-top: 5px;
+
 `
 
 export const ProfilePicture = styled.div`

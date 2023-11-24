@@ -17,11 +17,12 @@ export const Style = styled.div<{ $zIndex: number }>`
 
 `
 
-export const ChatButton = styled.img`
+export const ChatButton = styled.img<{ $zIndex: number }>`
 
 	position: absolute;
 	right: 0;
 	bottom: 0;
+	z-index: ${(props) => props.$zIndex};
 
 	width: 32px;
 	height: 32px;

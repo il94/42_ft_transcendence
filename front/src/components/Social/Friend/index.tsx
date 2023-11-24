@@ -11,14 +11,20 @@ import {
 import CardContext from "../../../contexts/CardContext"
 import ZIndexContext from "../../../contexts/ZIndexContext"
 
-function Friend({ social, color } : { social: boolean, color: string }) {
+function Friend({ username, social, color } : { username: string, social: boolean, color: string }) {
 
-	const { displayCard, setCardPosition } = useContext(CardContext)!
+	const { card, displayCard, setCardPosition, cardUsername, setCardUserName } = useContext(CardContext)!
 	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 	const friendContainerRef : RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {
 		
+		if (cardUsername === username)
+		{
+			displayCard(!card)
+			return ;
+		}
+
 		const friendcontainer = friendContainerRef.current
 
 		if (friendcontainer)
@@ -26,16 +32,18 @@ function Friend({ social, color } : { social: boolean, color: string }) {
 			const topCurrentElement = friendcontainer.getBoundingClientRect().top
 			const { top: topParentElement, height: heightParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
 			
-			const topMax = heightParentElement - 371 // taille de la carte
+			const topMax = heightParentElement - 388 // taille de la carte 371 + margin de la scroll bar 17
 	
-			const topCard = topCurrentElement - topParentElement > topMax ? topMax : topCurrentElement - topParentElement // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+			const target = topCurrentElement - topParentElement
+			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 		
+			setCardUserName(username)
 			setCardPosition({ top: topCard, left: 0})
-			setZCardIndex(zChatIndex - 1)
+			setZCardIndex(zChatIndex + 1)
 
 			displayCard(true)
 		}
-		
+
 	}
 
 	return (
@@ -45,7 +53,7 @@ function Friend({ social, color } : { social: boolean, color: string }) {
 				!social &&
 			<ProfileInfo>
 				<ProfileName>
-					WWWWWWWW
+					{username}
 				</ProfileName>
 				<ProfileStatus>
 					En recherche de partie...
