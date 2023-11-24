@@ -23,7 +23,7 @@ export const GameWrapper = styled.div`
 	
 	width: 95%;
 	height: 95%;
-	/* min-width: à définir par rapport au Pong */
+	min-width: 623px;
 	min-height: 212px;
 
 	${effects.pixelateWindow};
@@ -47,7 +47,7 @@ export const RightGameWrapper = styled.div`
 	flex-direction: column;
 
 	width: 100%;
-	/* min-width: à définir par rapport au Pong */
+	min-width: 373px;
 	height: 100%;
 
 `
@@ -58,7 +58,7 @@ export const TopGameWrapper = styled.div`
 
 	width: 100%;
 	height: 53px;
-	/* min-width: à définir par rapport au Pong */
+	min-width: 373px;
 	min-height: 53px;
 
 `
@@ -69,7 +69,7 @@ export const BottomGameWrapper = styled.div`
 
 	width: 100%;
 	height: 100%;
-	/* min-width: à définir par rapport au Pong */
+	min-width: 373px;
 	min-height: 159px;
 
 `
