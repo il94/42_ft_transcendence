@@ -1,9 +1,27 @@
-import { Button, ProfilePicture, Setting, SettingInfo, SettingTtile, Style, TwoFA, UserName } from "./style"
+import { Dispatch, SetStateAction } from "react"
 
-function SettingsPopup() {
+import { Button,
+	ButtonWrapper,
+	CloseButton,
+	ProfilePicture,
+	Setting,
+	SettingInfo,
+	SettingTtile,
+	Style,
+	TwoFA,
+	UserName
+} from "./style"
+
+import CloseIcon from "../../assets/base.png"
+
+function SettingsPopup({ displaySettings } : { displaySettings: Dispatch<SetStateAction<boolean>> }) {
 
 	return (
 		<Style>
+			<ButtonWrapper>
+				<CloseButton src={CloseIcon} onClick={() => displaySettings(false)}
+					alt="Close button" title="Close" />
+			</ButtonWrapper>
 			<Setting>
 				<ProfilePicture />
 				<Button>
@@ -36,7 +54,6 @@ function SettingsPopup() {
 					Disable
 				</Button>
 			</Setting>
-			<div style={{ marginTop: "15px"}}/>
 		</Style>
 	)
 

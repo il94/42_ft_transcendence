@@ -10,6 +10,7 @@ export const Style = styled.div`
 	position: absolute;
 	top: 50%;
 	left: 50%;
+	z-index: 999;
 	transform: translate(-50%, -50%);
 
 	width: 350px;
@@ -17,6 +18,37 @@ export const Style = styled.div`
 	${effects.pixelateWindow};
 
 	background-color: ${colors.module};
+
+`
+
+export const ButtonWrapper = styled.div`
+
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+
+	width: 100%;
+	height: 15px;
+
+`
+
+export const CloseButton = styled.img`
+
+
+	width: 18.11px;
+	height: 18.11px;
+
+	margin-top: 18px;
+	margin-right: 6.5px;
+
+	cursor: pointer;
+
+	${effects.pixelateIcon};
+	${effects.shadowButton};
+
+
+	border-width: 0.2em; // a definir
+	/* border-width: 2.5px; */
 
 `
 
@@ -28,7 +60,7 @@ export const Setting = styled.div`
 
 	width: 100%;
 
-	margin-top: 15px;
+	margin-bottom: 15px;
 
 `
 

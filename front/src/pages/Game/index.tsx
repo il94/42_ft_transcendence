@@ -84,7 +84,7 @@ function Game() {
 								}
 								{
 									settings &&
-									<SettingsPopup />
+									<SettingsPopup displaySettings={displaySettings} />
 								}
 							</BottomGameWrapper>
 						</RightGameWrapper>
