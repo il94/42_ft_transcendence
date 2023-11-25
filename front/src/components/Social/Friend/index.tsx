@@ -1,4 +1,4 @@
-import { useContext, useRef, RefObject } from "react"
+import { useContext, useRef, RefObject, MouseEvent } from "react"
 
 import {
 	Style,
@@ -46,8 +46,15 @@ function Friend({ username, social, color } : { username: string, social: boolea
 
 	}
 
+	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
+		event.preventDefault();
+	}
+
 	return (
-		<Style onClick={showCard} color={color} ref={friendContainerRef}>
+		<Style onClick={showCard}
+				onAuxClick={() => console.log("LOL")}
+				onContextMenu={handleContextMenu}
+				color={color} ref={friendContainerRef}>
 			<ProfilePicture />
 			{
 				!social &&

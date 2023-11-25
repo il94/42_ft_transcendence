@@ -1,10 +1,15 @@
 import { useContext } from "react"
+
 import { CloseButton, ProfilePicture, Style, TopWrapper, UserName } from "./style"
+
 import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
+import Icon from "../../componentsLibrary/Icon"
+
 import ZIndexContext from "../../contexts/ZIndexContext"
-import CloseIcon from "../../assets/base.png"
 import CardContext from "../../contexts/CardContext"
+
+import CloseIcon from "../../assets/close.png"
 
 function Card({ cardPosition, username } : { cardPosition: { top: number, left: number}, username: string }) {
 
@@ -16,8 +21,10 @@ function Card({ cardPosition, username } : { cardPosition: { top: number, left: 
 				$top={cardPosition.top} $left={cardPosition.left} $zIndex={zCardIndex}>
 			<TopWrapper>
 				<ProfilePicture />
-				<CloseButton src={CloseIcon} onClick={() => displayCard(false)}
-					alt="Close button" title="Close" />
+				<CloseButton>
+					<Icon src={CloseIcon} size="24px" onClick={() => displayCard(false)}
+						alt="Close button" title="Close"/>
+				</CloseButton>
 			</TopWrapper>
 			<UserName>
 				{username}

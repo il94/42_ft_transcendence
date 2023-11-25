@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
@@ -21,14 +20,6 @@ export const MainTitle = styled.h1`
 	&:hover {
 		transform: scale(1.015);
 	}
-
-`
-
-export const StyledLink = styled(Link)<{ color: string }>`
-
-	text-decoration: none;
-
-	color: ${(props) => props.color};
 
 `
 
@@ -117,37 +108,6 @@ export const TextInput = styled.input`
 
 `
 
-export const Button = styled.button`
-
-	padding-top: 1px;
-	padding-left: 11px;
-	padding-bottom: 3px;
-	padding-right: 13px;
-
-	cursor: pointer;
-
-	font-size: 35px;
-	text-decoration: none;
-	text-align: center;
-
-	${effects.shadowButton};
-	${effects.pixelateWindow};
-	
-	color: ${colors.text};
-	background-color: ${colors.button};
-
-	&:hover {
-		transform: scale(1.015);
-	}
-	&:active {
-		transform: scale(0.95);
-		transform: translate(2px, 2px);
-		background-color: ${colors.shadowButton};
-		border-color: ${colors.shadowButton};
-	}
-
-`
-
 export const Separator = styled.div`
 	
 	display: flex;
@@ -181,44 +141,5 @@ export const FTRedirectWrapper = styled.div`
 	align-items: center;
 
 	text-align: center;
-
-`
-
-export const ButtonImage = styled.button`
-
-	display: flex;
-	align-items: center;
-
-	padding-top: 1px;
-	padding-bottom: 3px;
-	padding-right: 13px;
-
-	cursor: pointer;
-
-	font-size: 16px;
-	text-decoration: none;
-	text-align: center;
-
-	${effects.shadowButton};
-	${effects.pixelateWindow};
-	
-	color: ${colors.text};
-	background-color: ${colors.button};
-
-	&:hover {
-		transform: scale(1.015);
-	}
-	&:active {
-		transform: scale(0.95);
-		transform: translate(2px, 2px);
-		background-color: ${colors.shadowButton};
-		border-color: ${colors.shadowButton};
-	}
-
-`
-
-export const Image = styled.img`
-
-	padding-right: 7px;
 
 `

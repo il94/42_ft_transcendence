@@ -4,10 +4,11 @@ import {
 	Style,
 	ProfileWrapper,
 	ButtonsWrapper,
-	Icon,
 	ProfileName,
-	ProfilePicture
+	ProfilePicture,
 } from "./style"
+
+import Icon from "../../componentsLibrary/Icon"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
@@ -47,8 +48,10 @@ function Profile({ username, displayCard, setCardPosition, settings, displaySett
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>
-				<Icon src={settingsIcon} onClick={() => displaySettings(!settings)} alt="Settings button" title="Settings" />
-				<Icon src={deconnexionIcon} alt="Deconnexion button" title="Deconnexion" />
+				<Icon src={settingsIcon} size="38px" onClick={() => displaySettings(!settings)}
+					alt="Settings button" title="Settings" />
+				<Icon src={deconnexionIcon} size="38px"
+					alt="Deconnexion button" title="Deconnexion" />
 			</ButtonsWrapper>
 		</Style>
 	)
