@@ -43,23 +43,10 @@ export const ButtonWrapper = styled.div`
 
 `
 
-export const CloseButton = styled.img`
-
-
-	width: 18.11px;
-	height: 18.11px;
+export const CloseButton = styled.div`
 
 	margin-top: 18px;
 	margin-right: 6.5px;
-
-	cursor: pointer;
-
-	${effects.pixelateIcon};
-	${effects.shadowButton};
-
-
-	border-width: 0.2em; // a definir
-	/* border-width: 2.5px; */
 
 `
 

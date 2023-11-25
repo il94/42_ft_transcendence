@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react"
 
-import { Button,
+import {
+	Button,
 	ButtonWrapper,
 	CloseButton,
 	ProfilePicture,
@@ -13,7 +14,8 @@ import { Button,
 	UserName
 } from "./style"
 
-import CloseIcon from "../../assets/base.png"
+import CloseIcon from "../../assets/close.png"
+import Icon from "../../componentsLibrary/Icon"
 
 function SettingsPopup({ displaySettings } : { displaySettings: Dispatch<SetStateAction<boolean>> }) {
 
@@ -22,8 +24,10 @@ function SettingsPopup({ displaySettings } : { displaySettings: Dispatch<SetStat
 		
 		<Style>
 			<ButtonWrapper>
-				<CloseButton src={CloseIcon} onClick={() => displaySettings(false)}
-					alt="Close button" title="Close" />
+				<CloseButton>
+					<Icon src={CloseIcon} size="24px" onClick={() => displaySettings(false)}
+						alt="Close button" title="Close"/>
+					</CloseButton>
 			</ButtonWrapper>
 			<Setting>
 				<ProfilePicture />
@@ -40,6 +44,7 @@ function SettingsPopup({ displaySettings } : { displaySettings: Dispatch<SetStat
 						WWWWWWWW
 					</UserName>
 				</SettingInfo>
+				
 				<Button>
 					Modify
 				</Button>
