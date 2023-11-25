@@ -32,7 +32,7 @@ export const ProfilePicture = styled.div`
 
 `
 
-export const ContactName = styled.p`
+export const RoomName = styled.p`
 	
 	margin-left: 6px;
 

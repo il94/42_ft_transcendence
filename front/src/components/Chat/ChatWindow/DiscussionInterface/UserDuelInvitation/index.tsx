@@ -8,12 +8,12 @@ import {
 import colors from "../../../../../utils/colors"
 import status from "../../../../../utils/status"
 
-type UserDuelInvitationProps = {
+type PropsUserDuelInvitation = {
 	opponent: string,
 	state: string
 }
 
-function UserDuelInvitation({ opponent, state } : UserDuelInvitationProps ) {
+function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
 	return (
 		<Style>
 			<Text>

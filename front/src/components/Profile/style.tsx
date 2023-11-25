@@ -1,3 +1,4 @@
+import { RefObject } from "react"
 import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
@@ -15,7 +16,7 @@ export const Style = styled.div`
 	
 `
 
-export const ProfileWrapper = styled.div`
+export const ProfileWrapper = styled.div<{ ref: RefObject<HTMLElement> }>`
 	
 	display: flex;
 	justify-content: flex-start;

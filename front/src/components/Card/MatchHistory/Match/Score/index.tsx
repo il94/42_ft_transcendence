@@ -24,15 +24,20 @@ const ScoreOpponent = styled.p`
 	
 `
 
-function Score() {
+type PropsScore = {
+	scoreUser: number,
+	scoreOpponent: number
+}
+
+function Score({ scoreUser, scoreOpponent } : PropsScore) {
 	return (
 		<Style>
 			<ScoreUser>
-				0
+				{scoreUser}
 			</ScoreUser>
 			<p>-</p>
 			<ScoreOpponent>
-				0
+				{scoreOpponent}
 			</ScoreOpponent>
 		</Style>
 	)

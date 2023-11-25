@@ -21,7 +21,7 @@ export const Style = styled.div`
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	z-index: 999;
+	z-index: 998;
 	transform: translate(-50%, -50%);
 
 	width: 350px;

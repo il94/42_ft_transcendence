@@ -27,6 +27,16 @@ const Style = createGlobalStyle`
 		height: 100%;
 	}
 
+	button {
+		
+		border: 0;
+
+		cursor: pointer;
+		
+		text-decoration: none;
+
+	}
+
 `
 
 function GlobalStyle() {

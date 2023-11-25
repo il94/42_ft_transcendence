@@ -3,7 +3,7 @@ import { useContext } from "react"
 import { Style, ChatButton } from "./style"
 
 import Icon from "../../componentsLibrary/Icon"
-import ContactList from "./ContactList"
+import RoomList from "./RoomList"
 import ChatWindow from "./ChatWindow"
 
 import ChatContext from "../../contexts/ChatContext"
@@ -24,7 +24,7 @@ function Chat() {
 	return (
 		chat ?
 		<Style onClick={() => {setZChatIndex(zCardIndex + 1)}} $zIndex={zChatIndex}>
-			<ContactList />
+			<RoomList />
 			<ChatWindow />
 		</Style>
 		:

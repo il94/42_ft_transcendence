@@ -8,7 +8,7 @@ export const ChatContext = createContext<{
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
 	contactListScrollValue: number,
-	setContactListScrollValue: Dispatch<SetStateAction<number>>,
+	setRoomListScrollValue: Dispatch<SetStateAction<number>>,
 	chatScrollValue: number,
 	setChatScrollValue: Dispatch<SetStateAction<number>>,
 	chatRender: boolean,

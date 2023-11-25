@@ -27,11 +27,11 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 
 import breakpoints from '../../utils/breakpoints'
-import SettingsPopup from '../../components/SettingsPopup'
-import InteractionPopup from '../../components/InteractionPopup'
+import MenuSettings from '../../components/MenuSettings'
 import axios from 'axios'
 import { User } from '../../utils/types'
 import TestsBack from '../../components/TestsBack'
+import MenuContextualContext from '../../contexts/MenuContextualContext'
 
 function Game() {
 
@@ -39,19 +39,25 @@ function Game() {
 
 	const [social, displaySocial] = useState<boolean>(true)
 	const [chat, displayChat] = useState<boolean>(false)
-	const [contactListScrollValue, setContactListScrollValue] = useState<number>(0)
+	const [contactListScrollValue, setRoomListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 	const [cardUsername, setCardUserName] = useState<string>("")
 
+	const [menuInteraction, displayMenuContextual] = useState<boolean>(false)
+	const [menuInteractionPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+
+
 	const [zCardIndex, setZCardIndex] = useState<number>(10)
 	const [zChatIndex, setZChatIndex] = useState<number>(10)
 
-	const [settings, displaySettings] = useState<boolean>(false)
+	const [settings, displayMenuSettings] = useState<boolean>(false)
 
-	const [userCurrent, setUserCurrent] = useState<User>({})
+	// A récuperer depuis le back, valeurs randoms en attendant
+	// const [userData, setUserData] = useState< User | undefined >()
+	const [userData, setUserData] = useState< User | undefined >({ hash: "MDP LOL", username: "ilandols" })
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
@@ -60,37 +66,45 @@ function Game() {
 	}, [isSmallDesktop])
 
 	useEffect(() => {
-		if (zCardIndex > 1 && zChatIndex > 1)
-		{
+		if (zCardIndex > 1 && zChatIndex > 1) {
 			setZCardIndex(zCardIndex - 1)
 			setZChatIndex(zChatIndex - 1)
 		}
 	}, [zCardIndex, zChatIndex])
 
-	useEffect(() => {
-		axios.get("http://localhost:3333/users")
-			.then((response) => {
-				setUserCurrent(response.data[0])
-				console.log(userCurrent)
-			})
-			.catch((error) => console.log(error))
-	}, [])
+
+	/* =========== TESTS ============== */
+
+	// const [userData, setUserData] = useState<User>({})
+
+	// useEffect(() => {
+	// 	axios.get("http://localhost:3333/users")
+	// 		.then((response) => {
+	// 			setUserData(response.data[0])
+	// 			console.log(userData)
+	// 		})
+	// 		.catch((error) => console.log(error))
+	// }, [])
+
+	/* ================================== */
 
 	return (
 		<GamePage>
 			{
-				<GameWrapper>
-					<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
+				<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
+					<GameWrapper>
 						<LeftGameWrapper $social={social}>
 							<Logo />
-							<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
-								<Social social={social} displaySocial={displaySocial} />
-							</CardContext.Provider>
+							<MenuContextualContext.Provider value={{ menuInteraction, displayMenuContextual, menuInteractionPosition, setMenuContextualPosition }} >
+								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
+									<Social social={social} displaySocial={displaySocial} />
+								</CardContext.Provider>
+							</MenuContextualContext.Provider>
 						</LeftGameWrapper>
 						<RightGameWrapper>
 							<TopGameWrapper>
 								<Info />
-								<Profile username={userCurrent?.username ? userCurrent?.username : "Loading..."} displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displaySettings={displaySettings} />
+								<Profile username={userData?.username ? userData?.username : "Loading..."} displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displayMenuSettings={displayMenuSettings} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								<Pong />
@@ -100,23 +114,20 @@ function Game() {
 										<Card username={cardUsername} cardPosition={cardPosition} />
 									</CardContext.Provider>
 								}
+								<TestsBack />
 								{
-									<InteractionPopup />
-								}
-									<TestsBack />
-								{
-									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setRoomListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 										<Chat />
 									</ChatContext.Provider>
 								}
 								{
 									settings &&
-									<SettingsPopup displaySettings={displaySettings} />
+									<MenuSettings displayMenuSettings={displayMenuSettings} userData={userData} />
 								}
 							</BottomGameWrapper>
 						</RightGameWrapper>
-					</ZIndexContext.Provider>
-				</GameWrapper>
+					</GameWrapper>
+				</ZIndexContext.Provider>
 			}
 		</GamePage>
 	)
