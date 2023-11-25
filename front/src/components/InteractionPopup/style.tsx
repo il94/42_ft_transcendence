@@ -1,9 +1,9 @@
 import styled from "styled-components"
-import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
 	display: flex;
+	flex-direction: column;
 
 	position: absolute;
 	top: 0;

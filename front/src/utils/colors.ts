@@ -25,7 +25,8 @@ const colors = {
 	reduceButton: "#bb8054",
 	reduceButtonHover: "#be9473",
 	shadowButton: "#7a3525",
-	hoverBorderText: "#ffff52",
+	focusBorderText: "#ffff52",
+	menuTextSelection: "#d38040",
 
 	/* Scrolling bar */
 	scrollingBar: "#804400",
@@ -45,6 +46,7 @@ const colors = {
 	chatWindow: "#f3a76080",
 	chatBanner: "#54545480",
 	chatInput: "#b77a41b3",
+	chatInputSelection: "#83562cb3",
 	contactList: "#85522c80",
 	messageUser: "#FAD7A3",
 	messageBanner: "#FFCB9A",

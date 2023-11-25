@@ -8,6 +8,8 @@ export const SignupPage = styled.div`
 	flex-direction: column;
 	align-items: center;
 
+	position: relative;
+
 	width: 100%;
 	height: 100%;
 
@@ -68,7 +70,7 @@ export const SignupForm = styled.form`
 	flex-direction: column;
 	align-items: center;
 
-	width: 231px;
+	width: 100%;
 
 	margin-top: 20px;
 	margin-bottom: 20px;
@@ -90,7 +92,7 @@ export const Label = styled.label`
 
 export const TextInput = styled.input`
 
-	width: 100%;
+	width: 231px;
 
 	border: none;
 	border-bottom: 1px solid ${colors.text};
@@ -101,10 +103,31 @@ export const TextInput = styled.input`
 	color: ${colors.text};
 	background-color: ${colors.popup};
 
+	&::selection {
+		background-color: ${colors.menuTextSelection};
+	}
+
 	&:focus {
 		outline: none;
-		border-color: ${colors.hoverBorderText};
+		border-color: ${colors.focusBorderText};
 	}
+
+`
+
+export const ErrorMessage = styled.div`
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 100%;
+	height: 15px;
+	min-height: 15px;
+
+	font-size: 12px;
+	text-align: center;
+
+	color: #c70505;
 
 `
 

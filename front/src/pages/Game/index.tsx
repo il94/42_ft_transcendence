@@ -29,7 +29,9 @@ import Card from '../../components/Card'
 import breakpoints from '../../utils/breakpoints'
 import SettingsPopup from '../../components/SettingsPopup'
 import InteractionPopup from '../../components/InteractionPopup'
-
+import axios from 'axios'
+import { User } from '../../utils/types'
+import TestsBack from '../../components/TestsBack'
 
 function Game() {
 
@@ -49,12 +51,13 @@ function Game() {
 
 	const [settings, displaySettings] = useState<boolean>(false)
 
+	const [userCurrent, setUserCurrent] = useState<User>({})
+
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
 		if (!social)
 			displayCard(false)
 	}, [isSmallDesktop])
-
 
 	useEffect(() => {
 		if (zCardIndex > 1 && zChatIndex > 1)
@@ -63,6 +66,15 @@ function Game() {
 			setZChatIndex(zChatIndex - 1)
 		}
 	}, [zCardIndex, zChatIndex])
+
+	useEffect(() => {
+		axios.get("http://localhost:3333/users")
+			.then((response) => {
+				setUserCurrent(response.data[0])
+				console.log(userCurrent)
+			})
+			.catch((error) => console.log(error))
+	}, [])
 
 	return (
 		<GamePage>
@@ -78,7 +90,7 @@ function Game() {
 						<RightGameWrapper>
 							<TopGameWrapper>
 								<Info />
-								<Profile username={cardUsername ? cardUsername : "LOL"} displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displaySettings={displaySettings} />
+								<Profile username={userCurrent?.username ? userCurrent?.username : "Loading..."} displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displaySettings={displaySettings} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								<Pong />
@@ -91,6 +103,7 @@ function Game() {
 								{
 									<InteractionPopup />
 								}
+									<TestsBack />
 								{
 									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 										<Chat />

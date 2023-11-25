@@ -4,7 +4,6 @@ function InteractionPopup() {
 
 	return (
 		<Style>
-
 		</Style>
 	)
 }
