@@ -17,11 +17,10 @@ services:
     build:
       context: ./back
       dockerfile: ./Dockerfile
-    container_name: api
-    environment:
-      - PORT=${PORT}
+    container_name: api_back
     ports:
       - '3333:3333'
+      - '5555:5555'
     depends_on:
       - db
     volumes:

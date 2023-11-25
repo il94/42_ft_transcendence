@@ -21,7 +21,7 @@ export class UsersService {
 					email: createUserDto.email,
 					hash,
 					avatar,
-					id42: '42',
+					//id42: 42,
 					username: createUserDto.username,
 				},
 			});
