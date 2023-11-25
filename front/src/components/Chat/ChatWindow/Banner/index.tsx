@@ -1,5 +1,6 @@
 import { useContext } from "react"
 import { ChannelName, ReduceButton, Style } from "./style"
+import Icon from "../../../../componentsLibrary/Icon"
 import ChatContext from "../../../../contexts/ChatContext"
 import ReduceIcon from "../../../../assets/reduce.png"
 
@@ -12,8 +13,10 @@ function Banner() {
 			<ChannelName>
 				WWWWWWWW
 			</ChannelName>
-			<ReduceButton src={ReduceIcon} onClick={() => displayChat(false)}
-				alt="Reduce button" title="Reduce" />
+			<ReduceButton>
+				<Icon src={ReduceIcon} size="24px" onClick={() => displayChat(false)}
+					alt="Reduce button" title="Reduce" />
+			</ReduceButton>
 		</Style>
 	)
 }

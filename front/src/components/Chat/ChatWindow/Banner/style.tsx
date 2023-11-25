@@ -1,6 +1,5 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
-import effects from "../../../../utils/effects"
 
 export const Style = styled.div`
 
@@ -24,20 +23,8 @@ export const ChannelName = styled.p`
 
 `
 
-export const ReduceButton = styled.img`
-
-	width: 18.11px;
-	height: 18.11px;
+export const ReduceButton = styled.div`
 
 	margin-right: 6.5px;
-
-	cursor: pointer;
-
-	${effects.pixelateIcon};
-	${effects.shadowButton};
-
-
-	border-width: 0.2em; // a definir
-	/* border-width: 2.5px; */
 
 `

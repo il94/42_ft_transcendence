@@ -69,19 +69,3 @@ export const ButtonsWrapper = styled.div`
 	height: 100%;
 
 `
-
-export const Icon = styled.img`
-
-	width: 32px;
-	height: 32px;
-
-	cursor: pointer;
-
-	${effects.pixelateIcon};
-	${effects.shadowButton};
-
-
-	border-width: 0.2em; // a definir
-	/* border-width: 2.5px; */
-
-`

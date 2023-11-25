@@ -52,7 +52,18 @@ const effects = {
 		${colors.shadowButton}
 		${colors.shadowButton}
 		${colors.button}
+	`,
+
+	shadowIcon : `
+		border-style: solid;
+		border-width: 3px;
+		border-color:
+		${colors.button}
+		${colors.shadowButton}
+		${colors.shadowButton}
+		${colors.button}
 	`
+
 
 }
 

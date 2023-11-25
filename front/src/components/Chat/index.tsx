@@ -2,8 +2,10 @@ import { useContext } from "react"
 
 import { Style, ChatButton } from "./style"
 
+import Icon from "../../componentsLibrary/Icon"
 import ContactList from "./ContactList"
 import ChatWindow from "./ChatWindow"
+
 import ChatContext from "../../contexts/ChatContext"
 import ZIndexContext from "../../contexts/ZIndexContext"
 
@@ -14,6 +16,11 @@ function Chat() {
 	const { chat, displayChat } = useContext(ChatContext)!
 	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(ZIndexContext)!
 
+	function handleCickChatButton() {
+		displayChat(true)
+		setZChatIndex(zChatIndex + 1)
+	}
+
 	return (
 		chat ?
 		<Style onClick={() => {setZChatIndex(zCardIndex + 1)}} $zIndex={zChatIndex}>
@@ -21,8 +28,10 @@ function Chat() {
 			<ChatWindow />
 		</Style>
 		:
-		<ChatButton src={ChatIcon} onClick={() => {displayChat(true); setZChatIndex(zChatIndex + 1)}} $zIndex={zChatIndex + 1}
-			alt="Chat button" title="Chat"/>
+		<ChatButton $zIndex={zChatIndex + 1}>
+			<Icon src={ChatIcon} size="38px" onClick={handleCickChatButton}
+				 alt="Chat button" title="Chat" />
+		</ChatButton>
 	)
 }
 
