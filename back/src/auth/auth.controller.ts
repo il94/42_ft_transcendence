@@ -1,11 +1,13 @@
 import { Body, Controller, Get, Post, HttpCode, HttpStatus, Request, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Api42AuthGuard, JwtGuard } from './auth.guard';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from "./auth.dto";
 
 
 // separer la logique metier : le controller execute les requetes https
 @Controller('auth')
+@ApiTags('authenticate')
 export class AuthController {
 	constructor(private authService: AuthService) {}
 

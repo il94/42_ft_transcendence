@@ -1,27 +1,36 @@
 version: "3.6"
 
 services:
-#  back:
-#    build: /back/
-#   ports:
-#      - 3333:3333
-#    env_file: /back/.env
-
   db:
+    container_name: database
     image: postgres:16.0
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password 
-      POSTGRES_DB: nest
+    restart: always
+    env_file: ./back/.env
     ports:
       - 5432:5432
     networks:
       - transcendence
-#    volumes:
-#      - db-data:/var/lib/postgresql/data
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
-#volumes:
-#  db-data
+  back:
+    build:
+      context: ./back
+      dockerfile: ./Dockerfile
+    container_name: api_back
+    ports:
+      - '3333:3333'
+      - '5555:5555'
+    depends_on:
+      - db
+    volumes:
+      - ./back/src:/app/src
+    networks:
+      - transcendence
+
+volumes:
+  db-data:
+
 networks:
   transcendence:
 

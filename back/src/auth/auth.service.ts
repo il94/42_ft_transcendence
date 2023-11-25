@@ -38,7 +38,7 @@ export class AuthService {
 					email: profile.email,
 					hash: "00",
 					avatar: process.env.AVATAR,
-					id42: profile.id42,
+					//id42: profile.id42,
 					username: profile.username,
 				},
 			});

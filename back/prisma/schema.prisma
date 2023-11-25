@@ -15,7 +15,7 @@ model User {
   createdAt DateTime @default(now())
 
   // profile data
-  id42        String? @unique
+  id42        Int?
   username    String  @unique
   email       String  @unique
   hash        String
