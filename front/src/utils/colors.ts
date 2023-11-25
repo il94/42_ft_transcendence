@@ -25,6 +25,7 @@ const colors = {
 	reduceButton: "#bb8054",
 	reduceButtonHover: "#be9473",
 	shadowButton: "#7a3525",
+	hoverBorderText: "#ffff52",
 
 	/* Scrolling bar */
 	scrollingBar: "#804400",

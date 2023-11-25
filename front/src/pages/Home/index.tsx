@@ -1,21 +1,36 @@
 import {
 	HomePage,
-	StyledMainTitle,
-	WelcomeWindow,
+	MainTitle,
+	CentralWindow,
 	StyledTitle,
+	LinkButtonFix,
+	ButtonsWrapper,
 	StyledLink
 } from './style'
+
+import colors from '../../utils/colors'
 
 function Home() {
 	return (
 		<HomePage>
-			<StyledMainTitle>
-				Transcendance
-			</StyledMainTitle>
-			<WelcomeWindow>
-				<StyledTitle>Welcome</StyledTitle>
-				<StyledLink to="/game" >Login</StyledLink>
-			</WelcomeWindow>
+			<MainTitle>
+				<StyledLink to="/" color={colors.text}>
+					Transcendance
+				</StyledLink>
+			</MainTitle>
+			<CentralWindow>
+				<StyledTitle>
+					Welcome
+				</StyledTitle>
+				<ButtonsWrapper>
+					<LinkButtonFix to="/signin" width="165px">
+						Sign in
+					</LinkButtonFix>
+					<LinkButtonFix to="/signup" width="165px">
+						Sign up
+					</LinkButtonFix>
+				</ButtonsWrapper>
+			</CentralWindow>
 		</HomePage>
 	)
 }

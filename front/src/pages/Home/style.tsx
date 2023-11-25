@@ -9,9 +9,14 @@ export const HomePage = styled.div`
 	flex-direction: column;
 	align-items: center;
 
+	position: relative;
+
+	width: 100%;
+	height: 100%;
+
 `
 
-export const StyledMainTitle = styled.h1`
+export const MainTitle = styled.h1`
 
 	font-size: 80px;
 
@@ -21,17 +26,27 @@ export const StyledMainTitle = styled.h1`
 
 `
 
-export const WelcomeWindow = styled.div`
+export const StyledLink = styled(Link)<{ color: string }>`
+
+	text-decoration: none;
+
+	color: ${(props) => props.color};
+
+`
+
+export const CentralWindow = styled.div`
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 
-	font-size: 10%;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+
 	width: 400px;
-	margin-top: 25vh;
-	margin-bottom: 25vh;
-	background-color: ${colors.popup};
+
+	padding-bottom: 5px;
 
 	border-style: solid;
 	border-width: 15px;
@@ -40,13 +55,17 @@ export const WelcomeWindow = styled.div`
 
 	${effects.pixelateWindow};
 
+	background-color: ${colors.popup};
+
 `
 
 export const StyledTitle = styled.h2`
 
-	margin: 10px;
+	width: 100%;
 
 	font-size: 45px;
+
+	text-align: center;
 
 	&:hover {
 		transform: scale(1.015);
@@ -54,24 +73,38 @@ export const StyledTitle = styled.h2`
 
 `
 
-export const StyledLink = styled(Link)`
+export const ButtonsWrapper = styled.div`
 
-	font-size: 40px;
-	margin: 10px;
-	padding: 1px;
+	display: flex;
+	justify-content: space-evenly;
+
+	width: 100%;
+
+	margin-top: 20px;
+
+`
+
+export const LinkButtonFix = styled(Link)<{ width: string }>`
+
+	width: ${(props) => props.width};
+
+	padding-top: 1px;
+	padding-left: 1px;
 	padding-bottom: 3px;
 	padding-right: 3px;
 
-	background-color: ${colors.button};
-	color: ${colors.text};
-
 	cursor: pointer;
 
+	font-size: 35px;
 	text-decoration: none;
-	${effects.shadowButton};
+	text-align: center;
 
+	${effects.shadowButton};
 	${effects.pixelateWindow};
 	
+	color: ${colors.text};
+	background-color: ${colors.button};
+
 	&:hover {
 		transform: scale(1.015);
 	}
