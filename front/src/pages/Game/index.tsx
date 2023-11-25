@@ -28,6 +28,7 @@ import Card from '../../components/Card'
 
 import breakpoints from '../../utils/breakpoints'
 import SettingsPopup from '../../components/SettingsPopup'
+import InteractionPopup from '../../components/InteractionPopup'
 
 
 function Game() {
@@ -86,6 +87,9 @@ function Game() {
 									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
 										<Card username={cardUsername} cardPosition={cardPosition} />
 									</CardContext.Provider>
+								}
+								{
+									<InteractionPopup />
 								}
 								{
 									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setContactListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
