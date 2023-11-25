@@ -3,22 +3,22 @@ import {
 	MainTitle,
 	CentralWindow,
 	StyledTitle,
-	StyledLink,
 	TextInput,
 	SignupForm,
 	Label,
-	Button,
 	FTRedirectWrapper,
-	ButtonImage,
-	Image,
 	Separator,
 	Line,
 	TextSeparator
 } from './style'
 
-import FTButton from "../../assets/42.png"
+import StyledLink from '../../componentsLibrary/StyledLink/Index'
+import Button from '../../componentsLibrary/Button'
+import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 import colors from '../../utils/colors'
+
+import FTButton from "../../assets/42.png"
 
 function Signup() {
 	return (
@@ -61,7 +61,7 @@ function Signup() {
 				</Separator>
 				<FTRedirectWrapper>
 					<ButtonImage>
-						<Image src={FTButton} />
+						<img src={FTButton} style={{ paddingRight: "7px"}} />
 						Continue with 42
 					</ButtonImage>
 				</FTRedirectWrapper>

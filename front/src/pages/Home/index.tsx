@@ -3,10 +3,11 @@ import {
 	MainTitle,
 	CentralWindow,
 	StyledTitle,
-	LinkButtonFix,
-	ButtonsWrapper,
-	StyledLink
+	ButtonsWrapper
 } from './style'
+
+import LinkButtonFix from '../../componentsLibrary/LinkButtonFix'
+import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
 import colors from '../../utils/colors'
 
