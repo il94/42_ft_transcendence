@@ -15,7 +15,7 @@ export const Style = styled.div`
 
 `
 
-export const RoomName = styled.p`
+export const ChannelName = styled.p`
 
 	width: 100%;
 

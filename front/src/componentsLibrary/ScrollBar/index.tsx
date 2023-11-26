@@ -31,13 +31,19 @@ const TrackVertical = styled.div<{ $onMouse: boolean }>`
 
 `
 
-type ScrollBarProps = {
-	state?: { value: number, setter: Dispatch<SetStateAction<number>> },
-	firstRenderState?: { value: boolean, setter: Dispatch<SetStateAction<boolean>> },
+type PropsScrollBar = {
+	state?: {
+		value: number,
+		setter: Dispatch<SetStateAction<number>>
+	},
+	firstRenderState?: {
+		value: boolean,
+		setter: Dispatch<SetStateAction<boolean>>
+	},
 	children: ReactNode
 }
 
-function ScrollBar({ state, firstRenderState, children }: ScrollBarProps) {
+function ScrollBar({ state, firstRenderState, children }: PropsScrollBar) {
 
 	const scrollBarRef = useRef<Scrollbars>(null)
 	const [onMouse, setOnMouse] = useState<boolean>(false)

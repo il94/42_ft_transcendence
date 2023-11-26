@@ -4,6 +4,7 @@ import {
 } from 'react'
 
 import { useMediaQuery } from 'react-responsive'
+import axios from 'axios'
 
 import {
 	GamePage,
@@ -14,10 +15,6 @@ import {
 	RightGameWrapper
 } from './style'
 
-import CardContext from '../../contexts/CardContext'
-import ChatContext from '../../contexts/ChatContext'
-import ZIndexContext from '../../contexts/ZIndexContext'
-
 import Logo from '../../components/Logo'
 import Info from '../../components/Info'
 import Social from '../../components/Social'
@@ -25,13 +22,17 @@ import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
+import TestsBack from '../../components/TestsBack'
+import MenuSettings from '../../components/MenuSettings'
+
+import CardContext from '../../contexts/CardContext'
+import ChatContext from '../../contexts/ChatContext'
+import ZIndexContext from '../../contexts/ZIndexContext'
+import MenuContextualContext from '../../contexts/MenuContextualContext'
+
+import { User } from '../../utils/types'
 
 import breakpoints from '../../utils/breakpoints'
-import MenuSettings from '../../components/MenuSettings'
-import axios from 'axios'
-import { User } from '../../utils/types'
-import TestsBack from '../../components/TestsBack'
-import MenuContextualContext from '../../contexts/MenuContextualContext'
 
 import DefaultProfilePicture from "../../assets/default_blue.png"
 
@@ -40,17 +41,18 @@ function Game() {
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
 	const [social, displaySocial] = useState<boolean>(true)
+
 	const [chat, displayChat] = useState<boolean>(false)
-	const [contactListScrollValue, setRoomListScrollValue] = useState<number>(0)
+	const [contactListScrollValue, setChannelListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
+
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 
 	const [menuInteraction, displayMenuContextual] = useState<boolean>(false)
 	const [menuInteractionPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
-
 
 	const [zCardIndex, setZCardIndex] = useState<number>(10)
 	const [zChatIndex, setZChatIndex] = useState<number>(10)
@@ -91,8 +93,6 @@ function Game() {
 
 	/* ============================================== */
 
-
-
 	return (
 		<GamePage>
 			{
@@ -102,7 +102,10 @@ function Game() {
 							<Logo />
 							<MenuContextualContext.Provider value={{ menuInteraction, displayMenuContextual, menuInteractionPosition, setMenuContextualPosition }} >
 								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
-									<Social social={social} displaySocial={displaySocial} />
+									<Social
+										social={social}
+										displaySocial={displaySocial}
+									/>
 								</CardContext.Provider>
 							</MenuContextualContext.Provider>
 						</LeftGameWrapper>
@@ -110,14 +113,12 @@ function Game() {
 							<TopGameWrapper>
 								<Info />
 								<Profile
-
 									userData={{
 										id: userTest.id,
 										username: userTest.username,
 										profilePicture: userTest.profilePicture,
 										scoreResume: userTest.scoreResume
 									}}
-
 									card={card}
 									cardIdTarget={cardIdTarget}
 									setIdTargetCard={setIdTargetCard}
@@ -131,20 +132,26 @@ function Game() {
 								<Pong />
 								{
 									card &&
-									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
-										<Card cardPosition={cardPosition} />
-									</CardContext.Provider>
+									<Card
+										cardPosition={cardPosition}
+										displayCard={displayCard}
+									/>
 								}
 								<TestsBack />
 								{
-									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setRoomListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 										<Chat />
 									</ChatContext.Provider>
 								}
 								{
 									settings &&
-									<MenuSettings displayMenuSettings={displayMenuSettings} userData={{ username: userTest.username, profilePicture: userTest.profilePicture
-									}} />
+									<MenuSettings
+										userData={{
+											username: userTest.username,
+											profilePicture: userTest.profilePicture
+										}}
+										displayMenuSettings={displayMenuSettings}
+									/>
 								}
 							</BottomGameWrapper>
 						</RightGameWrapper>

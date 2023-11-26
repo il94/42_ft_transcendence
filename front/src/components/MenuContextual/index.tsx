@@ -22,7 +22,7 @@ function MenuContextual({ position } : PropsMenuContextual) {
 				tabIndex={0} ref={menuInteractionRef}>
 			<Section>
 				<SectionName>
-					Roomer
+					Contacter
 				</SectionName>
 			</Section>
 			<Section>

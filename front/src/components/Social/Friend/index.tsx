@@ -61,7 +61,10 @@ function Friend({ id, username, profilePicture, state, social, color }: PropsFri
 	}
 
 	function showMenuContextual(event: MouseEvent<HTMLDivElement>) {
-		setMenuContextualPosition({ top: event.clientY, left: event.clientX }) // set la position du menu sur le clic
+		setMenuContextualPosition({
+			top: event.clientY,
+			left: event.clientX
+		}) // set la position du menu sur le clic
 		displayMenuContextual(true)
 	}
 

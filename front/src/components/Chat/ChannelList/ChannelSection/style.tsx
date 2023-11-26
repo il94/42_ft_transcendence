@@ -19,7 +19,7 @@ export const Style = styled.div`
 
 `
 
-export const ProfilePicture = styled.div`
+export const ProfilePicture = styled.img`
 	
 	width: 24px;
 	height: 24px;
@@ -28,11 +28,9 @@ export const ProfilePicture = styled.div`
 	
 	border-radius: 50%;
 
-	background-color: ${colors.profilePicture};
-
 `
 
-export const RoomName = styled.p`
+export const ChannelName = styled.p`
 	
 	margin-left: 6px;
 

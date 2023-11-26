@@ -16,8 +16,6 @@ export const Style = styled.div<{$top: number, $left: number}>`
 
 	${effects.pixelateWindow};
 
-	background-color: ${colors.module};
-	
 	&:focus {
 		outline: none;
 	}
@@ -34,7 +32,7 @@ export const Section = styled.button`
 	height: 35px;
 
 	color: ${colors.text};
-	background-color: ${colors.module};
+	background-color: ${colors.sectionContextualMenu};
 
 	&:hover {
 		cursor: pointer;
