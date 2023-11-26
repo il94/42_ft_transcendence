@@ -11,6 +11,7 @@ const colors = {
 	sectionHover: "#d68215",
 	sectionTransparent: "#aa6736b3",
 	sectionAltTransparent: "#995c2fb3",
+	sectionContextualMenu: "#8a4615",
 
 	/* Texts */
 	text: "#FFFFFF",
