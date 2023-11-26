@@ -16,6 +16,8 @@ import colors from "../../utils/colors"
 import DefaultRedProfilePicture from "../../assets/default_red.png"
 import DefaultYellowProfilePicture from "../../assets/default_yellow.png"
 import DefaultGreenProfilePicture from "../../assets/default_green.png"
+import DefaultBlackProfilePicture from "../../assets/default_black.png"
+import TontonPicture from "../../assets/xavier_niel.webp"
 
 type PropsSocial = {
 	social: boolean,
@@ -38,7 +40,7 @@ function Social({ social, displaySocial } : PropsSocial) {
 			username: "sbelabba",
 			hash: "password",
 			profilePicture: DefaultRedProfilePicture,
-			state: "En jeu",
+			state: "Dans les menus",
 			scoreResume: {
 				wins: 0,
 				draws: 0,
@@ -62,13 +64,38 @@ function Social({ social, displaySocial } : PropsSocial) {
 			username: "adouay",
 			hash: "password",
 			profilePicture: DefaultGreenProfilePicture,
+			state: "Partie en cours",
+			scoreResume: {
+				wins: 0,
+				draws: 0,
+				looses: 0
+			}
+		},
+		{
+			id: 13,
+			username: "PYXLBS",
+			hash: "password",
+			profilePicture: DefaultBlackProfilePicture,
+			state: "Spectateur",
+			scoreResume: {
+				wins: 0,
+				draws: 0,
+				looses: 0
+			}
+		},
+		{
+			id: 14,
+			username: "xniel",
+			hash: "password",
+			profilePicture: TontonPicture,
 			state: "Deconnecte",
 			scoreResume: {
 				wins: 0,
 				draws: 0,
 				looses: 0
 			}
-		}
+		},
+		
 	]
 
 	/* ============================================== */
