@@ -18,23 +18,25 @@ import ZIndexContext from "../../../contexts/ZIndexContext"
 import MenuContextualContext from "../../../contexts/MenuContextualContext"
 
 type PropsFriend = {
+	id: number,
 	username: string,
+	profilePicture: string,
 	state: string,
 	social: boolean,
 	color: string
 }
 
-function Friend({ username, state, social, color }: PropsFriend) {
+function Friend({ id, username, profilePicture, state, social, color }: PropsFriend) {
 
-	const { card, displayCard, setCardPosition, cardUsername, setCardUserName } = useContext(CardContext)!
+	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
 	const { displayMenuContextual, setMenuContextualPosition } = useContext(MenuContextualContext)!
 	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {
 
-		if (cardUsername === username) {
-			displayCard(!card)
+		if (card && cardIdTarget === id) {
+			displayCard(false)
 			return;
 		}
 
@@ -49,7 +51,7 @@ function Friend({ username, state, social, color }: PropsFriend) {
 			const target = topCurrentElement - topParentElement
 			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
-			setCardUserName(username)
+			setIdTargetCard(id)
 			setCardPosition({ top: topCard.toString() + "px", left: "0px" })
 			setZCardIndex(zChatIndex + 1)
 
@@ -72,7 +74,7 @@ function Friend({ username, state, social, color }: PropsFriend) {
 			onAuxClick={showMenuContextual}
 			onContextMenu={handleContextMenu}
 			color={color} ref={friendContainerRef}>
-			<ProfilePicture />
+			<ProfilePicture src={profilePicture} />
 			{
 				!social &&
 				<ProfileInfo>

@@ -43,10 +43,10 @@ function TestsBack() {
 			</Bout>
 			<Bout onClick={() => axios.post("http://localhost:3333/users",
 				{
-					email: "ilyes@test.fr",
+					username: "ilandols",
 					hash: "123456",
-					avatar: "image",
-					username: "ilandols"
+					email: "ilyes@test.fr",
+					profilePicture: "image"
 				})
 				.then(response => console.log(response.data))
 				.catch(error => console.log(error))

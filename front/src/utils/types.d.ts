@@ -1,10 +1,16 @@
 export type User = {
-	avatar?: string,
-	createdAt?: string,
-	email?: string,
-	hash: string,
-	id?: number,
+	id: number,
 	id42?: number,
+	createdAt?: string,
+	username: string,
+	hash: string,
+	email?: string,
 	tel?: string,
-	username: string
+	profilePicture: string,
+	state: string,
+	scoreResume: {
+		wins: number,
+		draws: number,
+		looses: number
+	}
 }

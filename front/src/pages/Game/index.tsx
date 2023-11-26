@@ -33,6 +33,8 @@ import { User } from '../../utils/types'
 import TestsBack from '../../components/TestsBack'
 import MenuContextualContext from '../../contexts/MenuContextualContext'
 
+import DefaultProfilePicture from "../../assets/default_blue.png"
+
 function Game() {
 
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
@@ -44,7 +46,7 @@ function Game() {
 	const [chatRender, setChatRender] = useState<boolean>(false)
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
-	const [cardUsername, setCardUserName] = useState<string>("")
+	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 
 	const [menuInteraction, displayMenuContextual] = useState<boolean>(false)
 	const [menuInteractionPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
@@ -54,10 +56,6 @@ function Game() {
 	const [zChatIndex, setZChatIndex] = useState<number>(10)
 
 	const [settings, displayMenuSettings] = useState<boolean>(false)
-
-	// A récuperer depuis le back, valeurs randoms en attendant
-	// const [userData, setUserData] = useState< User | undefined >()
-	const [userData, setUserData] = useState< User | undefined >({ hash: "MDP LOL", username: "ilandols" })
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
@@ -73,20 +71,27 @@ function Game() {
 	}, [zCardIndex, zChatIndex])
 
 
-	/* =========== TESTS ============== */
+	/* ============ Temporaire ============== */
 
-	// const [userData, setUserData] = useState<User>({})
+	// Recup le User authentifie avec un truc du style
+	// axios.get("http://localhost:3333/user")
 
-	// useEffect(() => {
-	// 	axios.get("http://localhost:3333/users")
-	// 		.then((response) => {
-	// 			setUserData(response.data[0])
-	// 			console.log(userData)
-	// 		})
-	// 		.catch((error) => console.log(error))
-	// }, [])
+	const userTest: User = {
+		profilePicture: DefaultProfilePicture,
+		hash: "password",
+		id: 0,
+		username: "ilandols",
+		state: "En ligne",
+		scoreResume: {
+			wins: 100,
+			draws: 1,
+			looses: 0	
+		}
+	}
 
-	/* ================================== */
+	/* ============================================== */
+
+
 
 	return (
 		<GamePage>
@@ -96,7 +101,7 @@ function Game() {
 						<LeftGameWrapper $social={social}>
 							<Logo />
 							<MenuContextualContext.Provider value={{ menuInteraction, displayMenuContextual, menuInteractionPosition, setMenuContextualPosition }} >
-								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
+								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
 									<Social social={social} displaySocial={displaySocial} />
 								</CardContext.Provider>
 							</MenuContextualContext.Provider>
@@ -104,14 +109,30 @@ function Game() {
 						<RightGameWrapper>
 							<TopGameWrapper>
 								<Info />
-								<Profile username={userData?.username ? userData?.username : "Loading..."} displayCard={displayCard} setCardPosition={setCardPosition} settings={settings} displayMenuSettings={displayMenuSettings} />
+								<Profile
+
+									userData={{
+										id: userTest.id,
+										username: userTest.username,
+										profilePicture: userTest.profilePicture,
+										scoreResume: userTest.scoreResume
+									}}
+
+									card={card}
+									cardIdTarget={cardIdTarget}
+									setIdTargetCard={setIdTargetCard}
+									displayCard={displayCard}
+									setCardPosition={setCardPosition}
+									settings={settings}
+									displayMenuSettings={displayMenuSettings}
+								/>
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								<Pong />
 								{
 									card &&
-									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardUsername, setCardUserName }}>
-										<Card username={cardUsername} cardPosition={cardPosition} />
+									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
+										<Card cardPosition={cardPosition} />
 									</CardContext.Provider>
 								}
 								<TestsBack />
@@ -122,7 +143,8 @@ function Game() {
 								}
 								{
 									settings &&
-									<MenuSettings displayMenuSettings={displayMenuSettings} userData={userData} />
+									<MenuSettings displayMenuSettings={displayMenuSettings} userData={{ username: userTest.username, profilePicture: userTest.profilePicture
+									}} />
 								}
 							</BottomGameWrapper>
 						</RightGameWrapper>

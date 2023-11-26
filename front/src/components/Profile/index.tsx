@@ -1,8 +1,7 @@
 import {
-	useRef,
-	RefObject,
 	SetStateAction,
-	Dispatch
+	Dispatch,
+	useContext
 } from "react"
 
 import {
@@ -13,32 +12,56 @@ import {
 	ProfilePicture,
 } from "./style"
 
+import ZIndexContext from "../../contexts/ZIndexContext"
+
 import Icon from "../../componentsLibrary/Icon"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 
 type PropsProfile = {
-	username: string,
+	userData: {
+		username: string,
+		profilePicture: string,
+		id: number,
+		scoreResume: {
+			wins: number,
+			draws: number,
+			looses: number
+		}
+	},
+	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
+	cardIdTarget: number,
+	setIdTargetCard: Dispatch<SetStateAction<number>>,
 	setCardPosition: Dispatch<SetStateAction<{ top: string, left: string }>>,
 	settings: boolean,
 	displayMenuSettings: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ username, displayCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
+function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
+
+	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 
 	function showCard() {
-		setCardPosition({ top: "0px", left: "calc(100% - 240px)" }) // set la postition tout en haut a gauche - width de la carte
-		displayCard(true)
+
+		if (card && cardIdTarget === userData.id)
+			displayCard(false)
+		else
+		{
+			setIdTargetCard(userData.id)
+			setZCardIndex(zChatIndex + 1)
+			setCardPosition({ top: "0px", left: "calc(100% - 240px)" }) // set la postition tout en haut a gauche - width de la carte
+			displayCard(true)
+		}
 	}
 
 	return (
 		<Style>
 			<ProfileWrapper onClick={showCard}>
-				<ProfilePicture />
+				<ProfilePicture src={userData.profilePicture}/>
 				<ProfileName>
-					{username}
+					{userData.username}
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>

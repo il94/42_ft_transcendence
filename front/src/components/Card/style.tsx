@@ -44,7 +44,7 @@ export const CloseButton = styled.div`
 
 `
 
-export const ProfilePicture = styled.div`
+export const ProfilePicture = styled.img`
 
 	width: 92px;
 	height: 92px;
@@ -57,8 +57,6 @@ export const ProfilePicture = styled.div`
 	border: 10px solid ${colors.rankGold};
 
 	border-radius: 50%;
-
-	background-color: ${colors.profilePicture};
 
 `
 
