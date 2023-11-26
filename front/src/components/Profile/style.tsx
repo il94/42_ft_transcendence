@@ -16,7 +16,7 @@ export const Style = styled.div`
 	
 `
 
-export const ProfileWrapper = styled.div<{ ref: RefObject<HTMLElement> }>`
+export const ProfileWrapper = styled.div`
 	
 	display: flex;
 	justify-content: flex-start;

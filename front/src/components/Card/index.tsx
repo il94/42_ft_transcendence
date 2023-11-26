@@ -18,7 +18,7 @@ import CardContext from "../../contexts/CardContext"
 import CloseIcon from "../../assets/close.png"
 
 type PropsCard = {
-	cardPosition: { top: number, left: number },
+	cardPosition: { top: string, left: string },
 	username: string
 }
 

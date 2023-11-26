@@ -21,30 +21,21 @@ import settingsIcon from "../../assets/settings.png"
 type PropsProfile = {
 	username: string,
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
+	setCardPosition: Dispatch<SetStateAction<{ top: string, left: string }>>,
 	settings: boolean,
 	displayMenuSettings: Dispatch<SetStateAction<boolean>>
 }
 
 function Profile({ username, displayCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
 
-	const profileContainerRef: RefObject<HTMLElement> = useRef(null)
-
 	function showCard() {
-
-		const profileContainer = profileContainerRef.current
-
-		if (profileContainer) {
-			const { width: widthParentElement } = profileContainer.parentElement!.parentElement!.getBoundingClientRect()
-
-			setCardPosition({ top: 0, left: widthParentElement - 240 }) // width de la carte
-			displayCard(true)
-		}
+		setCardPosition({ top: "0px", left: "calc(100% - 240px)" }) // set la postition tout en haut a gauche - width de la carte
+		displayCard(true)
 	}
 
 	return (
 		<Style>
-			<ProfileWrapper onClick={showCard} ref={profileContainerRef}>
+			<ProfileWrapper onClick={showCard}>
 				<ProfilePicture />
 				<ProfileName>
 					{username}

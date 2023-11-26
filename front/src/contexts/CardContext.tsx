@@ -7,8 +7,8 @@ import {
 const CardContext = createContext<{
 	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	cardPosition: { top: number; left: number },
-	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
+	cardPosition: { top: string; left: string },
+	setCardPosition: Dispatch<SetStateAction<{ top: string, left: string }>>,
 	cardUsername: string,
 	setCardUserName: Dispatch<SetStateAction<string>>
 } | undefined>(undefined)

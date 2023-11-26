@@ -43,7 +43,7 @@ function Game() {
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
 	const [cardUsername, setCardUserName] = useState<string>("")
 
 	const [menuInteraction, displayMenuContextual] = useState<boolean>(false)
