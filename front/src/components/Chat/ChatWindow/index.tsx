@@ -4,6 +4,8 @@ import TextInput from "./TextInput"
 import DiscussionInterface from "./DiscussionInterface"
 import Banner from "./Banner"
 
+import { Channel } from "../../../utils/types"
+
 import colors from "../../../utils/colors"
 
 const Style = styled.div`
@@ -18,11 +20,15 @@ const Style = styled.div`
 
 `
 
-function ChatWindow() {
+type PropsChatWindow = {
+	toDisplay: Channel
+}
+
+function ChatWindow({ toDisplay } : PropsChatWindow) {
 	return (
 		<Style>
-			<Banner />
-			<DiscussionInterface />
+			<Banner name={toDisplay.name} />
+			<DiscussionInterface targetId={toDisplay.id} />
 			<TextInput />
 		</Style>
 	)
