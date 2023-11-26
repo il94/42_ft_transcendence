@@ -28,10 +28,26 @@ function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
 				</ButtonsWrapper>
 			}
 			{
+				state === status.ACCEPTED &&
+				<ButtonsWrapper>
+					<Button color={colors.buttonGreen}>
+						Accepted !
+					</Button>
+				</ButtonsWrapper>
+			}
+			{
 				state === status.CANCELLED &&
 				<ButtonsWrapper>
 					<Button color={colors.buttonGray}>
 						Cancelled
+					</Button>
+				</ButtonsWrapper>
+			}
+			{
+				state === status.IN_PROGRESS &&
+				<ButtonsWrapper>
+					<Button color={colors.button}>
+						Spectate
 					</Button>
 				</ButtonsWrapper>
 			}
