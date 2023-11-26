@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { Dispatch, SetStateAction, useContext } from "react"
 
 import {
 	CloseButton,
@@ -13,7 +13,6 @@ import ScoreResume from "./ScoreResume"
 import Icon from "../../componentsLibrary/Icon"
 
 import ZIndexContext from "../../contexts/ZIndexContext"
-import CardContext from "../../contexts/CardContext"
 
 import { User } from "../../utils/types"
 
@@ -24,13 +23,13 @@ type PropsCard = {
 	cardPosition: {
 		top: string,
 		left: string
-	}
+	},
+	displayCard: Dispatch<SetStateAction<boolean>>
 }
 
-function Card({ cardPosition }: PropsCard) {
+function Card({ cardPosition, displayCard }: PropsCard) {
 
 	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(ZIndexContext)!
-	const { displayCard } = useContext(CardContext)!
 
 
 	/* ============ Temporaire ============== */
