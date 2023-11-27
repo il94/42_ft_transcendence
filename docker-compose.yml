@@ -28,6 +28,18 @@ services:
     networks:
       - transcendence
 
+  front:
+    build:
+      context: ./front
+      dockerfile: ./Dockerfile
+    container_name: api_front
+    ports:
+      - '5173:5173'
+    depends_on:
+      - back
+    networks:
+      - transcendence
+
 volumes:
   db-data:
 
