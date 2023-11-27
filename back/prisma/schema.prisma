@@ -10,47 +10,117 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  ONLINE
+  OFFLINE
+  PLAYING
+  WAITING
+  WATCHING
+}
+
 enum Role {
   USER
   ADMIN
+  OWNER
+}
+
+enum Type {
+  PRIVATE
+  PUBLIC
+}
+
+enum Podium {
+  WINNER
+  LOOSER
 }
 
 model User {
-  id        Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  id          Int @id @default(autoincrement())
+  createdAt   DateTime @default(now())
 
-  // profile data
-  id42        Int?
   username    String  @unique
   email       String  @unique
   hash        String
   avatar      String
   tel         String?
+  status      Status
 
-  //game data
-  //status    String?
+  games       UsersOnGames[]
+
   //chart     Int?
   //Badges    String?
 
-  // friendship data
-  // One-to-many self relation (implicit relation table)
-  hasFriends User[]  @relation("UserFriendship")
-  isFriend  User[]  @relation("UserFriendship")
+  hasFriends  Friends[] @relation("hasFriends")
+  isFriend    Friends[] @relation("isFriend")
 
-  //  games     UsersOnGames[]
-  //  channels  UsersOnChannel[]
-  
+  channels  UsersOnChannels[]
+  messages  Message[]
+
   @@map("users")
-
 }
 
-//model Game {
-//  id    Int     @id @default(autoincrement())
-//  level Int
-//  createdAt DateTime @default(now())
-//  player_oneUser    @relation(fields: [authorId], references: [id])
-//  player_two 
-//}
+model Friends {
+  hasFriends   User @relation("hasFriends", fields: [hasFriendsId], references: [id])
+  hasFriendsId Int
+  isFriend    User @relation("isFriend", fields: [isFriendId], references: [id])
+  isFriendId  Int
+
+  @@id([hasFriendsId, isFriendId])
+}
+
+model Channel {
+  id        Int  @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  type      Type
+
+  members   UsersOnChannels[]
+  content   Message[]
+}
+
+model Game {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  players   UsersOnGames[]   
+  level     Int
+}
+
+// Relation 1-m user-message et user-channel ?
+model Message {
+  id        Int  @id @default(autoincrement())
+  author    User @relation(fields: [authorId], references: [id])
+  authorId  Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  channelId Int
+  content   String?
+  isInvit   Boolean @default(false)
+}
+
+// Relation m-m user-channel
+model UsersOnChannels {
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  channelId Int
+  role      Role
+
+  @@id([userId, channelId])
+}
+
+// Relation m-m user-game
+model UsersOnGames {
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  game      Game @relation(fields: [gameId], references: [id])
+  gameId    Int
+  podium    Podium
+
+  @@id([userId, gameId])
+}
+
+
+
+
+
 
 
 
