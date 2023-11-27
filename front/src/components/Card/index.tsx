@@ -40,7 +40,6 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	const userTest: User = {
 		id: 0,
 		username: "ilandols",
-		hash: "password",
 		profilePicture: DefaultProfilePicture,
 		state: "En ligne",
 		scoreResume: {
@@ -51,8 +50,6 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	}
 
 	/* ============================================== */
-
-
 
 	return (
 		<Style onClick={() => { setZCardIndex(zChatIndex + 1) }}

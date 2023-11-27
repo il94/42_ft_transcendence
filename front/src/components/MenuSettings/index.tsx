@@ -15,7 +15,6 @@ import {
 } from "./style"
 
 import Icon from "../../componentsLibrary/Icon"
-import { User } from "../../utils/types"
 
 import CloseIcon from "../../assets/close.png"
 

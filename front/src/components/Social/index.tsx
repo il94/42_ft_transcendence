@@ -1,8 +1,9 @@
-import { Dispatch, SetStateAction, useContext } from "react"
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
+import axios from "axios"
 
 import { Style, ReduceButton } from "./style"
 
-import Friend from "./Friend"
+import FriendSection from "./FriendSection"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
 import MenuContextual from "../MenuContextual"
 
@@ -12,12 +13,6 @@ import MenuContextualContext from "../../contexts/MenuContextualContext"
 import { User } from "../../utils/types"
 
 import colors from "../../utils/colors"
-
-import DefaultRedProfilePicture from "../../assets/default_red.png"
-import DefaultYellowProfilePicture from "../../assets/default_yellow.png"
-import DefaultGreenProfilePicture from "../../assets/default_green.png"
-import DefaultBlackProfilePicture from "../../assets/default_black.png"
-import TontonPicture from "../../assets/xavier_niel.webp"
 
 type PropsSocial = {
 	social: boolean,
@@ -29,76 +24,15 @@ function Social({ social, displaySocial } : PropsSocial) {
 	const { displayCard } = useContext(CardContext)!
 	const { menuInteraction, menuInteractionPosition } = useContext(MenuContextualContext)!
 
-	/* ============ Temporaire ============== */
+	const [friends, setFriendSections] = useState<User[]>([])
 
-	// Recup les User ami du User authentifie avec un truc du style
-	// axios.get("http://localhost:3333/users
-
-	const friendsTest: User[] = [
-		{
-			id: 10,
-			username: "sbelabba",
-			hash: "password",
-			profilePicture: DefaultRedProfilePicture,
-			state: "Dans les menus",
-			scoreResume: {
-				wins: 0,
-				draws: 0,
-				looses: 0
-			}
-		},
-		{
-			id: 11,
-			username: "cchapon",
-			hash: "password",
-			profilePicture: DefaultYellowProfilePicture,
-			state: "En recherche de partie...",
-			scoreResume: {
-				wins: 0,
-				draws: 0,
-				looses: 0
-			}
-		},
-		{
-			id: 12,
-			username: "adouay",
-			hash: "password",
-			profilePicture: DefaultGreenProfilePicture,
-			state: "Partie en cours",
-			scoreResume: {
-				wins: 0,
-				draws: 0,
-				looses: 0
-			}
-		},
-		{
-			id: 13,
-			username: "PYXLBS",
-			hash: "password",
-			profilePicture: DefaultBlackProfilePicture,
-			state: "Spectateur",
-			scoreResume: {
-				wins: 0,
-				draws: 0,
-				looses: 0
-			}
-		},
-		{
-			id: 14,
-			username: "xniel",
-			hash: "password",
-			profilePicture: TontonPicture,
-			state: "Deconnecte",
-			scoreResume: {
-				wins: 0,
-				draws: 0,
-				looses: 0
-			}
-		},
-		
-	]
-
-	/* ============================================== */
+	useEffect(() => {
+		axios.get("http://localhost:3333/user")
+			.then((response) => {
+				setFriendSections(response.data)
+			})
+			.catch()
+	}, [])
 
 	function reduceSocial() {
 		displaySocial(!social)
@@ -114,12 +48,12 @@ function Social({ social, displaySocial } : PropsSocial) {
 			}
 			<ScrollBar>
 			{
-				friendsTest.map((friend, index) => (
-					<Friend
+				friends.map((friend, index) => (
+					<FriendSection
 						key={"friend" + index} // a definir
 						id={friend.id}
 						username={friend.username}
-						profilePicture={friend.profilePicture}
+						profilePicture={friend.avatar} // a renomer par profilePicture
 						state={friend.state}
 						social={social}
 						color={!(index % 2) ? colors.section : colors.sectionAlt}

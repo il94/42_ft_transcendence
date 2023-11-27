@@ -17,7 +17,7 @@ import CardContext from "../../../contexts/CardContext"
 import ZIndexContext from "../../../contexts/ZIndexContext"
 import MenuContextualContext from "../../../contexts/MenuContextualContext"
 
-type PropsFriend = {
+type PropsFriendSection = {
 	id: number,
 	username: string,
 	profilePicture: string,
@@ -26,7 +26,7 @@ type PropsFriend = {
 	color: string
 }
 
-function Friend({ id, username, profilePicture, state, social, color }: PropsFriend) {
+function FriendSection({ id, username, profilePicture, state, social, color }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
 	const { displayMenuContextual, setMenuContextualPosition } = useContext(MenuContextualContext)!
@@ -93,4 +93,4 @@ function Friend({ id, username, profilePicture, state, social, color }: PropsFri
 	)
 }
 
-export default Friend
+export default FriendSection

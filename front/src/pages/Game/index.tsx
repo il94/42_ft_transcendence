@@ -30,7 +30,7 @@ import ChatContext from '../../contexts/ChatContext'
 import ZIndexContext from '../../contexts/ZIndexContext'
 import MenuContextualContext from '../../contexts/MenuContextualContext'
 
-import { User } from '../../utils/types'
+import { UserAuthenticate } from '../../utils/types'
 
 import breakpoints from '../../utils/breakpoints'
 
@@ -78,17 +78,20 @@ function Game() {
 	// Recup le User authentifie avec un truc du style
 	// axios.get("http://localhost:3333/user")
 
-	const userTest: User = {
-		profilePicture: DefaultProfilePicture,
-		hash: "password",
+	const userTest: UserAuthenticate = {
 		id: 0,
 		username: "ilandols",
+		profilePicture: DefaultProfilePicture,
 		state: "En ligne",
 		scoreResume: {
 			wins: 100,
 			draws: 1,
 			looses: 0	
-		}
+		},
+		hash: "password",
+		email: "ilyes@test.fr",
+		tel: "0000000000",
+		createdAt: "???"
 	}
 
 	/* ============================================== */

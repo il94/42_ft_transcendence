@@ -2,12 +2,7 @@ import status from "./status"
 
 export type User = {
 	id: number,
-	id42?: number,
-	createdAt?: string,
 	username: string,
-	hash: string,
-	email?: string,
-	tel?: string,
 	profilePicture: string,
 	state: string,
 	scoreResume: {
@@ -17,9 +12,16 @@ export type User = {
 	}
 }
 
+export type UserAuthenticate = User & {
+	hash: string,
+	email: string,
+	tel: string,
+	createdAt: string,
+}
+
 export type Channel = {
 	id: number,
-	createdAt?: string,
+	createdAt: string,
 	name: string,
 	picture: string,
 	type: string
