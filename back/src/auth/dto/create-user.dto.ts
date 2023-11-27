@@ -9,7 +9,7 @@ export class CreateUserDto {
 	@IsString()
 	@IsOptional()
 	@ApiProperty({ required: false })
-	id42: string;
+	id42: number;
 
 	@IsString()
 	@IsNotEmpty()

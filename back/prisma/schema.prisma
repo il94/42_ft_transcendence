@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        Int @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -28,9 +33,9 @@ model User {
   //Badges    String?
 
   // friendship data
-  // Many-to-many self relation (implicit relation table)
-  hasFriend   User[] @relation("UserFriendship")
-  isFriend    User[] @relation("UserFriendship")
+  // One-to-many self relation (implicit relation table)
+  hasFriends User[]  @relation("UserFriendship")
+  isFriend  User[]  @relation("UserFriendship")
 
   //  games     UsersOnGames[]
   //  channels  UsersOnChannel[]
