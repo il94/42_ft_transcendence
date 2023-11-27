@@ -1,6 +1,8 @@
 import axios from "axios"
 import styled from "styled-components"
 
+import DefaultRedProfilePicture from "../assets/default_red.png"
+
 const Style = styled.div`
 
 	display: flex;
@@ -33,7 +35,7 @@ function TestsBack() {
 	return (
 		<Style>
 
-			<Bout onClick={() => axios.get("http://localhost:3333/users")
+			<Bout onClick={() => axios.get("http://localhost:3333/user")
 				.then((response) => {
 					console.log(response.data)
 				})
@@ -41,12 +43,13 @@ function TestsBack() {
 			}>
 				users get
 			</Bout>
-			<Bout onClick={() => axios.post("http://localhost:3333/users",
+			<Bout onClick={() => axios.post("http://localhost:3333/auth/signup",
 				{
-					username: "ilandols",
+					username: "sbelabba",
 					hash: "123456",
-					email: "ilyes@test.fr",
-					profilePicture: "image"
+					email: "soso@test.fr",
+					avatar: DefaultRedProfilePicture,
+					tel: "0000000000"
 				})
 				.then(response => console.log(response.data))
 				.catch(error => console.log(error))
