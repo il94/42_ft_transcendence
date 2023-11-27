@@ -35,7 +35,12 @@ export class AuthController {
 	@Post('signup')
 	@UseGuards(JwtGuard)
 	signup(@Body() dto:CreateUserDto) {
-		return this.authService.signin(dto);
+		return this.authService.signup(dto);
+	}
+
+	@Get('logout')
+	logout() {
+		return "TODO";
 	}
 
 	@HttpCode(HttpStatus.OK)

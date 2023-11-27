@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@prisma/client';
+import { User, Status, Friends, Role, Channel, Game, Message, UsersOnChannels, UsersOnGames } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
 export class UserEntity implements User {
@@ -12,9 +12,6 @@ export class UserEntity implements User {
 
 	@ApiProperty()
   	createdAt: Date;
-	
-	@ApiProperty()
-	id42: string;
 	
 	@ApiProperty()
 	username: string; 
@@ -30,4 +27,9 @@ export class UserEntity implements User {
 	
 	@ApiProperty()
 	tel: string;
+
+	@ApiProperty()
+	status: Status;
+
+
 }

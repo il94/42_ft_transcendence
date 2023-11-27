@@ -2,7 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/commo
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, Status } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 
@@ -13,15 +13,15 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const hash = await argon.hash(createUserDto.hash);
     let avatar = process.env.AVATAR;
-		if (createUserDto.avatar) { avatar = createUserDto.avatar  };
+		if (createUserDto.avatar) { avatar = createUserDto.avatar };
 		try {
 			const user = await this.prisma.user.create({
 				data: {
 					email: createUserDto.email,
 					hash,
 					avatar,
-					id42: '0',
 					username: createUserDto.username,
+					status: Status.ONLINE,
 				},
 			});
 			return user;
@@ -47,6 +47,10 @@ export class UsersService {
 	if (!user)
 		throw new NotFoundException(`Article with ${id} does not exist.`);
     return user;
+  }
+
+  async updateStatus(id: number, updateUserDto: UpdateUserDto) {
+
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

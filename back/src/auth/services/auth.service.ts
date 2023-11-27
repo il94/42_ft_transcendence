@@ -1,5 +1,6 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaClient, User, Prisma, Role, Status } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from "./users.service";
 import * as argon from 'argon2';
@@ -41,8 +42,8 @@ export class AuthService {
 					email: profile.email,
 					hash: "00", // fonction setHash ? module pour generer un password ?
 					avatar: process.env.AVATAR,
-					id42: profile.id42,
 					username: profile.username,
+					status: Status.ONLINE,
 				},
 			});
 			return newUser; // signtoken ?
