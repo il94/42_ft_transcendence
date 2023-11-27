@@ -4,8 +4,8 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
   
-// @Injectable()
-// export class JwtAuthGuard implements CanActivate {
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
 // 	constructor(private jwtService: JwtService) {}
   
 // 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -23,7 +23,7 @@ import { Observable } from 'rxjs';
 // 		throw new UnauthorizedException();
 // 	  }
 // 	return true;
-// 	}
+}
   
 // 	private extractTokenFromHeader(request: Request): string | undefined {
 // 	  const [type, token] = request.headers.authorization?.split(' ') ?? [];

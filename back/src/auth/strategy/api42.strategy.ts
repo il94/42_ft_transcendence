@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport";
 import moduleDefaultExport from "passport-42";
-import { AuthService } from "../auth.service";
+import { AuthService } from "../services/auth.service";
 
 @Injectable() 
 export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy) {
@@ -13,7 +13,7 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
         });
     }
     async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
-        const user = this.authService.validateUser({ email: profile.emails[0].value, username: profile.username, id42: profile.id }); 
+        const user = this.authService.validate42User({ email: profile.emails[0].value, username: profile.username, id42: profile.id }); 
         console.log ("User valide : ", user);
         return user;
     }

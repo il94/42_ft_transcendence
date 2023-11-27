@@ -1,17 +1,20 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { PrismaClient, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { AuthDto } from "./auth.dto";
-import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from "./users.service";
+import * as argon from 'argon2';
+import { AuthDto } from "../dto/auth.dto";
+import { CreateUserDto } from "../dto/create-user.dto";
 
 @Injectable()
 export class AuthService {
-	constructor(private prisma: PrismaService, private jwt: JwtService) {}
+	constructor(private prisma: PrismaService, 
+		private jwt: JwtService, 
+		private userService: UsersService) {}
 
-	getHello() {
-		return "Coucou!";
+	async signup(dto: CreateUserDto) {
+		const newUser = await this.userService.create(dto);
+		return this.signToken(newUser.id, newUser.username);
 	}
 
 	async signin(dto: AuthDto) {
@@ -27,7 +30,7 @@ export class AuthService {
 	}
 
 	// TODO proteger avec un try catch
-	async validateUser(profile: any) { // profile: any => profile: AuthDTO
+	async validate42User(profile: any) { // profile: any => profile: AuthDTO
 		const user = await this.prisma.user.findUnique({
 			where: { username: profile.username, },
 		});
@@ -36,15 +39,14 @@ export class AuthService {
 			const newUser = await this.prisma.user.create({
 				data: {
 					email: profile.email,
-					hash: "00",
+					hash: "00", // fonction setHash ? module pour generer un password ?
 					avatar: process.env.AVATAR,
-					//id42: profile.id42,
+					id42: profile.id42,
 					username: profile.username,
 				},
 			});
-			return newUser;
+			return newUser; // signtoken ?
 		}
-			//throw new ForbiddenException('Credentials incorrect');
 		console.log("user data: ", user);
 		return user;
 	}

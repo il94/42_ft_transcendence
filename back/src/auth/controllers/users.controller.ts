@@ -1,18 +1,18 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, 
   UseGuards, ParseIntPipe } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { JwtGuard } from '../auth/auth.guard';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from '../services/users.service';
+import { JwtGuard } from '../auth.guard';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 
-@Controller('users')
-@ApiTags('users')
+@Controller('user')
+@ApiTags('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('signup')
   @ApiCreatedResponse({ type: UserEntity })
   async create(@Body() createUserDto: CreateUserDto) {
     return new UserEntity(await this.usersService.create(createUserDto));
