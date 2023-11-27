@@ -1,19 +1,19 @@
 import Score from "./Score"
 import { Opponent, Style, Username } from "./style"
 
-type MatchProps = {
+type PropsMatch = {
 	username: string,
 	opponent: string,
 	color: string
 }
 
-function Match({ username, opponent, color } : MatchProps ) {
+function Match({ username, opponent, color } : PropsMatch ) {
 	return (
 		<Style color={color}>
 			<Username>
 				{username}
 			</Username>
-			<Score />
+			<Score scoreUser={0} scoreOpponent={0} />
 			<Opponent>
 				{opponent}
 			</Opponent>

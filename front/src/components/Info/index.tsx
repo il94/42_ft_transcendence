@@ -1,6 +1,11 @@
 import styled from "styled-components"
+import SearchBar from "../SearchBar"
 
 export const Style = styled.div`
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	width: 100%;
 	height: 53px;
@@ -13,7 +18,7 @@ export const Style = styled.div`
 function Info() {
 	return (
 		<Style>
-			Info
+			<SearchBar />
 		</Style>
 	)
 }

@@ -1,3 +1,4 @@
+import { RefObject } from "react"
 import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
@@ -34,14 +35,12 @@ export const ProfileWrapper = styled.div`
 
 `
 
-export const ProfilePicture = styled.div`
+export const ProfilePicture = styled.img`
 	
 	width: 32px;
 	height: 32px;
 
 	margin-left: 7px;
-
-	background-color: ${colors.profilePicture};
 
 	border-radius: 50%;
 

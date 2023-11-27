@@ -11,7 +11,11 @@ const Style = styled.p`
 	color: ${colors.historyDraw};
 `
 
-function Draw({ value } : { value: number }) {
+type PropsDraw = {
+	value: number
+}
+
+function Draw({ value } : PropsDraw) {
 	return (
 		<Style>
 			{value}D

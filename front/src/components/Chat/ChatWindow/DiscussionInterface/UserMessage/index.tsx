@@ -1,6 +1,10 @@
 import { Style, Text } from "./style"
 
-function UserMessage({ content } : { content: string }) {
+type PropsUserMessage = {
+	content: string
+}
+
+function UserMessage({ content } : PropsUserMessage) {
 	return (
 		<Style className="userMessages">
 			<Text>

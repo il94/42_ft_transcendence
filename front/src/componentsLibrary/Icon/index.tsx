@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const Icon = styled.button<{src: string, size: string, alt: string,}>`
+const Icon = styled.button<{ src: string, size: string, alt: string }>`
 
 	width: ${(props) => props.size};
 	height: ${(props) => props.size};

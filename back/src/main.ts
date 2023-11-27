@@ -32,9 +32,9 @@ async function bootstrap() {
 		}),
 	  );
 
-//	app.enableCors({
-//		origin: 'http://localhost:5173'
-//	})
+	app.enableCors({
+		origin: 'http://localhost:5173'
+	})
 
 	app.use(passport.initialize());
 	app.use(passport.session());

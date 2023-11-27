@@ -8,6 +8,8 @@ export const SigninPage = styled.div`
 	flex-direction: column;
 	align-items: center;
 
+	position: relative;
+
 	width: 100%;
 	height: 100%;
 
@@ -103,8 +105,25 @@ export const TextInput = styled.input`
 
 	&:focus {
 		outline: none;
-		border-color: ${colors.hoverBorderText};
+		border-color: ${colors.focusBorderText};
 	}
+
+`
+
+export const ErrorMessage = styled.div`
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 100%;
+	height: 15px;
+	min-height: 15px;
+
+	font-size: 12px;
+	text-align: center;
+
+	color: #c70505;
 
 `
 

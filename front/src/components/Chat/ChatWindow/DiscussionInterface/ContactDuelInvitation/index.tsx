@@ -10,13 +10,13 @@ import {
 import colors from "../../../../../utils/colors"
 import status from "../../../../../utils/status"
 
-type ContactDuelInvitationProps = {
+type PropsContactDuelInvitation = {
 	userName: string,
 	opponent: string,
 	state: string
 }
 
-function ContactDuelInvitation({ userName, opponent, state } : ContactDuelInvitationProps ) {
+function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
 	return (
 		<Style>
 			<ProfilePicture />

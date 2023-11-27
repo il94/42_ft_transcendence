@@ -28,4 +28,8 @@ export const Style = styled.input`
 		outline: none;
 	}
 
+	&::selection {
+		background-color: ${colors.chatInputSelection};
+	}
+
 `

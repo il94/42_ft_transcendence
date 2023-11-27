@@ -4,37 +4,160 @@ import { Style } from "./style"
 
 import ContactMessage from "./ContactMessage"
 import UserMessage from "./UserMessage"
-import ScrollBar from "../../../ScrollBar"
+import ScrollBar from "../../../../componentsLibrary/ScrollBar"
 import ContactDuelInvitation from "./ContactDuelInvitation"
 import UserDuelInvitation from "./UserDuelInvitation"
+
 import ChatContext from "../../../../contexts/ChatContext"
+
+import { MessageInvitation, MessageText } from "../../../../utils/types"
 
 import status from "../../../../utils/status"
 
-function DiscussionInterface(){
+type PropsDiscussionInterface = {
+	targetId: number
+}
+
+function DiscussionInterface({ targetId } : PropsDiscussionInterface) {
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
 
+	/* ============ Temporaire ============== */
+
+	// Recup les Messages du Channel avec un truc du style
+	// axios.get("http://localhost:3333/user&id=?/channel&id=targetId")
+
+	const messages: (MessageText | MessageInvitation)[]  = [
+		{
+			id: 30,
+			sender: "Someone",
+			type: "text",
+			content: "Contact message"
+		},
+		{
+			id: 31,
+			sender: "You",
+			type: "text",
+			content: "User message"
+		},
+		{
+			id: 33,
+			sender: "You",
+			type: "invitation",
+			target: "target",
+			state: status.PENDING
+		},
+		{
+			id: 34,
+			sender: "You",
+			type: "invitation",
+			target: "target",
+			state: status.ACCEPTED
+		},
+		{
+			id: 35,
+			sender: "You",
+			type: "invitation",
+			target: "target",
+			state: status.CANCELLED
+		},
+		{
+			id: 36,
+			sender: "You",
+			type: "invitation",
+			target: "target",
+			state: status.IN_PROGRESS
+		},
+		{
+			id: 37,
+			sender: "You",
+			type: "invitation",
+			target: "target",
+			state: status.FINISHED
+		},
+		{
+			id: 40,
+			sender: "Someone",
+			type: "invitation",
+			target: "target",
+			state: status.PENDING
+		},
+		{
+			id: 41,
+			sender: "Someone",
+			type: "invitation",
+			target: "target",
+			state: status.ACCEPTED
+		},
+		{
+			id: 42,
+			sender: "Someone",
+			type: "invitation",
+			target: "target",
+			state: status.CANCELLED
+		},
+		{
+			id: 43,
+			sender: "Someone",
+			type: "invitation",
+			target: "target",
+			state: status.IN_PROGRESS
+		},
+		{
+			id: 44,
+			sender: "Someone",
+			type: "invitation",
+			target: "target",
+			state: status.FINISHED
+		}
+	]
+
+	/* ============================================== */
+
 	return (
 		<Style>
-				<ScrollBar state={{value: chatScrollValue, setter: setChatScrollValue}} firstRenderState={{value: chatRender, setter: setChatRender}}>
-
-				<ContactMessage userName={"i"} content={"iiiiiiii"} />
-				<ContactMessage userName={"Claire zer"} content={"Kikou"} />
-				<ContactMessage userName={"Adouay"} content={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna lol a  aliqua."} />
-				<UserMessage content={"salut"} />
-				<ContactMessage userName={"Test"} content={"Jde fais un test car c'estl"} />
-				<ContactMessage userName={"Test"} content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
-				<UserMessage content={"    WWWWWWWWW\nWWWWWWWWWWW    ALORS    CA VA iiiiiiiiiiiiiiiiiiii"} />
-				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.PENDING} />
-				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.IN_PROGRESS} />
-				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.FINISHED} />
-				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.ACCEPTED} />
-				<ContactDuelInvitation userName={"A"} opponent={"B"} state={status.CANCELLED} />
-				<UserDuelInvitation opponent={"WWWWWWWW"} state={status.PENDING} />
-				<UserDuelInvitation opponent={"WWWWWWWW"} state={status.CANCELLED} />
+			<ScrollBar
+				state={{
+					value: chatScrollValue,
+					setter: setChatScrollValue
+				}}
+				firstRenderState={{
+					value: chatRender,
+					setter: setChatRender
+				}}
+			>
+			{
+				messages.map((message) => (
+					message.sender === "You" ?
+						message.type === "text" ?
+							<UserMessage
+								key={"message" + message.id} // a definir
+								content={(message as MessageText).content}
+							/>
+						:
+							<UserDuelInvitation
+								key={"message" + message.id} // a definir
+								opponent={(message as MessageInvitation).target}
+								state={(message as MessageInvitation).state}
+							/>
+					:
+						message.type === "text" ?
+							<ContactMessage
+								key={"message" + message.id} // a definir
+								userName={message.sender}
+								content={(message as MessageText).content}
+							/>
+						:
+							<ContactDuelInvitation
+								key={"message" + message.id} // a definir
+								userName={message.sender}
+								opponent={(message as MessageInvitation).target}
+								state={(message as MessageInvitation).state}
+							/>
+							))
+			}
 				<div style={{ marginTop: "3px" }} />
-				</ScrollBar>
+			</ScrollBar>
 		</Style>
 	)
 }

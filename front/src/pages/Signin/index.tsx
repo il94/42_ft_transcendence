@@ -1,3 +1,6 @@
+import { ChangeEvent, FormEvent, useState } from 'react'
+import axios from 'axios'
+
 import {
 	SigninPage,
 	MainTitle,
@@ -9,18 +12,56 @@ import {
 	FTRedirectWrapper,
 	Separator,
 	Line,
-	TextSeparator
+	TextSeparator,
+	ErrorMessage
 } from './style'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
-import ButtonImage from '../../componentsLibrary/ButtonImage'
+import LinkImage from '../../componentsLibrary/LinkImage'
 
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
 
 function Signin() {
+
+	/* ============ Tests ============== */
+
+	const [errorMessage, setErrorMessage] = useState('')
+	const [inputUsername, setInputUsername] = useState('')
+	const [inputPassword, setInputPassword] = useState('')
+
+	function handleSubmit(event: FormEvent<HTMLFormElement>) {
+
+		event.preventDefault()
+
+		axios.post("http://localhost:3333/users", formData)
+			.then((response) => console.log(response))
+			.catch((error) => console.log(error))
+
+	}
+
+	/* ============================================== */
+
+	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+
+		const { name, value } = event.target
+
+		if (name === "username") {
+			if (value.length > 8)
+				setErrorMessage("Username must be 8 characters max")
+			else if (!/^[a-zA-Z0-9-_.]*$/.test(value))
+				setErrorMessage("Username can't contain special characters")
+			else {
+				setInputUsername(value)
+				setErrorMessage('')
+			}
+		}
+		else
+			setInputPassword(value.replace(/\./g, '*'))
+	}
+
 	return (
 		<SigninPage>
 			<MainTitle>
@@ -32,15 +73,20 @@ function Signin() {
 				<StyledTitle>
 					Sign in
 				</StyledTitle>
-				<SigninForm>
+				<SigninForm onSubmit={handleSubmit} autoComplete="off" spellCheck="false" >
 					<Label>
 						Username
-						<TextInput type="text" />
+						<TextInput type="text" onChange={handleInputChange}
+							name="username" value={inputUsername} />
 					</Label>
 					<Label>
 						Password
-						<TextInput type="text" />
+						<TextInput type="password" onChange={handleInputChange}
+							name="password" value={inputPassword} />
 					</Label>
+					<ErrorMessage>
+						{errorMessage}
+					</ErrorMessage>
 					<div style={{ marginTop: "10px" }} />
 					<Button>
 						Continue
@@ -60,10 +106,10 @@ function Signin() {
 					<Line />
 				</Separator>
 				<FTRedirectWrapper>
-					<ButtonImage>
-						<img src={FTButton} style={{ paddingRight: "7px"}} />
+					<LinkImage to="http://localhost:3333/auth/api42/login">
+						<img src={FTButton} style={{ paddingRight: "7px" }} />
 						Continue with 42
-					</ButtonImage>
+					</LinkImage>
 				</FTRedirectWrapper>
 			</CentralWindow>
 		</SigninPage>
