@@ -12,12 +12,6 @@ import { UserEntity } from '../entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('signup')
-  @ApiCreatedResponse({ type: UserEntity })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return new UserEntity(await this.usersService.create(createUserDto));
-  }
-
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   findAll() {

@@ -34,7 +34,8 @@ model User {
 
   // friendship data
   // One-to-many self relation (implicit relation table)
-  friends   User[] @relation("UserFriendship")
+  hasFriends User[]  @relation("UserFriendship")
+  isFriend  User[]  @relation("UserFriendship")
 
   //  games     UsersOnGames[]
   //  channels  UsersOnChannel[]

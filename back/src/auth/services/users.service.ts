@@ -20,7 +20,7 @@ export class UsersService {
 					email: createUserDto.email,
 					hash,
 					avatar,
-					id42: 0,
+					id42: '0',
 					username: createUserDto.username,
 				},
 			});
