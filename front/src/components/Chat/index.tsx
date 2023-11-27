@@ -12,7 +12,7 @@ import ZIndexContext from "../../contexts/ZIndexContext"
 import { Channel } from "../../utils/types"
 
 import ChatIcon from "../../assets/chat.png"
-import DefaultPicture from "../../assets/default_black.png"
+import DefaultChannelPicture from "../../assets/default_channel.png"
 
 function Chat() {
 
@@ -33,19 +33,19 @@ function Chat() {
 		{
 			id: 20,
 			name: "Public",
-			picture: DefaultPicture,
+			picture: DefaultChannelPicture,
 			type: "public"
 		},
 		{
 			id: 21,
 			name: "Protect",
-			picture: DefaultPicture,
+			picture: DefaultChannelPicture,
 			type: "protected"
 		},
 		{
 			id: 22,
 			name: "Private",
-			picture: DefaultPicture,
+			picture: DefaultChannelPicture,
 			type: "private"
 		}
 	]
