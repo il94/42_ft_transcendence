@@ -14,7 +14,7 @@ export const Style = styled.div<{$top: number, $left: number}>`
 
 	width: 180px;
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 	&:focus {
 		outline: none;

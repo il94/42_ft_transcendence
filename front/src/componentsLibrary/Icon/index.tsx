@@ -19,7 +19,7 @@ const Icon = styled.button<{ src: string, size: string, alt: string }>`
 	background-size: cover;
 
 	${effects.shadowIcon};
-	${effects.pixelateIcon};
+	clip-path: ${effects.pixelateIcon};
 	
 	color: ${colors.text};
 	background-color: ${colors.button};

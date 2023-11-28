@@ -19,7 +19,7 @@ export const Style = styled.div<{$top: string, $left: string, $zIndex: number}>`
 	min-width: 240px;
 	min-height: 371px;
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 	background-color: ${colors.module};
 	
