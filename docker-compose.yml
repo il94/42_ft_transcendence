@@ -37,6 +37,8 @@ services:
       - '5173:5173'
     depends_on:
       - back
+    volumes:
+      - ./front/src:/app/src
     networks:
       - transcendence
 
