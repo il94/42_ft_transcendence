@@ -17,6 +17,11 @@ enum Status {
   WAITING
   WATCHING
 }
+enum Invitation {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
 
 enum Role {
   USER
@@ -64,6 +69,7 @@ model Friends {
   hasFriendsId Int
   isFriend    User @relation("isFriend", fields: [isFriendId], references: [id])
   isFriendId  Int
+  request     Invitation
 
   @@id([hasFriendsId, isFriendId])
 }

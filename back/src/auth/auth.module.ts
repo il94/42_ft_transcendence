@@ -9,7 +9,7 @@ import { JwtStrategy } from './strategy';
 import { Api42Strategy } from "./strategy/api42.strategy";
 import { SessionSerializer } from "./Serializer";
 import { UsersController } from "./controllers/users.controller";
-import { Api42AuthGuard, JwtGuard } from "./auth.guard";
+import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
 
 @Module ({
 	imports: [

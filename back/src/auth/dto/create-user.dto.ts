@@ -2,14 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, IsNotEmpty, 
 	IsMobilePhone, IsOptional, MaxLength, MinLength
  } from "class-validator";
+import { Status } from '@prisma/client'
 
 
 export class CreateUserDto {
-    
-	@IsString()
-	@IsOptional()
-	@ApiProperty({ required: false })
-	id42: number;
 
 	@IsString()
 	@IsNotEmpty()
@@ -37,4 +33,6 @@ export class CreateUserDto {
 	@IsOptional()
 	@ApiProperty()
 	tel: string;
+
+	status: Status;
 }

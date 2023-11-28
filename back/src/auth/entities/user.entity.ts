@@ -30,6 +30,4 @@ export class UserEntity implements User {
 
 	@ApiProperty()
 	status: Status;
-
-
 }
