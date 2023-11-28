@@ -40,7 +40,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	const userTest: User = {
 		id: 0,
 		username: "ilandols",
-		profilePicture: DefaultProfilePicture,
+		avatar: DefaultProfilePicture,
 		state: "En ligne",
 		scoreResume: {
 			wins: 100,
@@ -55,7 +55,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 		<Style onClick={() => { setZCardIndex(zChatIndex + 1) }}
 				$top={cardPosition.top} $left={cardPosition.left} $zIndex={zCardIndex}>
 			<TopWrapper>
-				<ProfilePicture src={userTest.profilePicture}/>
+				<ProfilePicture src={userTest.avatar}/>
 				<CloseButton>
 					<Icon src={CloseIcon} size="24px" onClick={() => displayCard(false)}
 						alt="Close button" title="Close" />

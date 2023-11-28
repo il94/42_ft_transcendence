@@ -3,7 +3,7 @@ import status from "./status"
 export type User = {
 	id: number,
 	username: string,
-	profilePicture: string,
+	avatar: string, //a renomer par profilePicture
 	state: string,
 	scoreResume: {
 		wins: number,
@@ -21,7 +21,7 @@ export type UserAuthenticate = User & {
 
 export type Channel = {
 	id: number,
-	createdAt: string,
+	createdAt?: string,
 	name: string,
 	picture: string,
 	type: string

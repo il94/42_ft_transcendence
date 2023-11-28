@@ -28,7 +28,7 @@ function ChatWindow({ toDisplay } : PropsChatWindow) {
 	return (
 		<Style>
 			<Banner name={toDisplay.name} />
-			<DiscussionInterface targetId={toDisplay.id} />
+			<DiscussionInterface /* targetId={toDisplay.id} */ />
 			<TextInput />
 		</Style>
 	)

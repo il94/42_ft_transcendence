@@ -32,10 +32,10 @@ function ChannelList({ channels } : PropsChannelList) {
 				channels.map((channel, index) => (
 					<ChannelSection
 						key={"channel" + index} // a definir
-						id={channel.id}
+						// _id={channel.id}
 						name={channel.name}
 						picture={channel.picture}
-						type={channel.type}
+						// _type={channel.type}
 						color={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 					/>
 				))

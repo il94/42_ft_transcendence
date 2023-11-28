@@ -2,9 +2,7 @@ import {
 	useEffect,
 	useState
 } from 'react'
-
 import { useMediaQuery } from 'react-responsive'
-import axios from 'axios'
 
 import {
 	GamePage,
@@ -81,7 +79,7 @@ function Game() {
 	const userTest: UserAuthenticate = {
 		id: 0,
 		username: "ilandols",
-		profilePicture: DefaultProfilePicture,
+		avatar: DefaultProfilePicture,
 		state: "En ligne",
 		scoreResume: {
 			wins: 100,
@@ -119,7 +117,7 @@ function Game() {
 									userData={{
 										id: userTest.id,
 										username: userTest.username,
-										profilePicture: userTest.profilePicture,
+										profilePicture: userTest.avatar,
 										scoreResume: userTest.scoreResume
 									}}
 									card={card}
@@ -151,7 +149,7 @@ function Game() {
 									<MenuSettings
 										userData={{
 											username: userTest.username,
-											profilePicture: userTest.profilePicture
+											profilePicture: userTest.avatar
 										}}
 										displayMenuSettings={displayMenuSettings}
 									/>

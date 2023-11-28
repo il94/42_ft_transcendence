@@ -15,10 +15,10 @@ import { MessageInvitation, MessageText } from "../../../../utils/types"
 import status from "../../../../utils/status"
 
 type PropsDiscussionInterface = {
-	targetId: number
+	// targetId: number
 }
 
-function DiscussionInterface({ targetId } : PropsDiscussionInterface) {
+function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
 

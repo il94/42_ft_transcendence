@@ -1,5 +1,4 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
-import axios from 'axios'
 
 import {
 	SigninPage,
@@ -36,9 +35,9 @@ function Signin() {
 
 		event.preventDefault()
 
-		axios.post("http://localhost:3333/users", formData)
-			.then((response) => console.log(response))
-			.catch((error) => console.log(error))
+		// axios.post("http://localhost:3333/users", formData)
+		// 	.then((response) => console.log(response))
+		// 	.catch((error) => console.log(error))
 
 	}
 
