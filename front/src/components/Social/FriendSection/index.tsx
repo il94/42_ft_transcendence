@@ -46,7 +46,7 @@ function FriendSection({ id, username, profilePicture, state, social, color }: P
 			const topCurrentElement = friendcontainer.getBoundingClientRect().top
 			const { top: topParentElement, height: heightParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
 
-			const topMax = heightParentElement - 388 // taille de la carte 371 + margin de la scroll bar 17
+			const topMax = heightParentElement - 371 // taille de la carte
 
 			const target = topCurrentElement - topParentElement
 			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
@@ -57,15 +57,23 @@ function FriendSection({ id, username, profilePicture, state, social, color }: P
 
 			displayCard(true)
 		}
-
 	}
 
 	function showMenuContextual(event: MouseEvent<HTMLDivElement>) {
-		setMenuContextualPosition({
-			top: event.clientY,
-			left: event.clientX
-		}) // set la position du menu sur le clic
-		displayMenuContextual(true)
+
+		const friendcontainer = friendContainerRef.current
+
+		if (friendcontainer) {
+			const { bottom: bottomParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
+
+			const topMax = bottomParentElement - 175 // taille du menu
+			const target = event.clientY
+	
+			const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+
+			setMenuContextualPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
+			displayMenuContextual(true)
+		}
 	}
 
 	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
@@ -73,7 +81,8 @@ function FriendSection({ id, username, profilePicture, state, social, color }: P
 	}
 
 	return (
-		<Style onClick={showCard}
+		<Style
+			onClick={showCard}
 			onAuxClick={showMenuContextual}
 			onContextMenu={handleContextMenu}
 			color={color} ref={friendContainerRef}>
