@@ -52,9 +52,6 @@ model User {
 
   games       UsersOnGames[]
 
-  //chart     Int?
-  //Badges    String?
-
   hasFriends  Friends[] @relation("hasFriends")
   isFriend    Friends[] @relation("isFriend")
 

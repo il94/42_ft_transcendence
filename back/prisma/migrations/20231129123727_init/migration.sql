@@ -2,6 +2,9 @@
 CREATE TYPE "Status" AS ENUM ('ONLINE', 'OFFLINE', 'PLAYING', 'WAITING', 'WATCHING');
 
 -- CreateEnum
+CREATE TYPE "Invitation" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED');
+
+-- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN', 'OWNER');
 
 -- CreateEnum
@@ -28,6 +31,7 @@ CREATE TABLE "users" (
 CREATE TABLE "Friends" (
     "hasFriendsId" INTEGER NOT NULL,
     "isFriendId" INTEGER NOT NULL,
+    "request" "Invitation" NOT NULL,
 
     CONSTRAINT "Friends_pkey" PRIMARY KEY ("hasFriendsId","isFriendId")
 );
