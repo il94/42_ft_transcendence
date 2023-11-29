@@ -57,6 +57,30 @@ function TestsBack() {
 				post user
 			</Bout>
 
+			<Bout onClick={() => {
+			
+				let i = 0
+
+				while (i < 15)
+				{
+					axios.post("http://localhost:3333/auth/signup",
+					{
+						username: `friend_${i}`,
+						hash: "123456",
+						email: `friend_${i}@test.fr`,
+						avatar: DefaultRedProfilePicture,
+						tel: "0000000000"
+					})
+					.then(response => console.log(response.data))
+					.catch(error => console.log(error))
+					i++
+				}
+			}
+				}>
+				post users
+			</Bout>
+
+
 			{/*  */}
 		</Style>
 	)
