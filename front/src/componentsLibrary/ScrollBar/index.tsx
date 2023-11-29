@@ -13,10 +13,40 @@ import { Scrollbars } from "react-custom-scrollbars"
 import styled from "styled-components"
 import colors from "../../utils/colors"
 
+const View = styled.div`
+
+	position: absolute;
+
+	inset: 0px;
+	
+	overflow-y : scroll;
+
+	margin-right: -15px;
+
+`
+
+const ThumHorizontal = styled.div`
+
+	display: none;
+	
+`
+
+const TrackHorizontal = styled.div`
+
+	display: none;
+	
+`
+
 const ThumbVertical = styled.div`
 
 	background-color: ${colors.scrollingBarTransparent};
+
+	margin: 0;
+	margin-bottom: 0;
+	padding: 0;
+	padding-bottom: 0;
 	
+
 `
 
 const TrackVertical = styled.div<{ $onMouse: boolean }>`
@@ -28,6 +58,12 @@ const TrackVertical = styled.div<{ $onMouse: boolean }>`
 
 	width: 5px;
 	height: 100%;
+
+	margin: 0;
+	margin-bottom: 0;
+	padding: 0;
+	padding-bottom: 0;
+	
 
 `
 
@@ -78,7 +114,10 @@ function ScrollBar({ state, firstRenderState, children }: PropsScrollBar) {
 					onScroll={handleScrollPosition}
 					ref={scrollBarRef}
 					renderThumbVertical={() => <ThumbVertical />}
-					renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}>
+					renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}
+					renderThumbHorizontal={() => <ThumHorizontal />}
+					renderTrackHorizontal={() => <TrackHorizontal />}
+					renderView={() => <View />}>
 			{children}
 		</Scrollbars>
 	)
