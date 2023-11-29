@@ -5,7 +5,6 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/create-user.dto";
 
-// separer la logique metier : le controller execute les requetes https
 @Controller('auth')
 @ApiTags('authenticate')
 export class AuthController {
@@ -23,16 +22,15 @@ export class AuthController {
 		return {msg: 'ok'};
 	}
 
-	// loging as a user => no mandatory
 	@HttpCode(HttpStatus.OK)
 	@Post('signin')
-	signin(@Body() dto:AuthDto) {
+	signin(@Body() dto: AuthDto) {
 		return this.authService.signin(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('signup')
-	signup(@Body() dto:CreateUserDto) {
+	signup(@Body() dto: CreateUserDto) {
 		return this.authService.signup(dto);
 	}
 
@@ -47,6 +45,7 @@ export class AuthController {
 		return "Coucou!";
 	}
 
+	@UseGuards(JwtGuard)
 	@Get('profile')
 	getProfile(@Request() req) {
 		console.log(req.user);

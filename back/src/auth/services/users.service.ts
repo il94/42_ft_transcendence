@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,11 +12,16 @@ import { map, switchMap } from 'rxjs/operators';
 export class UsersService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(createUserDto: CreateUserDto) {
-		const hash = await argon.hash(createUserDto.hash);
-		let avatar = process.env.AVATAR;
-		if (createUserDto.avatar) { avatar = createUserDto.avatar };
+	async createUser(createUserDto: CreateUserDto) {
 		try {
+			const userExists = await this.prisma.user.findUnique({
+				where: { email: createUserDto.email },
+			})
+			if (userExists)
+				throw new BadRequestException("User already exists");
+			const hash = await argon.hash(createUserDto.hash);
+			let avatar = process.env.AVATAR;
+			if (createUserDto.avatar) { avatar = createUserDto.avatar };
 			const user = await this.prisma.user.create({
 				data: {
 					email: createUserDto.email,
@@ -26,11 +31,12 @@ export class UsersService {
 					status: Status.ONLINE,
 				},
 			});
+            console.log(`User ${user.username} with id ${user.id} created successfully`);
 			return user;
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === 'P2002')
-					throw new ForbiddenException('Credentials taken');
+					throw new ForbiddenException('Failed to create new user');
 			}
 			throw error;
 		}

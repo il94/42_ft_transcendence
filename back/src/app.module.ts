@@ -4,7 +4,6 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { GamesModule } from './games/games.module';
-import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -13,7 +12,6 @@ import { ChatModule } from './chat/chat.module';
     ConfigModule.forRoot({ isGlobal: true}),
     PassportModule.register({ session: true }),
     GamesModule,
-    ChatModule,
   ],
 })
 export class AppModule {}
