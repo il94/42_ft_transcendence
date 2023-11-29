@@ -34,14 +34,12 @@ export const ProfileWrapper = styled.div`
 
 `
 
-export const ProfilePicture = styled.div`
+export const ProfilePicture = styled.img`
 	
 	width: 32px;
 	height: 32px;
 
 	margin-left: 7px;
-
-	background-color: ${colors.profilePicture};
 
 	border-radius: 50%;
 

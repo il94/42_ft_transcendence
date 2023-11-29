@@ -1,7 +1,7 @@
 import { Style } from "./style"
 
 import Match from "./Match"
-import ScrollBar from "../../ScrollBar"
+import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
 import colors from "../../../utils/colors"
 

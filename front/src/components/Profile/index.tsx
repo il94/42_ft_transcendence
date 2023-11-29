@@ -1,4 +1,8 @@
-import { useRef, RefObject, SetStateAction, Dispatch } from "react"
+import {
+	SetStateAction,
+	Dispatch,
+	useContext
+} from "react"
 
 import {
 	Style,
@@ -8,47 +12,60 @@ import {
 	ProfilePicture,
 } from "./style"
 
+import ZIndexContext from "../../contexts/ZIndexContext"
+
 import Icon from "../../componentsLibrary/Icon"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 
-type ProfileProps = {
-	username: string,
+type PropsProfile = {
+	userData: {
+		username: string,
+		profilePicture: string,
+		id: number,
+		scoreResume: {
+			wins: number,
+			draws: number,
+			looses: number
+		}
+	},
+	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
+	cardIdTarget: number,
+	setIdTargetCard: Dispatch<SetStateAction<number>>,
+	setCardPosition: Dispatch<SetStateAction<{ top: string, left: string }>>,
 	settings: boolean,
-	displaySettings: Dispatch<SetStateAction<boolean>>
+	displayMenuSettings: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ username, displayCard, setCardPosition, settings, displaySettings } : ProfileProps ) {
+function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
 
-	const profileContainerRef : RefObject<HTMLElement> = useRef(null)
+	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 
 	function showCard() {
-		
-		const profileContainer = profileContainerRef.current
 
-		if (profileContainer)
+		if (card && cardIdTarget === userData.id)
+			displayCard(false)
+		else
 		{
-			const { width: widthParentElement } = profileContainer.parentElement!.parentElement!.getBoundingClientRect()
-			
-			setCardPosition({ top: 0, left: widthParentElement - 240}) // width de la carte
+			setIdTargetCard(userData.id)
+			setZCardIndex(zChatIndex + 1)
+			setCardPosition({ top: "0px", left: "calc(100% - 240px)" }) // set la postition tout en haut a gauche - width de la carte
 			displayCard(true)
 		}
-		
 	}
 
 	return (
 		<Style>
-			<ProfileWrapper onClick={showCard} ref={profileContainerRef}>
-				<ProfilePicture />
+			<ProfileWrapper onClick={showCard}>
+				<ProfilePicture src={userData.profilePicture}/>
 				<ProfileName>
-					{username}
+					{userData.username}
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>
-				<Icon src={settingsIcon} size="38px" onClick={() => displaySettings(!settings)}
+				<Icon src={settingsIcon} size="38px" onClick={() => displayMenuSettings(!settings)}
 					alt="Settings button" title="Settings" />
 				<Icon src={deconnexionIcon} size="38px"
 					alt="Deconnexion button" title="Deconnexion" />

@@ -19,9 +19,9 @@ const ThumbVertical = styled.div`
 	
 `
 
-const TrackVertical = styled.div<{$onMouse: boolean}>`
+const TrackVertical = styled.div<{ $onMouse: boolean }>`
 
-	display: ${(props) => props.$onMouse ? "block" : "none" };
+	display: ${(props) => props.$onMouse ? "block" : "none"};
 
 	position: absolute;
 	right: 0px;
@@ -31,28 +31,32 @@ const TrackVertical = styled.div<{$onMouse: boolean}>`
 
 `
 
-type ScrollBarProps = {
-	state?: { value: number, setter: Dispatch<SetStateAction<number>> },
-	firstRenderState?: { value: boolean, setter: Dispatch<SetStateAction<boolean>> },
+type PropsScrollBar = {
+	state?: {
+		value: number,
+		setter: Dispatch<SetStateAction<number>>
+	},
+	firstRenderState?: {
+		value: boolean,
+		setter: Dispatch<SetStateAction<boolean>>
+	},
 	children: ReactNode
 }
 
-function ScrollBar({ state, firstRenderState, children } : ScrollBarProps ) {
+function ScrollBar({ state, firstRenderState, children }: PropsScrollBar) {
 
 	const scrollBarRef = useRef<Scrollbars>(null)
 	const [onMouse, setOnMouse] = useState<boolean>(false)
 
 	useEffect(() => {
-		if (scrollBarRef.current)
-		{
+		if (scrollBarRef.current) {
 			setFirstPosition()
 			setCurrentPosition()
 		}
 	}, [])
 
 	function setFirstPosition() { // Definit la position de depart de la scrollbar
-		if (firstRenderState && !firstRenderState.value)
-		{
+		if (firstRenderState && !firstRenderState.value) {
 			scrollBarRef.current!.scrollToBottom()
 			firstRenderState.setter(true)
 		}
@@ -73,9 +77,9 @@ function ScrollBar({ state, firstRenderState, children } : ScrollBarProps ) {
 					onMouseLeave={() => setOnMouse(false)}
 					onScroll={handleScrollPosition}
 					ref={scrollBarRef}
-			renderThumbVertical={() => <ThumbVertical />}
-			renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}>
-			{ children }
+					renderThumbVertical={() => <ThumbVertical />}
+					renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}>
+			{children}
 		</Scrollbars>
 	)
 }

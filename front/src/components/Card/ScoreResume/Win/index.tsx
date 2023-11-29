@@ -12,7 +12,11 @@ const Style = styled.p`
 
 `
 
-function Win({ value } : { value: number }) {
+type PropsWin = {
+	value: number
+}
+
+function Win({ value } : PropsWin) {
 	return (
 		<Style>
 			{value}W

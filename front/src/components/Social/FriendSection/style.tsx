@@ -8,6 +8,8 @@ export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 	justify-content: center;
 	align-items: center;
 
+	position: relative;
+
 	width: 100%;
 	min-width: 100%;
 	height: 53px;
@@ -22,7 +24,7 @@ export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 
 `
 
-export const ProfilePicture = styled.div`
+export const ProfilePicture = styled.img<{ src: string }>`
 	
 	width: 32px;
 	height: 32px;
@@ -33,8 +35,6 @@ export const ProfilePicture = styled.div`
 
 	border-radius: 50%;
 	
-	background-color: ${colors.profilePicture};
-
 `
 
 export const ProfileInfo = styled.div`

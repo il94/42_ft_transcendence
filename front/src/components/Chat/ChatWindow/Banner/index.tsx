@@ -4,18 +4,25 @@ import Icon from "../../../../componentsLibrary/Icon"
 import ChatContext from "../../../../contexts/ChatContext"
 import ReduceIcon from "../../../../assets/reduce.png"
 
-function Banner() {
+type PropsBanner = {
+	name: string
+}
+
+function Banner({ name } : PropsBanner) {
 
 	const { displayChat } = useContext(ChatContext)!
 
 	return (
 		<Style>
 			<ChannelName>
-				WWWWWWWW
+				{name}
 			</ChannelName>
 			<ReduceButton>
-				<Icon src={ReduceIcon} size="24px" onClick={() => displayChat(false)}
-					alt="Reduce button" title="Reduce" />
+				<Icon
+					onClick={() => displayChat(false)}
+					src={ReduceIcon} size="24px"
+					alt="Reduce button" title="Reduce"
+				/>
 			</ReduceButton>
 		</Style>
 	)

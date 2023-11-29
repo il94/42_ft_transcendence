@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Game from './pages/Game'
 import Signin from './pages/Signin'
 import Signup from './pages/Signup'
+import Error from './pages/Error'
 import GlobalStyle from './utils/GlobalStyle'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/signin" element={<Signin />} />
 					<Route path="/signup" element={<Signup />} />
 					<Route path="/game" element={<Game />} />
+					<Route path="*" element={<Error />} />
 				</Routes>
 			</Router>
 	</React.StrictMode>,
