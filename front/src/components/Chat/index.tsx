@@ -52,7 +52,6 @@ function Chat() {
 
 	/* ============================================== */
 
-
 	return (
 		chat ?
 		<Style onClick={() => {setZChatIndex(zCardIndex + 1)}} $zIndex={zChatIndex}>
