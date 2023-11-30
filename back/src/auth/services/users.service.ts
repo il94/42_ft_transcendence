@@ -2,7 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException, BadRequestException 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, Status, Friends, } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, Status, Friends, Invitation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 import { from, Observable, of, throwError } from 'rxjs';
@@ -118,5 +118,56 @@ export class UsersService {
 			throw error;
 		}
 	}
+
+	async getFriendRequestStatus(isFriendId: number, currentUser: User): Promise<Invitation | { error: string }> {
+		const receiver = await this.prisma.user.findUnique({
+			where: { id: isFriendId },
+		})
+		const friendRequest = await this.prisma.friends.findUnique({
+			where : { hasFriendsId_isFriendId: {
+				hasFriendsId: currentUser.id,
+				isFriendId: receiver.id,
+				}}
+		})
+		if (friendRequest)
+			return friendRequest.request; 
+		return { error : 'friend request not sent'};
+	}
+
+	async getFriends(userId: number) {
+		const user = await this.prisma.user.findFirst({ 
+			where: { id: userId },
+			include: { hasFriends: true, },
+		})
+		return user;
+	}
+
+	async getUserFriends(userId: number) {
+		const friends = await this.prisma.friends.findMany({
+			where: { hasFriendsId: userId }
+		})
+		return friends;
+	}
+
+	async getNonFriends(UserId: number) {
+		//TODO ?
+	}
+
+	async removeFriends(userId: number, friendId: number) {
+		const result = await this.prisma.user.update({ 
+			where: { id: userId, },
+			data: {
+				hasFriends: {
+					disconnect: [{ hasFriendsId_isFriendId: {
+						hasFriendsId: userId,
+						isFriendId: friendId,
+						} }],
+				}
+			}})
+		return result;
+
+	}
+
+
 
 }

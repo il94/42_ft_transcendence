@@ -4,6 +4,8 @@ import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/create-user.dto";
+import { getUser } from "../decorators/users.decorator";
+import { User } from "@prisma/client"
 
 @Controller('auth')
 @ApiTags('authenticate')
@@ -45,11 +47,11 @@ export class AuthController {
 		return "Coucou!";
 	}
 
-	@UseGuards(JwtGuard)
+	//@UseGuards(JwtGuard)
 	@Get('profile')
-	getProfile(@Request() req) {
-		console.log(req.user);
-		if (req.user) {
+	getProfile(@getUser() user: User) {
+		console.log(user);
+		if (user) {
 			return { msg: 'Authenticated' };
 		} else { 
 			return { msg: 'NOT Authenticated' };

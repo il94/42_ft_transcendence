@@ -6,13 +6,15 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from '../entities/user.entity';
+import { getUser } from '../decorators/users.decorator'
+import { User } from '@prisma/client';
 
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(JwtGuard)
+  //@UseGuards(JwtGuard)
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   findAll() {
@@ -26,10 +28,11 @@ export class UsersController {
     return new UserEntity(await this.usersService.findById(id));
   }
 
-  @UseGuards(JwtGuard)
+  //@UseGuards(JwtGuard)
 	@Get('me')
-	getMe() {
-		return "user info";
+	getMe(@getUser() user: User) {
+    console.log(user);
+		return user;
 	}
 
   @Patch(':id')
@@ -44,12 +47,20 @@ export class UsersController {
     return new UserEntity(await this.usersService.remove(id));
   }
 
-  @UseGuards(JwtGuard)
+  //@UseGuards(JwtGuard)
   @Post('friend-request/send/:isFriendId')
   @ApiOkResponse({ type: UserEntity })
   async sendFriendRequest(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
     @Request() req) {
     return await this.usersService.sendFriendRequest(isFriendId, req.user);
+  }
+
+  @Get('friend-request/status/:isFriendId')
+  @ApiOkResponse({ type: UserEntity })
+  async getFriendRequestStatus(
+    @Param('isFriendId', ParseIntPipe) isFriendId: number,
+    @Request() req) {
+    return await this.usersService.getFriendRequestStatus(isFriendId, req.user);
   }
 }
