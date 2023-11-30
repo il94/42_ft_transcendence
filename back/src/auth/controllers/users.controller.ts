@@ -12,7 +12,6 @@ import { UserEntity } from '../entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(JwtGuard)
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   findAll() {
