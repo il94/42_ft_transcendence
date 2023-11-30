@@ -29,7 +29,7 @@ export const ProfileWrapper = styled.div`
 		cursor: pointer;
 		background-color: #9E5B29;
 
-		${effects.pixelateWindow};
+		clip-path: ${effects.pixelateWindow};
 	}
 
 `

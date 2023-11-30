@@ -26,7 +26,7 @@ export const Style = styled.div`
 
 	width: 350px;
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 	background-color: ${colors.module};
 
@@ -119,7 +119,7 @@ export const Button = styled.button`
 	text-decoration: none;
 	${effects.shadowButton};
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 	&:active {
 		transform: scale(0.95);

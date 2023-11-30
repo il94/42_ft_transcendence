@@ -13,7 +13,7 @@ export const Style = styled.div<{ $zIndex: number }>`
 	width: 373px;
 	height: 243px;
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 `
 

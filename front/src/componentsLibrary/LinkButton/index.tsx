@@ -3,19 +3,16 @@ import { Link } from 'react-router-dom'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const LinkImage = styled(Link)`
-
-	display: flex;
-	align-items: center;
+const LinkButton = styled(Link)`
 
 	padding-top: 1px;
+	padding-left: 11px;
 	padding-bottom: 3px;
 	padding-right: 13px;
-	padding-left: 6px;
 
 	cursor: pointer;
 
-	font-size: 16px;
+	font-size: 35px;
 	text-decoration: none;
 	text-align: center;
 
@@ -37,4 +34,4 @@ const LinkImage = styled(Link)`
 
 `
 
-export default LinkImage
+export default LinkButton
