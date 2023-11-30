@@ -1,14 +1,19 @@
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useState
+} from "react"
 import axios from "axios"
 
 import { Style, ReduceButton } from "./style"
 
 import FriendSection from "./FriendSection"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
-import MenuContextual from "../MenuContextual"
+import MenuContextual from "./MenuContextual"
 
 import CardContext from "../../contexts/CardContext"
-import MenuContextualContext from "../../contexts/MenuContextualContext"
 
 import { User } from "../../utils/types"
 
@@ -16,13 +21,22 @@ import colors from "../../utils/colors"
 
 type PropsSocial = {
 	social: boolean,
-	displaySocial: Dispatch<SetStateAction<boolean>>
+	displaySocial: Dispatch<SetStateAction<boolean>>,
+	menuContextual: boolean,
+	displayMenuContextual: Dispatch<SetStateAction<boolean>>,
+	menuContextualPosition: {
+		top: number,
+		left: number
+	},
+	setMenuContextualPosition: Dispatch<SetStateAction<{
+		top: number,
+		left: number
+	}>>
 }
 
-function Social({ social, displaySocial } : PropsSocial) {
+function Social({ social, displaySocial, menuContextual, displayMenuContextual, menuContextualPosition, setMenuContextualPosition } : PropsSocial) {
 
 	const { displayCard } = useContext(CardContext)!
-	const { menuInteraction, menuInteractionPosition } = useContext(MenuContextualContext)!
 
 	const [friends, setFriendSections] = useState<User[]>([])
 
@@ -43,8 +57,10 @@ function Social({ social, displaySocial } : PropsSocial) {
 	return (
 		<Style onContextMenu={(event) => event.preventDefault()}>
 			{
-				menuInteraction &&
-				<MenuContextual position={menuInteractionPosition} />
+				menuContextual &&
+				<MenuContextual
+					position={menuContextualPosition}
+					displayMenuContextual={displayMenuContextual} />
 			}
 			<ScrollBar>
 			{
@@ -57,7 +73,8 @@ function Social({ social, displaySocial } : PropsSocial) {
 						state={friend.state}
 						social={social}
 						color={!(index % 2) ? colors.section : colors.sectionAlt}
-					/>
+						displayMenuContextual={displayMenuContextual}
+						setMenuContextualPosition={setMenuContextualPosition} />
 				))
 			}
 			</ScrollBar>

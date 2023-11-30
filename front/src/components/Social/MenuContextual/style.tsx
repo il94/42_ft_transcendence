@@ -3,6 +3,7 @@ import styled from "styled-components"
 export const Style = styled.div<{ $top: number, $left: number }>`
 
 	display: flex;
+	/* flex-direction: row-reverse; */
 
 	position: absolute;
 	left: ${(props) => props.$left}px;

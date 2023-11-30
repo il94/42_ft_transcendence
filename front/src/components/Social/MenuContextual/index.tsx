@@ -1,23 +1,28 @@
-import { RefObject, useContext, useEffect, useRef, useState } from "react"
+import {
+	Dispatch,
+	RefObject,
+	SetStateAction,
+	useEffect,
+	useRef,
+	useState
+} from "react"
 
 import { Style } from "./style"
 
 import PrimaryMenuContextual from "./PrimaryMenuContextual"
 import SecondaryMenuContextual from "./SecondaryMenuContextual"
 
-import MenuContextualContext from "../../contexts/MenuContextualContext"
-
 type PropsMenuContextual = {
 	position: {
 		top: number,
 		left: number
-	}
+	},
+	displayMenuContextual: Dispatch<SetStateAction<boolean>>
 }
 
-function MenuContextual({ position } : PropsMenuContextual) {
+function MenuContextual({ position, displayMenuContextual } : PropsMenuContextual) {
 
-	const { displayMenuContextual } = useContext(MenuContextualContext)!
-	const menuInteractionRef: RefObject<HTMLDivElement> = useRef(null)
+	const menuContextualRef: RefObject<HTMLDivElement> = useRef(null)
 
 	const [secondary, displaySecondary] = useState<boolean>(false)
 	const [secondaryTop, setSecondaryTop] = useState<number>(0)
@@ -25,14 +30,14 @@ function MenuContextual({ position } : PropsMenuContextual) {
 
 
 	useEffect(() => {
-		if (menuInteractionRef.current)
-			menuInteractionRef.current.focus()
+		if (menuContextualRef.current)
+			menuContextualRef.current.focus()
 	}, [])
 
 	return (
 		<Style onBlur={() => displayMenuContextual(false)}
 				$top={position.top} $left={position.left}
-				tabIndex={0} ref={menuInteractionRef}>
+				tabIndex={0} ref={menuContextualRef}>
 			<PrimaryMenuContextual
 				position={position}
 				displaySecondary={displaySecondary}

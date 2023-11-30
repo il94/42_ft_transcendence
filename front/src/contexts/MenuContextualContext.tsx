@@ -5,9 +5,9 @@ import {
 } from 'react'
 
 const MenuContextualContext = createContext<{
-	menuInteraction: boolean,
+	menuContextual: boolean,
 	displayMenuContextual: Dispatch<SetStateAction<boolean>>,
-	menuInteractionPosition: { top: number; left: number },
+	menuContextualPosition: { top: number; left: number },
 	setMenuContextualPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
 } | undefined>(undefined)
 

@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import effects from "../../../utils/effects"
+import effects from "../../../../utils/effects"
 
 export const Style = styled.div`
 

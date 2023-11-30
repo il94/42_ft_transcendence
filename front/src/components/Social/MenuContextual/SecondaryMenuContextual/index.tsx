@@ -2,12 +2,12 @@ import { Dispatch, SetStateAction, useEffect } from "react"
 
 import { Style } from "./style"
 
-import Section from "../../../componentsLibrary/Section"
-import SectionName from "../../../componentsLibrary/SectionName/SectionName"
+import Section from "../../../../componentsLibrary/Section"
+import SectionName from "../../../../componentsLibrary/SectionName/SectionName"
 
-import { Channel } from "../../../utils/types"
+import { Channel } from "../../../../utils/types"
 
-import DefaultChannelPicture from "../../../assets/default_channel.png"
+import DefaultChannelPicture from "../../../../assets/default_channel.png"
 
 type PropsSecondaryMenuContextual = {
 	secondary: boolean,

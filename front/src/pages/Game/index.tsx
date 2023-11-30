@@ -49,8 +49,12 @@ function Game() {
 	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 
-	const [menuInteraction, displayMenuContextual] = useState<boolean>(false)
-	const [menuInteractionPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+	const [menuContextual, displayMenuContextual] = useState<boolean>(false)
+	const [menuContextualPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+
+
+	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
+
 
 	const [zCardIndex, setZCardIndex] = useState<number>(10)
 	const [zChatIndex, setZChatIndex] = useState<number>(10)
@@ -99,16 +103,21 @@ function Game() {
 			{
 				<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
 					<GameWrapper>
+						{
+							contextualMenu &&
+							
+						}
 						<LeftGameWrapper $social={social}>
 							<Logo />
-							<MenuContextualContext.Provider value={{ menuInteraction, displayMenuContextual, menuInteractionPosition, setMenuContextualPosition }} >
 								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
-									<Social
-										social={social}
-										displaySocial={displaySocial}
-									/>
+								<Social
+									social={social}
+									displaySocial={displaySocial}
+									menuContextual={menuContextual}
+									displayMenuContextual={displayMenuContextual}
+									menuContextualPosition={menuContextualPosition}
+									setMenuContextualPosition={setMenuContextualPosition} />
 								</CardContext.Provider>
-							</MenuContextualContext.Provider>
 						</LeftGameWrapper>
 						<RightGameWrapper>
 							<TopGameWrapper>

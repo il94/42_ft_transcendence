@@ -6,6 +6,8 @@ export const Style = styled.div`
 	flex-direction: column;
 	justify-content: flex-end;
 
+	position: relative;
+
 	width: 100%;
 	min-height: 188px;
 
