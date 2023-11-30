@@ -1,15 +1,18 @@
 import styled from "styled-components"
+import effects from "../../../utils/effects"
 
 export const Style = styled.div<{ $top: number, $left: number }>`
 
 	display: flex;
-	/* flex-direction: row-reverse; */
+	flex-direction: column;
 
 	position: absolute;
-	left: ${(props) => props.$left}px;
 	top: ${(props) => props.$top}px;
-	bottom: auto;
-	z-index: 999;
+	left: ${(props) => props.$left}px;
+
+	width: 180px;
+
+	clip-path: ${effects.pixelateWindow};
 
 	&:focus {
 		outline: none;

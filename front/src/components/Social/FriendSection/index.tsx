@@ -25,14 +25,14 @@ type PropsFriendSection = {
 	state: string,
 	social: boolean,
 	color: string,
-	displayMenuContextual: Dispatch<SetStateAction<boolean>>,
-	setMenuContextualPosition: Dispatch<SetStateAction<{
+	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	setContextualMenuPosition: Dispatch<SetStateAction<{
 		top: number,
 		left: number
 	}>>
 }
 
-function FriendSection({ id, username, profilePicture, state, social, color, displayMenuContextual, setMenuContextualPosition }: PropsFriendSection) {
+function FriendSection({ id, username, profilePicture, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
 	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
@@ -76,8 +76,8 @@ function FriendSection({ id, username, profilePicture, state, social, color, dis
 	
 			const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
-			setMenuContextualPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
-			displayMenuContextual(true)
+			setContextualMenuPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
+			displayContextualMenu(true)
 		}
 	}
 

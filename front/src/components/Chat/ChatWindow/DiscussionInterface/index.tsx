@@ -22,8 +22,6 @@ type PropsDiscussionInterface = {
 function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
-	const [menuContextual, displayMenuContextual] = useState<boolean>(false)
-	const [menuContextualPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
 	/* ============ Temporaire ============== */
 
@@ -119,13 +117,6 @@ function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 
 	return (
 		<Style>
-		{/* {
-			menuContextual &&
-			<MenuContextual
-				position={menuContextualPosition}
-				displayMenuContextual={displayMenuContextual} />
-		} */}
-
 			<ScrollBar
 				state={{
 					value: chatScrollValue,
@@ -163,8 +154,6 @@ function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 								userName={message.sender}
 								opponent={(message as MessageInvitation).target}
 								state={(message as MessageInvitation).state}
-								displayMenuContextual={displayMenuContextual}
-								setMenuContextualPosition={setMenuContextualPosition}
 							/>
 							))
 			}

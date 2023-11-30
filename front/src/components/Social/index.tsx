@@ -22,19 +22,14 @@ import colors from "../../utils/colors"
 type PropsSocial = {
 	social: boolean,
 	displaySocial: Dispatch<SetStateAction<boolean>>,
-	menuContextual: boolean,
-	displayMenuContextual: Dispatch<SetStateAction<boolean>>,
-	menuContextualPosition: {
-		top: number,
-		left: number
-	},
-	setMenuContextualPosition: Dispatch<SetStateAction<{
+	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	setContextualMenuPosition: Dispatch<SetStateAction<{
 		top: number,
 		left: number
 	}>>
 }
 
-function Social({ social, displaySocial, menuContextual, displayMenuContextual, menuContextualPosition, setMenuContextualPosition } : PropsSocial) {
+function Social({ social, displaySocial, displayContextualMenu, setContextualMenuPosition } : PropsSocial) {
 
 	const { displayCard } = useContext(CardContext)!
 
@@ -56,12 +51,6 @@ function Social({ social, displaySocial, menuContextual, displayMenuContextual, 
 
 	return (
 		<Style onContextMenu={(event) => event.preventDefault()}>
-			{
-				menuContextual &&
-				<MenuContextual
-					position={menuContextualPosition}
-					displayMenuContextual={displayMenuContextual} />
-			}
 			<ScrollBar>
 			{
 				friends.map((friend, index) => (
@@ -73,8 +62,8 @@ function Social({ social, displaySocial, menuContextual, displayMenuContextual, 
 						state={friend.state}
 						social={social}
 						color={!(index % 2) ? colors.section : colors.sectionAlt}
-						displayMenuContextual={displayMenuContextual}
-						setMenuContextualPosition={setMenuContextualPosition} />
+						displayContextualMenu={displayContextualMenu}
+						setContextualMenuPosition={setContextualMenuPosition} />
 				))
 			}
 			</ScrollBar>

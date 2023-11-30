@@ -9,59 +9,38 @@ import {
 
 import colors from "../../../../../utils/colors"
 import status from "../../../../../utils/status"
-import { Dispatch, MouseEvent, SetStateAction, useContext } from "react"
-import MenuContextualContext from "../../../../../contexts/MenuContextualContext"
+import { MouseEvent, useContext } from "react"
+import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 
 type PropsContactDuelInvitation = {
 	userName: string,
 	opponent: string,
-	state: string,
-	displayMenuContextual: Dispatch<SetStateAction<boolean>>,
-	setMenuContextualPosition: Dispatch<SetStateAction<{
-		top: number,
-		left: number
-	}>>
+	state: string
 }
 
-function ContactDuelInvitation({ userName, opponent, state, displayMenuContextual, setMenuContextualPosition } : PropsContactDuelInvitation) {
+function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
 	
-	// const { displayMenuContextual, setMenuContextualPosition } = useContext(MenuContextualContext)!
+	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 
-	// function showMenuContextual(event: MouseEvent<HTMLDivElement>) {
+	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-	// 	// const friendcontainer = friendContainerRef.current
-
-
-
-	// 	const parentElementContainer = event.target.parentElement.parentElement.parentElement.parentElement.parentElement
-	// 	// // if (friendcontainer) {
-	// 	const { bottom: bottomParentElement } = parentElementContainer.getBoundingClientRect()
-
-	// 	// console.log(parentElementContainer)
-	// 	// console.log(bottomParentElement)
-
-	// 	const topMax = bottomParentElement - 175 // taille du menu
-	// 	const target = event.clientY
-
-	// 	const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
-
-	// 	// 	// setMenuContextualPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
-	// 	// 	// displayMenuContextual(true)
-	// 	// // }
+		const parentElementContainer = event.target.parentElement.parentElement.parentElement.parentElement.parentElement
+		const { bottom: bottomParentElement } = parentElementContainer.getBoundingClientRect()
 
 
+		const topMax = bottomParentElement - 175 // taille du menu
+		const target = event.clientY
 
-	// 	console.log(event.clientX, " , ", event.clientY)
-	// 	console.log(bottomParentElement)
+		const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
-	// 	setMenuContextualPosition({ top: -50, left: 0 }) // +1 pour eviter que la souris soit directement sur le menu
-	// 	displayMenuContextual(true)
+		setContextualMenuPosition({ top: topMenu, left: event.clientX - 180 }) // +1 pour eviter que la souris soit directement sur le menu
+		displayContextualMenu(true)
 
-	// }
+	}
 
 	return (
 		<Style>
-			<ProfilePicture /* onAuxClick={showMenuContextual} */ />
+			<ProfilePicture onAuxClick={showContextualMenu} />
 			<InvitationContent>
 				<Text>
 					{userName} challenge {opponent} to a duel !

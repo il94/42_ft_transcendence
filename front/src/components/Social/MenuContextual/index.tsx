@@ -17,15 +17,15 @@ type PropsMenuContextual = {
 		top: number,
 		left: number
 	},
-	displayMenuContextual: Dispatch<SetStateAction<boolean>>
+	displayContextualMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function MenuContextual({ position, displayMenuContextual } : PropsMenuContextual) {
+function MenuContextual({ position, displayContextualMenu } : PropsMenuContextual) {
 
 	const menuContextualRef: RefObject<HTMLDivElement> = useRef(null)
 
 	const [secondary, displaySecondary] = useState<boolean>(false)
-	const [secondaryTop, setSecondaryTop] = useState<number>(0)
+	const [secondaryPosition, setSecondaryPosition] = useState<number>(0)
 	const [secondaryHeight, setSecondaryHeight] = useState<number>(0)
 
 
@@ -35,17 +35,17 @@ function MenuContextual({ position, displayMenuContextual } : PropsMenuContextua
 	}, [])
 
 	return (
-		<Style onBlur={() => displayMenuContextual(false)}
+		<Style onBlur={() => displayContextualMenu(false)}
 				$top={position.top} $left={position.left}
 				tabIndex={0} ref={menuContextualRef}>
 			<PrimaryMenuContextual
 				position={position}
 				displaySecondary={displaySecondary}
-				setSecondaryTop={setSecondaryTop}
+				setSecondaryPosition={setSecondaryPosition}
 				secondaryHeight={secondaryHeight} />
 			<SecondaryMenuContextual
 				secondary={secondary}
-				secondaryTop={secondaryTop}
+				secondaryPosition={secondaryPosition}
 				displaySecondary={displaySecondary}
 				setSecondaryHeight={setSecondaryHeight} />
 		</Style>

@@ -1,27 +1,30 @@
 import { Dispatch, MouseEvent, SetStateAction } from "react"
 import { Style } from "./style"
-import SectionName from "../../../../componentsLibrary/SectionName/SectionName"
-import Section from "../../../../componentsLibrary/Section"
+import SectionName from "../../../componentsLibrary/SectionName/SectionName"
+import Section from "../../../componentsLibrary/Section"
 
 type PropsPrimaryMenuContextual = {
-	position: {
+	contextualMenuPosition: {
 		top: number,
 		left: number
 	},
 	displaySecondary: Dispatch<SetStateAction<boolean>>,
-	setSecondaryPosition: Dispatch<SetStateAction<number>>,
+	setSecondaryPosition: Dispatch<SetStateAction<{
+		top: number,
+		left: number
+	}>>,
 	secondaryHeight: number
 }
 
-function PrimaryMenuContextual({ position, displaySecondary, setSecondaryPosition, secondaryHeight } : PropsPrimaryMenuContextual) {
+function PrimaryMenuContextual({ contextualMenuPosition, displaySecondary, setSecondaryPosition, secondaryHeight } : PropsPrimaryMenuContextual) {
 
 	function handleEvent(event: MouseEvent) {
 
 		const { clientX, clientY } = event
-		const { left, top } = position
+		const { top, left } = contextualMenuPosition
 
 		// sert a definir si le curseur se rend sur le menu secondaire ou non
-		if (clientX < left || clientY < top)
+		if (clientY < top || clientX < left)
 			displaySecondary(false)
 	}
 
@@ -31,14 +34,17 @@ function PrimaryMenuContextual({ position, displaySecondary, setSecondaryPositio
 		
 		if (sectionContainer)
 		{
-			const target = position.top // position du clic sur l'axe Y
-
+			const { left: leftContextual, top: topContextual } = contextualMenuPosition // position du menu contextuel
 			const bottomParent = sectionContainer.parentElement!.parentElement!.parentElement!.getBoundingClientRect().bottom // bas du composant parent (bas du game)
 			
-			const topMenu = -(Math.abs(bottomParent - target - secondaryHeight)) // valeur max que peut prendre le top du menu
+			const topMenu = -(Math.abs(bottomParent - topContextual - secondaryHeight)) // valeur max que peut prendre le top du menu
+			const leftMenu = leftContextual + 180 < window.innerWidth / 2 ? 180 : -180 // définit si le menu secondaire s'affiche à gauche ou à droite
 			
-			if (bottomParent - secondaryHeight < target)
-				setSecondaryPosition(topMenu)
+			if (bottomParent - secondaryHeight < topContextual) // vérifie si le menu secondaire dépasserait par le bas
+				setSecondaryPosition({ left: leftMenu, top: topMenu })
+			else
+				setSecondaryPosition({ left: leftMenu, top: 0 })
+
 			displaySecondary(true)
 		}
 
