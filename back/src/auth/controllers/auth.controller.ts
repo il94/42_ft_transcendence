@@ -47,9 +47,9 @@ export class AuthController {
 		return "Coucou!";
 	}
 
-	//@UseGuards(JwtGuard)
+	@UseGuards(JwtGuard)
 	@Get('profile')
-	getProfile(@getUser() user: User) {
+	getProfile(@Request() user: User) {
 		console.log(user);
 		if (user) {
 			return { msg: 'Authenticated' };

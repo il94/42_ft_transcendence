@@ -52,15 +52,15 @@ export class UsersController {
   @ApiOkResponse({ type: UserEntity })
   async sendFriendRequest(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
-    @Request() req) {
-    return await this.usersService.sendFriendRequest(isFriendId, req.user);
+    @Request() user: User) {
+    return await this.usersService.sendFriendRequest(isFriendId, user);
   }
 
   @Get('friend-request/status/:isFriendId')
   @ApiOkResponse({ type: UserEntity })
   async getFriendRequestStatus(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
-    @Request() req) {
-    return await this.usersService.getFriendRequestStatus(isFriendId, req.user);
+    @Request() user: User) {
+    return await this.usersService.getFriendRequestStatus(isFriendId, user);
   }
 }
