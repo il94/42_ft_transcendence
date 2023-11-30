@@ -19,7 +19,8 @@ const View = styled.div`
 
 	inset: 0px;
 	
-	overflow-y : scroll;
+	overflow-y: scroll;
+	overflow-x: hidden;
 
 	margin-right: -15px;
 
