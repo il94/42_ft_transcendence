@@ -9,7 +9,7 @@ export class AuthDto {
 	username: string;
 
 	@IsEmail()
-	@IsNotEmpty()
+	@IsOptional()
 	@ApiProperty()
 	email: string;
 

@@ -17,7 +17,7 @@ import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
 		JwtModule.registerAsync({
 			useFactory: async () => ({
 			  secret: process.env.JWT_SECRET,
-			  signOptions: { expiresIn: '1h' },
+			  signOptions: { expiresIn: '1d' },
 			}),
 		}),
 		PassportModule.register({ defaultStrategy: '42' }),

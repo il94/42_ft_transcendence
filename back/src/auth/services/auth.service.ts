@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, Status } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -15,20 +15,27 @@ export class AuthService {
 		private userService: UsersService) {}
 
 	async signup(dto: CreateUserDto) {
-		const newUser = await this.userService.create(dto);
-		return this.signToken(newUser.id, newUser.username);
+		const newUser = await this.userService.createUser(dto);
+		delete newUser.hash;
+		return newUser; // ou signtoken ?
 	}
 
 	async signin(dto: AuthDto) {
-		const user = await this.prisma.user.findUnique({
-			where: { username: dto.username, },
-		});
-		if (!user)
-			throw new ForbiddenException('user not found');
-		const pwdMatch = await argon.verify(user.hash, dto.hash);
-		if (!pwdMatch) 
-			throw new ForbiddenException('incorrect password');
-		return this.signToken(user.id, user.username);
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { username: dto.username, },
+			});
+			if (!user)
+				throw new BadRequestException('user not found');
+			const pwdMatch = await argon.verify(user.hash, dto.hash);
+			if (!pwdMatch) 
+				throw new ForbiddenException('incorrect password');
+			return this.signToken(user.id, user.username);
+		} catch (error) {
+            const err = error as Error;
+            console.log(err.message);
+              throw new BadRequestException(err.message)
+        }
 	}
 
 	// TODO proteger avec un try catch
