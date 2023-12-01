@@ -19,7 +19,7 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const parentElementContainer = event.target.parentElement.parentElement.parentElement.parentElement.parentElement
+		const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!.parentElement!.parentElement!.parentElement!
 		const { bottom: bottomParentElement } = parentElementContainer.getBoundingClientRect()
 
 

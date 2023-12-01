@@ -11,7 +11,6 @@ import { Style, ReduceButton } from "./style"
 
 import FriendSection from "./FriendSection"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
-import MenuContextual from "./MenuContextual"
 
 import CardContext from "../../contexts/CardContext"
 

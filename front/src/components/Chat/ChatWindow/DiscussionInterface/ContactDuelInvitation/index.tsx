@@ -24,8 +24,8 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const parentElementContainer = event.target.parentElement.parentElement.parentElement.parentElement.parentElement
-		const { bottom: bottomParentElement } = parentElementContainer.getBoundingClientRect()
+		const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!.parentElement!.parentElement!.parentElement
+		const { bottom: bottomParentElement } = parentElementContainer!.getBoundingClientRect()
 
 
 		const topMax = bottomParentElement - 175 // taille du menu
