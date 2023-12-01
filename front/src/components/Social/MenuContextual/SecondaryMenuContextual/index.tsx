@@ -2,21 +2,21 @@ import { Dispatch, SetStateAction, useEffect } from "react"
 
 import { Style } from "./style"
 
-import Section from "../../../componentsLibrary/Section"
-import SectionName from "../../../componentsLibrary/SectionName/SectionName"
+import Section from "../../../../componentsLibrary/Section"
+import SectionName from "../../../../componentsLibrary/SectionName/SectionName"
 
-import { Channel } from "../../../utils/types"
+import { Channel } from "../../../../utils/types"
 
-import DefaultChannelPicture from "../../../assets/default_channel.png"
+import DefaultChannelPicture from "../../../../assets/default_channel.png"
 
 type PropsSecondaryMenuContextual = {
 	secondary: boolean,
 	displaySecondary: Dispatch<SetStateAction<boolean>>,
-	secondaryTop: number,
+	secondaryPosition: number,
 	setSecondaryHeight: Dispatch<SetStateAction<number>>,
 }
 
-function SecondaryMenuContextual({ secondary, displaySecondary, secondaryTop, setSecondaryHeight } : PropsSecondaryMenuContextual) {
+function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPosition, setSecondaryHeight } : PropsSecondaryMenuContextual) {
 
 	/* ============ Temporaire ============== */
 
@@ -76,7 +76,7 @@ function SecondaryMenuContextual({ secondary, displaySecondary, secondaryTop, se
 
 	return ( secondary &&
 		<Style onMouseLeave={() => displaySecondary(false)}
-			$top={secondaryTop}>
+			$top={secondaryPosition}>
 		{
 			channels.map((channel) => (
 				<Section key={"channelSection" + channel.id}>

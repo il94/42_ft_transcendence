@@ -25,14 +25,15 @@ import MenuSettings from '../../components/MenuSettings'
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
+import ContextualMenuContext from '../../contexts/ContextualMenuContext'
 import ZIndexContext from '../../contexts/ZIndexContext'
-import MenuContextualContext from '../../contexts/MenuContextualContext'
 
 import { UserAuthenticate } from '../../utils/types'
 
 import breakpoints from '../../utils/breakpoints'
 
 import DefaultProfilePicture from "../../assets/default_blue.png"
+import ContextualMenu from '../../components/ContextualMenu'
 
 function Game() {
 
@@ -48,9 +49,9 @@ function Game() {
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
-
-	const [menuInteraction, displayMenuContextual] = useState<boolean>(false)
-	const [menuInteractionPosition, setMenuContextualPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+	
+	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
+	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
 	const [zCardIndex, setZCardIndex] = useState<number>(10)
 	const [zChatIndex, setZChatIndex] = useState<number>(10)
@@ -99,16 +100,21 @@ function Game() {
 			{
 				<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
 					<GameWrapper>
+						{
+							contextualMenu &&
+							<ContextualMenu
+								contextualMenuPosition={contextualMenuPosition}
+								displayContextualMenu={displayContextualMenu} />
+						}
 						<LeftGameWrapper $social={social}>
 							<Logo />
-							<MenuContextualContext.Provider value={{ menuInteraction, displayMenuContextual, menuInteractionPosition, setMenuContextualPosition }} >
 								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
-									<Social
-										social={social}
-										displaySocial={displaySocial}
-									/>
+								<Social
+									social={social}
+									displaySocial={displaySocial}
+									displayContextualMenu={displayContextualMenu}
+									setContextualMenuPosition={setContextualMenuPosition} />
 								</CardContext.Provider>
-							</MenuContextualContext.Provider>
 						</LeftGameWrapper>
 						<RightGameWrapper>
 							<TopGameWrapper>
@@ -140,9 +146,11 @@ function Game() {
 								}
 								<TestsBack />
 								{
-									<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-										<Chat />
-									</ChatContext.Provider>
+									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition }}>
+										<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+											<Chat />
+										</ChatContext.Provider>
+									</ContextualMenuContext.Provider>
 								}
 								{
 									settings &&

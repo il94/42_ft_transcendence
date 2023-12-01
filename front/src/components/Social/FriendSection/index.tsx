@@ -2,7 +2,9 @@ import {
 	useContext,
 	useRef,
 	RefObject,
-	MouseEvent
+	MouseEvent,
+	Dispatch,
+	SetStateAction
 } from "react"
 
 import {
@@ -15,7 +17,6 @@ import {
 
 import CardContext from "../../../contexts/CardContext"
 import ZIndexContext from "../../../contexts/ZIndexContext"
-import MenuContextualContext from "../../../contexts/MenuContextualContext"
 
 type PropsFriendSection = {
 	id: number,
@@ -23,13 +24,17 @@ type PropsFriendSection = {
 	profilePicture: string,
 	state: string,
 	social: boolean,
-	color: string
+	color: string,
+	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	setContextualMenuPosition: Dispatch<SetStateAction<{
+		top: number,
+		left: number
+	}>>
 }
 
-function FriendSection({ id, username, profilePicture, state, social, color }: PropsFriendSection) {
+function FriendSection({ id, username, profilePicture, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
-	const { displayMenuContextual, setMenuContextualPosition } = useContext(MenuContextualContext)!
 	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
@@ -71,8 +76,8 @@ function FriendSection({ id, username, profilePicture, state, social, color }: P
 	
 			const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
-			setMenuContextualPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
-			displayMenuContextual(true)
+			setContextualMenuPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
+			displayContextualMenu(true)
 		}
 	}
 

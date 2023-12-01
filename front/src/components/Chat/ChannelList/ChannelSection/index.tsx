@@ -9,9 +9,6 @@ type PropsChannel = {
 }
 
 function ChannelSection({ /* id, */ name, picture, /* type, */ color } : PropsChannel) {
-
-
-
 	return (
 		<Style color={color}>
 			<ProfilePicture src={picture}/>
