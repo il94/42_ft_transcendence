@@ -44,7 +44,7 @@ export const CentralWindow = styled.div`
 	border-color: ${colors.popup};
 	box-shadow: 10px;
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 	background-color: ${colors.popup};
 

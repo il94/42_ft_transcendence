@@ -9,6 +9,8 @@ import {
 
 import colors from "../../../../../utils/colors"
 import status from "../../../../../utils/status"
+import { MouseEvent, useContext } from "react"
+import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 
 type PropsContactDuelInvitation = {
 	userName: string,
@@ -17,9 +19,28 @@ type PropsContactDuelInvitation = {
 }
 
 function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
+	
+	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
+
+	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
+
+		const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!.parentElement!.parentElement!.parentElement
+		const { bottom: bottomParentElement } = parentElementContainer!.getBoundingClientRect()
+
+
+		const topMax = bottomParentElement - 175 // taille du menu
+		const target = event.clientY
+
+		const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+
+		setContextualMenuPosition({ top: topMenu, left: event.clientX - 180 }) // +1 pour eviter que la souris soit directement sur le menu
+		displayContextualMenu(true)
+
+	}
+
 	return (
 		<Style>
-			<ProfilePicture />
+			<ProfilePicture onAuxClick={showContextualMenu} />
 			<InvitationContent>
 				<Text>
 					{userName} challenge {opponent} to a duel !

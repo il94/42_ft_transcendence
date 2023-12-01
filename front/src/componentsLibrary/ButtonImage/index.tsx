@@ -18,7 +18,7 @@ const ButtonImage = styled.button`
 	text-align: center;
 
 	${effects.shadowButton};
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 	
 	color: ${colors.text};
 	background-color: ${colors.button};

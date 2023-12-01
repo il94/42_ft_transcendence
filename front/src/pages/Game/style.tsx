@@ -26,7 +26,7 @@ export const GameWrapper = styled.div`
 	min-width: 623px;
 	min-height: 212px;
 
-	${effects.pixelateWindow};
+	clip-path: ${effects.pixelateWindow};
 
 `
 

@@ -1,4 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
+import axios from 'axios'
 
 import {
 	SignupPage,
@@ -21,11 +22,16 @@ import LinkImage from '../../componentsLibrary/LinkImage'
 
 import colors from '../../utils/colors'
 
+import DefaultBlackProfilePicture from "../../assets/default_black.png"
+import DefaultBlueProfilePicture from "../../assets/default_blue.png"
+import DefaultGreenProfilePicture from "../../assets/default_green.png"
+import DefaultPinkProfilePicture from "../../assets/default_pink.png"
+import DefaultPurpleProfilePicture from "../../assets/default_purple.png"
+import DefaultRedProfilePicture from "../../assets/default_red.png"
+import DefaultYellowProfilePicture from "../../assets/default_yellow.png"
 import FTButton from "../../assets/42.png"
 
 function Signup() {
-
-	/* ============ Tests ============== */
 
 	const [errorMessage, setErrorMessage] = useState('')
 	const [inputUsername, setInputUsername] = useState('')
@@ -35,13 +41,35 @@ function Signup() {
 
 		event.preventDefault()
 
-		// axios.post("http://localhost:3333/users", formData)
-		// 	.then((response) => console.log(response))
-		// 	.catch((error) => console.log(error))
+		axios.post("http://localhost:3333/auth/signup",
+		{
+			username: inputUsername,
+			hash: inputPassword,
+			email: `${inputUsername}_test@test.fr`,
+			avatar: getRandomDefaultProfilePicture(),
+			tel: "0000000000"
+		})
+		.then((response) => console.log(response))
+		.catch((error) => console.log(error))
 
 	}
 
-	/* ============================================== */
+	function getRandomDefaultProfilePicture(): string {
+
+		const defaultProfilePictures: string[] = [
+			DefaultBlackProfilePicture,
+			DefaultBlueProfilePicture,
+			DefaultGreenProfilePicture,
+			DefaultPinkProfilePicture,
+			DefaultPurpleProfilePicture,
+			DefaultRedProfilePicture,
+			DefaultYellowProfilePicture
+		]
+
+		const randomIndex = Math.floor(Math.random() * defaultProfilePictures.length)
+
+		return (defaultProfilePictures[randomIndex])
+	}
 
 	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
 

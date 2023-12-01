@@ -3,7 +3,7 @@ import colors from "./colors"
 const effects = {
 
 	pixelateWindow : `
-		clip-path : polygon(
+		polygon(
 		0px 8px,
 		4px 8px,
 		4px 4px,
@@ -28,7 +28,7 @@ const effects = {
 	`,
 
 	pixelateIcon : `
-		clip-path: polygon(
+		polygon(
 		0px calc(100% - 4px),
 		4px calc(100% - 4px),
 		4px 100%,
