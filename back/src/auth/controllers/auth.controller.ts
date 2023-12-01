@@ -49,9 +49,9 @@ export class AuthController {
 
 	@UseGuards(JwtGuard)
 	@Get('profile')
-	getProfile(@Request() user: User) {
-		console.log(user);
-		if (user) {
+	getProfile(@Request() req) {
+		console.log(req.user);
+		if (req.user) {
 			return { msg: 'Authenticated' };
 		} else { 
 			return { msg: 'NOT Authenticated' };

@@ -11,6 +11,6 @@ COPY . .
 
 RUN npm run build
 
-#RUN npx prisma studio
+#RUN npx prisma migrate dev
 
 CMD [ "npm", "run", "start:migrate:dev" ]

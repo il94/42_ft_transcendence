@@ -43,16 +43,21 @@ export class UsersService {
 	}
 
 	findAll() {
-		const users = this.prisma.user.findMany({ });
+		const users = this.prisma.user.findMany({ 
+			select: { id: true,
+					username: true,
+					email: true,			 
+			},});
 		return users;
 	}
 
 	async findById(id: number) {
 		const user = await this.prisma.user.findUnique({
 			where: { id: id },
+			select: { hash: false },
 		})
 		if (!user)
-			throw new NotFoundException(`Article with ${id} does not exist.`);
+			throw new NotFoundException(`User with ${id} does not exist.`);
 		return user;
 	}
 
@@ -94,15 +99,46 @@ export class UsersService {
 		return true;
 	} 
 
+	async addFriend(userId: number, friendId: number) 
+	{
+		if (userId === friendId) 
+			return { error: 'It is not possible to add yourself!' };
+		try {
+			const friend: User = await this.prisma.user.findUnique({where: { id: friendId }});
+		if (!friend)
+			throw new NotFoundException(`User with id ${friendId} does not exist.`);
+		
+		const isFriend  =  await this.prisma.friends.findUnique({
+			where: { hasFriendsId_isFriendId: {
+				hasFriendsId: userId,
+				isFriendId: friendId,}}
+			})
+		if (isFriend)
+			return { error: `User with id ${friendId} is already your friend.` };
+
+		const newFriend = await this.prisma.friends.create({
+			data: { hasFriendsId: userId,
+			isFriendId: friendId,
+			request: 'ACCEPTED', }
+			});
+		return newFriend;
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				return { error: 'An error occurred while addind friend' };
+			throw error;
+		}
+	}
 
 	async sendFriendRequest(receiverId: number, sender: User): Promise<Friends | { error: string }> {
 		if (receiverId === sender.id)
 			return { error: 'It is not possible to add yourself!' };
 
 		try {
-			const receiver: User = await this.findById(receiverId);
+			const receiver: User = await this.prisma.user.findUnique({where: { id: receiverId }});
+			if (!receiver)
+				throw new NotFoundException(`User with ${receiverId} does not exist.`);
+			
 			const isSent: boolean = await this.isSent(sender, receiver);
-
 			if (isSent === true)
 				return { error: 'A friend request has already been sent or received to your account!' };
 
@@ -153,21 +189,26 @@ export class UsersService {
 		//TODO ?
 	}
 
-	async removeFriends(userId: number, friendId: number) {
-		const result = await this.prisma.user.update({ 
-			where: { id: userId, },
-			data: {
-				hasFriends: {
-					disconnect: [{ hasFriendsId_isFriendId: {
-						hasFriendsId: userId,
-						isFriendId: friendId,
-						} }],
-				}
-			}})
-		return result;
-
+	async removeFriend(userId: number, friendId: number) {
+		if (userId === friendId)
+			return { error: 'user has same id as friend' };
+		try {
+			const result = await this.prisma.user.update({ 
+				where: { id: userId, },
+				data: {
+					hasFriends: {
+						disconnect: [{ hasFriendsId_isFriendId: {
+							hasFriendsId: userId,
+							isFriendId: friendId,
+							} }],
+					}
+				}})
+			return result;
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				return { error: 'An error occurred while removing friend' };
+			throw error;
+		}
 	}
-
-
 
 }
