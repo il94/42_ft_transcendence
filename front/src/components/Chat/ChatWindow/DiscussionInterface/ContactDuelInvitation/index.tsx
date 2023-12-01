@@ -11,6 +11,8 @@ import colors from "../../../../../utils/colors"
 import status from "../../../../../utils/status"
 import { MouseEvent, useContext } from "react"
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
+import CardContext from "../../../../../contexts/CardContext"
+import ZIndexContext from "../../../../../contexts/ZIndexContext"
 
 type PropsContactDuelInvitation = {
 	userName: string,
@@ -21,6 +23,26 @@ type PropsContactDuelInvitation = {
 function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
 	
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
+	const { card, displayCard, setCardPosition, setIdTargetCard, cardIdTarget } = useContext(CardContext)!
+	const { setZCardIndex, zChatIndex } = useContext(ZIndexContext)!
+
+	function showCard(event: MouseEvent<HTMLDivElement>) {
+
+		const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement!
+
+		if (parentElementContainer)
+		{
+			const { top: topParentElement, left: leftParentElement } = parentElementContainer.getBoundingClientRect()
+
+			const resultY = Math.abs(topParentElement - event.clientY) - 371 // hauteur de la carte
+			const resultX = Math.abs(leftParentElement - event.clientX) - 240 // largeur de la carte
+			
+			setCardPosition({ top: resultY, left: resultX })
+			setZCardIndex(zChatIndex + 1)
+			
+			displayCard(true)
+		}
+	}
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
@@ -31,6 +53,9 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 		const topMax = bottomParentElement - 175 // taille du menu
 		const target = event.clientY
 
+		console.log("Y context = ", event.clientY)
+		console.log("event = ", event.target.getBoundingClientRect())
+
 		const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
 		setContextualMenuPosition({ top: topMenu, left: event.clientX - 180 }) // +1 pour eviter que la souris soit directement sur le menu
@@ -40,7 +65,9 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 
 	return (
 		<Style>
-			<ProfilePicture onAuxClick={showContextualMenu} />
+			<ProfilePicture
+				onClick={showCard}
+				onAuxClick={showContextualMenu} />
 			<InvitationContent>
 				<Text>
 					{userName} challenge {opponent} to a duel !

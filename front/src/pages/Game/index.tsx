@@ -47,7 +47,7 @@ function Game() {
 	const [chatRender, setChatRender] = useState<boolean>(false)
 
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
+	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 	
 	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
@@ -147,9 +147,11 @@ function Game() {
 								<TestsBack />
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition }}>
-										<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-											<Chat />
-										</ChatContext.Provider>
+										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
+											<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+												<Chat />
+											</ChatContext.Provider>
+										</CardContext.Provider>
 									</ContextualMenuContext.Provider>
 								}
 								{

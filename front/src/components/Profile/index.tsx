@@ -43,15 +43,20 @@ function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, s
 
 	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 
-	function showCard() {
+	function showCard(event) {
 
 		if (card && cardIdTarget === userData.id)
 			displayCard(false)
 		else
 		{
+			const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!
+			const { right: rightParentElement } = parentElementContainer!.getBoundingClientRect()
+	
+			console.log(parentElementContainer)
+
 			setIdTargetCard(userData.id)
 			setZCardIndex(zChatIndex + 1)
-			setCardPosition({ top: "0px", left: "calc(100% - 240px)" }) // set la postition tout en haut a gauche - width de la carte
+			setCardPosition({ top: 0, left: rightParentElement - 240 }) // set la postition tout en haut a gauche - width de la carte
 			displayCard(true)
 		}
 	}
