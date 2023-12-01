@@ -22,10 +22,9 @@ import LinkImage from '../../componentsLibrary/LinkImage'
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
+import axios from 'axios'
 
 function Signin() {
-
-	/* ============ Tests ============== */
 
 	const [errorMessage, setErrorMessage] = useState('')
 	const [inputUsername, setInputUsername] = useState('')
@@ -35,13 +34,16 @@ function Signin() {
 
 		event.preventDefault()
 
-		// axios.post("http://localhost:3333/users", formData)
-		// 	.then((response) => console.log(response))
-		// 	.catch((error) => console.log(error))
+		axios.post("http://localhost:3333/auth/signin",
+		{
+			username: inputUsername,
+			hash: inputPassword,
+			email: `${inputUsername}_test@test.fr` // a retirer
+		})
+		.then((response) => console.log(response))
+		.catch((error) => console.log(error))
 
 	}
-
-	/* ============================================== */
 
 	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
 
@@ -87,7 +89,7 @@ function Signin() {
 						{errorMessage}
 					</ErrorMessage>
 					<div style={{ marginTop: "10px" }} />
-					<Button>
+					<Button type="submit">
 						Continue
 					</Button>
 				</SigninForm>
