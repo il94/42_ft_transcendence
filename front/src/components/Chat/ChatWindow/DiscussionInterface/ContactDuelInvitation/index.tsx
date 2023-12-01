@@ -23,7 +23,7 @@ type PropsContactDuelInvitation = {
 function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
 	
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
-	const { card, displayCard, setCardPosition, setIdTargetCard, cardIdTarget } = useContext(CardContext)!
+	const { displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zChatIndex } = useContext(ZIndexContext)!
 
 	function showCard(event: MouseEvent<HTMLDivElement>) {
@@ -53,8 +53,8 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 		const topMax = bottomParentElement - 175 // taille du menu
 		const target = event.clientY
 
-		console.log("Y context = ", event.clientY)
-		console.log("event = ", event.target.getBoundingClientRect())
+		// console.log("Y context = ", event.clientY)
+		// console.log("event = ", event.target.getBoundingClientRect())
 
 		const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 

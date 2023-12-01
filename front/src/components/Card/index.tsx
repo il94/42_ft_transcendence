@@ -21,8 +21,8 @@ import DefaultProfilePicture from "../../assets/default_blue.png"
 
 type PropsCard = {
 	cardPosition: {
-		top: string,
-		left: string
+		top: number,
+		left: number
 	},
 	displayCard: Dispatch<SetStateAction<boolean>>
 }

@@ -1,7 +1,9 @@
 import {
 	SetStateAction,
 	Dispatch,
-	useContext
+	useContext,
+	MouseEvent,
+	useRef
 } from "react"
 
 import {
@@ -34,7 +36,7 @@ type PropsProfile = {
 	displayCard: Dispatch<SetStateAction<boolean>>,
 	cardIdTarget: number,
 	setIdTargetCard: Dispatch<SetStateAction<number>>,
-	setCardPosition: Dispatch<SetStateAction<{ top: string, left: string }>>,
+	setCardPosition: Dispatch<SetStateAction<{ top: number, left: number }>>,
 	settings: boolean,
 	displayMenuSettings: Dispatch<SetStateAction<boolean>>
 }
@@ -42,27 +44,46 @@ type PropsProfile = {
 function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
 
 	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
+	const profileRef = useRef(null)
 
-	function showCard(event) {
+
+	function showCard(event: MouseEvent<HTMLDivElement>) {
 
 		if (card && cardIdTarget === userData.id)
 			displayCard(false)
 		else
 		{
-			const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!
-			const { right: rightParentElement } = parentElementContainer!.getBoundingClientRect()
-	
-			console.log(parentElementContainer)
+			const profileContainer = profileRef.current
 
-			setIdTargetCard(userData.id)
-			setZCardIndex(zChatIndex + 1)
-			setCardPosition({ top: 0, left: rightParentElement - 240 }) // set la postition tout en haut a gauche - width de la carte
-			displayCard(true)
+			if (profileContainer)
+			{
+
+				const parentElementContainer = profileContainer.parentElement!
+				const { left: leftProfileContainer, right: rightProfileContainer } = profileContainer!.getBoundingClientRect()
+				
+				console.log("===========================================")
+				// console.log(profileContainer)
+				console.log(parentElementContainer)
+				console.log(parentElementContainer.getBoundingClientRect())
+				console.log("left = ", leftProfileContainer)
+				console.log("right = ", rightProfileContainer)
+				console.log("window = ", window.innerWidth)
+				
+				// const result = 325
+				const result = parentElementContainer.getBoundingClientRect().width - 271
+				
+				console.log("result = ", result)
+				
+				setIdTargetCard(userData.id)
+				setZCardIndex(zChatIndex + 1)
+				setCardPosition({ top: 0, left: result }) // set la postition tout en haut a gauche - width de la carte
+				displayCard(true)
+			}
 		}
 	}
 
 	return (
-		<Style>
+		<Style ref={profileRef}>
 			<ProfileWrapper onClick={showCard}>
 				<ProfilePicture src={userData.profilePicture}/>
 				<ProfileName>
