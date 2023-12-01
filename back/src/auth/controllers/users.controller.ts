@@ -9,7 +9,7 @@ import { UserEntity, FriendsEntity } from '../entities/';
 import { getUser } from '../decorators/users.decorator'
 import { User } from '@prisma/client';
 
-@UseGuards(JwtGuard)
+//@UseGuards(JwtGuard)
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
@@ -45,6 +45,8 @@ export class UsersController {
     return new UserEntity(await this.usersService.remove(id));
   }
 
+  /******** FRIENDS CRUD *********/
+
   @Post('friend-request/send/:isFriendId')
   @ApiOkResponse({ type: UserEntity })
   async sendFriendRequest(
@@ -73,7 +75,10 @@ export class UsersController {
     return await this.usersService.getUserFriends(id);
   }
 
-  @Post("friends-remove/:id")
+  //
+  // @Patch
+
+  @Delete("friends-remove/:id")
   @ApiOkResponse({ type: FriendsEntity })
   async removeFriend(
     @Param('id', ParseIntPipe) id: number, 

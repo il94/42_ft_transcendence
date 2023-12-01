@@ -35,7 +35,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	/* ============ Temporaire ============== */
 
 	// Recup le bon User avec un truc du style
-	// axios.get("http://localhost:3333/user:id (id etant defini par le param id de la fonction)")
+	// axios.get("http://localhost:3333/user/:id (id etant defini par le param id de la fonction)")
 
 	const userTest: User = {
 		id: 0,
