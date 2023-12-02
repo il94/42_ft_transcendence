@@ -47,14 +47,14 @@ function Game() {
 	const [chatRender, setChatRender] = useState<boolean>(false)
 
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<{ top: string; left: string }>({ top: "0px", left: "0px" })
+	const [cardPosition, setCardPosition] = useState<{ left?: number; right?: number; top?: number }>({ left: 0, right: 0, top: 0 })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 	
 	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
 	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
-	const [zCardIndex, setZCardIndex] = useState<number>(10)
-	const [zChatIndex, setZChatIndex] = useState<number>(10)
+	const [zCardIndex, setZCardIndex] = useState<number>(0)
+	const [zChatIndex, setZChatIndex] = useState<number>(0)
 
 	const [settings, displayMenuSettings] = useState<boolean>(false)
 
@@ -65,7 +65,7 @@ function Game() {
 	}, [isSmallDesktop])
 
 	useEffect(() => {
-		if (zCardIndex > 1 && zChatIndex > 1) {
+		if (zCardIndex > 0 && zChatIndex > 0) {
 			setZCardIndex(zCardIndex - 1)
 			setZChatIndex(zChatIndex - 1)
 		}
@@ -147,9 +147,11 @@ function Game() {
 								<TestsBack />
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition }}>
-										<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-											<Chat />
-										</ChatContext.Provider>
+										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
+											<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+												<Chat />
+											</ChatContext.Provider>
+										</CardContext.Provider>
 									</ContextualMenuContext.Provider>
 								}
 								{

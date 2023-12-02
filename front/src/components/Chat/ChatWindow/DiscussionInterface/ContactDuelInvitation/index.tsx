@@ -11,6 +11,8 @@ import colors from "../../../../../utils/colors"
 import status from "../../../../../utils/status"
 import { MouseEvent, useContext } from "react"
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
+import CardContext from "../../../../../contexts/CardContext"
+import ZIndexContext from "../../../../../contexts/ZIndexContext"
 
 type PropsContactDuelInvitation = {
 	userName: string,
@@ -21,6 +23,26 @@ type PropsContactDuelInvitation = {
 function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
 	
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
+	const { displayCard, setCardPosition } = useContext(CardContext)!
+	const { setZCardIndex, zChatIndex } = useContext(ZIndexContext)!
+
+	function showCard(event: MouseEvent<HTMLDivElement>) {
+
+		const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement!.parentElement!
+
+		if (parentElementContainer)
+		{
+			const { top: topParentElement, left: leftParentElement } = parentElementContainer.getBoundingClientRect()
+
+			const resultY = Math.abs(topParentElement - event.clientY) - 371 // hauteur de la carte
+			const resultX = Math.abs(leftParentElement - event.clientX) - 240 // largeur de la carte
+			
+			setCardPosition({ left: resultX, top: resultY })
+			setZCardIndex(zChatIndex + 1)
+			
+			displayCard(true)
+		}
+	}
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
@@ -40,7 +62,9 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 
 	return (
 		<Style>
-			<ProfilePicture onAuxClick={showContextualMenu} />
+			<ProfilePicture
+				onClick={showCard}
+				onAuxClick={showContextualMenu} />
 			<InvitationContent>
 				<Text>
 					{userName} challenge {opponent} to a duel !

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useContext } from "react"
+import { Dispatch, SetStateAction, useContext, useEffect } from "react"
 
 import {
 	CloseButton,
@@ -21,8 +21,9 @@ import DefaultProfilePicture from "../../assets/default_blue.png"
 
 type PropsCard = {
 	cardPosition: {
-		top: string,
-		left: string
+		left?: number,
+		right?: number
+		top?: number,
 	},
 	displayCard: Dispatch<SetStateAction<boolean>>
 }
@@ -31,9 +32,14 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 
 	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(ZIndexContext)!
 
+	useEffect(() => {
+		setZCardIndex(zChatIndex + 1)
+	}, [])
+
 
 	/* ============ Temporaire ============== */
 
+	// ROUTE TESTABLE
 	// Recup le bon User avec un truc du style
 	// axios.get("http://localhost:3333/user/:id (id etant defini par le param id de la fonction)")
 
@@ -52,8 +58,12 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	/* ============================================== */
 
 	return (
-		<Style onClick={() => { setZCardIndex(zChatIndex + 1) }}
-				$top={cardPosition.top} $left={cardPosition.left} $zIndex={zCardIndex}>
+		<Style
+			onClick={() => {setZCardIndex(zChatIndex + 1)}}
+			$left={cardPosition.left}
+			$right={cardPosition.right}
+			$top={cardPosition.top}
+			$zIndex={zCardIndex}>
 			<TopWrapper>
 				<ProfilePicture src={userTest.avatar}/>
 				<CloseButton>

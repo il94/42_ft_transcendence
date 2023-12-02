@@ -2,7 +2,7 @@ import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
-export const Style = styled.div<{$top: string, $left: string, $zIndex: number}>`
+export const Style = styled.div<{$top?: number, $left?: number, $right?: number, $zIndex: number}>`
 
 	display: flex;
 
@@ -10,8 +10,9 @@ export const Style = styled.div<{$top: string, $left: string, $zIndex: number}>`
 	align-items: center;
 
 	position: absolute;
-	left: ${(props) => props.$left};
-	top: ${(props) => props.$top};
+	left: ${(props) => props.$left}px;
+	right: ${(props) => props.$right}px;
+	top: ${(props) => props.$top}px;
 	z-index: ${(props) => props.$zIndex};
 
 	width: 240px;

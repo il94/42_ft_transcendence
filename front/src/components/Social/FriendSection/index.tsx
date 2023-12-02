@@ -16,7 +16,6 @@ import {
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
-import ZIndexContext from "../../../contexts/ZIndexContext"
 
 type PropsFriendSection = {
 	id: number,
@@ -35,7 +34,6 @@ type PropsFriendSection = {
 function FriendSection({ id, username, profilePicture, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
-	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {
@@ -57,8 +55,7 @@ function FriendSection({ id, username, profilePicture, state, social, color, dis
 			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
 			setIdTargetCard(id)
-			setCardPosition({ top: topCard.toString() + "px", left: "0px" })
-			setZCardIndex(zChatIndex + 1)
+			setCardPosition({ top: topCard })
 
 			displayCard(true)
 		}
