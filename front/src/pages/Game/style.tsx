@@ -12,6 +12,7 @@ export const GamePage = styled.div`
 	height: 100%;
 	min-height: 212px;
 
+	color: ${colors.text}; 
 	background-color: ${colors.background}; 
 
 `

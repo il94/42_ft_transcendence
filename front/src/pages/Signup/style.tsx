@@ -13,6 +13,9 @@ export const SignupPage = styled.div`
 	width: 100%;
 	height: 100%;
 
+	color: ${colors.text}; 
+	background-color: ${colors.background}; 
+
 `
 
 export const MainTitle = styled.h1`
