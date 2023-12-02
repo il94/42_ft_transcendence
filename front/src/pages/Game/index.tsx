@@ -47,7 +47,7 @@ function Game() {
 	const [chatRender, setChatRender] = useState<boolean>(false)
 
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+	const [cardPosition, setCardPosition] = useState<{ left?: number; right?: number; top?: number }>({ left: 0, right: 0, top: 0 })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 	
 	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)

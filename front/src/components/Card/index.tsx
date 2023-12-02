@@ -21,8 +21,9 @@ import DefaultProfilePicture from "../../assets/default_blue.png"
 
 type PropsCard = {
 	cardPosition: {
-		top: number,
-		left: number
+		left?: number,
+		right?: number
+		top?: number,
 	},
 	displayCard: Dispatch<SetStateAction<boolean>>
 }
@@ -53,8 +54,12 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	/* ============================================== */
 
 	return (
-		<Style onClick={() => { setZCardIndex(zChatIndex + 1) }}
-				$top={cardPosition.top} $left={cardPosition.left} $zIndex={zCardIndex}>
+		<Style
+			onClick={() => {setZCardIndex(zChatIndex + 1)}}
+			$left={cardPosition.left}
+			$right={cardPosition.right}
+			$top={cardPosition.top}
+			$zIndex={zCardIndex}>
 			<TopWrapper>
 				<ProfilePicture src={userTest.avatar}/>
 				<CloseButton>

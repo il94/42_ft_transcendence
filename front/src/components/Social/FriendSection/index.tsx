@@ -57,7 +57,7 @@ function FriendSection({ id, username, profilePicture, state, social, color, dis
 			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
 			setIdTargetCard(id)
-			setCardPosition({ top: topCard, left: 0 })
+			setCardPosition({ top: topCard })
 			setZCardIndex(zChatIndex + 1)
 
 			displayCard(true)

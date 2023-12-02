@@ -37,7 +37,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 			const resultY = Math.abs(topParentElement - event.clientY) - 371 // hauteur de la carte
 			const resultX = Math.abs(leftParentElement - event.clientX) - 240 // largeur de la carte
 			
-			setCardPosition({ top: resultY, left: resultX })
+			setCardPosition({ left: resultX, top: resultY })
 			setZCardIndex(zChatIndex + 1)
 			
 			displayCard(true)
@@ -52,9 +52,6 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 
 		const topMax = bottomParentElement - 175 // taille du menu
 		const target = event.clientY
-
-		// console.log("Y context = ", event.clientY)
-		// console.log("event = ", event.target.getBoundingClientRect())
 
 		const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
 
