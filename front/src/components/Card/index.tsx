@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useContext, useEffect } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext,
+	useEffect,
+	useState
+} from "react"
+import axios from "axios"
 
 import {
 	CloseButton,
@@ -14,10 +21,7 @@ import Icon from "../../componentsLibrary/Icon"
 
 import ZIndexContext from "../../contexts/ZIndexContext"
 
-import { User } from "../../utils/types"
-
 import CloseIcon from "../../assets/close.png"
-import DefaultAvatar from "../../assets/default_blue.png"
 
 type PropsCard = {
 	cardPosition: {
@@ -25,37 +29,54 @@ type PropsCard = {
 		right?: number
 		top?: number,
 	},
-	displayCard: Dispatch<SetStateAction<boolean>>
+	displayCard: Dispatch<SetStateAction<boolean>>,
+	cardIdTarget: number
 }
 
-function Card({ cardPosition, displayCard }: PropsCard) {
+function Card({ cardPosition, displayCard, cardIdTarget }: PropsCard) {
 
 	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(ZIndexContext)!
+
+	type PropsUserTarget = {
+		username: string,
+		avatar: string,
+		scoreResume: {
+			wins: number,
+			draws: number,
+			looses: number
+		}
+	}
+
+	const [userTarget, setUserTarget] = useState<PropsUserTarget>({
+		username: "",
+		avatar: "",
+		scoreResume: {
+			wins: 0,
+			draws: 0,
+			looses: 0
+		}
+	})
 
 	useEffect(() => {
 		setZCardIndex(zChatIndex + 1)
 	}, [])
 
-
-	/* ============ Temporaire ============== */
-
-	// ROUTE TESTABLE
-	// Recup le bon User avec un truc du style
-	// axios.get("http://localhost:3333/user/:id (id etant defini par le param id de la fonction)")
-
-	const userTest: User = {
-		id: 0,
-		username: "ilandols",
-		avatar: DefaultAvatar,
-		status: "En ligne",
-		scoreResume: {
-			wins: 100,
-			draws: 1,
-			looses: 0	
-		}
-	}
-
-	/* ============================================== */
+	useEffect(() => {
+		axios.get(`http://localhost:3333/user/${cardIdTarget}`)
+			.then((response) => {
+				console.log(response)
+				setUserTarget({
+					username: response.data.username,
+					avatar: response.data.avatar,
+					scoreResume: {
+						wins: 0, // en attente de l'obtention par le back
+						draws: 0,
+						looses: 0
+					}
+				})
+			})
+			.catch((error) => console.log(error))
+	}, [cardIdTarget])
 
 	return (
 		<Style
@@ -65,21 +86,21 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			$top={cardPosition.top}
 			$zIndex={zCardIndex}>
 			<TopWrapper>
-				<Avatar src={userTest.avatar}/>
+				<Avatar src={userTarget.avatar}/>
 				<CloseButton>
-					<Icon src={CloseIcon} size="24px" onClick={() => displayCard(false)}
+					<Icon onClick={() => displayCard(false)}
+						src={CloseIcon} size="24px" 
 						alt="Close button" title="Close" />
 				</CloseButton>
 			</TopWrapper>
 			<UserName>
-				{userTest.username}
+				{userTarget.username}
 			</UserName>
 			<ScoreResume
-				wins={userTest.scoreResume.wins}
-				draws={userTest.scoreResume.draws}
-				looses={userTest.scoreResume.looses}
-			/>
-			<MatchHistory />
+				wins={userTarget.scoreResume.wins}
+				draws={userTarget.scoreResume.draws}
+				looses={userTarget.scoreResume.looses} />
+			<MatchHistory username={userTarget.username} /* cardIdTarget={cardIdTarget} */ />
 		</Style>
 	)
 }
