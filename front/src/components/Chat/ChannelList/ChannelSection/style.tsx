@@ -19,7 +19,7 @@ export const Style = styled.div`
 
 `
 
-export const ProfilePicture = styled.img`
+export const Avatar = styled.img`
 	
 	width: 24px;
 	height: 24px;

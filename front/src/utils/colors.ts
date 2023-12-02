@@ -41,7 +41,7 @@ const colors = {
 	
 	/* Profile */
 	profile: "#C9783C",
-	profilePicture: "#524FFD",
+	avatar: "#524FFD",
 
 	/* Chat */
 	chatWindow: "#f3a76080",

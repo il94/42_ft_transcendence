@@ -34,7 +34,7 @@ function ChannelList({ channels } : PropsChannelList) {
 						key={"channel" + index} // a definir
 						// _id={channel.id}
 						name={channel.name}
-						picture={channel.picture}
+						avatar={channel.avatar}
 						// _type={channel.type}
 						color={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 					/>

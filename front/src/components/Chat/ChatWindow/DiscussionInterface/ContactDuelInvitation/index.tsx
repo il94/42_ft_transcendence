@@ -1,5 +1,5 @@
 import {
-	ProfilePicture,
+	Avatar,
 	Style,
 	Text,
 	InvitationContent,
@@ -62,7 +62,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 
 	return (
 		<Style>
-			<ProfilePicture
+			<Avatar
 				onClick={showCard}
 				onAuxClick={showContextualMenu} />
 			<InvitationContent>

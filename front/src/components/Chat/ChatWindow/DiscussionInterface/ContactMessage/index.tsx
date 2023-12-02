@@ -1,6 +1,6 @@
 import { MouseEvent, useContext } from "react"
 import {
-	ProfilePicture,
+	Avatar,
 	Style,
 	UserName,
 	Text,
@@ -35,7 +35,7 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 
 	return (
 		<Style>
-			<ProfilePicture onAuxClick={showContextualMenu} />
+			<Avatar onAuxClick={showContextualMenu} />
 			<MessageContent>
 				<UserName>
 					{userName}

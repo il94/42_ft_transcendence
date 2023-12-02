@@ -78,7 +78,7 @@ export const SettingTtile = styled.div`
 
 `
 
-export const ProfilePicture = styled.img`
+export const Avatar = styled.img`
 
 	width: 92px;
 	height: 92px;

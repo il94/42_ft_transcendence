@@ -22,13 +22,13 @@ import LinkImage from '../../componentsLibrary/LinkImage'
 
 import colors from '../../utils/colors'
 
-import DefaultBlackProfilePicture from "../../assets/default_black.png"
-import DefaultBlueProfilePicture from "../../assets/default_blue.png"
-import DefaultGreenProfilePicture from "../../assets/default_green.png"
-import DefaultPinkProfilePicture from "../../assets/default_pink.png"
-import DefaultPurpleProfilePicture from "../../assets/default_purple.png"
-import DefaultRedProfilePicture from "../../assets/default_red.png"
-import DefaultYellowProfilePicture from "../../assets/default_yellow.png"
+import DefaultBlackAvatar from "../../assets/default_black.png"
+import DefaultBlueAvatar from "../../assets/default_blue.png"
+import DefaultGreenAvatar from "../../assets/default_green.png"
+import DefaultPinkAvatar from "../../assets/default_pink.png"
+import DefaultPurpleAvatar from "../../assets/default_purple.png"
+import DefaultRedAvatar from "../../assets/default_red.png"
+import DefaultYellowAvatar from "../../assets/default_yellow.png"
 import FTButton from "../../assets/42.png"
 
 function Signup() {
@@ -46,7 +46,7 @@ function Signup() {
 			username: inputUsername,
 			hash: inputPassword,
 			email: `${inputUsername}_test@test.fr`,
-			avatar: getRandomDefaultProfilePicture(),
+			avatar: getRandomDefaultAvatar(),
 			tel: "0000000000"
 		})
 		.then((response) => console.log(response))
@@ -54,21 +54,21 @@ function Signup() {
 
 	}
 
-	function getRandomDefaultProfilePicture(): string {
+	function getRandomDefaultAvatar(): string {
 
-		const defaultProfilePictures: string[] = [
-			DefaultBlackProfilePicture,
-			DefaultBlueProfilePicture,
-			DefaultGreenProfilePicture,
-			DefaultPinkProfilePicture,
-			DefaultPurpleProfilePicture,
-			DefaultRedProfilePicture,
-			DefaultYellowProfilePicture
+		const defaultAvatars: string[] = [
+			DefaultBlackAvatar,
+			DefaultBlueAvatar,
+			DefaultGreenAvatar,
+			DefaultPinkAvatar,
+			DefaultPurpleAvatar,
+			DefaultRedAvatar,
+			DefaultYellowAvatar
 		]
 
-		const randomIndex = Math.floor(Math.random() * defaultProfilePictures.length)
+		const randomIndex = Math.floor(Math.random() * defaultAvatars.length)
 
-		return (defaultProfilePictures[randomIndex])
+		return (defaultAvatars[randomIndex])
 	}
 
 	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {

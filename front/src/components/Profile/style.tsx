@@ -34,7 +34,7 @@ export const ProfileWrapper = styled.div`
 
 `
 
-export const ProfilePicture = styled.img`
+export const Avatar = styled.img`
 	
 	width: 32px;
 	height: 32px;

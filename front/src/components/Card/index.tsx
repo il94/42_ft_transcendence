@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useContext, useEffect } from "react"
 
 import {
 	CloseButton,
-	ProfilePicture,
+	Avatar,
 	Style,
 	TopWrapper,
 	UserName
@@ -17,7 +17,7 @@ import ZIndexContext from "../../contexts/ZIndexContext"
 import { User } from "../../utils/types"
 
 import CloseIcon from "../../assets/close.png"
-import DefaultProfilePicture from "../../assets/default_blue.png"
+import DefaultAvatar from "../../assets/default_blue.png"
 
 type PropsCard = {
 	cardPosition: {
@@ -46,7 +46,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 	const userTest: User = {
 		id: 0,
 		username: "ilandols",
-		avatar: DefaultProfilePicture,
+		avatar: DefaultAvatar,
 		state: "En ligne",
 		scoreResume: {
 			wins: 100,
@@ -65,7 +65,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			$top={cardPosition.top}
 			$zIndex={zCardIndex}>
 			<TopWrapper>
-				<ProfilePicture src={userTest.avatar}/>
+				<Avatar src={userTest.avatar}/>
 				<CloseButton>
 					<Icon src={CloseIcon} size="24px" onClick={() => displayCard(false)}
 						alt="Close button" title="Close" />

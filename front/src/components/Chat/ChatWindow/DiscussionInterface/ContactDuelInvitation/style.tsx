@@ -16,7 +16,7 @@ export const Style = styled.div`
 
 `
 
-export const ProfilePicture = styled.div`
+export const Avatar = styled.div`
 	
 	width: 20px;
 	height: 20px;
@@ -25,7 +25,7 @@ export const ProfilePicture = styled.div`
 
 	border-radius: 50%;
 
-	background-color: ${colors.profilePicture};
+	background-color: ${colors.avatar};
 
 `
 

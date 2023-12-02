@@ -24,7 +24,7 @@ export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 
 `
 
-export const ProfilePicture = styled.img<{ src: string }>`
+export const Avatar = styled.img<{ src: string }>`
 	
 	width: 32px;
 	height: 32px;

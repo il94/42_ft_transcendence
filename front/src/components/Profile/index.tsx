@@ -8,7 +8,7 @@ import {
 	ProfileWrapper,
 	ButtonsWrapper,
 	ProfileName,
-	ProfilePicture,
+	Avatar,
 } from "./style"
 
 
@@ -20,7 +20,7 @@ import settingsIcon from "../../assets/settings.png"
 type PropsProfile = {
 	userData: {
 		username: string,
-		profilePicture: string,
+		avatar: string,
 		id: number,
 		scoreResume: {
 			wins: number,
@@ -57,7 +57,7 @@ function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, s
 	return (
 		<Style>
 			<ProfileWrapper onClick={showCard}>
-				<ProfilePicture src={userData.profilePicture}/>
+				<Avatar src={userData.avatar}/>
 				<ProfileName>
 					{userData.username}
 				</ProfileName>

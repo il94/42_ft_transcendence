@@ -57,7 +57,7 @@ function Social({ social, displaySocial, displayContextualMenu, setContextualMen
 						key={"friend" + index} // a definir
 						id={friend.id}
 						username={friend.username}
-						profilePicture={friend.avatar} // a renomer par profilePicture
+						avatar={friend.avatar}
 						state={friend.state}
 						social={social}
 						color={!(index % 2) ? colors.section : colors.sectionAlt}

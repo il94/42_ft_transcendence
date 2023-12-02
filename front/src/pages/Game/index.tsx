@@ -32,7 +32,7 @@ import { UserAuthenticate } from '../../utils/types'
 
 import breakpoints from '../../utils/breakpoints'
 
-import DefaultProfilePicture from "../../assets/default_blue.png"
+import DefaultAvatar from "../../assets/default_blue.png"
 import ContextualMenu from '../../components/ContextualMenu'
 
 function Game() {
@@ -80,7 +80,7 @@ function Game() {
 	const userTest: UserAuthenticate = {
 		id: 0,
 		username: "ilandols",
-		avatar: DefaultProfilePicture,
+		avatar: DefaultAvatar,
 		state: "En ligne",
 		scoreResume: {
 			wins: 100,
@@ -123,7 +123,7 @@ function Game() {
 									userData={{
 										id: userTest.id,
 										username: userTest.username,
-										profilePicture: userTest.avatar,
+										avatar: userTest.avatar,
 										scoreResume: userTest.scoreResume
 									}}
 									card={card}
@@ -159,7 +159,7 @@ function Game() {
 									<MenuSettings
 										userData={{
 											username: userTest.username,
-											profilePicture: userTest.avatar
+											avatar: userTest.avatar
 										}}
 										displayMenuSettings={displayMenuSettings}
 									/>

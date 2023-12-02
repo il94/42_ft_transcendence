@@ -4,7 +4,7 @@ import {
 	Button,
 	ButtonWrapper,
 	CloseButton,
-	ProfilePicture,
+	Avatar,
 	PseudoStyle,
 	Setting,
 	SettingInfo,
@@ -21,7 +21,7 @@ import CloseIcon from "../../assets/close.png"
 type PropsMenuSettings = {
 	userData: {
 		username: string,
-		profilePicture: string
+		avatar: string
 	}
 	displayMenuSettings: Dispatch<SetStateAction<boolean>>,
 }
@@ -39,7 +39,7 @@ function MenuSettings({ displayMenuSettings, userData }: PropsMenuSettings) {
 					</CloseButton>
 				</ButtonWrapper>
 				<Setting>
-					<ProfilePicture src={userData.profilePicture}/>
+					<Avatar src={userData.avatar}/>
 					<Button>
 						Modify
 					</Button>

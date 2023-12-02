@@ -10,7 +10,7 @@ import {
 import {
 	Style,
 	ProfileName,
-	ProfilePicture,
+	Avatar,
 	ProfileInfo,
 	ProfileStatus
 } from "./style"
@@ -20,7 +20,7 @@ import CardContext from "../../../contexts/CardContext"
 type PropsFriendSection = {
 	id: number,
 	username: string,
-	profilePicture: string,
+	avatar: string,
 	state: string,
 	social: boolean,
 	color: string,
@@ -31,7 +31,7 @@ type PropsFriendSection = {
 	}>>
 }
 
-function FriendSection({ id, username, profilePicture, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ id, username, avatar, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
@@ -88,7 +88,7 @@ function FriendSection({ id, username, profilePicture, state, social, color, dis
 			onAuxClick={showMenuContextual}
 			onContextMenu={handleContextMenu}
 			color={color} ref={friendContainerRef}>
-			<ProfilePicture src={profilePicture} />
+			<Avatar src={avatar} />
 			{
 				!social &&
 				<ProfileInfo>

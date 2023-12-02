@@ -1,17 +1,17 @@
-import { Style, ProfilePicture, ChannelName } from "./style"
+import { Style, Avatar, ChannelName } from "./style"
 
 type PropsChannel = {
 	// id: number,
 	name: string,
-	picture: string,
+	avatar: string,
 	// type: string,
 	color: string
 }
 
-function ChannelSection({ /* id, */ name, picture, /* type, */ color } : PropsChannel) {
+function ChannelSection({ /* id, */ name, avatar, /* type, */ color } : PropsChannel) {
 	return (
 		<Style color={color}>
-			<ProfilePicture src={picture}/>
+			<Avatar src={avatar}/>
 			<ChannelName>
 				{name}
 			</ChannelName>
