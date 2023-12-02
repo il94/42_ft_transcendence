@@ -77,7 +77,7 @@ function Game() {
 	// Recup le User authentifie avec un truc du style
 	// axios.get("http://localhost:3333/user")
 
-	const userTest: UserAuthenticate = {
+	const userAuthenticate: UserAuthenticate = {
 		id: 0,
 		username: "ilandols",
 		avatar: DefaultAvatar,
@@ -121,10 +121,10 @@ function Game() {
 								<Info />
 								<Profile
 									userData={{
-										id: userTest.id,
-										username: userTest.username,
-										avatar: userTest.avatar,
-										scoreResume: userTest.scoreResume
+										id: userAuthenticate.id,
+										username: userAuthenticate.username,
+										avatar: userAuthenticate.avatar,
+										scoreResume: userAuthenticate.scoreResume
 									}}
 									card={card}
 									cardIdTarget={cardIdTarget}
@@ -142,7 +142,7 @@ function Game() {
 									<Card
 										cardPosition={cardPosition}
 										displayCard={displayCard}
-									/>
+										cardIdTarget={cardIdTarget} />
 								}
 								<TestsBack />
 								{
@@ -158,8 +158,8 @@ function Game() {
 									settings &&
 									<MenuSettings
 										userData={{
-											username: userTest.username,
-											avatar: userTest.avatar
+											username: userAuthenticate.username,
+											avatar: userAuthenticate.avatar
 										}}
 										displayMenuSettings={displayMenuSettings}
 									/>

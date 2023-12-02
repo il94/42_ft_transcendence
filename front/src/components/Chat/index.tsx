@@ -59,14 +59,19 @@ function Chat() {
 
 	return (
 		chat ?
-		<Style onContextMenu={(event) => event.preventDefault()} onClick={() => {setZChatIndex(zCardIndex + 1)}} $zIndex={zChatIndex}>
+		<Style
+			onContextMenu={(event) => event.preventDefault()}
+			onClick={() => {setZChatIndex(zCardIndex + 1)}}
+			$zIndex={zChatIndex}>
 			<ChannelList channels={channels} />
 			<ChatWindow toDisplay={channels[0]} />
 		</Style>
 		:
 		<ChatButton $zIndex={zChatIndex + 1}>
-			<Icon src={ChatIcon} size="38px" onClick={handleCickChatButton}
-				 alt="Chat button" title="Chat" />
+			<Icon
+				onClick={handleCickChatButton}
+				src={ChatIcon} size="38px" 
+				alt="Chat button" title="Chat" />
 		</ChatButton>
 	)
 }
