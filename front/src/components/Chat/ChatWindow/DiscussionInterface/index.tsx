@@ -11,8 +11,8 @@ import UserDuelInvitation from "./UserDuelInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
 
 import { MessageInvitation, MessageText } from "../../../../utils/types"
+import { challengeStatus } from "../../../../utils/status"
 
-import status from "../../../../utils/status"
 // import MenuContextual from "./MenuContextual"
 
 type PropsDiscussionInterface = {
@@ -46,70 +46,70 @@ function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 			sender: "You",
 			type: "invitation",
 			target: "target",
-			state: status.PENDING
+			status: challengeStatus.PENDING
 		},
 		{
 			id: 34,
 			sender: "You",
 			type: "invitation",
 			target: "target",
-			state: status.ACCEPTED
+			status: challengeStatus.ACCEPTED
 		},
 		{
 			id: 35,
 			sender: "You",
 			type: "invitation",
 			target: "target",
-			state: status.CANCELLED
+			status: challengeStatus.CANCELLED
 		},
 		{
 			id: 36,
 			sender: "You",
 			type: "invitation",
 			target: "target",
-			state: status.IN_PROGRESS
+			status: challengeStatus.IN_PROGRESS
 		},
 		{
 			id: 37,
 			sender: "You",
 			type: "invitation",
 			target: "target",
-			state: status.FINISHED
+			status: challengeStatus.FINISHED
 		},
 		{
 			id: 40,
 			sender: "Someone",
 			type: "invitation",
 			target: "target",
-			state: status.PENDING
+			status: challengeStatus.PENDING
 		},
 		{
 			id: 41,
 			sender: "Someone",
 			type: "invitation",
 			target: "target",
-			state: status.ACCEPTED
+			status: challengeStatus.ACCEPTED
 		},
 		{
 			id: 42,
 			sender: "Someone",
 			type: "invitation",
 			target: "target",
-			state: status.CANCELLED
+			status: challengeStatus.CANCELLED
 		},
 		{
 			id: 43,
 			sender: "Someone",
 			type: "invitation",
 			target: "target",
-			state: status.IN_PROGRESS
+			status: challengeStatus.IN_PROGRESS
 		},
 		{
 			id: 44,
 			sender: "Someone",
 			type: "invitation",
 			target: "target",
-			state: status.FINISHED
+			status: challengeStatus.FINISHED
 		}
 	]
 
@@ -139,7 +139,7 @@ function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 							<UserDuelInvitation
 								key={"message" + message.id} // a definir
 								opponent={(message as MessageInvitation).target}
-								state={(message as MessageInvitation).state}
+								status={(message as MessageInvitation).status}
 							/>
 					:
 						message.type === "text" ?
@@ -153,7 +153,7 @@ function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 								key={"message" + message.id} // a definir
 								userName={message.sender}
 								opponent={(message as MessageInvitation).target}
-								state={(message as MessageInvitation).state}
+								status={(message as MessageInvitation).status}
 							/>
 							))
 			}

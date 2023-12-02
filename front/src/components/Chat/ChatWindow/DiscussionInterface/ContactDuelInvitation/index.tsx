@@ -8,19 +8,19 @@ import {
 } from "./style"
 
 import colors from "../../../../../utils/colors"
-import status from "../../../../../utils/status"
 import { MouseEvent, useContext } from "react"
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 import CardContext from "../../../../../contexts/CardContext"
 import ZIndexContext from "../../../../../contexts/ZIndexContext"
+import { challengeStatus } from "../../../../../utils/status"
 
 type PropsContactDuelInvitation = {
 	userName: string,
 	opponent: string,
-	state: string
+	status: string
 }
 
-function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelInvitation) {
+function ContactDuelInvitation({ userName, opponent, status } : PropsContactDuelInvitation) {
 	
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
@@ -70,7 +70,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 					{userName} challenge {opponent} to a duel !
 				</Text>
 				{
-					state === status.PENDING &&
+					status === challengeStatus.PENDING &&
 					<ButtonsWrapper>
 						<Button color={colors.buttonGreen}>
 							Accept
@@ -81,7 +81,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 					</ButtonsWrapper>
 				}
 				{
-					state === status.ACCEPTED &&
+					status === challengeStatus.ACCEPTED &&
 					<ButtonsWrapper>
 						<Button color={colors.buttonGreen}>
 							Accepted !
@@ -89,7 +89,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 					</ButtonsWrapper>
 				}
 				{
-					state === status.CANCELLED &&
+					status === challengeStatus.CANCELLED &&
 					<ButtonsWrapper>
 						<Button color={colors.buttonGray}>
 							Cancelled
@@ -97,7 +97,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 					</ButtonsWrapper>
 				}
 				{
-					state === status.IN_PROGRESS &&
+					status === challengeStatus.IN_PROGRESS &&
 					<ButtonsWrapper>
 						<Button color={colors.button}>
 							Spectate
@@ -105,7 +105,7 @@ function ContactDuelInvitation({ userName, opponent, state } : PropsContactDuelI
 					</ButtonsWrapper>
 				}
 				{
-					state === status.FINISHED &&
+					status === challengeStatus.FINISHED &&
 					<ButtonsWrapper>
 						<Button color={colors.button}>
 							Finished

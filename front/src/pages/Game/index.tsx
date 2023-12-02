@@ -81,7 +81,7 @@ function Game() {
 		id: 0,
 		username: "ilandols",
 		avatar: DefaultAvatar,
-		state: "En ligne",
+		status: "En ligne",
 		scoreResume: {
 			wins: 100,
 			draws: 1,

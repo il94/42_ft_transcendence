@@ -21,7 +21,7 @@ type PropsFriendSection = {
 	id: number,
 	username: string,
 	avatar: string,
-	state: string,
+	status: string,
 	social: boolean,
 	color: string,
 	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
@@ -31,7 +31,7 @@ type PropsFriendSection = {
 	}>>
 }
 
-function FriendSection({ id, username, avatar, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ id, username, avatar, status, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
@@ -96,11 +96,15 @@ function FriendSection({ id, username, avatar, state, social, color, displayCont
 						{username}
 					</ProfileName>
 					<ProfileStatus>
-						{state}
+						{status}
 					</ProfileStatus>
 				</ProfileInfo>
 			}
 		</Style>
+		// const statusString = "ONLINE";
+		// const statusEnum: Status = Status.valueOf(statusString as keyof typeof Status);
+		// console.log(statusEnum); // Affichera 'ONLINE' si la chaîne correspond à une valeur de l'énumération
+		
 	)
 }
 

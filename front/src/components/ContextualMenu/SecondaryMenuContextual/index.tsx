@@ -30,43 +30,43 @@ function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPositio
 		{
 			id: 1,
 			name: "Public 1",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "public"
 		},
 		{
 			id: 2,
 			name: "Public 2",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "public"
 		},
 		{
 			id: 3,
 			name: "Public 3",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "public"
 		},
 		{
 			id: 4,
 			name: "Public 4",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "public"
 		},
 		{
 			id: 5,
 			name: "Protected 1",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "protected"
 		},
 		{
 			id: 6,
 			name: "Protected 2",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "protected"
 		},
 		{
 			id: 7,
 			name: "Protected 3",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "protected"
 		}
 	]

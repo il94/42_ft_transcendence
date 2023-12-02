@@ -6,21 +6,21 @@ import {
 } from "./style"
 
 import colors from "../../../../../utils/colors"
-import status from "../../../../../utils/status"
+import { challengeStatus } from "../../../../../utils/status"
 
 type PropsUserDuelInvitation = {
 	opponent: string,
-	state: string
+	status: string
 }
 
-function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
+function UserDuelInvitation({ opponent, status } : PropsUserDuelInvitation ) {
 	return (
 		<Style>
 			<Text>
 				You challenge {opponent} to a duel !
 			</Text>
 			{
-				state === status.PENDING &&
+				status === challengeStatus.PENDING &&
 				<ButtonsWrapper>
 					<Button color={colors.buttonRed}>
 						Cancel
@@ -28,7 +28,7 @@ function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
 				</ButtonsWrapper>
 			}
 			{
-				state === status.ACCEPTED &&
+				status === challengeStatus.ACCEPTED &&
 				<ButtonsWrapper>
 					<Button color={colors.buttonGreen}>
 						Accepted !
@@ -36,7 +36,7 @@ function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
 				</ButtonsWrapper>
 			}
 			{
-				state === status.CANCELLED &&
+				status === challengeStatus.CANCELLED &&
 				<ButtonsWrapper>
 					<Button color={colors.buttonGray}>
 						Cancelled
@@ -44,7 +44,7 @@ function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
 				</ButtonsWrapper>
 			}
 			{
-				state === status.IN_PROGRESS &&
+				status === challengeStatus.IN_PROGRESS &&
 				<ButtonsWrapper>
 					<Button color={colors.button}>
 						Spectate
@@ -52,7 +52,7 @@ function UserDuelInvitation({ opponent, state } : PropsUserDuelInvitation ) {
 				</ButtonsWrapper>
 			}
 			{
-				state === status.FINISHED &&
+				status === challengeStatus.FINISHED &&
 				<ButtonsWrapper>
 					<Button color={colors.button}>
 						Finished

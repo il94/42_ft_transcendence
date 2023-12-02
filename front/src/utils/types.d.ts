@@ -1,10 +1,10 @@
-import status from "./status"
+import { userStatus, challengeStatus } from "./status"
 
 export type User = {
 	id: number,
 	username: string,
 	avatar: string,
-	state: string,
+	status: string,
 	scoreResume: {
 		wins: number,
 		draws: number,
@@ -40,5 +40,5 @@ export type MessageText = Message & {
 
 export type MessageInvitation = Message & {
 	target: string // a remplacer par User
-	state: status
+	status: string
 }
