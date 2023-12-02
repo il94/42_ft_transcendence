@@ -53,8 +53,8 @@ function Game() {
 	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
 	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
-	const [zCardIndex, setZCardIndex] = useState<number>(10)
-	const [zChatIndex, setZChatIndex] = useState<number>(10)
+	const [zCardIndex, setZCardIndex] = useState<number>(0)
+	const [zChatIndex, setZChatIndex] = useState<number>(0)
 
 	const [settings, displayMenuSettings] = useState<boolean>(false)
 
@@ -65,7 +65,7 @@ function Game() {
 	}, [isSmallDesktop])
 
 	useEffect(() => {
-		if (zCardIndex > 1 && zChatIndex > 1) {
+		if (zCardIndex > 0 && zChatIndex > 0) {
 			setZCardIndex(zCardIndex - 1)
 			setZChatIndex(zChatIndex - 1)
 		}

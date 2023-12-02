@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useContext } from "react"
+import { Dispatch, SetStateAction, useContext, useEffect } from "react"
 
 import {
 	CloseButton,
@@ -31,6 +31,10 @@ type PropsCard = {
 function Card({ cardPosition, displayCard }: PropsCard) {
 
 	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(ZIndexContext)!
+
+	useEffect(() => {
+		setZCardIndex(zChatIndex + 1)
+	}, [])
 
 
 	/* ============ Temporaire ============== */

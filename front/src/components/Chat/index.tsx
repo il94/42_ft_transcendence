@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 
 import { Style, ChatButton } from "./style"
 
@@ -18,6 +18,11 @@ function Chat() {
 
 	const { chat, displayChat } = useContext(ChatContext)!
 	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(ZIndexContext)!
+
+	useEffect(() => {
+		setZChatIndex(zCardIndex + 1)
+	}, [])
+
 
 	function handleCickChatButton() {
 		displayChat(true)

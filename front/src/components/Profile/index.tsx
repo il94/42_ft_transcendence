@@ -1,7 +1,6 @@
 import {
 	SetStateAction,
-	Dispatch,
-	useContext
+	Dispatch
 } from "react"
 
 import {
@@ -12,7 +11,6 @@ import {
 	ProfilePicture,
 } from "./style"
 
-import ZIndexContext from "../../contexts/ZIndexContext"
 
 import Icon from "../../componentsLibrary/Icon"
 
@@ -45,15 +43,12 @@ type PropsProfile = {
 
 function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
 
-	const { zChatIndex, setZCardIndex } = useContext(ZIndexContext)!
-
 	function showCard() {
 		if (card && cardIdTarget === userData.id)
 			displayCard(false)
 		else
 		{				
 			setIdTargetCard(userData.id)
-			setZCardIndex(zChatIndex + 1)
 			setCardPosition({ right: 0, top: 0 })
 			displayCard(true)
 		}
