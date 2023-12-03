@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 
 import { Style, ChatButton } from "./style"
 
@@ -18,6 +18,8 @@ function Chat() {
 
 	const { chat, displayChat } = useContext(ChatContext)!
 	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(ZIndexContext)!
+
+	const [createChannelMenu, displayCreateChannelMenu] = useState<boolean>(false)
 
 	useEffect(() => {
 		setZChatIndex(zCardIndex + 1)
@@ -64,7 +66,9 @@ function Chat() {
 			onClick={() => {setZChatIndex(zCardIndex + 1)}}
 			$zIndex={zChatIndex}>
 			<ChannelList channels={channels} />
-			<ChatWindow toDisplay={channels[0]} />
+			<ChatWindow
+				channelToDisplay={channels[0]} 
+				createChannelMenu={createChannelMenu} />
 		</Style>
 		:
 		<ChatButton $zIndex={zChatIndex + 1}>

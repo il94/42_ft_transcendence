@@ -34,6 +34,7 @@ import breakpoints from '../../utils/breakpoints'
 
 import DefaultAvatar from "../../assets/default_blue.png"
 import ContextualMenu from '../../components/ContextualMenu'
+import axios from 'axios'
 
 function Game() {
 
@@ -42,7 +43,7 @@ function Game() {
 	const [social, displaySocial] = useState<boolean>(true)
 
 	const [chat, displayChat] = useState<boolean>(false)
-	const [contactListScrollValue, setChannelListScrollValue] = useState<number>(0)
+	const [channelListScrollValue, setChannelListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
 
@@ -148,7 +149,7 @@ function Game() {
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
-											<ChatContext.Provider value={{ chat, displayChat, contactListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+											<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 												<Chat />
 											</ChatContext.Provider>
 										</CardContext.Provider>

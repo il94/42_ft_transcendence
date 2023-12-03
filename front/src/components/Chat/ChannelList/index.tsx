@@ -6,6 +6,7 @@ import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
+import ChannelCreateButton from "./ChannelCreateButton"
 
 const Style = styled.div`
 
@@ -15,7 +16,7 @@ const Style = styled.div`
 	width: 128px;
 	height: 100%;
 
-	background-color: ${colors.contactList};
+	background-color: ${colors.channelList};
 
 `
 
@@ -27,6 +28,7 @@ function ChannelList({ channels } : PropsChannelList) {
 
 	return (
 		<Style>
+			<ChannelCreateButton />
 			<ScrollBar>
 			{
 				channels.map((channel, index) => (

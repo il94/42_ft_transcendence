@@ -17,6 +17,8 @@ const colors = {
 	text: "#FFFFFF",
 	textAlt: "#000000",
 	textTransparent: "#ffffff80",
+	textBlocked: "#705A56",
+	textSelection: "#83562cb3",
 
 	/* Buttons */
 	button: "#DB6045",
@@ -47,8 +49,8 @@ const colors = {
 	chatWindow: "#f3a76080",
 	chatBanner: "#54545480",
 	chatInput: "#b77a41b3",
-	chatInputSelection: "#83562cb3",
-	contactList: "#85522c80",
+	channelList: "#85522c80",
+	channelCreateButton: "#724321b3",
 	messageUser: "#FAD7A3",
 	messageBanner: "#FFCB9A",
 	messageFriend: "#FFD6B0",

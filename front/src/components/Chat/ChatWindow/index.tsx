@@ -1,6 +1,7 @@
 import styled from "styled-components"
 
 import TextInput from "./TextInput"
+import CreateChannelMenu from "./CreateChannelMenu"
 import DiscussionInterface from "./DiscussionInterface"
 import Banner from "./Banner"
 
@@ -21,15 +22,23 @@ const Style = styled.div`
 `
 
 type PropsChatWindow = {
-	toDisplay: Channel
+	channelToDisplay: Channel,
+	createChannelMenu: boolean
 }
 
-function ChatWindow({ toDisplay } : PropsChatWindow) {
+function ChatWindow({ channelToDisplay, createChannelMenu } : PropsChatWindow) {
 	return (
 		<Style>
-			<Banner name={toDisplay.name} />
-			<DiscussionInterface /* targetId={toDisplay.id} */ />
-			<TextInput />
+			<Banner name={channelToDisplay.name} />
+			{
+				!createChannelMenu ?
+					<CreateChannelMenu />
+				:
+					<>
+						<DiscussionInterface /* targetId={channelToDisplay.id} */ />
+						<TextInput />
+					</>
+			}
 		</Style>
 	)
 }
