@@ -35,7 +35,7 @@ function Social({ social, displaySocial, displayContextualMenu, setContextualMen
 	const [friends, setFriendSections] = useState<User[]>([])
 
 	useEffect(() => {
-		axios.get("http://localhost:3333/user")
+		axios.get("http://localhost:3333/user") // appeler la route qui retourne les amis uniquement
 			.then((response) => {
 				setFriendSections(response.data)
 			})

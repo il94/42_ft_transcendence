@@ -17,7 +17,7 @@ function Match({ username, opponent, result, scoreUser, scoreOpponent } : PropsM
 						: colors.historyLoose
 
 	return (
-		<Style backgroundColor={backgroundColor}>
+		<Style $backgroundColor={backgroundColor}>
 			<Username>
 				{username}
 			</Username>

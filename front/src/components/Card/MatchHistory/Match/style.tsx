@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
 
-export const Style = styled.div<{ backgroundColor: string }>`
+export const Style = styled.div<{ $backgroundColor: string }>`
 
 	display: flex;
 	justify-content: space-between;
@@ -12,7 +12,7 @@ export const Style = styled.div<{ backgroundColor: string }>`
 
 	font-size: 10px;
 
-	background-color: ${(props) => props.backgroundColor};
+	background-color: ${(props) => props.$backgroundColor};
 
 `
 export const Username = styled.p`
