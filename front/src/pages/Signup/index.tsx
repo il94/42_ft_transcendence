@@ -94,7 +94,7 @@ function Signup() {
 	return (
 		<SignupPage>
 			<MainTitle>
-				<StyledLink to="/" color={colors.text}>
+				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>

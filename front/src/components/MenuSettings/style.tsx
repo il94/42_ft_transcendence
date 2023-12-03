@@ -112,11 +112,7 @@ export const Button = styled.button`
 	margin-right: 15px;
 
 	background-color: ${colors.button};
-	color: ${colors.text};
 
-	cursor: pointer;
-
-	text-decoration: none;
 	${effects.shadowButton};
 
 	clip-path: ${effects.pixelateWindow};

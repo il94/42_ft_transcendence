@@ -16,7 +16,6 @@ const Style = styled.button`
 	background-color: ${colors.channelCreateButton};
 
 	&:hover {
-		cursor: pointer;
 		background-color: ${colors.sectionHover};
 	}
 

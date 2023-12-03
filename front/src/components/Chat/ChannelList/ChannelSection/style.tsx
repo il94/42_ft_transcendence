@@ -36,6 +36,4 @@ export const ChannelName = styled.p`
 
 	font-size: 12px;
 
-	color: ${colors.text};
-
 `

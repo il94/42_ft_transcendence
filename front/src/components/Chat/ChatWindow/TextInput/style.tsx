@@ -16,7 +16,6 @@ export const Style = styled.input`
 
 	word-wrap: break-word;
 
-	color: ${colors.text};
 	background-color: ${colors.chatInput};
 
 	&::placeholder {
@@ -29,7 +28,7 @@ export const Style = styled.input`
 	}
 
 	&::selection {
-		background-color: ${colors.chatInputSelection};
+		background-color: ${colors.textSelection};
 	}
 
 `

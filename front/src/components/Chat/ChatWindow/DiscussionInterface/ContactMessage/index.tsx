@@ -41,7 +41,7 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 					{userName}
 				</UserName>
 				<Text>
-					{(content)}
+					{content}
 				</Text>
 			</MessageContent>
 		</Style>

@@ -30,6 +30,7 @@ export const Text = styled.div`
 
 	text-align: center;
 	font-size: 10px;
+	user-select: text;
 
 	color: ${colors.textAlt};
 	background-color: ${colors.messageUser};
@@ -52,12 +53,8 @@ export const Button = styled.button`
 
 	border: 0;
 
-	cursor: pointer;
-
-	text-decoration: none;
 	font-size: 10px;
 	
-	color: ${colors.text};
 	background-color: ${(props) => props.color};
 
 `

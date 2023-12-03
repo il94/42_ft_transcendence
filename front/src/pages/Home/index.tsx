@@ -26,7 +26,7 @@ function Home() {
 	return (
 		<HomePage>
 			<MainTitle>
-				<StyledLink to="/" color={colors.text}>
+				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
@@ -52,7 +52,7 @@ function Home() {
 					</ButtonsWrapper>
 				}
 			</CentralWindow>
-			<button onClick={() => setIsAuth(!isAuth)}>
+			<button onClick={() => setIsAuth(!isAuth)} style={{ color: "black" }}>
 				Auth ?
 			</button>
 		</HomePage>

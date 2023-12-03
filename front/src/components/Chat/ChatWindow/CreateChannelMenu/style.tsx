@@ -59,7 +59,7 @@ export const ChannelName = styled.input<{ $disable?: boolean }>`
 	font-size: 16px;
 	text-align: center;
 
-	color: ${(props) => props.$disable ? colors.textBlocked : colors.text};
+	color: ${(props) => props.$disable && colors.textBlocked};
 	background-color: transparent;
 
 	&:focus {

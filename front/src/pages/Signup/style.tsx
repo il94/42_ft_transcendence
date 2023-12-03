@@ -13,7 +13,6 @@ export const SignupPage = styled.div`
 	width: 100%;
 	height: 100%;
 
-	color: ${colors.text}; 
 	background-color: ${colors.background}; 
 
 `
@@ -98,12 +97,11 @@ export const TextInput = styled.input`
 	width: 231px;
 
 	border: none;
-	border-bottom: 1px solid ${colors.text};
+	border-bottom: 1px solid;
 
 	font-size: 25px;
 	text-align: center;
 
-	color: ${colors.text};
 	background-color: ${colors.popup};
 
 	&::selection {
@@ -149,7 +147,7 @@ export const Line = styled.div`
 
 	width: 100%;
 
-	border-bottom: 0.5px solid ${colors.text};
+	border-bottom: 0.5px solid;
 
 `
 

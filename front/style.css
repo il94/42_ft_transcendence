@@ -11,18 +11,11 @@
 
 * {
 	margin: 0;
+
 	font-family: "Retro Gaming";
-}
-
-body {
-	width: 100%;
-	height: 100vh;
-
-	cursor: default;
-
-	overflow: hidden;
-
 	user-select: none;
+
+	color: white; /* colors.text */
 }
 
 #root {
@@ -30,12 +23,22 @@ body {
 	height: 100%;
 }
 
+body {
+	width: 100%;
+	height: 100vh;
+
+	overflow: hidden;
+}
+
 button {
-	
 	border: 0;
 
 	cursor: pointer;
 	
 	text-decoration: none;
-
 }
+
+::selection {
+	background-color: #83562cb3; /* colors.textSelection */
+}
+

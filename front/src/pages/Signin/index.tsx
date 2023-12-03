@@ -66,7 +66,7 @@ function Signin() {
 	return (
 		<SigninPage>
 			<MainTitle>
-				<StyledLink to="/" color={colors.text}>
+				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>

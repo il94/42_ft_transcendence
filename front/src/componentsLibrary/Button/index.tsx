@@ -2,7 +2,9 @@ import styled from 'styled-components'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const Button = styled.button<{ fontSize?: number}>`
+const Button = styled.button<{ width?: number, fontSize?: number}>`
+
+	width: ${(props) => props.width ? props.width + "px" : "auto"};
 
 	padding-top: 1px;
 	padding-left: 11px;

@@ -33,6 +33,7 @@ const Bout = styled.button`
 
 	margin-bottom: 20px;
 
+	color: black;
 `
 
 

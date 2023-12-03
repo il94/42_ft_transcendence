@@ -11,4 +11,6 @@ export const Style = styled.div`
 	width: 100%;
 	min-height: 188px;
 
+	user-select: text;
+
 `
