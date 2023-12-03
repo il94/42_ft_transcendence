@@ -7,7 +7,6 @@ import {
 } from './style'
 
 import LinkButton from '../../componentsLibrary/LinkButton'
-import LinkButtonFix from '../../componentsLibrary/LinkButtonFix'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
 import colors from '../../utils/colors'
@@ -38,18 +37,18 @@ function Home() {
 				{
 					isAuth ? 
 					<ButtonsWrapper>
-						<LinkButton to="/game">
+						<LinkButton to="/game" fontSize={35}>
 							Game !
 						</LinkButton>
 					</ButtonsWrapper>
 					:
 					<ButtonsWrapper>
-						<LinkButtonFix to="/signin" width="165px">
+						<LinkButton to="/signin" width={165} fontSize={35}>
 							Sign in
-						</LinkButtonFix>
-						<LinkButtonFix to="/signup" width="165px">
+						</LinkButton>
+						<LinkButton to="/signup" width={165} fontSize={35}>
 							Sign up
-						</LinkButtonFix>
+						</LinkButton>
 					</ButtonsWrapper>
 				}
 			</CentralWindow>

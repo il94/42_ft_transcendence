@@ -18,7 +18,7 @@ import {
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
-import LinkImage from '../../componentsLibrary/LinkImage'
+import LinkButtonImage from '../../componentsLibrary/LinkButtonImage'
 
 import colors from '../../utils/colors'
 
@@ -117,7 +117,7 @@ function Signup() {
 							{errorMessage}
 						</ErrorMessage>
 					<div style={{ marginTop: "10px" }} />
-					<Button>
+					<Button type="submit" fontSize={35}>
 						Continue
 					</Button>
 				</SignupForm>
@@ -135,10 +135,10 @@ function Signup() {
 					<Line />
 				</Separator>
 				<FTRedirectWrapper>
-					<LinkImage to="http://localhost:3333/auth/api42/login">
+					<LinkButtonImage to="http://localhost:3333/auth/api42/login">
 						<img src={FTButton} style={{ paddingRight: "7px"}} />
 						Continue with 42
-					</LinkImage>
+					</LinkButtonImage>
 				</FTRedirectWrapper>
 			</CentralWindow>
 		</SignupPage>
