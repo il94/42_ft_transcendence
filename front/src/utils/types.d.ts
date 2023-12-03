@@ -42,3 +42,10 @@ export type MessageInvitation = Message & {
 	target: string // a remplacer par User
 	status: string
 }
+
+export type SearchBarOption = {
+	id: number,
+	value: string,
+	label: string,
+	type: string
+}
