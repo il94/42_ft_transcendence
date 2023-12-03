@@ -1,4 +1,6 @@
-import styled from "styled-components"
+import { Dispatch, SetStateAction } from "react"
+
+import { Style, ChannelCreateButton } from "./style"
 
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
@@ -6,29 +8,17 @@ import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
-import ChannelCreateButton from "./ChannelCreateButton"
-
-const Style = styled.div`
-
-	display: flex;
-	flex-direction: column;
-
-	width: 128px;
-	height: 100%;
-
-	background-color: ${colors.channelList};
-
-`
 
 type PropsChannelList = {
-	channels: Channel[]
+	channels: Channel[],
+	displayCreateChannelMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function ChannelList({ channels } : PropsChannelList) {
+function ChannelList({ channels, displayCreateChannelMenu } : PropsChannelList) {
 
 	return (
 		<Style>
-			<ChannelCreateButton />
+			<ChannelCreateButton onClick={() => displayCreateChannelMenu(true)} />
 			<ScrollBar>
 			{
 				channels.map((channel, index) => (

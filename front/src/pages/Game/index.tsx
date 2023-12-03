@@ -34,7 +34,6 @@ import breakpoints from '../../utils/breakpoints'
 
 import DefaultAvatar from "../../assets/default_blue.png"
 import ContextualMenu from '../../components/ContextualMenu'
-import axios from 'axios'
 
 function Game() {
 

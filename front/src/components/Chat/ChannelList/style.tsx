@@ -1,7 +1,19 @@
 import styled from "styled-components"
-import colors from "../../../../utils/colors"
+import colors from "../../../utils/colors"
 
-const Style = styled.button`
+export const Style = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 128px;
+	height: 100%;
+
+	background-color: ${colors.channelList};
+
+`
+
+export const ChannelCreateButton = styled.button`
 	
 	display: flex;
 	justify-content: center;
@@ -20,14 +32,3 @@ const Style = styled.button`
 	}
 
 `
-
-
-function ChannelCreateButton() {
-	return (
-		<Style>
-			Create
-		</Style>
-	)
-}
-
-export default ChannelCreateButton

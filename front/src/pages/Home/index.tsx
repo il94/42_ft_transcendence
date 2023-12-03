@@ -9,7 +9,6 @@ import {
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
-import colors from '../../utils/colors'
 import { useState } from 'react'
 
 function Home() {

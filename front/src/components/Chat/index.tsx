@@ -65,7 +65,9 @@ function Chat() {
 			onContextMenu={(event) => event.preventDefault()}
 			onClick={() => {setZChatIndex(zCardIndex + 1)}}
 			$zIndex={zChatIndex}>
-			<ChannelList channels={channels} />
+			<ChannelList
+				channels={channels}
+				displayCreateChannelMenu={displayCreateChannelMenu} />
 			<ChatWindow
 				channelToDisplay={channels[0]} 
 				createChannelMenu={createChannelMenu} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Select, { SingleValue } from "react-select"
+import Select from "react-select"
 import axios from "axios"
 
 import { Style, StylesAttributes } from "./style"
@@ -49,7 +49,7 @@ function SearchBar() {
 
 	}, [])
 
-	function addFriendOrJoinChannel(option: SingleValue<SearchBarOption>) {
+	function addFriendOrJoinChannel(option: any) {
 
 		if (option?.type === "user")
 		{

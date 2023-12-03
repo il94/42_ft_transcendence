@@ -1,14 +1,21 @@
-import { useState } from "react";
-import { Avatar, Setting, SettingInfo, SettingTtile, Style, TwoFA, ChannelName, ButtonsWrapper, SettingsWrapper } from "./style";
+import { ChangeEvent, useState } from "react";
+
+import {
+	Avatar,
+	Setting,
+	SettingTtile,
+	Style,
+	ChannelName,
+	ButtonsWrapper,
+	SettingsWrapper
+} from "./style";
+
 import Button from "../../../../componentsLibrary/Button";
-import colors from "../../../../utils/colors";
-
-
 
 function CreateChannelMenu() {
 
 	const [inputName, setInputName] = useState<string>('')
-	function handleInputNameChange(event) {
+	function handleInputNameChange(event: ChangeEvent<HTMLInputElement>) {
 		setInputName(event.target.value)
 	}
 
@@ -23,7 +30,7 @@ function CreateChannelMenu() {
 	}
 
 	const [inputPassword, setInputPassword] = useState<string>('')
-	function handleInputPasswordChange(event) {
+	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		setInputPassword(event.target.value)
 	}
 
@@ -63,19 +70,18 @@ function CreateChannelMenu() {
 							value={inputPassword}
 							type="text" />
 					</Setting>
-
-				:
-				<Setting>
-					<SettingTtile $disable>
-						Password
-					</SettingTtile>
-					<ChannelName
-						onInput={handleInputPasswordChange}
-						value={inputPassword}
-						type="text"
-						$disable
-						readOnly />
-				</Setting>
+					:
+					<Setting>
+						<SettingTtile $disable>
+							Password
+						</SettingTtile>
+						<ChannelName
+							onInput={handleInputPasswordChange}
+							value={inputPassword}
+							type="text"
+							$disable
+							readOnly />
+					</Setting>
 			}
 			<Setting>
 				<SettingTtile>

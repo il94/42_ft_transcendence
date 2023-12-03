@@ -1,6 +1,5 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
-import effects from "../../../../utils/effects"
 
 export const Style = styled.div`
 
@@ -40,6 +39,7 @@ export const SettingTtile = styled.p<{ $disable?: boolean }>`
 	font-size: 15px;
 
 	color: ${(props) => props.$disable && colors.textBlocked};
+
 `
 
 export const ChannelName = styled.input<{ $disable?: boolean }>`
@@ -91,4 +91,5 @@ export const ButtonsWrapper = styled.div`
 
 	height: 32px;
 	margin-bottom: 12.2px;
+
 `
