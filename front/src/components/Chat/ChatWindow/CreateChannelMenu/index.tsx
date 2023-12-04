@@ -1,4 +1,10 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState } from "react";
+import {
+	ChangeEvent,
+	Dispatch, 
+	FormEvent, 
+	SetStateAction,
+	useState
+} from "react"
 
 import {
 	Avatar,
@@ -8,16 +14,17 @@ import {
 	ChannelName,
 	ButtonsWrapper,
 	CreateChannelForm,
-	AvatarWrapper
-} from "./style";
+	AvatarWrapper,
+	ChannelNameWrapper,
+	ErrorMessage
+} from "./style"
 
-import Button from "../../../../componentsLibrary/Button";
-import axios from "axios";
-import Icon from "../../../../componentsLibrary/Icon";
+import Button from "../../../../componentsLibrary/Button"
+import Icon from "../../../../componentsLibrary/Icon"
+import IconUploadFile, { HiddenInput } from "../../../../componentsLibrary/IconUploadFile"
 
 import RemoveIcon from "../../../../assets/close.png"
 import DefaultChannelIcon from "../../../../assets/default_channel.png"
-import IconUploadFile, { HiddenInput } from "../../../../componentsLibrary/IconUploadFile";
 
 type PropsCreateChannelMenu = {
 	displayCreateChannelMenu: Dispatch<SetStateAction<boolean>>
@@ -29,27 +36,51 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 
 		event.preventDefault()
 
-		console.log(inputName)
-		console.log(channelType)
-		console.log(inputPassword)
-		/* ============ Temporaire ============== */
-
-		// Creer un Channel avec un truc du style
-		// axios.post("http://localhost:3333/channels"), {
-		// 		name: inputName,
-		// 		avatar: avatarUploaded,
-		//		type: channelType,
-		// 		hash: inputPassword
-		// })
-		// .then((response) => console.log(response))
-		// .catch((error) => console.log(error))
-
+		if (inputName.length === 0)
+			setError({
+				message: "Insert name",
+				state: true
+			})
+		else
+		{
+			/* ============ Temporaire ============== */
+			
+			// Creer un Channel avec un truc du style
+			// axios.post("http://localhost:3333/channels"), {
+				// 		name: inputName,
+				// 		avatar: avatarUploaded,
+				//		type: channelType,
+				// 		hash: inputPassword
+				// })
+				// .then((response) => console.log(response))
+				// .catch((error) => console.log(error))
+		}
 	}
 
+	type PropsError = {
+		message: string,
+		state: boolean
+	}
 
 	const [inputName, setInputName] = useState<string>('')
+	const [error, setError] = useState<PropsError>({ message: '', state: false })
 	function handleInputNameChange(event: ChangeEvent<HTMLInputElement>) {
-		setInputName(event.target.value)
+
+		const value = event.target.value
+
+		if (value.length > 8 )
+			setError({
+				message: "8 characters max",
+				state: true
+			})
+		else
+		{
+			setInputName(value)
+			setError({
+				message: '',
+				state: false
+			})
+		}
 	}
 
 	const [channelType, setChannelType] = useState<string>('public')
@@ -90,7 +121,6 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 
 	}
 
-
 	return (
 		<Style>
 			<CreateChannelForm
@@ -101,11 +131,17 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 					<SettingTtile>
 						Name
 					</SettingTtile>
-					<ChannelName
-						onInput={handleInputNameChange}
-						type="text"
-						value={inputName}
-						maxLength={8} />
+					<ChannelNameWrapper>
+						<ChannelName
+							onInput={handleInputNameChange}
+							onBlur={() => setError({ message: '', state: false})}
+							type="text"
+							value={inputName}
+							$error={error.state} />
+						<ErrorMessage>
+							{error.message}
+						</ErrorMessage>
+					</ChannelNameWrapper>
 				</Setting>
 				<Setting>
 					<SettingTtile>

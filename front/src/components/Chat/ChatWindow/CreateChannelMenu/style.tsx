@@ -1,6 +1,5 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
-import effects from "../../../../utils/effects"
 
 export const Style = styled.div`
 
@@ -24,7 +23,7 @@ export const Setting = styled.div`
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
-	
+
 	height: 30px;
 
 	margin-bottom: 12.2px;
@@ -44,7 +43,32 @@ export const SettingTtile = styled.p<{ $disable?: boolean }>`
 
 `
 
-export const ChannelName = styled.input<{ $disable?: boolean }>`
+export const ChannelNameWrapper = styled.div`
+
+	position: relative;
+
+	height: 100%;
+
+`
+
+export const ErrorMessage = styled.p`
+	
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	transform: translate(-50%, -50%);
+
+	width: 100%;
+	height: 10px;
+
+	text-align: center;
+	font-size: 8.5px;
+
+	color: red;
+
+`
+
+export const ChannelName = styled.input<{ $error?: boolean, $disable?: boolean }>`
 
 	align-self: center;
 
@@ -54,7 +78,7 @@ export const ChannelName = styled.input<{ $disable?: boolean }>`
 	margin-right: 10px;
 
 	border: none;
-	border-bottom: 1px solid ${(props) => props.$disable && colors.textBlocked};
+	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && "red" };
 
 	cursor: ${(props) => props.$disable && "default"};
 
@@ -66,7 +90,7 @@ export const ChannelName = styled.input<{ $disable?: boolean }>`
 
 	&:focus {
 		outline: none;
-		border-color: ${(props) => props.$disable ? colors.textBlocked : colors.focusBorderText};
+		border-color: ${(props) => props.$disable ? colors.textBlocked : props.$error ? "red" : colors.focusBorderText};
 	}
 
 `
@@ -126,6 +150,5 @@ export const ButtonsWrapper = styled.div`
 	justify-content: space-evenly;
 
 	height: 32px;
-	margin-bottom: 12.2px;
 
 `
