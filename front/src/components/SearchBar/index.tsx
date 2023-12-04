@@ -19,7 +19,6 @@ function SearchBar() {
 	useEffect(() => {
 		axios.get("http://localhost:3333/user")
 			.then((response) => {
-
 				setUserOptions(response.data.map((user: User) => ({
 					id: user.id,
 					value: user.username,

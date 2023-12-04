@@ -74,7 +74,7 @@ function Signin() {
 				<StyledTitle>
 					Sign in
 				</StyledTitle>
-				<SigninForm onSubmit={handleSubmit} autoComplete="off" spellCheck="false" >
+				<SigninForm onSubmit={handleSubmit} autoComplete="off" spellCheck="false">
 					<Label>
 						Username
 						<TextInput type="text" onChange={handleInputChange}
