@@ -159,6 +159,9 @@ function Game() {
 									<SettingsMenu
 										userData={{
 											username: userAuthenticate.username,
+											password: userAuthenticate.hash,
+											email: userAuthenticate.email,
+											tel: userAuthenticate.tel,
 											avatar: userAuthenticate.avatar
 										}}
 										displaySettingsMenu={displaySettingsMenu}

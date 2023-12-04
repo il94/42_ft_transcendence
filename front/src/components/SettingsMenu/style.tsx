@@ -15,10 +15,7 @@ export const PseudoStyle = styled.div`
 
 export const Style = styled.div`
 
-	display: flex;
-	flex-direction: column;
-
-	position: absolute;
+	position: relative;
 	top: 50%;
 	left: 50%;
 	z-index: 998;
@@ -32,42 +29,52 @@ export const Style = styled.div`
 
 `
 
-export const ButtonWrapper = styled.div`
+export const CloseButtonWrapper = styled.div`
 
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
 
-	width: 100%;
-	height: 15px;
+	height: 30.5px;
+
+	padding-right: 6.5px;
 
 `
 
 export const CloseButton = styled.div`
 
-	margin-top: 18px;
-	margin-right: 6.5px;
+	position: absolute;
+	top: 6.5px;
+	right: 6.5px;
+
+`
+
+export const SettingsForm = styled.form`
+
+	display: flex;
+	flex-direction: column;
+
+`
+
+export const SettingsRow = styled.div`
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 100%;
+	min-height: 70px;
 
 `
 
 export const Setting = styled.div`
 
 	display: flex;
-	justify-content: space-between;
+	flex-direction: column;
+	justify-content: center;
 	align-items: center;
 
 	width: 100%;
-
-	margin-bottom: 15px;
-
-`
-
-export const SettingInfo = styled.div`
-
-	display: flex;
-	flex-direction: column;
-
-	margin-left: 15px;
 
 `
 
@@ -78,6 +85,12 @@ export const SettingTtile = styled.div`
 
 `
 
+export const SettingValue = styled.p`
+
+	font-size: 16px;
+
+`
+
 export const Avatar = styled.img`
 
 	width: 92px;
@@ -85,44 +98,9 @@ export const Avatar = styled.img`
 	min-width: 92px;
 	min-height: 92px;
 
-	margin-left: 15px;
+	/* margin-left: 15px; */
 	border: 10px solid ${colors.rankNull};
 
 	border-radius: 50%;
-
-`
-
-export const UserName = styled.p`
-
-	font-size: 16px;
-
-`
-
-export const TwoFA = styled.p`
-
-	font-size: 16px;
-
-`
-
-export const Button = styled.button`
-
-	/* min-width: 62px; */
-	height: 50px;
-
-	margin-right: 15px;
-
-	background-color: ${colors.button};
-
-	${effects.shadowButton};
-
-	clip-path: ${effects.pixelateWindow};
-
-	&:active {
-		transform: scale(0.95);
-		transform: translate(2px, 2px);
-		background-color: ${colors.shadowButton};
-		border-color: ${colors.shadowButton};
-	}
-
 
 `
