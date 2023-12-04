@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 import { Style, ChannelCreateButton } from "./style"
 
@@ -11,14 +11,26 @@ import colors from "../../../utils/colors"
 
 type PropsChannelList = {
 	channels: Channel[],
+	createChannelMenu: boolean,
 	displayCreateChannelMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function ChannelList({ channels, displayCreateChannelMenu } : PropsChannelList) {
+function ChannelList({ channels, createChannelMenu, displayCreateChannelMenu } : PropsChannelList) {
+
+	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
+
+	useEffect(() => {
+		if (createChannelMenu)
+			setValueChannelCreateButton("<<")
+		else
+			setValueChannelCreateButton("Create")
+	}, [createChannelMenu])
 
 	return (
 		<Style>
-			<ChannelCreateButton onClick={() => displayCreateChannelMenu(true)} />
+			<ChannelCreateButton onClick={() => displayCreateChannelMenu(!createChannelMenu)}>
+				{valueChannelCreateButton}
+			</ChannelCreateButton>
 			<ScrollBar>
 			{
 				channels.map((channel, index) => (

@@ -8,6 +8,7 @@ import Banner from "./Banner"
 import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
+import { Dispatch, SetStateAction } from "react"
 
 const Style = styled.div`
 
@@ -23,16 +24,17 @@ const Style = styled.div`
 
 type PropsChatWindow = {
 	channelToDisplay: Channel,
-	createChannelMenu: boolean
+	createChannelMenu: boolean,
+	displayCreateChannelMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function ChatWindow({ channelToDisplay, createChannelMenu } : PropsChatWindow) {
+function ChatWindow({ channelToDisplay, createChannelMenu, displayCreateChannelMenu } : PropsChatWindow) {
 	return (
 		<Style>
 			<Banner name={channelToDisplay.name} />
 			{
-				!createChannelMenu ?
-					<CreateChannelMenu />
+				createChannelMenu ?
+					<CreateChannelMenu displayCreateChannelMenu={displayCreateChannelMenu} />
 				:
 					<>
 						<DiscussionInterface /* targetId={channelToDisplay.id} */ />

@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
+import effects from "../../../../utils/effects"
 
 export const Style = styled.div`
 
@@ -11,7 +12,7 @@ export const Style = styled.div`
 
 `
 
-export const SettingsWrapper = styled.div`
+export const CreateChannelForm = styled.form`
 
 	display: flex;
 	flex-direction: column;
@@ -25,6 +26,7 @@ export const Setting = styled.div`
 	align-items: center;
 	
 	height: 30px;
+
 	margin-bottom: 12.2px;
 
 `
@@ -69,18 +71,52 @@ export const ChannelName = styled.input<{ $disable?: boolean }>`
 
 `
 
-export const Avatar = styled.img`
+export const AvatarWrapper = styled.div`
+	
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 
-	width: 30px;
-	height: 30px;
-	min-width: 30px;
-	min-height: 30px;
+	width: 155px;
+	/* height: 30px; */
 
 	margin-left: auto;
 	margin-right: auto;
 
+`
+
+export const Avatar = styled.label<{src: string}>`
+
+	position: relative;
+
+	width: 40px;
+	height: 40px;
+	min-width: 40px;
+	min-height: 40px;
+
+	border: none;
 	border-radius: 50%;
-	background-color: blue;
+
+	background-image: url(${(props) => props.src});
+	background-size: cover;
+
+	&:hover {
+		cursor: pointer;
+		filter: brightness(70%);
+		background-color: rgba(0, 0, 0, 0.5);
+
+		&::after {
+			content: 'Upload';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+
+			font-size: 9px;
+      		font-weight: bold;
+
+		}
+	}
 
 `
 
