@@ -1,7 +1,6 @@
 import { Dispatch, MouseEvent, SetStateAction } from "react"
 import { Style } from "./style"
-import SectionName from "../../../componentsLibrary/SectionName/SectionName"
-import Section from "../../../componentsLibrary/Section"
+import Section, { SectionName } from "../../../componentsLibrary/Section"
 
 type PropsPrimaryMenuContextual = {
 	contextualMenuPosition: {

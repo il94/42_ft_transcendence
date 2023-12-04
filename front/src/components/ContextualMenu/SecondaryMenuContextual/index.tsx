@@ -2,8 +2,7 @@ import { Dispatch, SetStateAction, useEffect } from "react"
 
 import { Style } from "./style"
 
-import Section from "../../../componentsLibrary/Section"
-import SectionName from "../../../componentsLibrary/SectionName/SectionName"
+import Section, { SectionName } from "../../../componentsLibrary/Section"
 
 import { Channel } from "../../../utils/types"
 

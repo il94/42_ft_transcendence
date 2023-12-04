@@ -67,16 +67,18 @@ function Chat() {
 			$zIndex={zChatIndex}>
 			<ChannelList
 				channels={channels}
+				createChannelMenu={createChannelMenu}
 				displayCreateChannelMenu={displayCreateChannelMenu} />
 			<ChatWindow
 				channelToDisplay={channels[0]} 
-				createChannelMenu={createChannelMenu} />
+				createChannelMenu={createChannelMenu}
+				displayCreateChannelMenu={displayCreateChannelMenu} />
 		</Style>
 		:
 		<ChatButton $zIndex={zChatIndex + 1}>
 			<Icon
 				onClick={handleCickChatButton}
-				src={ChatIcon} size="38px" 
+				src={ChatIcon} size={38}
 				alt="Chat button" title="Chat" />
 		</ChatButton>
 	)

@@ -89,7 +89,7 @@ function Card({ cardPosition, displayCard, cardIdTarget }: PropsCard) {
 				<Avatar src={userTarget.avatar}/>
 				<CloseButton>
 					<Icon onClick={() => displayCard(false)}
-						src={CloseIcon} size="24px" 
+						src={CloseIcon} size={24}
 						alt="Close button" title="Close" />
 				</CloseButton>
 			</TopWrapper>

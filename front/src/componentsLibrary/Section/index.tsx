@@ -21,3 +21,11 @@ const Section = styled.button`
 `
 
 export default Section
+
+export const SectionName = styled.p`
+
+	margin-left: 15px;
+
+	font-size: 15px;
+
+`

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const LinkButtonImage = styled(Link)<{ fontSize?: number }>`
+const LinkButtonImage = styled(Link)<{ fontSize?: number, alt: string, title: string }>`
 
 	display: flex;
 	align-items: center;

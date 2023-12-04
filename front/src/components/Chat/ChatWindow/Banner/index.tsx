@@ -20,7 +20,7 @@ function Banner({ name } : PropsBanner) {
 			<ReduceButton>
 				<Icon
 					onClick={() => displayChat(false)}
-					src={ReduceIcon} size="24px"
+					src={ReduceIcon} size={24}
 					alt="Reduce button" title="Reduce"
 				/>
 			</ReduceButton>

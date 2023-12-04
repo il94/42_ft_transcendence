@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const ButtonImage = styled.button<{ fontSize?: number}>`
+const ButtonImage = styled.button<{ fontSize?: number, alt: string, title: string }>`
 
 	display: flex;
 	align-items: center;
@@ -14,7 +14,7 @@ const ButtonImage = styled.button<{ fontSize?: number}>`
 
 	cursor: pointer;
 
-	font-size: ${(props) => props.fontSize}px;
+	font-size: ${(props) => props.fontSize && props.fontSize}px;
 	text-decoration: none;
 	text-align: center;
 
