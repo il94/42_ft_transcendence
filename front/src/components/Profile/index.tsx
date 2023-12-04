@@ -38,10 +38,10 @@ type PropsProfile = {
 		top?: number
 	}>>,
 	settings: boolean,
-	displayMenuSettings: Dispatch<SetStateAction<boolean>>
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
+function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
 	function showCard() {
 		if (card && cardIdTarget === userData.id)
@@ -63,9 +63,9 @@ function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, s
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>
-				<Icon src={settingsIcon} size="38px" onClick={() => displayMenuSettings(!settings)}
+				<Icon src={settingsIcon} size={38} onClick={() => displaySettingsMenu(!settings)}
 					alt="Settings button" title="Settings" />
-				<Icon src={deconnexionIcon} size="38px"
+				<Icon src={deconnexionIcon} size={38}
 					alt="Deconnexion button" title="Deconnexion" />
 			</ButtonsWrapper>
 		</Style>

@@ -21,7 +21,7 @@ import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 import TestsBack from '../../components/TestsBack'
-import MenuSettings from '../../components/MenuSettings'
+import SettingsMenu from '../../components/SettingsMenu'
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
@@ -56,7 +56,7 @@ function Game() {
 	const [zCardIndex, setZCardIndex] = useState<number>(0)
 	const [zChatIndex, setZChatIndex] = useState<number>(0)
 
-	const [settings, displayMenuSettings] = useState<boolean>(false)
+	const [settings, displaySettingsMenu] = useState<boolean>(false)
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
@@ -132,7 +132,7 @@ function Game() {
 									displayCard={displayCard}
 									setCardPosition={setCardPosition}
 									settings={settings}
-									displayMenuSettings={displayMenuSettings}
+									displaySettingsMenu={displaySettingsMenu}
 								/>
 							</TopGameWrapper>
 							<BottomGameWrapper>
@@ -156,12 +156,12 @@ function Game() {
 								}
 								{
 									settings &&
-									<MenuSettings
+									<SettingsMenu
 										userData={{
 											username: userAuthenticate.username,
 											avatar: userAuthenticate.avatar
 										}}
-										displayMenuSettings={displayMenuSettings}
+										displaySettingsMenu={displaySettingsMenu}
 									/>
 								}
 							</BottomGameWrapper>

@@ -18,23 +18,23 @@ import Icon from "../../componentsLibrary/Icon"
 
 import CloseIcon from "../../assets/close.png"
 
-type PropsMenuSettings = {
+type PropsSettingsMenu = {
 	userData: {
 		username: string,
 		avatar: string
 	}
-	displayMenuSettings: Dispatch<SetStateAction<boolean>>,
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
 }
 
-function MenuSettings({ displayMenuSettings, userData }: PropsMenuSettings) {
+function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 
 	return (
 		<PseudoStyle>
 			<Style>
 				<ButtonWrapper>
 					<CloseButton>
-						<Icon src={CloseIcon} size="24px"
-							onClick={() => displayMenuSettings(false)}
+						<Icon src={CloseIcon} size={24}
+							onClick={() => displaySettingsMenu(false)}
 							alt="Close button" title="Close" />
 					</CloseButton>
 				</ButtonWrapper>
@@ -75,4 +75,4 @@ function MenuSettings({ displayMenuSettings, userData }: PropsMenuSettings) {
 	)
 }
 
-export default MenuSettings
+export default SettingsMenu
