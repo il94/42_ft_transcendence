@@ -27,6 +27,10 @@ export type Channel = {
 	type: string
 }
 
+export type PrivateChannel = Channel & {
+	hash: string
+}
+
 export type Message = {
 	id: number,
 	createdAt?: string,
