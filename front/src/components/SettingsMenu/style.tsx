@@ -54,27 +54,30 @@ export const SettingsForm = styled.form`
 	display: flex;
 	flex-direction: column;
 
-`
-
-export const SettingsRow = styled.div`
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	width: 100%;
-	min-height: 70px;
+	margin-left: 15px;
+	margin-right: 15px;
 
 `
+
+// export const SettingsRow = styled.div`
+
+// 	display: flex;
+// 	justify-content: center;
+// 	align-items: center;
+
+// 	width: 100%;
+// 	min-height: 70px;
+
+// `
 
 export const Setting = styled.div`
 
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	/* justify-content: center; */
 
 	width: 100%;
+	/* min-height: 70px; */
 
 `
 
@@ -85,9 +88,30 @@ export const SettingTtile = styled.div`
 
 `
 
-export const SettingValue = styled.p`
+export const ErrorMessage = styled.p`
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
-	font-size: 16px;
+	width: 100%;
+	height: 20px;
+
+	/* margin-top: 5px; */
+
+	text-align: center;
+	font-size: 10px;
+
+	color: red;
+
+`
+
+export const TwoFAValue = styled.p`
+
+	border-bottom: 1px solid;
+	text-align: center;
+
+	background-color: inherit;
 
 `
 
