@@ -11,6 +11,7 @@ COPY . .
 
 RUN npm run build
 
-#RUN npx prisma migrate dev
+COPY ./start.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/start.sh
 
-CMD [ "npm", "run", "start:migrate:dev" ]
+ENTRYPOINT ["bash", "start.sh"]
