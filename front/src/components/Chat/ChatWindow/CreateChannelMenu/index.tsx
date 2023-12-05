@@ -65,9 +65,7 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 	const [inputName, setInputName] = useState<string>('')
 	const [error, setError] = useState<PropsError>({ message: '', state: false })
 	function handleInputNameChange(event: ChangeEvent<HTMLInputElement>) {
-
 		const value = event.target.value
-
 		if (value.length > 8 )
 			setError({
 				message: "8 characters max",
