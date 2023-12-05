@@ -36,16 +36,22 @@ function Home() {
 				{
 					isAuth ? 
 					<ButtonsWrapper>
-						<LinkButton to="/game" fontSize={35}>
+						<LinkButton
+							to="/game" fontSize={35}
+							alt="Game button" title="Game">
 							Game !
 						</LinkButton>
 					</ButtonsWrapper>
 					:
 					<ButtonsWrapper>
-						<LinkButton to="/signin" width={165} fontSize={35}>
+						<LinkButton
+							to="/signin" width={165} fontSize={35}
+							alt="Sign in button" title="Sign in">
 							Sign in
 						</LinkButton>
-						<LinkButton to="/signup" width={165} fontSize={35}>
+						<LinkButton
+							to="/signup" width={165} fontSize={35}
+							alt="Sign up button" title="Sign up">
 							Sign up
 						</LinkButton>
 					</ButtonsWrapper>

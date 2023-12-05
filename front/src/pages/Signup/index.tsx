@@ -117,7 +117,9 @@ function Signup() {
 							{errorMessage}
 						</ErrorMessage>
 					<div style={{ marginTop: "10px" }} />
-					<Button type="submit" fontSize={35}>
+					<Button
+						type="submit" fontSize={35}
+						alt="Continue button" title="Continue">
 						Continue
 					</Button>
 				</SignupForm>

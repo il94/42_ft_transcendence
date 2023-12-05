@@ -102,11 +102,7 @@ export const TextInput = styled.input`
 	font-size: 25px;
 	text-align: center;
 
-	background-color: ${colors.popup};
-
-	&::selection {
-		background-color: ${colors.menuTextSelection};
-	}
+	background-color: inherit;
 
 	&:focus {
 		outline: none;
