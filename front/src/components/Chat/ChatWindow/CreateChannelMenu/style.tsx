@@ -64,7 +64,7 @@ export const ErrorMessage = styled.p`
 	text-align: center;
 	font-size: 8.5px;
 
-	color: red;
+	color: ${colors.textError};
 
 `
 
@@ -78,7 +78,7 @@ export const ChannelName = styled.input<{ $error?: boolean, $disable?: boolean }
 	margin-right: 10px;
 
 	border: none;
-	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && "red" };
+	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && colors.textError};
 
 	cursor: ${(props) => props.$disable && "default"};
 
@@ -90,7 +90,7 @@ export const ChannelName = styled.input<{ $error?: boolean, $disable?: boolean }
 
 	&:focus {
 		outline: none;
-		border-color: ${(props) => props.$disable ? colors.textBlocked : props.$error ? "red" : colors.focusBorderText};
+		border-color: ${(props) => props.$disable ? colors.textBlocked : props.$error ? colors.textError : colors.focusBorderText};
 	}
 
 `

@@ -6,7 +6,7 @@ const InputText = styled.input<{ $width?: number, $fontSize?: number, $error?: b
 	width: ${(props) => props.$width && props.$width}px;
 
 	border: none;
-	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && "red" };
+	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && colors.textError };
 
 	font-size: ${(props) => props.$fontSize && props.$fontSize}px;
 	text-align: center;
@@ -15,7 +15,7 @@ const InputText = styled.input<{ $width?: number, $fontSize?: number, $error?: b
 
 	&:focus {
 		outline: none;
-		border-color: ${(props) => props.$disable ? colors.textBlocked : props.$error ? "red" : colors.focusBorderText};
+		border-color: ${(props) => props.$disable ? colors.textBlocked : props.$error ? colors.textError : colors.focusBorderText};
 	}
 
 `

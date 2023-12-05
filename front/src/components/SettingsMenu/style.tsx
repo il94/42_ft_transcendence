@@ -59,25 +59,12 @@ export const SettingsForm = styled.form`
 
 `
 
-// export const SettingsRow = styled.div`
-
-// 	display: flex;
-// 	justify-content: center;
-// 	align-items: center;
-
-// 	width: 100%;
-// 	min-height: 70px;
-
-// `
-
 export const Setting = styled.div`
 
 	display: flex;
 	flex-direction: column;
-	/* justify-content: center; */
 
 	width: 100%;
-	/* min-height: 70px; */
 
 `
 
@@ -97,12 +84,10 @@ export const ErrorMessage = styled.p`
 	width: 100%;
 	height: 20px;
 
-	/* margin-top: 5px; */
-
 	text-align: center;
 	font-size: 10px;
 
-	color: red;
+	color: ${colors.textError};
 
 `
 
