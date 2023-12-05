@@ -16,6 +16,7 @@ const colors = {
 	/* Texts */
 	text: "#FFFFFF",
 	textAlt: "#000000",
+	textError: "#c70505",
 	textTransparent: "#ffffff80",
 	textBlocked: "#705A56",
 	textSelection: "#83562cb3",

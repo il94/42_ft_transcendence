@@ -183,7 +183,7 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 					</SettingTtile>
 					<AvatarWrapper>
 						<IconUploadFile
-							htmlFor="upload" fontSize={13}
+							htmlFor="uploadAvatarChannel" fontSize={13}
 							alt="Upload icon" title="Upload image">
 								&nbsp;Upload&nbsp;
 						</IconUploadFile>
@@ -192,10 +192,10 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 							type="button" src={RemoveIcon} size={23}
 							alt="Remove icon" title="Remove image" />
 						<Avatar
-							src={avatarUploaded} htmlFor="upload"
+							src={avatarUploaded} htmlFor="uploadAvatarChannel"
 							title="Upload image" />
 						<HiddenInput onChange={handleAvatarUpload}
-							id="upload" type="file" accept="image/*" />
+							id="uploadAvatarChannel" type="file" accept="image/*" />
 					</AvatarWrapper>
 				</Setting>
 				<ButtonsWrapper>

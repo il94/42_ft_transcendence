@@ -23,6 +23,8 @@ export const Style = styled.div`
 
 	width: 350px;
 
+	padding-bottom: 15px;
+
 	clip-path: ${effects.pixelateWindow};
 
 	background-color: ${colors.module};
@@ -59,25 +61,12 @@ export const SettingsForm = styled.form`
 
 `
 
-// export const SettingsRow = styled.div`
-
-// 	display: flex;
-// 	justify-content: center;
-// 	align-items: center;
-
-// 	width: 100%;
-// 	min-height: 70px;
-
-// `
-
 export const Setting = styled.div`
 
 	display: flex;
 	flex-direction: column;
-	/* justify-content: center; */
 
 	width: 100%;
-	/* min-height: 70px; */
 
 `
 
@@ -97,12 +86,10 @@ export const ErrorMessage = styled.p`
 	width: 100%;
 	height: 20px;
 
-	/* margin-top: 5px; */
-
 	text-align: center;
 	font-size: 10px;
 
-	color: red;
+	color: ${colors.textError};
 
 `
 
@@ -112,19 +99,5 @@ export const TwoFAValue = styled.p`
 	text-align: center;
 
 	background-color: inherit;
-
-`
-
-export const Avatar = styled.img`
-
-	width: 92px;
-	height: 92px;
-	min-width: 92px;
-	min-height: 92px;
-
-	/* margin-left: 15px; */
-	border: 10px solid ${colors.rankNull};
-
-	border-radius: 50%;
 
 `

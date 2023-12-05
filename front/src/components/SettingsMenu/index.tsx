@@ -1,7 +1,6 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react"
+import { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useState } from "react"
 
 import {
-	Avatar,
 	PseudoStyle,
 	Setting,
 	SettingTtile,
@@ -17,15 +16,7 @@ import Icon from "../../componentsLibrary/Icon"
 import CloseIcon from "../../assets/close.png"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
-
-// import DefaultBlackAvatar from "../assets/default_black.png"
-// import DefaultBlueAvatar from "../assets/default_blue.png"
-// import DefaultGreenAvatar from "../assets/default_green.png"
-// import DefaultPinkAvatar from "../assets/default_pink.png"
-// import DefaultPurpleAvatar from "../assets/default_purple.png"
-// import DefaultRedAvatar from "../assets/default_red.png"
-// import DefaultYellowAvatar from "../assets/default_yellow.png"
-
+import SelectAvatar from "./SelectAvatar"
 
 type PropsSettingsMenu = {
 	userData: {
@@ -128,28 +119,21 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 	}
 
 	const [twoFA, setTwoFA] = useState<boolean>(userData.twoFA)
-	const [avatar, setAvatar] = useState<string>(userData.avatar)
-	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
+	function handleClickTwoFAChange(event: MouseEvent) {
 
-		const avatar = event.target.files?.[0]
-		if (avatar)
+		if (userData.email === '' && userData.tel === '')
 		{
-			const reader = new FileReader()
-
-			reader.onloadend = () => {
-				const imageDataUrl = reader.result
-				if (typeof imageDataUrl === 'string')
-				setAvatar(imageDataUrl);
-			}
-
-			reader.onerror = () => {
-				console.error("error")
-				setAvatar('');
-			}
-			reader.readAsDataURL(avatar)
+			setError({
+				message: "No valid email or phone number",
+				state: true,
+				category: "twoFA"
+			})
 		}
-
+		else
+			setTwoFA(!twoFA)
 	}
+
+	const [avatar, setAvatar] = useState<string>(userData.avatar)
 
 	return (
 		<PseudoStyle>
@@ -238,11 +222,11 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 						}
 						</TwoFAValue>
 						<Button
-							onClick={() => setTwoFA(!twoFA)}
+							onClick={handleClickTwoFAChange}
 							type="button" width={200}
 							alt="Set 2FA button"
 							title={showPassword ? "Disable" : "Able"}
-							style={{ alignSelf: "center", marginTop: "12.5px", marginBottom: "7.5px" }}>
+							style={{ alignSelf: "center", marginTop: "12.5px" }}>
 						{
 							twoFA ?
 								"Disable"
@@ -250,13 +234,13 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 								"Able"
 						}
 						</Button>
+						<ErrorMessage>
+							{error.category === "twoFA" && error.message}
+						</ErrorMessage>
 					</Setting>
-					<Setting>
-						<SettingTtile>
-							Avatar
-						</SettingTtile>
-						<Avatar src={avatar}/>
-					</Setting>
+					<SelectAvatar
+						avatar={avatar}
+						setAvatar={setAvatar}/>
 					<Button
 						type="submit"
 						fontSize={19}
