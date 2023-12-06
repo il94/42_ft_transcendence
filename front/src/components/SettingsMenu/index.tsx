@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react"
 
 import {
 	PseudoStyle,
@@ -119,7 +119,7 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 	}
 
 	const [twoFA, setTwoFA] = useState<boolean>(userData.twoFA)
-	function handleClickTwoFAChange(event: MouseEvent) {
+	function handleClickTwoFAChange() {
 
 		if (userData.email === '' && userData.tel === '')
 		{
