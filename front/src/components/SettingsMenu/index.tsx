@@ -1,4 +1,10 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react"
+import {
+	ChangeEvent,
+	Dispatch,
+	FormEvent,
+	SetStateAction,
+	useState
+} from "react"
 
 import {
 	PseudoStyle,
@@ -17,6 +23,7 @@ import CloseIcon from "../../assets/close.png"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
 import SelectAvatar from "./SelectAvatar"
+// import axios from "axios"
 
 type PropsSettingsMenu = {
 	userData: {
@@ -31,6 +38,36 @@ type PropsSettingsMenu = {
 }
 
 function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
+
+	function handleSubmit(event: FormEvent<HTMLFormElement>) {
+
+		event.preventDefault()
+
+		if (username.length === 0)
+		{
+			setError({
+				message: "Insert name",
+				state: true,
+				category: "username"
+			})
+		}
+		else
+		{
+		// 	/* ============ Temporaire ============== */
+			
+			// Modifier le User avec un truc du style
+			// axios.patch("http://localhost:3333/user/me", {
+			// 	username: username,
+			// 	hash: hash,
+			// 	email: email,
+			// 	tel: tel,
+			// 	twoFA: twoFA,
+			// 	avatar: avatar
+			// })
+			// .then((response) => console.log(response))
+			// .catch((error) => console.log(error))
+		}	
+	}
 
 	type PropsError = {
 		message: string,
@@ -144,6 +181,7 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 						alt="Close button" title="Close" />
 				</CloseButtonWrapper>
 				<SettingsForm
+					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
 					<Setting>
