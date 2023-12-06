@@ -2,7 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException, BadRequestException 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, Status, Friends, Invitation } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus, Friends, RequestStatus, Invitation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 import { from, Observable, of, throwError } from 'rxjs';
@@ -28,7 +28,7 @@ export class UsersService {
 					hash,
 					avatar,
 					username: createUserDto.username,
-					status: Status.ONLINE,
+					status: UserStatus.ONLINE,
 				},
 			});
             console.log(`User ${user.username} with id ${user.id} created successfully`);
@@ -157,7 +157,7 @@ export class UsersService {
 		}
 	}
 
-	async getFriendRequestStatus(isFriendId: number, currentUser: User): Promise<Invitation | { error: string }> {
+	async getFriendRequestStatus(isFriendId: number, currentUser: User): Promise<RequestStatus | { error: string }> {
 		const receiver = await this.prisma.user.findUnique({
 			where: { id: isFriendId },
 		})

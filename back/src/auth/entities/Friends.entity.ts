@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Friends, Invitation } from '@prisma/client';
+import { Friends, RequestStatus } from '@prisma/client';
 
 export class FriendsEntity implements Friends {
 	constructor(partial: Partial<FriendsEntity>) {
@@ -16,5 +16,5 @@ export class FriendsEntity implements Friends {
 	isFriendId: number;
 
 	@ApiProperty()
-	request: Invitation;
+	request: RequestStatus;
 }
