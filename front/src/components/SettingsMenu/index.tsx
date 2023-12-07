@@ -3,6 +3,7 @@ import {
 	Dispatch,
 	FormEvent,
 	SetStateAction,
+	useEffect,
 	useState
 } from "react"
 
@@ -43,134 +44,216 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 
 		event.preventDefault()
 
-		if (username.length === 0)
-		{
-			setError({
-				message: "Insert name",
-				state: true,
-				category: "username"
-			})
-		}
+		if (username.error || password.error || email.error || phoneNumber.error)
+			return
 		else
 		{
-		// 	/* ============ Temporaire ============== */
+			// 	/* ============ Temporaire ============== */
 			
 			// Modifier le User avec un truc du style
 			// axios.patch("http://localhost:3333/user/me", {
-			// 	username: username,
-			// 	hash: hash,
-			// 	email: email,
-			// 	tel: tel,
-			// 	twoFA: twoFA,
-			// 	avatar: avatar
-			// })
-			// .then((response) => console.log(response))
-			// .catch((error) => console.log(error))
-		}	
+				// 	username: username,
+				// 	hash: hash,
+				// 	email: email,
+				// 	tel: tel,
+				// 	twoFA: twoFA,
+				// 	avatar: avatar
+				// })
+				// .then((response) => console.log(response))
+				// .catch((error) => console.log(error))
+			}
 	}
 
-	type PropsError = {
-		message: string,
-		state: boolean,
-		category?: string
+	type PropsSetting = {
+		value: string | boolean,
+		error: boolean,
+		errorMessage?: string
 	}
 
-	const [error, setError] = useState<PropsError>({ message: '', state: false })
 
-	const [username, setUsername] = useState<string>(userData.username)
+/* ============================== USERNAME ================================== */
+
+	const [username, setUsername] = useState<PropsSetting>({
+		value: userData.username,
+		error: false,
+		errorMessage: ''
+	})
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (value.length > 8 )
 		{
-			setError({
-				message: "8 characters max",
-				state: true,
-				category: "username"
-			})
+			setUsername((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "8 characters max"
+			}))
 		}
 		else if (!/^[a-zA-Z0-9-_.]*$/.test(value))
 		{
-			setError({
-				message: "Username can't contain special characters",
-				state: true,
-				category: "username"
+			setUsername((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username can't contain special characters",
+			}))
+		}
+		else
+		{
+			if (value.length === 0)
+			{
+				setUsername({
+					value: value,
+					error: true,
+					errorMessage: "Insert username",
+				})
+			}
+			else
+			{
+				setUsername({
+					value: value,
+					error: false
+				})
+			}
+		}
+	}
+
+	function handleInputUsernameBlur(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		if (value.length === 0)
+		{
+			setUsername({
+				value: value,
+				error: true,
+				errorMessage: "Insert username",
 			})
 		}
 		else
 		{
-			setUsername(value)
-			setError({
-				message: '',
-				state: false
+			setUsername({
+				value: value,
+				error: false
 			})
 		}
 	}
 
-	const [email, setEmail] = useState<string>(userData.email)
+/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+
+	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setPassword({
+			value: value,
+			error: false
+		})
+	}
+
+	const [showPassword, setShowPassword] = useState<boolean>(false)
+	const [placeHolder, setPlaceHolder] = useState<string>("New password")
+
+/* =============================== EMAIL ==================================== */
+
+	const [email, setEmail] = useState<PropsSetting>({
+		value: userData.email,
+		error: false,
+		errorMessage: ''
+	})
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (!/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(value))
 		{
-			setError({
-				message: "Invalid email",
-				state: true,
-				category: "email"
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Invalid email"
 			})
 		}
 		else
 		{
-			setError({
-				message: '',
-				state: false
+			setEmail({
+				value: value,
+				error: false
 			})
 		}
-		setEmail(value)
 	}
 
+/* ============================ PHONE NUMBER ================================ */
 
-	const [hash, setHash] = useState<string>(userData.hash)
-	const [showPassword, setShowPassword] = useState<boolean>(false)
-	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
-		setHash(event.target.value)
-	}
-
-	const [tel, setTel] = useState<string>(userData.tel)
+	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
+		value: userData.tel,
+		error: false,
+		errorMessage: ''
+	})
 	function handleInputTelChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value))
+		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value) && value.length !== 0)
 		{
-			setError({
-				message: "Invalid phone number",
-				state: true,
-				category: "tel"
+			setPhoneNumber({
+				value: value,
+				error: true,
+				errorMessage: "Invalid phone number"
 			})
 		}
 		else
 		{
-			setError({
-				message: '',
-				state: false
+			setPhoneNumber({
+				value: value,
+				error: false
 			})
 		}
-		setTel(value)
 	}
 
-	const [twoFA, setTwoFA] = useState<boolean>(userData.twoFA)
+/* ================================= 2FA ==================================== */
+
+	const [twoFA, setTwoFA] = useState<PropsSetting>({
+		value: userData.twoFA,
+		error: false,
+		errorMessage: ''
+	})
 	function handleClickTwoFAChange() {
-
-		if (userData.email === '' && userData.tel === '')
+		if (email.error)
 		{
-			setError({
-				message: "No valid email or phone number",
-				state: true,
-				category: "twoFA"
+			setTwoFA({
+				value: false,
+				error: true,
+				errorMessage: "No valid email"
 			})
 		}
 		else
-			setTwoFA(!twoFA)
+		{
+			setTwoFA({
+				value: !twoFA.value,
+				error: false
+			})
+		}
 	}
+
+	useEffect(() => {
+		if (email.error)
+		{
+			setTwoFA({
+				value: false,
+				error: true,
+				errorMessage: "No valid email"
+			})
+		}
+		else
+		{
+			setTwoFA((prevState) => ({
+				...prevState,
+				error: false
+			}))
+		}
+	}, [email.value, phoneNumber.value])
+
+/* =============================== AVATAR =================================== */
 
 	const [avatar, setAvatar] = useState<string>(userData.avatar)
+
+/* ========================================================================== */
 
 	return (
 		<PseudoStyle>
@@ -190,25 +273,12 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 						</SettingTtile>
 						<InputText
 							onChange={handleInputUsernameChange}
-							onBlur={() => setError({ message: '', state: false})}
-							type="text" value={username}
+							onBlur={handleInputUsernameBlur}
+							type="text" value={username.value as string}
 							$fontSize={16}
-							$error={error.category === "username" && error.state} />
+							$error={username.error} />
 						<ErrorMessage>
-							{error.category === "username" && error.message}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
-						<SettingTtile>
-							E-mail
-						</SettingTtile>
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email}
-							$fontSize={16}
-							$error={error.category === "email" && error.state} />
-						<ErrorMessage>
-							{error.category === "email" && error.message}
+							{username.error && username.errorMessage}
 						</ErrorMessage>
 					</Setting>
 					<Setting>
@@ -217,15 +287,22 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 						</SettingTtile>
 						<InputText
 							onChange={handleInputPasswordChange}
-							type={showPassword ? "text" : "password"} value={hash}
+							onClick={() => setPlaceHolder('')}
+							onBlur={() => setPlaceHolder("New password")}
+							type={showPassword ? "text" : "password"}
+							placeholder={placeHolder}
+							value={password.value as string}
 							$fontSize={16}
-							$error={error.category === "password" && error.state} />
+							$error={password.error} />
+						<ErrorMessage>
+							{password.error && password.errorMessage}
+						</ErrorMessage>
 						<Button
 							onClick={() => setShowPassword(!showPassword)}
 							type="button" width={200}
 							alt="Show password button"
 							title={showPassword ? "Hide password" : "Show password"}
-							style={{ alignSelf: "center", marginTop: "12.5px", marginBottom: "7.5px" }}>
+							style={{ alignSelf: "center", marginBottom: "7.5px" }}>
 						{
 							showPassword ?
 								"Hide password"
@@ -236,45 +313,58 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 					</Setting>
 					<Setting>
 						<SettingTtile>
+							E-mail
+						</SettingTtile>
+						<InputText
+							onChange={handleInputEmailChange}
+							type="text" value={email.value as string}
+							$fontSize={16}
+							$error={email.error} />
+						<ErrorMessage>
+							{email.error && email.errorMessage}
+						</ErrorMessage>
+					</Setting>
+					<Setting>
+						<SettingTtile>
 							Phone number
 						</SettingTtile>
 						<InputText
 							onChange={handleInputTelChange}
-							type="text" value={tel}
+							type="text" value={phoneNumber.value as string}
 							$fontSize={16}
-							$error={error.category === "tel" && error.state} />
+							$error={phoneNumber.error} />
 						<ErrorMessage>
-							{error.category === "tel" && error.message}
+							{phoneNumber.error && phoneNumber.errorMessage}
 						</ErrorMessage>
 					</Setting>
 					<Setting>
 						<SettingTtile>
 							2FA
 						</SettingTtile>
-						<TwoFAValue>
+						<TwoFAValue $error={twoFA.error}>
 						{
-							twoFA ?
+							twoFA.value ?
 								"Able"
 							:
 								"Disable"
 						}
 						</TwoFAValue>
+						<ErrorMessage>
+							{twoFA.error && twoFA.errorMessage}
+						</ErrorMessage>
 						<Button
 							onClick={handleClickTwoFAChange}
 							type="button" width={200}
 							alt="Set 2FA button"
-							title={showPassword ? "Disable" : "Able"}
-							style={{ alignSelf: "center", marginTop: "12.5px" }}>
+							title={twoFA.value ? "Disable" : "Able"}
+							style={{ alignSelf: "center" }}>
 						{
-							twoFA ?
+							twoFA.value ?
 								"Disable"
 							:
 								"Able"
 						}
 						</Button>
-						<ErrorMessage>
-							{error.category === "twoFA" && error.message}
-						</ErrorMessage>
 					</Setting>
 					<SelectAvatar
 						avatar={avatar}
