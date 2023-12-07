@@ -46,18 +46,12 @@ function ContactDuelInvitation({ userName, opponent, status } : PropsContactDuel
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const parentElementContainer = (event.target as HTMLElement).parentElement!.parentElement!.parentElement!.parentElement!.parentElement
-		const { bottom: bottomParentElement } = parentElementContainer!.getBoundingClientRect()
+		const resultX = window.innerWidth - event.clientX
+		const resultY = window.innerHeight - event.clientY
 
-
-		const topMax = bottomParentElement - 175 // taille du menu
-		const target = event.clientY
-
-		const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
-
-		setContextualMenuPosition({ top: topMenu, left: event.clientX - 180 }) // +1 pour eviter que la souris soit directement sur le menu
+		setContextualMenuPosition({ right: resultX, bottom: resultY })
 		displayContextualMenu(true)
-
+		
 	}
 
 	return (

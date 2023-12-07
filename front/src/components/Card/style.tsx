@@ -2,7 +2,7 @@ import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
-export const Style = styled.div<{$top?: number, $left?: number, $right?: number, $zIndex: number}>`
+export const Style = styled.div<{ $left?: number, $right?: number, $top?: number, $zIndex: number }>`
 
 	display: flex;
 

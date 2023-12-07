@@ -26,8 +26,9 @@ type PropsFriendSection = {
 	color: string,
 	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
-		top: number,
-		left: number
+		left?: number,
+		top?: number,
+		bottom?: number
 	}>>
 }
 

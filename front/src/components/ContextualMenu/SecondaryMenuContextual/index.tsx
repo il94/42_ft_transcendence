@@ -8,17 +8,29 @@ import { Channel } from "../../../utils/types"
 
 import DefaultChannelPicture from "../../../assets/default_channel.png"
 
+// type PropsSecondaryMenuContextual = {
+// 	secondary: boolean,
+// 	displaySecondary: Dispatch<SetStateAction<boolean>>,
+// 	secondaryPosition: {
+// 		top: number,
+// 		left: number
+// 	},
+// 	setSecondaryHeight: Dispatch<SetStateAction<number>>,
+// }
+
 type PropsSecondaryMenuContextual = {
-	secondary: boolean,
-	displaySecondary: Dispatch<SetStateAction<boolean>>,
-	secondaryPosition: {
-		top: number,
-		left: number
+	contextualMenuPosition: {
+		left?: number,
+		right?: number,
+		top?: number,
+		bottom?: number
 	},
-	setSecondaryHeight: Dispatch<SetStateAction<number>>,
+	offset: number
 }
 
-function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPosition, setSecondaryHeight } : PropsSecondaryMenuContextual) {
+
+function SecondaryMenuContextual({ contextualMenuPosition, offset } : PropsSecondaryMenuContextual) {
+	// function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPosition, setSecondaryHeight } : PropsSecondaryMenuContextual) {
 
 	/* ============ Temporaire ============== */
 
@@ -72,13 +84,19 @@ function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPositio
 
 	/* ============================================== */
 
-	useEffect(() => {
-		setSecondaryHeight(channels.length * 35)
-	}, [])
+	// useEffect(() => {
+	// 	setSecondaryHeight(channels.length * 35)
+	// }, [])
 
-	return ( secondary &&
-		<Style onMouseLeave={() => displaySecondary(false)}
-			$top={secondaryPosition.top} $left={secondaryPosition.left}>
+
+	return (
+		<Style
+			$left={contextualMenuPosition.left}
+			$right={contextualMenuPosition.right}
+			$top={contextualMenuPosition.top}
+			$bottom={contextualMenuPosition.bottom}
+			$offset={offset}>
+
 		{
 			channels.map((channel) => (
 				<Section key={"channelSection" + channel.id}>
@@ -90,6 +108,23 @@ function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPositio
 		}
 		</Style>
 	)
+
+
+
+	// return (
+	// 	<Style /* onMouseLeave={() => displaySecondary(false)}
+	// 		$top={secondaryPosition.top} $left={secondaryPosition.left} */>
+	// 	{
+	// 		channels.map((channel) => (
+	// 			<Section key={"channelSection" + channel.id}>
+	// 				<SectionName> 
+	// 					{channel.name}
+	// 				</SectionName>
+	// 			</Section>
+	// 		))
+	// 	}
+	// 	</Style>
+	// )
 }
 
 export default SecondaryMenuContextual

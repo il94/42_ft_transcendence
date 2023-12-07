@@ -34,6 +34,7 @@ import breakpoints from '../../utils/breakpoints'
 
 import DefaultAvatar from "../../assets/default_blue.png"
 import ContextualMenu from '../../components/ContextualMenu'
+import SecondaryMenuContextual from '../../components/ContextualMenu/SecondaryMenuContextual'
 
 function Game() {
 
@@ -51,7 +52,9 @@ function Game() {
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 	
 	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
-	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom? : number }>({ left: 0, right: 0, top: 0, bottom: 0 })
+	const [secondaryContextualMenu, displaySecondaryContextualMenu] = useState<boolean>(false)
+	const [secondaryContextualMenuOffset, setSecondaryContextualMenuOffset] = useState<number>(0)
 
 	const [zCardIndex, setZCardIndex] = useState<number>(0)
 	const [zChatIndex, setZChatIndex] = useState<number>(0)
@@ -100,12 +103,22 @@ function Game() {
 			{
 				<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
 					<GameWrapper>
-						{
-							contextualMenu &&
-							<ContextualMenu
-								contextualMenuPosition={contextualMenuPosition}
-								displayContextualMenu={displayContextualMenu} />
-						}
+					{
+						contextualMenu &&
+						<ContextualMenu
+							contextualMenuPosition={contextualMenuPosition}
+							secondaryContextualMenu={secondaryContextualMenu}
+							displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+							setSecondaryContextualMenuOffset={setSecondaryContextualMenuOffset}/>
+
+					}
+					{
+						secondaryContextualMenu &&
+						<SecondaryMenuContextual
+							contextualMenuPosition={contextualMenuPosition}
+							offset={secondaryContextualMenuOffset} />
+					}
+						
 						<LeftGameWrapper $social={social}>
 							<Logo />
 								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>

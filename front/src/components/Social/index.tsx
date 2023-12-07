@@ -23,8 +23,9 @@ type PropsSocial = {
 	displaySocial: Dispatch<SetStateAction<boolean>>,
 	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
-		top: number,
-		left: number
+		left?: number,
+		top?: number,
+		bottom?: number
 	}>>
 }
 
