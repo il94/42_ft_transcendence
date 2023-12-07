@@ -38,19 +38,19 @@ function Chat() {
 		{
 			id: 20,
 			name: "Public",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "public"
 		},
 		{
 			id: 21,
 			name: "Protect",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "protected"
 		},
 		{
 			id: 22,
 			name: "Private",
-			picture: DefaultChannelPicture,
+			avatar: DefaultChannelPicture,
 			type: "private"
 		}
 	]
