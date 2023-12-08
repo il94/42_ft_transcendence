@@ -1,36 +1,27 @@
-import { Dispatch, SetStateAction, useEffect } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 import { Style } from "./style"
 
+import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
 
 import { Channel } from "../../../utils/types"
 
 import DefaultChannelPicture from "../../../assets/default_channel.png"
 
-// type PropsSecondaryMenuContextual = {
-// 	secondary: boolean,
-// 	displaySecondary: Dispatch<SetStateAction<boolean>>,
-// 	secondaryPosition: {
-// 		top: number,
-// 		left: number
-// 	},
-// 	setSecondaryHeight: Dispatch<SetStateAction<number>>,
-// }
-
 type PropsSecondaryMenuContextual = {
-	contextualMenuPosition: {
+	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
+	secondaryContextualMenuPosition: {
 		left?: number,
 		right?: number,
 		top?: number,
 		bottom?: number
 	},
-	offset: number
+	secondaryContextualMenuHeight: number
 }
 
 
-function SecondaryMenuContextual({ contextualMenuPosition, offset } : PropsSecondaryMenuContextual) {
-	// function SecondaryMenuContextual({ secondary, displaySecondary, secondaryPosition, setSecondaryHeight } : PropsSecondaryMenuContextual) {
+function SecondaryMenuContextual({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight } : PropsSecondaryMenuContextual) {
 
 	/* ============ Temporaire ============== */
 
@@ -84,47 +75,27 @@ function SecondaryMenuContextual({ contextualMenuPosition, offset } : PropsSecon
 
 	/* ============================================== */
 
-	// useEffect(() => {
-	// 	setSecondaryHeight(channels.length * 35)
-	// }, [])
-
-
 	return (
 		<Style
-			$left={contextualMenuPosition.left}
-			$right={contextualMenuPosition.right}
-			$top={contextualMenuPosition.top}
-			$bottom={contextualMenuPosition.bottom}
-			$offset={offset}>
-
-		{
-			channels.map((channel) => (
-				<Section key={"channelSection" + channel.id}>
-					<SectionName> 
-						{channel.name}
-					</SectionName>
-				</Section>
-			))
-		}
+			onMouseLeave={() => displaySecondaryContextualMenu(false)}
+			$left={secondaryContextualMenuPosition.left}
+			$right={secondaryContextualMenuPosition.right}
+			$top={secondaryContextualMenuPosition.top}
+			$bottom={secondaryContextualMenuPosition.bottom}
+			$height={secondaryContextualMenuHeight}>
+			<ScrollBar>
+			{
+				channels.map((channel, index) => (
+					<Section key={"channelSection" + index}>
+						<SectionName> 
+							{channel.name}
+						</SectionName>
+					</Section>
+				))
+			}
+			</ScrollBar>
 		</Style>
 	)
-
-
-
-	// return (
-	// 	<Style /* onMouseLeave={() => displaySecondary(false)}
-	// 		$top={secondaryPosition.top} $left={secondaryPosition.left} */>
-	// 	{
-	// 		channels.map((channel) => (
-	// 			<Section key={"channelSection" + channel.id}>
-	// 				<SectionName> 
-	// 					{channel.name}
-	// 				</SectionName>
-	// 			</Section>
-	// 		))
-	// 	}
-	// 	</Style>
-	// )
 }
 
 export default SecondaryMenuContextual

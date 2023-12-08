@@ -8,7 +8,7 @@ const Section = styled.button`
 	align-items: center;
 
 	width: 100%;
-	height: 35px;
+	min-height: 35px;
 
 	color: ${colors.text};
 	background-color: ${colors.sectionContextualMenu};

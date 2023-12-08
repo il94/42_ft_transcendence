@@ -21,7 +21,10 @@ import colors from "../../utils/colors"
 type PropsSocial = {
 	social: boolean,
 	displaySocial: Dispatch<SetStateAction<boolean>>,
-	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	displayContextualMenu: Dispatch<SetStateAction<{
+		display: boolean,
+		type: string
+	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
 		left?: number,
 		top?: number,

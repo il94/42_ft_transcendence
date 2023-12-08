@@ -35,7 +35,8 @@ type PropsProfile = {
 	setCardPosition: Dispatch<SetStateAction<{
 		left?: number,
 		right?: number,
-		top?: number
+		top?: number,
+		bottom?: number
 	}>>,
 	settings: boolean,
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>

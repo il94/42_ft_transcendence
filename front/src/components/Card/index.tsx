@@ -19,7 +19,7 @@ import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
 import Icon from "../../componentsLibrary/Icon"
 
-import ZIndexContext from "../../contexts/ZIndexContext"
+import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
 import CloseIcon from "../../assets/close.png"
 
@@ -28,6 +28,7 @@ type PropsCard = {
 		left?: number,
 		right?: number
 		top?: number,
+		bottom?: number
 	},
 	displayCard: Dispatch<SetStateAction<boolean>>,
 	cardIdTarget: number
@@ -35,7 +36,7 @@ type PropsCard = {
 
 function Card({ cardPosition, displayCard, cardIdTarget }: PropsCard) {
 
-	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(ZIndexContext)!
+	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(GlobalDisplayContext)!
 
 	type PropsUserTarget = {
 		username: string,
@@ -84,6 +85,7 @@ function Card({ cardPosition, displayCard, cardIdTarget }: PropsCard) {
 			$left={cardPosition.left}
 			$right={cardPosition.right}
 			$top={cardPosition.top}
+			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
 			<TopWrapper>
 				<Avatar src={userTarget.avatar}/>

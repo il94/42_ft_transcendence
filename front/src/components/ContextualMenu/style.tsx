@@ -7,10 +7,10 @@ export const Style = styled.div<{ $left?: number, $right?: number, $bottom?: num
 	flex-direction: column;
 
 	position: absolute;
-	left: ${(props) => props.$left && props.$left}px;
-	right: ${(props) => props.$right && props.$right}px;
-	top: ${(props) => props.$top && props.$top}px;
-	bottom: ${(props) => props.$bottom && props.$bottom}px;
+	left: ${(props) => props.$left ? props.$left + "px" : "auto"};
+	right: ${(props) => props.$right ? props.$right + "px" : "auto"};
+	top: ${(props) => props.$top ? props.$top + "px" : "auto"};
+	bottom: ${(props) => props.$bottom ? props.$bottom + "px" : "auto"};
 	z-index: 999;
 
 	width: 180px;

@@ -7,7 +7,8 @@ import ChannelList from "./ChannelList"
 import ChatWindow from "./ChatWindow"
 
 import ChatContext from "../../contexts/ChatContext"
-import ZIndexContext from "../../contexts/ZIndexContext"
+import ContextualMenuContext from "../../contexts/ContextualMenuContext"
+import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
 import { Channel } from "../../utils/types"
 
@@ -17,7 +18,8 @@ import DefaultChannelPicture from "../../assets/default_channel.png"
 function Chat() {
 
 	const { chat, displayChat } = useContext(ChatContext)!
-	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(ZIndexContext)!
+	const { setSecondaryContextualMenuHeight } = useContext(ContextualMenuContext)!
+	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(GlobalDisplayContext)!
 
 	const [createChannelMenu, displayCreateChannelMenu] = useState<boolean>(false)
 
@@ -38,26 +40,59 @@ function Chat() {
 
 	const channels: Channel[] = [
 		{
-			id: 20,
-			name: "Public",
+			id: 1,
+			name: "Public 1",
 			avatar: DefaultChannelPicture,
 			type: "public"
 		},
 		{
-			id: 21,
-			name: "Protect",
+			id: 2,
+			name: "Public 2",
+			avatar: DefaultChannelPicture,
+			type: "public"
+		},
+		{
+			id: 3,
+			name: "Public 3",
+			avatar: DefaultChannelPicture,
+			type: "public"
+		},
+		{
+			id: 4,
+			name: "Public 4",
+			avatar: DefaultChannelPicture,
+			type: "public"
+		},
+		{
+			id: 5,
+			name: "Protected 1",
 			avatar: DefaultChannelPicture,
 			type: "protected"
 		},
 		{
-			id: 22,
-			name: "Private",
+			id: 6,
+			name: "Protected 2",
 			avatar: DefaultChannelPicture,
-			type: "private"
+			type: "protected"
+		},
+		{
+			id: 7,
+			name: "Protected 3",
+			avatar: DefaultChannelPicture,
+			type: "protected"
 		}
 	]
 
 	/* ============================================== */
+
+	useEffect(() => {
+		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
+
+		if (channels.length * 35 < maxHeight) // verifie si la taille max n'est pas depassee
+			setSecondaryContextualMenuHeight(channels.length * 35) // 35 = height d'une section
+		else
+			setSecondaryContextualMenuHeight(maxHeight) // height max
+	}, [channels])
 
 	return (
 		chat ?

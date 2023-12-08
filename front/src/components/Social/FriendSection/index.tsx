@@ -24,7 +24,10 @@ type PropsFriendSection = {
 	status: string,
 	social: boolean,
 	color: string,
-	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	displayContextualMenu: Dispatch<SetStateAction<{
+		display: boolean,
+		type: string
+	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
 		left?: number,
 		top?: number,
@@ -39,44 +42,48 @@ function FriendSection({ id, username, avatar, status, social, color, displayCon
 
 	function showCard() {
 
-		if (card && cardIdTarget === id) {
+		if (card && cardIdTarget === id) // verifie que la carte a afficher ne l'est pas deja
+		{
 			displayCard(false)
 			return;
 		}
 
-		const friendcontainer = friendContainerRef.current
+		const friendcontainer = friendContainerRef.current // sert a cibler le container et non ses enfants
 
-		if (friendcontainer) {
-			const topCurrentElement = friendcontainer.getBoundingClientRect().top
-			const { top: topParentElement, height: heightParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
+		if (friendcontainer)
+		{
+			const heightCard = 371 // height de la carte
+			const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
+			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
+			const maxBottom = window.innerHeight - horizontalBorder - heightNavBar - heightCard // valeur max avant que la carte ne depasse par le bas
 
-			const topMax = heightParentElement - 371 // taille de la carte
+			let resultY = friendcontainer.getBoundingClientRect().top - horizontalBorder / 2 - heightNavBar // resultat par defaut (top container cible - bordure du haut - navbar)
 
-			const target = topCurrentElement - topParentElement
-			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+			if (resultY > maxBottom) // verifie si la carte depasse sur l'axe vertical
+				resultY = maxBottom // ajuste le resultat vertical
 
 			setIdTargetCard(id)
-			setCardPosition({ top: topCard })
+			setCardPosition({ top: resultY })
 
 			displayCard(true)
 		}
 	}
 
-	function showMenuContextual(event: MouseEvent<HTMLDivElement>) {
+	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const friendcontainer = friendContainerRef.current
+		const heightContextualMenu = 175 // height du menu contextuel
+		const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
+		const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 
-		if (friendcontainer) {
-			const { bottom: bottomParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
+		const resultX = event.clientX // resultat horizontal par defaut (position du clic)
+		let resultY = event.clientY // resultat vertical par defaut (position du clic)
 
-			const topMax = bottomParentElement - 175 // taille du menu
-			const target = event.clientY
-	
-			const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+		if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
+			resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
-			setContextualMenuPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
-			displayContextualMenu(true)
-		}
+		setContextualMenuPosition({ left: resultX, top: resultY })
+		displayContextualMenu({ display: true, type: "social" })
+		
 	}
 
 	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
@@ -86,7 +93,7 @@ function FriendSection({ id, username, avatar, status, social, color, displayCon
 	return (
 		<Style
 			onClick={showCard}
-			onAuxClick={showMenuContextual}
+			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
 			color={color} ref={friendContainerRef}>
 			<Avatar src={avatar} />

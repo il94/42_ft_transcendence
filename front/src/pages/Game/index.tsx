@@ -1,5 +1,6 @@
 import {
 	useEffect,
+	useRef,
 	useState
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
@@ -26,7 +27,7 @@ import SettingsMenu from '../../components/SettingsMenu'
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
 import ContextualMenuContext from '../../contexts/ContextualMenuContext'
-import ZIndexContext from '../../contexts/ZIndexContext'
+import GlobalDisplayContext from '../../contexts/GlobalDisplayContext'
 
 import { UserAuthenticate } from '../../utils/types'
 
@@ -48,16 +49,18 @@ function Game() {
 	const [chatRender, setChatRender] = useState<boolean>(false)
 
 	const [card, displayCard] = useState<boolean>(false)
-	const [cardPosition, setCardPosition] = useState<{ left?: number; right?: number; top?: number }>({ left: 0, right: 0, top: 0 })
+	const [cardPosition, setCardPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [cardIdTarget, setIdTargetCard] = useState<number>(0)
 	
-	const [contextualMenu, displayContextualMenu] = useState<boolean>(false)
+	const [contextualMenu, displayContextualMenu] = useState<{ display: boolean; type: string }>({ display: false, type: '' })
 	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom? : number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [secondaryContextualMenu, displaySecondaryContextualMenu] = useState<boolean>(false)
-	const [secondaryContextualMenuOffset, setSecondaryContextualMenuOffset] = useState<number>(0)
+	const [secondaryContextualMenuPosition, setSecondaryContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom? : number }>({ left: 0, right: 0, top: 0, bottom: 0 })
+	const [secondaryContextualMenuHeight, setSecondaryContextualMenuHeight] = useState<number>(0)
 
 	const [zCardIndex, setZCardIndex] = useState<number>(0)
 	const [zChatIndex, setZChatIndex] = useState<number>(0)
+	const GameWrapperRef = useRef(null)
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 
@@ -101,24 +104,26 @@ function Game() {
 	return (
 		<GamePage>
 			{
-				<ZIndexContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex }}>
-					<GameWrapper>
+				<GlobalDisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, GameWrapperRef }}>
+					<GameWrapper ref={GameWrapperRef}>
 					{
-						contextualMenu &&
+						contextualMenu.display &&
 						<ContextualMenu
+							type={contextualMenu.type}
+							displayContextualMenu={displayContextualMenu}
 							contextualMenuPosition={contextualMenuPosition}
-							secondaryContextualMenu={secondaryContextualMenu}
 							displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-							setSecondaryContextualMenuOffset={setSecondaryContextualMenuOffset}/>
+							setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
+							secondaryContextualMenuHeight={secondaryContextualMenuHeight} />
 
 					}
 					{
 						secondaryContextualMenu &&
 						<SecondaryMenuContextual
-							contextualMenuPosition={contextualMenuPosition}
-							offset={secondaryContextualMenuOffset} />
+							displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+							secondaryContextualMenuPosition={secondaryContextualMenuPosition}
+							secondaryContextualMenuHeight={secondaryContextualMenuHeight} />
 					}
-						
 						<LeftGameWrapper $social={social}>
 							<Logo />
 								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
@@ -159,7 +164,7 @@ function Game() {
 								}
 								<TestsBack />
 								{
-									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition }}>
+									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition, cardIdTarget, setIdTargetCard }}>
 											<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 												<Chat />
@@ -184,7 +189,7 @@ function Game() {
 							</BottomGameWrapper>
 						</RightGameWrapper>
 					</GameWrapper>
-				</ZIndexContext.Provider>
+				</GlobalDisplayContext.Provider>
 			}
 		</GamePage>
 	)

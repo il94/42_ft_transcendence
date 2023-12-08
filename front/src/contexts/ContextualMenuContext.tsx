@@ -5,8 +5,14 @@ import {
 } from 'react'
 
 const ContextualMenuContext = createContext<{
-	contextualMenu: boolean,
-	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	contextualMenu: {
+		display: boolean,
+		type: string
+	},
+	displayContextualMenu: Dispatch<SetStateAction<{
+		display: boolean,
+		type: string
+	}>>,
 	contextualMenuPosition: {
 		left?: number,
 		right?: number,
@@ -19,6 +25,9 @@ const ContextualMenuContext = createContext<{
 		top?: number,
 		bottom?: number
 	}>>,
+	secondaryContextualMenuHeight: number,
+	setSecondaryContextualMenuHeight: Dispatch<SetStateAction<number>>
+
 } | undefined>(undefined)
 
 export default ContextualMenuContext
