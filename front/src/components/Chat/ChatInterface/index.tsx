@@ -1,10 +1,7 @@
-import { Dispatch, SetStateAction } from "react"
-
 import styled from "styled-components"
 
 import TextInput from "./TextInput"
 import Discussion from "./Discussion"
-import Banner from "./Banner"
 
 import { Channel } from "../../../utils/types"
 
@@ -16,29 +13,27 @@ const Style = styled.div`
 	flex-direction: column;
 
 	width: 245px;
-	height: 100%;
 
 	background-color: ${colors.chatWindow};
 
 `
 
 type PropsChatInterface = {
-	channel: Channel,
-	displayUpdateChannelInterface: Dispatch<SetStateAction<{
-		display: boolean,
-		updateChannel?: boolean
-	}>>
+	channel: Channel | undefined
 }
 
-function ChatInterface({ channel, displayUpdateChannelInterface } : PropsChatInterface) {
+function ChatInterface({ channel } : PropsChatInterface) {
 	return (
 		<Style>
-			<Banner
-				name={channel.name}
-				displaySettingsButton={true}
-				displayUpdateChannelInterface={displayUpdateChannelInterface} />
-			<Discussion /* messages={channel.messages} */ />
-			<TextInput />
+		{
+			channel ?
+			<>
+				<Discussion /* messages={channel.messages} */ />
+				<TextInput />
+			</>
+			:
+			"Ce channel n'existe pas" // prevoir composant pour afficher l'erreur
+		}
 		</Style>
 	)
 }

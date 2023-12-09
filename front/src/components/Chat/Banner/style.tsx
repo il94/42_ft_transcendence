@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import colors from "../../../../utils/colors"
+import colors from "../../../utils/colors"
 
 export const Style = styled.div`
 
@@ -7,9 +7,7 @@ export const Style = styled.div`
 	justify-content: flex-end;
 	align-items: center;
 
-	width: 100%;
-	height: 30px;
-	min-height: 30px;
+	width: 245px;
 
 	background-color: ${colors.chatBanner};
 

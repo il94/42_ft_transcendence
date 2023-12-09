@@ -1,13 +1,16 @@
 import styled from "styled-components"
-import colors from "../../../../utils/colors"
+import colors from "../../../utils/colors"
 
 export const Style = styled.div`
 
 	display: flex;
-	width: 100%;
-	height: 100%;
 	flex-direction: column;
 	justify-content: space-between;
+
+	width: 100%;
+	height: 100%;
+
+	background-color: ${colors.chatWindow};
 
 `
 
@@ -104,7 +107,7 @@ export const AvatarWrapper = styled.div`
 	width: 155px;
 
 	margin-left: auto;
-	margin-right: auto;
+	margin-right: 10px;
 
 `
 

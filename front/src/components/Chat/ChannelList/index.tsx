@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction } from "react"
 
-import { Style, ChannelCreateButton } from "./style"
+import styled from "styled-components"
 
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
@@ -9,35 +9,26 @@ import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
 
+const Style = styled.div`
+
+	display: flex;
+	flex-direction: column;
+
+	width: 128px;
+
+	background-color: ${colors.channelList};
+
+`
+
 type PropsChannelList = {
 	channels: Channel[],
-	setChannelIdTarget: Dispatch<SetStateAction<number>>,
-	channelInterface: {
-		display: boolean,
-		updateChannel?: boolean
-	},
-	displayChannelInterface: Dispatch<SetStateAction<{
-		display: boolean,
-		updateChannel?: boolean
-	}>>
+	setChannelIdTarget: Dispatch<SetStateAction<number>>
 }
 
-function ChannelList({ channels, setChannelIdTarget, channelInterface, displayChannelInterface } : PropsChannelList) {
-
-	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
-
-	useEffect(() => {
-		if (channelInterface.display)
-			setValueChannelCreateButton("<<")
-		else
-			setValueChannelCreateButton("Create")
-	}, [channelInterface])
+function ChannelList({ channels, setChannelIdTarget } : PropsChannelList) {
 
 	return (
 		<Style>
-			<ChannelCreateButton onClick={() => displayChannelInterface({ display: !channelInterface.display, updateChannel: false })}>
-				{valueChannelCreateButton}
-			</ChannelCreateButton>
 			<ScrollBar>
 			{
 				channels.map((channel, index) => (

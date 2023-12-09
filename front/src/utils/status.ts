@@ -19,3 +19,9 @@ export enum channelStatus {
 	PROTECTED = "Protected",
 	PRIVATE = "Private"
 }
+
+export enum chatWindowStatus {
+	CHANNEL,
+	CREATE_CHANNEL,
+	UPDATE_CHANNEL
+}
