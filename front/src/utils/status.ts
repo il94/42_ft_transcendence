@@ -13,3 +13,9 @@ export enum challengeStatus {
 	IN_PROGRESS = "in progress",
 	FINISHED = "finished"	
 }
+
+export enum channelStatus {
+	PUBLIC = "Public",
+	PROTECTED = "Protected",
+	PRIVATE = "Private"
+}
