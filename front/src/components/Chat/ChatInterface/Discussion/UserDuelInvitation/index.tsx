@@ -5,8 +5,9 @@ import {
 	Button
 } from "./style"
 
-import colors from "../../../../../utils/colors"
 import { challengeStatus } from "../../../../../utils/status"
+
+import colors from "../../../../../utils/colors"
 
 type PropsUserDuelInvitation = {
 	opponent: string,

@@ -13,20 +13,17 @@ import ChatContext from "../../../../contexts/ChatContext"
 import { MessageInvitation, MessageText } from "../../../../utils/types"
 import { challengeStatus } from "../../../../utils/status"
 
-// import MenuContextual from "./MenuContextual"
-
-type PropsDiscussionInterface = {
-	// targetId: number
+type PropsDiscussion = {
+	// messages: (MessageText | MessageInvitation)[]
 }
 
-function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
+function Discussion({ /* messages */ } : PropsDiscussion) {
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
 
 	/* ============ Temporaire ============== */
 
-	// Recup les Messages du Channel avec un truc du style
-	// axios.get("http://localhost:3333/user&id=?/channel&id=targetId")
+	// Recup les Messages du Channel en faisant un map quand le format sera defini
 
 	const messages: (MessageText | MessageInvitation)[]  = [
 		{
@@ -163,4 +160,4 @@ function DiscussionInterface({ /* targetId */ } : PropsDiscussionInterface) {
 	)
 }
 
-export default DiscussionInterface
+export default Discussion

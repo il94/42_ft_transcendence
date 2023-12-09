@@ -1,16 +1,19 @@
+import { Dispatch, SetStateAction } from "react"
 import { Style, Avatar, ChannelName } from "./style"
 
 type PropsChannel = {
-	// id: number,
+	id: number,
+	setChannelIdTarget: Dispatch<SetStateAction<number>>,
 	name: string,
 	avatar: string,
-	// type: string,
-	color: string
+	backgroundColor: string
 }
 
-function ChannelSection({ /* id, */ name, avatar, /* type, */ color } : PropsChannel) {
+function ChannelSection({ id, setChannelIdTarget, name, avatar, backgroundColor } : PropsChannel) {
 	return (
-		<Style color={color}>
+		<Style
+			onClick={() => setChannelIdTarget(id)}
+			$backgroundColor={backgroundColor}>
 			<Avatar src={avatar}/>
 			<ChannelName>
 				{name}

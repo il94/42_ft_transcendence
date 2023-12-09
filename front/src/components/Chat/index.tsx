@@ -2,18 +2,21 @@ import { useContext, useEffect, useState } from "react"
 
 import { Style, ChatButton } from "./style"
 
-import Icon from "../../componentsLibrary/Icon"
 import ChannelList from "./ChannelList"
-import ChatWindow from "./ChatWindow"
+import ChatInterface from "./ChatInterface"
+import ChannelInterface from "./ChannelInterface"
+import Icon from "../../componentsLibrary/Icon"
 
 import ChatContext from "../../contexts/ChatContext"
 import ContextualMenuContext from "../../contexts/ContextualMenuContext"
 import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
 import { Channel } from "../../utils/types"
+import { channelStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
 import DefaultChannelPicture from "../../assets/default_channel.png"
+import TontonPicture from "../../assets/xavier_niel.webp"
 
 function Chat() {
 
@@ -21,7 +24,9 @@ function Chat() {
 	const { setSecondaryContextualMenuHeight } = useContext(ContextualMenuContext)!
 	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(GlobalDisplayContext)!
 
-	const [createChannelMenu, displayCreateChannelMenu] = useState<boolean>(false)
+	const [channelIdTarget, setChannelIdTarget] = useState<number>(0)
+
+	const [channelInterface, displayChannelInterface] = useState<{ display: boolean, updateChannel?: boolean }>({ display: false, updateChannel: false })
 
 	useEffect(() => {
 		setZChatIndex(zCardIndex + 1)
@@ -40,46 +45,29 @@ function Chat() {
 
 	const channels: Channel[] = [
 		{
-			id: 1,
-			name: "Public 1",
+			id: 0,
+			name: "Public",
 			avatar: DefaultChannelPicture,
-			type: "public"
+			type: channelStatus.PUBLIC
+		},
+		{
+			id: 1,
+			name: "Protect",
+			avatar: DefaultChannelPicture,
+			type: channelStatus.PROTECTED,
+			password: "password"
 		},
 		{
 			id: 2,
-			name: "Public 2",
+			name: "Private",
 			avatar: DefaultChannelPicture,
-			type: "public"
+			type: channelStatus.PRIVATE
 		},
 		{
 			id: 3,
-			name: "Public 3",
-			avatar: DefaultChannelPicture,
-			type: "public"
-		},
-		{
-			id: 4,
-			name: "Public 4",
-			avatar: DefaultChannelPicture,
-			type: "public"
-		},
-		{
-			id: 5,
-			name: "Protected 1",
-			avatar: DefaultChannelPicture,
-			type: "protected"
-		},
-		{
-			id: 6,
-			name: "Protected 2",
-			avatar: DefaultChannelPicture,
-			type: "protected"
-		},
-		{
-			id: 7,
-			name: "Protected 3",
-			avatar: DefaultChannelPicture,
-			type: "protected"
+			name: "MP",
+			avatar: TontonPicture,
+			type: channelStatus.PRIVATE
 		}
 	]
 
@@ -102,12 +90,20 @@ function Chat() {
 			$zIndex={zChatIndex}>
 			<ChannelList
 				channels={channels}
-				createChannelMenu={createChannelMenu}
-				displayCreateChannelMenu={displayCreateChannelMenu} />
-			<ChatWindow
-				channelToDisplay={channels[0]} 
-				createChannelMenu={createChannelMenu}
-				displayCreateChannelMenu={displayCreateChannelMenu} />
+				setChannelIdTarget={setChannelIdTarget}
+				channelInterface={channelInterface}
+				displayChannelInterface={displayChannelInterface} />
+			{
+				channelInterface.display ?
+				<ChannelInterface
+					channel={channels.find((channel) => channel.id === channelIdTarget)}
+					updateChannel={channelInterface.updateChannel}
+					displayChannelInterface={displayChannelInterface} />
+				:
+				<ChatInterface
+					channel={channels.find((channel) => channel.id === channelIdTarget)}
+					displayUpdateChannelInterface={displayChannelInterface} />
+			}
 		</Style>
 		:
 		<ChatButton $zIndex={zChatIndex + 1}>

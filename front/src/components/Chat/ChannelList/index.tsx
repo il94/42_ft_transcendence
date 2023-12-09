@@ -11,24 +11,31 @@ import colors from "../../../utils/colors"
 
 type PropsChannelList = {
 	channels: Channel[],
-	createChannelMenu: boolean,
-	displayCreateChannelMenu: Dispatch<SetStateAction<boolean>>
+	setChannelIdTarget: Dispatch<SetStateAction<number>>,
+	channelInterface: {
+		display: boolean,
+		updateChannel?: boolean
+	},
+	displayChannelInterface: Dispatch<SetStateAction<{
+		display: boolean,
+		updateChannel?: boolean
+	}>>
 }
 
-function ChannelList({ channels, createChannelMenu, displayCreateChannelMenu } : PropsChannelList) {
+function ChannelList({ channels, setChannelIdTarget, channelInterface, displayChannelInterface } : PropsChannelList) {
 
 	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
 
 	useEffect(() => {
-		if (createChannelMenu)
+		if (channelInterface.display)
 			setValueChannelCreateButton("<<")
 		else
 			setValueChannelCreateButton("Create")
-	}, [createChannelMenu])
+	}, [channelInterface])
 
 	return (
 		<Style>
-			<ChannelCreateButton onClick={() => displayCreateChannelMenu(!createChannelMenu)}>
+			<ChannelCreateButton onClick={() => displayChannelInterface({ display: !channelInterface.display, updateChannel: false })}>
 				{valueChannelCreateButton}
 			</ChannelCreateButton>
 			<ScrollBar>
@@ -36,11 +43,11 @@ function ChannelList({ channels, createChannelMenu, displayCreateChannelMenu } :
 				channels.map((channel, index) => (
 					<ChannelSection
 						key={"channel" + index} // a definir
-						// _id={channel.id}
+						id={channel.id}
+						setChannelIdTarget={setChannelIdTarget}
 						name={channel.name}
 						avatar={channel.avatar}
-						// _type={channel.type}
-						color={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
+						backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 					/>
 				))
 			}

@@ -24,11 +24,8 @@ export type Channel = {
 	createdAt?: string,
 	name: string,
 	avatar: string,
-	type: string
-}
-
-export type PrivateChannel = Channel & {
-	hash: string
+	type: string,
+	password?: string
 }
 
 export type Message = {

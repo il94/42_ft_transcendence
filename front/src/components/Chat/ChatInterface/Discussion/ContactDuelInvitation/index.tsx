@@ -13,8 +13,9 @@ import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext
 import CardContext from "../../../../../contexts/CardContext"
 import GlobalDisplayContext from "../../../../../contexts/GlobalDisplayContext"
 
-import colors from "../../../../../utils/colors"
 import { challengeStatus } from "../../../../../utils/status"
+
+import colors from "../../../../../utils/colors"
 
 type PropsContactDuelInvitation = {
 	userName: string,

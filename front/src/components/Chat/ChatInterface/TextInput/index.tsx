@@ -13,9 +13,10 @@ function TextInput() {
 	}
 
 	return (
-		<Style	onFocus={removePlaceHolder}
-				onBlur={setPlaceHolder}
-				placeholder="Type here..." />
+		<Style
+			onFocus={removePlaceHolder}
+			onBlur={setPlaceHolder}
+			placeholder="Type here..." />
 	)
 }
 

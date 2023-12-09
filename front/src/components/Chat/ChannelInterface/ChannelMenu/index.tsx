@@ -25,12 +25,20 @@ import IconUploadFile, { HiddenInput } from "../../../../componentsLibrary/IconU
 
 import RemoveIcon from "../../../../assets/close.png"
 import DefaultChannelIcon from "../../../../assets/default_channel.png"
+import { Channel } from "../../../../utils/types"
+import { channelStatus } from "../../../../utils/status"
 
-type PropsCreateChannelMenu = {
-	displayCreateChannelMenu: Dispatch<SetStateAction<boolean>>
+type PropsChannelMenu = {
+	channel: Channel,
+	updateChannel?: boolean,
+	displayChannelInterface: Dispatch<SetStateAction<{
+		display: boolean,
+		updateChannel?: boolean
+	}>>,
+	setChannelNameOverview: Dispatch<SetStateAction<string>>
 }
 
-function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu) {
+function ChannelMenu({ channel, updateChannel, displayChannelInterface, setChannelNameOverview } : PropsChannelMenu) {
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 
@@ -62,8 +70,9 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 		state: boolean
 	}
 
-	const [inputName, setInputName] = useState<string>('')
 	const [error, setError] = useState<PropsError>({ message: '', state: false })
+
+	const [inputName, setInputName] = useState<string>(updateChannel ? channel.name : '')
 	function handleInputNameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (value.length > 8 )
@@ -78,27 +87,27 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 				message: '',
 				state: false
 			})
+			setChannelNameOverview(value)
 		}
 	}
 
-	const [channelType, setChannelType] = useState<string>('public')
+	const [channelType, setChannelType] = useState<string>(updateChannel ? channel.type : channelStatus.PUBLIC)
 	function handleButtonClick() {
-		if (channelType === "public")
-			setChannelType("protected")
-		else if (channelType === "protected")
-			setChannelType("private")
+		if (channelType === channelStatus.PUBLIC)
+			setChannelType(channelStatus.PROTECTED)
+		else if (channelType === channelStatus.PROTECTED)
+			setChannelType(channelStatus.PRIVATE)
 		else
-			setChannelType("public")
+			setChannelType(channelStatus.PUBLIC)
 	}
 
-	const [inputPassword, setInputPassword] = useState<string>('')
+	const [inputPassword, setInputPassword] = useState<string | undefined>(updateChannel ? channel.password : '')
 	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		setInputPassword(event.target.value)
 	}
 
-	const [avatarUploaded, setAvatarUploaded] = useState<string>(DefaultChannelIcon)
+	const [avatarUploaded, setAvatarUploaded] = useState<string>(updateChannel ? channel.avatar : DefaultChannelIcon)
 	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
-
 		const avatar = event.target.files?.[0]
 		if (avatar)
 		{
@@ -116,7 +125,6 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 			}
 			reader.readAsDataURL(avatar)
 		}
-
 	}
 
 	return (
@@ -154,7 +162,7 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 					</Button>
 				</Setting>
 				{
-					channelType === "protected" ?
+					channelType === channelStatus.PROTECTED ?
 					<Setting>
 						<SettingTtile>
 							Password
@@ -200,7 +208,7 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 				</Setting>
 				<ButtonsWrapper>
 					<Button
-						onClick={() => displayCreateChannelMenu(false)}
+						onClick={() => displayChannelInterface({ display: false })}
 						type="button"
 						fontSize={14} alt="Cancel icon" title="Cancel" >
 						Cancel
@@ -216,4 +224,4 @@ function CreateChannelMenu({ displayCreateChannelMenu } : PropsCreateChannelMenu
 	)
 }
 
-export default CreateChannelMenu
+export default ChannelMenu
