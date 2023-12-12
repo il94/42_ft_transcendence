@@ -16,7 +16,7 @@ export const Style = styled.div`
 
 `
 
-export const Avatar = styled.div`
+export const Avatar = styled.img`
 	
 	width: 20px;
 	height: 20px;
@@ -24,8 +24,6 @@ export const Avatar = styled.div`
 	min-height: 20px;
 
 	border-radius: 50%;
-
-	background-color: ${colors.avatar};
 
 `
 

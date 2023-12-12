@@ -13,9 +13,19 @@ export const Style = styled.div`
 
 `
 
+export const LeaveButtonWrapper = styled.div`
+
+	display: flex;
+
+	margin-left: 2.5px;
+`
+
 export const ChannelName = styled.p`
 
 	margin-left: auto;
+	margin-right: auto;
+
+	width: 111px;
 
 	transform: translate(15%);
 
@@ -30,6 +40,7 @@ export const ButtonsWrapper = styled.div`
 	justify-content: space-between;
 
 	min-width: 51px;
+	width: 51px;
 
 	margin-right: 6.5px;
 	margin-left: auto;

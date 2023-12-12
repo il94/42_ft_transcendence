@@ -3,7 +3,7 @@ import styled from "styled-components"
 import TextInput from "./TextInput"
 import Discussion from "./Discussion"
 
-import { Channel } from "../../../utils/types"
+import { ChannelData } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
 
@@ -19,21 +19,14 @@ const Style = styled.div`
 `
 
 type PropsChatInterface = {
-	channel: Channel | undefined
+	channelTarget: ChannelData
 }
 
-function ChatInterface({ channel } : PropsChatInterface) {
+function ChatInterface({ channelTarget } : PropsChatInterface) {
 	return (
 		<Style>
-		{
-			channel ?
-			<>
-				<Discussion /* messages={channel.messages} */ />
-				<TextInput />
-			</>
-			:
-			"Ce channel n'existe pas" // prevoir composant pour afficher l'erreur
-		}
+			<Discussion channelTarget={channelTarget} />
+			<TextInput channelTarget={channelTarget} />
 		</Style>
 	)
 }

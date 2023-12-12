@@ -1,7 +1,17 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
 
-export const Style = styled.input`
+export const Style = styled.form`
+
+	display: flex;
+
+	width: 100%;
+	height: 25px;
+	min-height: 25px;
+	
+`
+
+export const Input = styled.input`
 
 	display: flex;
 
@@ -25,10 +35,6 @@ export const Style = styled.input`
 
 	&:focus {
 		outline: none;
-	}
-
-	&::selection {
-		background-color: ${colors.textSelection};
 	}
 
 `

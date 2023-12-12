@@ -5,7 +5,8 @@ import styled from "styled-components"
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
-import { Channel } from "../../../utils/types"
+import { ChannelData } from "../../../utils/types"
+import { chatWindowStatus } from "../../../utils/status"
 
 import colors from "../../../utils/colors"
 
@@ -21,11 +22,12 @@ const Style = styled.div`
 `
 
 type PropsChannelList = {
-	channels: Channel[],
-	setChannelIdTarget: Dispatch<SetStateAction<number>>
+	channels: ChannelData[],
+	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 }
 
-function ChannelList({ channels, setChannelIdTarget } : PropsChannelList) {
+function ChannelList({ channels, setChannelTarget, setChatWindowState } : PropsChannelList) {
 
 	return (
 		<Style>
@@ -34,10 +36,9 @@ function ChannelList({ channels, setChannelIdTarget } : PropsChannelList) {
 				channels.map((channel, index) => (
 					<ChannelSection
 						key={"channel" + index} // a definir
-						id={channel.id}
-						setChannelIdTarget={setChannelIdTarget}
-						name={channel.name}
-						avatar={channel.avatar}
+						channel={channel}
+						setChannelTarget={setChannelTarget}
+						setChatWindowState={setChatWindowState}
 						backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 					/>
 				))

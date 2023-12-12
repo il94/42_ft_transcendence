@@ -1,9 +1,9 @@
 export enum userStatus {
-	ONLINE = "En ligne",
-	OFFLINE = "Hors ligne",
-	PLAYING = "En jeu",
-	WAITING = "En recherche de partie",
-	WATCHING = "Spectateur"	
+	ONLINE = "Online",
+	OFFLINE = "Offline",
+	PLAYING = "Playing",
+	WAITING = "Looking for a game...",
+	WATCHING = "Spectator"	
 }
 
 export enum challengeStatus {
@@ -17,11 +17,24 @@ export enum challengeStatus {
 export enum channelStatus {
 	PUBLIC = "Public",
 	PROTECTED = "Protected",
-	PRIVATE = "Private"
+	PRIVATE = "Private",
+	MP = "Direct messages"
 }
 
 export enum chatWindowStatus {
+	HOME,
 	CHANNEL,
 	CREATE_CHANNEL,
 	UPDATE_CHANNEL
+}
+
+export enum messageStatus {
+	TEXT,
+	INVITATION
+}
+
+export enum matchResultStatus {
+	WIN,
+	DRAW,
+	LOOSE
 }

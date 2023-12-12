@@ -2,7 +2,7 @@ import { RefObject } from "react"
 import styled from "styled-components"
 import colors from "../../../utils/colors"
 
-export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
+export const Style = styled.div<{ $backgroundColor: string, ref: RefObject<HTMLElement> }>`
 
 	display: flex;
 	justify-content: center;
@@ -15,7 +15,7 @@ export const Style = styled.div<{ ref: RefObject<HTMLElement> }>`
 	height: 53px;
 	min-height: 53px;
 
-	background-color: ${(props) => props.color};
+	background-color: ${(props) => props.$backgroundColor};
 
 	&:hover {
 		cursor: pointer;
@@ -37,7 +37,7 @@ export const Avatar = styled.img<{ src: string }>`
 	
 `
 
-export const ProfileInfo = styled.div`
+export const ProfileInfo = styled.div<{ $offline: boolean }>`
 
 	display: flex;
 	justify-content: space-between;
@@ -47,11 +47,17 @@ export const ProfileInfo = styled.div`
 
 	width: calc(100% - 32px);
 	height: 32px;
+
+	filter: ${(props) => props.$offline && "brightness(70%)"};
+
 `
 
 export const ProfileName = styled.p`
 	
 	font-size: 13px;
+
+	color: inherit;
+
 
 `
 
@@ -59,4 +65,6 @@ export const ProfileStatus = styled.p`
 	
 	font-size: 10px;
 	
+	color: inherit;
+
 `

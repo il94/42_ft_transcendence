@@ -1,22 +1,32 @@
 import { Dispatch, SetStateAction } from "react"
+
 import { Style, Avatar, ChannelName } from "./style"
 
+import { ChannelData } from "../../../../utils/types"
+import { chatWindowStatus } from "../../../../utils/status"
+
 type PropsChannel = {
-	id: number,
-	setChannelIdTarget: Dispatch<SetStateAction<number>>,
-	name: string,
-	avatar: string,
+	channel: ChannelData,
+	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	backgroundColor: string
 }
 
-function ChannelSection({ id, setChannelIdTarget, name, avatar, backgroundColor } : PropsChannel) {
+function ChannelSection({ channel, setChannelTarget, setChatWindowState, backgroundColor } : PropsChannel) {
+
+	function handleClickChannelButton() {
+
+		setChannelTarget(channel)
+		setChatWindowState(chatWindowStatus.CHANNEL)
+	}
+	
 	return (
 		<Style
-			onClick={() => setChannelIdTarget(id)}
+			onClick={handleClickChannelButton}
 			$backgroundColor={backgroundColor}>
-			<Avatar src={avatar}/>
+			<Avatar src={channel.avatar}/>
 			<ChannelName>
-				{name}
+				{channel.name}
 			</ChannelName>
 		</Style>
 	)

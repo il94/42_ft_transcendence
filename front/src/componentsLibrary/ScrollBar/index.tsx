@@ -65,7 +65,6 @@ const TrackVertical = styled.div<{ $onMouse: boolean }>`
 	padding: 0;
 	padding-bottom: 0;
 	
-
 `
 
 type PropsScrollBar = {

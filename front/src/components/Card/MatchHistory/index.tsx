@@ -1,55 +1,80 @@
+import { useEffect, useState } from "react"
+// import axios from "axios"
+
 import { Style } from "./style"
 
 import Match from "./Match"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
+import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
+
+import { MatchData, User, UserAuthenticate } from "../../../utils/types"
+import { matchResultStatus } from "../../../utils/status"
 
 type PropsMatchHistory = {
-	username: string,
-	/* cardIdTarget: number */
+	userTarget: User | UserAuthenticate
 }
 
-function MatchHistory({ username /*, cardIdTarget */ } : PropsMatchHistory) {
+function MatchHistory({ userTarget } : PropsMatchHistory) {
 
-	/* ============ Temporaire ============== */
+	const [matchs, setMatchs] = useState<MatchData[] | undefined>(undefined)
 
-	// Recup l'historique du User avec un truc du style
-	// axios.get("http://localhost:3333/user/:id/history") (id etant cardIdTarget)
+	useEffect(() => {
+		async function fetchMatchs() {
+			try {
 
-	const matchs = [
-		{
-			id: 110,
-			opponent: "match_00",
-			result: "win",
-			scoreUser: 15,
-			scoreOpponent: 0
-		},
-		{
-			id: 111,
-			opponent: "match_01",
-			result: "draw",
-			scoreUser: 10,
-			scoreOpponent: 10
-		},
-		{
-			id: 112,
-			opponent: "match_02",
-			result: "loose",
-			scoreUser: 0,
-			scoreOpponent: 999
+			/* ============ Temporaire ============== */
+
+			// const response = await axios.get("http://localhost:3333/user/:id/history") //(id etant userIdTarget)
+			// setMatchs(response.data)		
+
+				setMatchs([
+					{
+						id: 0,
+						user: userTarget,
+						opponent: userTarget,
+						result: matchResultStatus.WIN,
+						scoreUser: 15,
+						scoreOpponent: 0
+					},
+					{
+						id: 1,
+						user: userTarget,
+						opponent: userTarget,
+						result: matchResultStatus.DRAW,
+						scoreUser: 10,
+						scoreOpponent: 10
+					},
+					{
+						id: 2,
+						user: userTarget,
+						opponent: userTarget,
+						result: matchResultStatus.LOOSE,
+						scoreUser: 0,
+						scoreOpponent: 999
+					}
+				])
+
+			/* ====================================== */
+
+			}
+			catch (error) {
+				setMatchs(undefined)
+			}
 		}
-	]
-
-	/* ============================================== */
+		fetchMatchs()
+	}, [userTarget])
 
 	return (
 		<Style>
+		{
+			matchs ?
 			<ScrollBar>
 			{
-				matchs.map((match) => (
+				matchs.map((match, index) => (
 					<Match
-						key={"match" + match.id} // a definir
-						username={username}
-						opponent={match.opponent}
+						key={"match" + index} // a definir
+						username={match.user.username}
+						opponent={match.opponent.username}
 						result={match.result}
 						scoreUser={match.scoreUser}
 						scoreOpponent={match.scoreOpponent}
@@ -57,6 +82,9 @@ function MatchHistory({ username /*, cardIdTarget */ } : PropsMatchHistory) {
 				))
 			}
 			</ScrollBar>
+			:
+			<ErrorRequest />
+		}
 		</Style>
 	)
 }

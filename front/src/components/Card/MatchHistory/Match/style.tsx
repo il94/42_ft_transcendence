@@ -17,7 +17,7 @@ export const Style = styled.div<{ $backgroundColor: string }>`
 `
 export const Username = styled.p`
 
-	width: 70px; // definir par rapport a la taille max de pseudo
+	width: 70px; // ???
 
 	margin-left: 5px;
 
@@ -29,7 +29,7 @@ export const Username = styled.p`
 
 export const Opponent = styled.p`
 
-	width: 70px; // definir par rapport a la taille max de pseudo
+	width: 70px; // ???
 
 	margin-right: 5px;
 

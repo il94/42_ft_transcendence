@@ -16,14 +16,15 @@ import {
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
+import GlobalContext from "../../../contexts/GlobalContext"
+
+import { User } from "../../../utils/types"
+import { userStatus } from "../../../utils/status"
 
 type PropsFriendSection = {
-	id: number,
-	username: string,
-	avatar: string,
-	status: string,
+	friend: User,
+	backgroundColor: string,
 	social: boolean,
-	color: string,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
 		type: string
@@ -35,14 +36,15 @@ type PropsFriendSection = {
 	}>>
 }
 
-function FriendSection({ id, username, avatar, status, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
-	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
+	const { card, displayCard, setCardPosition } = useContext(CardContext)!
+	const { userTarget, setUserTarget } = useContext(GlobalContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {
 
-		if (card && cardIdTarget === id) // verifie que la carte a afficher ne l'est pas deja
+		if (card && userTarget === friend) // verifie que la carte a afficher ne l'est pas deja
 		{
 			displayCard(false)
 			return;
@@ -52,6 +54,8 @@ function FriendSection({ id, username, avatar, status, social, color, displayCon
 
 		if (friendcontainer)
 		{
+			setUserTarget(friend)
+
 			const heightCard = 371 // height de la carte
 			const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
 			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
@@ -62,16 +66,23 @@ function FriendSection({ id, username, avatar, status, social, color, displayCon
 			if (resultY > maxBottom) // verifie si la carte depasse sur l'axe vertical
 				resultY = maxBottom // ajuste le resultat vertical
 
-			setIdTargetCard(id)
 			setCardPosition({ top: resultY })
-
 			displayCard(true)
 		}
 	}
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const heightContextualMenu = 175 // height du menu contextuel
+		function getContextualMenuHeight() { // determine la taille du menu par rapport au statut du user cible
+			if (userTarget.status === userStatus.OFFLINE)
+				return (140)
+			else
+				return (175)
+		}
+
+		setUserTarget(friend)
+
+		const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel de la liste d'amis
 		const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
 		const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 
@@ -83,7 +94,6 @@ function FriendSection({ id, username, avatar, status, social, color, displayCon
 
 		setContextualMenuPosition({ left: resultX, top: resultY })
 		displayContextualMenu({ display: true, type: "social" })
-		
 	}
 
 	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
@@ -95,24 +105,21 @@ function FriendSection({ id, username, avatar, status, social, color, displayCon
 			onClick={showCard}
 			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
-			color={color} ref={friendContainerRef}>
-			<Avatar src={avatar} />
+			$backgroundColor={backgroundColor}
+			ref={friendContainerRef}>
+			<Avatar src={friend.avatar} />
 			{
 				!social &&
-				<ProfileInfo>
+				<ProfileInfo $offline={friend.status === "Offline"}>
 					<ProfileName>
-						{username}
+						{friend.username}
 					</ProfileName>
 					<ProfileStatus>
-						{status}
+						{friend.status}
 					</ProfileStatus>
 				</ProfileInfo>
 			}
-		</Style>
-		// const statusString = "ONLINE";
-		// const statusEnum: Status = Status.valueOf(statusString as keyof typeof Status);
-		// console.log(statusEnum); // Affichera 'ONLINE' si la chaîne correspond à une valeur de l'énumération
-		
+		</Style>		
 	)
 }
 

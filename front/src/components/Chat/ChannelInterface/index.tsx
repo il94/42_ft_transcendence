@@ -3,8 +3,10 @@ import {
 	Dispatch, 
 	FormEvent, 
 	SetStateAction,
+	useContext,
 	useState
 } from "react"
+// import axios from "axios"
 
 import {
 	Avatar,
@@ -22,74 +24,168 @@ import {
 import Button from "../../../componentsLibrary/Button"
 import Icon from "../../../componentsLibrary/Icon"
 import IconUploadFile, { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
+import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
-import { Channel } from "../../../utils/types"
+import GlobalContext from "../../../contexts/GlobalContext"
+
+import { ChannelData } from "../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 
 import RemoveIcon from "../../../assets/close.png"
 import DefaultChannelIcon from "../../../assets/default_channel.png"
 
 type PropsChannelInterface = {
-	channel: Channel | undefined,
+	channel: ChannelData | undefined,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
-	setChannelNameOverview: Dispatch<SetStateAction<string | undefined>>
+	setBannerName: Dispatch<SetStateAction<string>>
 }
 
-function ChannelInterface({ channel, chatWindowState, setChatWindowState, setChannelNameOverview } : PropsChannelInterface) {
+function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBannerName } : PropsChannelInterface) {
 
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
+	const [error, setError] = useState<boolean>(false)
 
+	const { userAuthenticate, setChannelTarget } = useContext(GlobalContext)!
+
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		
 		event.preventDefault()
+		if (name.error)
+			return
 
-		if (inputName.length === 0)
-			setError({
-				message: "Insert name",
-				state: true
-			})
-		else
-		{
-			/* ============ Temporaire ============== */
-			
-			// Creer un Channel avec un truc du style
-			// axios.post("http://localhost:3333/channels"), {
-				// 		name: inputName,
-				// 		avatar: avatarUploaded,
-				//		type: channelType,
-				// 		hash: inputPassword
-				// })
-				// .then((response) => console.log(response))
-				// .catch((error) => console.log(error))
+		const newChannel: ChannelData | undefined = {
+			id: -1, // ???
+			name: name.value,
+			avatar: avatar,
+			type: channelType,
+			password: password,
+			owner: userAuthenticate,
+			administrators: [
+				userAuthenticate
+			],
+			users: [
+				userAuthenticate
+			],
+			mutedUsers: [],
+			bannedUsers: [],
+		}
+
+		try {
+			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
+			{
+				if (channel)
+				{
+					newChannel.administrators = channel.administrators
+					newChannel.users = channel.users
+					newChannel.mutedUsers = channel.mutedUsers
+					newChannel.bannedUsers = channel.bannedUsers
+					
+					/* ============ Temporaire ============== */
+					
+					// await axios.patch("http://localhost:3333/channel/:id", newChannel)
+					
+					/* ====================================== */
+
+					channel.name = name.value
+					channel.type = channelType
+					channel.password = password
+					channel.avatar = avatar
+				}
+				else
+					throw new Error
+
+				/* ====================================== */
+				
+			}
+			else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL)
+			{
+				/* ============ Temporaire ============== */
+				
+				// await axios.post("http://localhost:3333/channel", newChannel)
+
+				/* ====================================== */
+
+				userAuthenticate.channels.push(newChannel)
+			}
+			setChannelTarget(newChannel)
+			setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+		catch (error) {
+			setError(true)
 		}
 	}
 
-	type PropsError = {
-		message: string,
-		state: boolean
+/* ================================ NAME ==================================== */
+
+	type PropsName = {
+		value: string,
+		error: boolean,
+		errorMessage?: string
 	}
-
-	const [error, setError] = useState<PropsError>({ message: '', state: false })
-
-	const [inputName, setInputName] = useState<string>(channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channel.name : '')
-	function handleInputNameChange(event: ChangeEvent<HTMLInputElement>) {
+	
+	const [name, setName] = useState<PropsName>({
+		value: channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channel.name : '',
+		error: channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? false : true,
+		errorMessage: ''
+	})
+	function handleNameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (value.length > 8 )
-			setError({
-				message: "8 characters max",
-				state: true
-			})
+		{
+			setName((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "8 characters max"
+			}))
+		}
 		else
 		{
-			setInputName(value)
-			setError({
-				message: '',
-				state: false
-			})
-			setChannelNameOverview(value)
+			if (value.length === 0)
+			{
+				setName({
+					value: value,
+					error: true,
+					errorMessage: "Insert name",
+				})
+			}
+			else
+			{
+				setName({
+					value: value,
+					error: false
+				})
+			}
+			setBannerName(value)
 		}
 	}
 
-	const [channelType, setChannelType] = useState<string>(channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channel.type : channelStatus.PUBLIC)
+	function handleNameBlur(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		if (value.length === 0)
+		{
+			setName({
+				value: value,
+				error: true,
+				errorMessage: "Insert name",
+			})
+		}
+		else
+		{
+			setName({
+				value: value,
+				error: false
+			})
+		}
+	}
+
+/* =========================== CHANNEL TYPE ================================= */
+
+	const [channelType, setChannelType] = useState<channelStatus>(
+		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+		channel.type
+		:
+		channelStatus.PUBLIC
+	)
 	function handleButtonClick() {
 		if (channelType === channelStatus.PUBLIC)
 			setChannelType(channelStatus.PROTECTED)
@@ -99,12 +195,26 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setCha
 			setChannelType(channelStatus.PUBLIC)
 	}
 
-	const [inputPassword, setInputPassword] = useState<string | undefined>(channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channel.password : '')
-	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
-		setInputPassword(event.target.value)
+/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<string | undefined>(
+		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+		channel.password
+		:
+		''
+	)
+	function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
+		setPassword(event.target.value)
 	}
 
-	const [avatarUploaded, setAvatarUploaded] = useState<string>(channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channel.avatar : DefaultChannelIcon)
+/* =============================== AVATAR =================================== */
+
+	const [avatar, setAvatar] = useState<string>(
+		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+		channel.avatar
+		:
+		DefaultChannelIcon
+	)
 	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
 		const avatar = event.target.files?.[0]
 		if (avatar)
@@ -114,12 +224,12 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setCha
 			reader.onloadend = () => {
 				const imageDataUrl = reader.result
 				if (typeof imageDataUrl === 'string')
-					setAvatarUploaded(imageDataUrl);
+					setAvatar(imageDataUrl);
 			}
 
 			reader.onerror = () => {
 				console.error("error")
-				setAvatarUploaded('');
+				setAvatar('');
 			}
 			reader.readAsDataURL(avatar)
 		}
@@ -128,100 +238,105 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setCha
 	return (
 		<Style>
 		{
-			channel || chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
-				<CreateChannelForm
-					onSubmit={handleSubmit}
-					autoComplete="off"
-					spellCheck="false">
+			!error ?
+			<CreateChannelForm
+				onSubmit={handleSubmit}
+				autoComplete="off"
+				spellCheck="false">
+				<Setting>
+					<SettingTtile>
+						Name
+					</SettingTtile>
+					<ChannelNameWrapper>
+						<ChannelName
+							onInput={handleNameChange}
+							onBlur={handleNameBlur}
+							type="text"
+							value={name.value}
+							$error={name.error} />
+						<ErrorMessage>
+							{name.error && name.errorMessage}
+						</ErrorMessage>
+					</ChannelNameWrapper>
+				</Setting>
+				<Setting>
+					<SettingTtile>
+						Type
+					</SettingTtile>
+					<Button
+						onClick={handleButtonClick}
+						type="button"
+						fontSize={13} alt="Type channel icon" title="Change type"
+						style={{marginLeft: "auto", marginRight: "5px"}}>
+						{channelType}
+					</Button>
+				</Setting>
+				{
+					channelType === channelStatus.PROTECTED ?
 					<Setting>
 						<SettingTtile>
-							Name
+							Password
 						</SettingTtile>
-						<ChannelNameWrapper>
-							<ChannelName
-								onInput={handleInputNameChange}
-								onBlur={() => setError({ message: '', state: false})}
-								type="text"
-								value={inputName}
-								$error={error.state} />
-							<ErrorMessage>
-								{error.message}
-							</ErrorMessage>
-						</ChannelNameWrapper>
+						<ChannelName
+							onInput={handlePasswordChange}
+							type="text"
+							value={password} />
 					</Setting>
+					:
 					<Setting>
-						<SettingTtile>
-							Type
+						<SettingTtile $disable>
+							Password
 						</SettingTtile>
-						<Button
-							onClick={handleButtonClick}
-							type="button"
-							fontSize={13} alt="Type channel icon" title="Change type"
-							style={{marginLeft: "auto", marginRight: "5px"}}>
-							{channelType}
-						</Button>
+						<ChannelName
+							onInput={handlePasswordChange}
+							type="text"
+							value={password}
+							$disable
+							readOnly />
 					</Setting>
+				}
+				<Setting>
+					<SettingTtile>
+						Avatar
+					</SettingTtile>
+					<AvatarWrapper>
+						<IconUploadFile
+							htmlFor="uploadAvatarChannel" fontSize={13}
+							alt="Upload icon" title="Upload image">
+								&nbsp;Upload&nbsp;
+						</IconUploadFile>
+						<Icon
+							onClick={() => setAvatar(DefaultChannelIcon)}
+							type="button" src={RemoveIcon} size={23}
+							alt="Remove icon" title="Remove image" />
+						<Avatar
+							src={avatar} htmlFor="uploadAvatarChannel"
+							title="Upload image" />
+						<HiddenInput onChange={handleAvatarUpload}
+							id="uploadAvatarChannel" type="file" accept="image/*" />
+					</AvatarWrapper>
+				</Setting>
+				<ButtonsWrapper>
+					<Button
+						onClick={() => setChatWindowState(chatWindowStatus.CHANNEL)}
+						type="button"
+						fontSize={14} alt="Cancel icon" title="Cancel" >
+						Cancel
+					</Button>
+					<Button
+						type="submit"
+						fontSize={14} alt="Create icon" title="Create" >
 					{
-						channelType === channelStatus.PROTECTED ?
-						<Setting>
-							<SettingTtile>
-								Password
-							</SettingTtile>
-							<ChannelName
-								onInput={handleInputPasswordChange}
-								type="text"
-								value={inputPassword} />
-						</Setting>
+						chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
+							"Create"
 						:
-						<Setting>
-							<SettingTtile $disable>
-								Password
-							</SettingTtile>
-							<ChannelName
-								onInput={handleInputPasswordChange}
-								type="text"
-								value={inputPassword}
-								$disable
-								readOnly />
-						</Setting>
+							"Update"
 					}
-					<Setting>
-						<SettingTtile>
-							Avatar
-						</SettingTtile>
-						<AvatarWrapper>
-							<IconUploadFile
-								htmlFor="uploadAvatarChannel" fontSize={13}
-								alt="Upload icon" title="Upload image">
-									&nbsp;Upload&nbsp;
-							</IconUploadFile>
-							<Icon
-								onClick={() => setAvatarUploaded(DefaultChannelIcon)}
-								type="button" src={RemoveIcon} size={23}
-								alt="Remove icon" title="Remove image" />
-							<Avatar
-								src={avatarUploaded} htmlFor="uploadAvatarChannel"
-								title="Upload image" />
-							<HiddenInput onChange={handleAvatarUpload}
-								id="uploadAvatarChannel" type="file" accept="image/*" />
-						</AvatarWrapper>
-					</Setting>
-					<ButtonsWrapper>
-						<Button
-							onClick={() => setChatWindowState(chatWindowStatus.CHANNEL)}
-							type="button"
-							fontSize={14} alt="Cancel icon" title="Cancel" >
-							Cancel
-						</Button>
-						<Button
-							type="submit"
-							fontSize={14} alt="Create icon" title="Create" >
-							Create
-						</Button>
-					</ButtonsWrapper>
-				</CreateChannelForm>
+					</Button>
+				</ButtonsWrapper>
+			</CreateChannelForm>
 			:
-			"Ce channel n'existe pas" // prevoir composant pour afficher l'erreur
+			<ErrorRequest />
 		}
 		</Style>
 	)

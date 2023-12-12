@@ -1,20 +1,27 @@
 import { Opponent, Style, Username } from "./style"
+
 import Score from "./Score"
+
+import { matchResultStatus } from "../../../../utils/status"
+
 import colors from "../../../../utils/colors"
 
 type PropsMatch = {
 	username: string,
 	opponent: string,
-	result: string,
+	result: matchResultStatus,
 	scoreUser: number,
 	scoreOpponent: number
 }
 
 function Match({ username, opponent, result, scoreUser, scoreOpponent } : PropsMatch ) {
 
-	const backgroundColor = result === "win" ? colors.historyWin
-						: result === "draw" ? colors.historyDraw
-						: colors.historyLoose
+	const backgroundColor = 
+		result === matchResultStatus.WIN ?
+			colors.historyWin
+		: result === matchResultStatus.DRAW ?
+			colors.historyDraw
+		: colors.historyLoose
 
 	return (
 		<Style $backgroundColor={backgroundColor}>

@@ -7,18 +7,20 @@ import {
 
 import { challengeStatus } from "../../../../../utils/status"
 
+import { User } from "../../../../../utils/types"
+
 import colors from "../../../../../utils/colors"
 
-type PropsUserDuelInvitation = {
-	opponent: string,
+type PropsUserInvitation = {
+	target: User,
 	status: string
 }
 
-function UserDuelInvitation({ opponent, status } : PropsUserDuelInvitation ) {
+function UserInvitation({ target, status } : PropsUserInvitation ) {
 	return (
 		<Style>
 			<Text>
-				You challenge {opponent} to a duel !
+				You challenge {target.username} to a duel !
 			</Text>
 			{
 				status === challengeStatus.PENDING &&
@@ -64,4 +66,4 @@ function UserDuelInvitation({ opponent, status } : PropsUserDuelInvitation ) {
 	)
 }
 
-export default UserDuelInvitation
+export default UserInvitation

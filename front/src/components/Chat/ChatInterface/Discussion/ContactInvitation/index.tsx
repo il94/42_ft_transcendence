@@ -3,32 +3,43 @@ import { MouseEvent, useContext } from "react"
 import {
 	Avatar,
 	Style,
-	UserName,
 	Text,
-	MessageContent
+	InvitationContent,
+	ButtonsWrapper,
+	Button
 } from "./style"
 
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 import CardContext from "../../../../../contexts/CardContext"
 import GlobalDisplayContext from "../../../../../contexts/GlobalDisplayContext"
+import GlobalContext from "../../../../../contexts/GlobalContext"
 
-type PropsContactMessage = {
-	userName: string,
-	content: string
+import { challengeStatus, userStatus } from "../../../../../utils/status"
+import { User, UserAuthenticate } from "../../../../../utils/types"
+
+import colors from "../../../../../utils/colors"
+
+type PropsContactInvitation = {
+	sender: User,
+	target: User | UserAuthenticate,
+	status: string
 }
 
-function ContactMessage({ userName, content } : PropsContactMessage ) {
-
+function ContactInvitation({ sender, target, status } : PropsContactInvitation) {
+	
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zChatIndex, GameWrapperRef } = useContext(GlobalDisplayContext)!
+	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(GlobalContext)!
 
 	function showCard(event: MouseEvent<HTMLDivElement>) {
 
 		const GameWrapperContainer = GameWrapperRef.current
-
+	
 		if (GameWrapperContainer)
 		{
+			setUserTarget(sender)
+
 			const heightCard = 371 // height de la carte
 			const { height: GameWrapperHeight, width: GameWrapperWidth } = GameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
@@ -39,8 +50,7 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 			const resultY = event.clientY - heightCard - horizontalBorder / 2 - heightNavBar // resultat vertical par defaut (position du clic - height de la carte - bordure du haut - navbar)
 			
 			setCardPosition({ right: resultX, top: resultY })
-			setZCardIndex(zChatIndex + 1)
-			
+			setZCardIndex(zChatIndex + 1)			
 			displayCard(true)
 		}
 	}
@@ -51,12 +61,30 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 
 		if (GameWrapperContainer)
 		{
-			// doit pouvoir donner la taille du menu en fonction des sections a afficher
-			function getContextualMenuHeight() {
-				return (210) // temporaire
+			function getContextualMenuHeight() { // determine la taille du menu par rapport aux status du user authentifie et de la cible
+				if (channelTarget)
+				{
+					if (channelTarget.owner === userAuthenticate)
+					{
+						if (userTarget.status === userStatus.OFFLINE)
+							return (280)
+						else
+							return (315)
+					}
+					else if (channelTarget.administrators.includes(userAuthenticate) &&
+						(channelTarget.owner !== userTarget &&
+						!channelTarget.administrators.includes(userTarget)))
+							return (280)
+					else
+						return (175)
+				}
+				else
+					return (0)
 			}
+
+			setUserTarget(sender)
 			
-			const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel
+			const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel du chat
 			const { height: GameWrapperHeight } = GameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
@@ -65,8 +93,9 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 			let resultY = event.clientY // resultat vertical par defaut (position du clic)
 			
 			if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
-			resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
+				resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 			
+
 			setContextualMenuPosition({ right: resultX, top: resultY })
 			displayContextualMenu({ display: true, type: "chat" })
 		}
@@ -75,18 +104,59 @@ function ContactMessage({ userName, content } : PropsContactMessage ) {
 	return (
 		<Style>
 			<Avatar
+				src={sender.avatar}
 				onClick={showCard}
 				onAuxClick={showContextualMenu} />
-			<MessageContent>
-				<UserName>
-					{userName}
-				</UserName>
+			<InvitationContent>
 				<Text>
-					{content}
+					{sender.username} challenge {target.username} to a duel !
 				</Text>
-			</MessageContent>
+				{
+					status === challengeStatus.PENDING &&
+					<ButtonsWrapper>
+						<Button color={colors.buttonGreen}>
+							Accept
+						</Button>
+						<Button color={colors.buttonRed}>
+							Decline
+						</Button>
+					</ButtonsWrapper>
+				}
+				{
+					status === challengeStatus.ACCEPTED &&
+					<ButtonsWrapper>
+						<Button color={colors.buttonGreen}>
+							Accepted !
+						</Button>
+					</ButtonsWrapper>
+				}
+				{
+					status === challengeStatus.CANCELLED &&
+					<ButtonsWrapper>
+						<Button color={colors.buttonGray}>
+							Cancelled
+						</Button>
+					</ButtonsWrapper>
+				}
+				{
+					status === challengeStatus.IN_PROGRESS &&
+					<ButtonsWrapper>
+						<Button color={colors.button}>
+							Spectate
+						</Button>
+					</ButtonsWrapper>
+				}
+				{
+					status === challengeStatus.FINISHED &&
+					<ButtonsWrapper>
+						<Button color={colors.button}>
+							Finished
+						</Button>
+					</ButtonsWrapper>
+				}
+			</InvitationContent>
 		</Style>
 	)
 }
 
-export default ContactMessage
+export default ContactInvitation

@@ -1,5 +1,6 @@
 import styled from "styled-components"
-import effects from "../../utils/effects"
+import effects from "../../../utils/effects"
+import colors from "../../../utils/colors"
 
 export const Style = styled.div<{ $left?: number, $right?: number, $bottom?: number, $top?: number }>`
 
@@ -16,6 +17,8 @@ export const Style = styled.div<{ $left?: number, $right?: number, $bottom?: num
 	width: 180px;
 
 	clip-path: ${effects.pixelateWindow};
+
+	background-color: ${colors.sectionContextualMenu};
 
 	&:focus {
 		outline: none;

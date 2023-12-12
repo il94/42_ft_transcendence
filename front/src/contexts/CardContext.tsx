@@ -18,9 +18,7 @@ const CardContext = createContext<{
 		right?: number,
 		top?: number,
 		bottom?: number
-	}>>,
-	cardIdTarget: number,
-	setIdTargetCard: Dispatch<SetStateAction<number>>
+	}>>
 } | undefined>(undefined)
 
 export default CardContext

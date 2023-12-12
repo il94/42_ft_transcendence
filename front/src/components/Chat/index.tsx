@@ -1,4 +1,8 @@
-import { useContext, useEffect, useState } from "react"
+import {
+	useContext,
+	useEffect,
+	useState
+} from "react"
 
 import {
 	Style,
@@ -13,109 +17,90 @@ import ChatInterface from "./ChatInterface"
 import ChannelInterface from "./ChannelInterface"
 import Banner from "./Banner"
 import Icon from "../../componentsLibrary/Icon"
+import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import ChatContext from "../../contexts/ChatContext"
-import ContextualMenuContext from "../../contexts/ContextualMenuContext"
 import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
-import { Channel } from "../../utils/types"
-import { channelStatus, chatWindowStatus } from "../../utils/status"
+import { ChannelData } from "../../utils/types"
+import { chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
-import DefaultChannelPicture from "../../assets/default_channel.png"
-import TontonPicture from "../../assets/xavier_niel.webp"
+import GlobalContext from "../../contexts/GlobalContext"
 
-function Chat() {
+type PropsChat = {
+	channels: ChannelData[]
+}
+
+function Chat({ channels } : PropsChat) {
 	
 	function handleCickChatButton() {
 		displayChat(true)
 		setZChatIndex(zChatIndex + 1)
 	}
 
-	function handleClickCreateButton() {
-		if (chatWindowState === chatWindowStatus.CHANNEL)
-		{
-			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
-			setChannelNameOverview("Create")
-		}
-		else
-			setChatWindowState(chatWindowStatus.CHANNEL)
-	}
-
-	/* ============ Temporaire ============== */
-
-	// Recup les Channels du User authentifie avec un truc du style
-	// axios.get("http://localhost:3333/user&id=?/channels")
-
-	const channels: Channel[] = [
-		{
-			id: 0,
-			name: "Public",
-			avatar: DefaultChannelPicture,
-			type: channelStatus.PUBLIC
-		},
-		{
-			id: 1,
-			name: "Protect",
-			avatar: DefaultChannelPicture,
-			type: channelStatus.PROTECTED,
-			password: "password"
-		},
-		{
-			id: 2,
-			name: "Private",
-			avatar: DefaultChannelPicture,
-			type: channelStatus.PRIVATE
-		},
-		{
-			id: 3,
-			name: "MP",
-			avatar: TontonPicture,
-			type: channelStatus.PRIVATE
-		}
-	]
-
-	/* ============================================== */
-
 	const { chat, displayChat } = useContext(ChatContext)!
-	const { setSecondaryContextualMenuHeight } = useContext(ContextualMenuContext)!
 	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(GlobalDisplayContext)!
+	const { channelTarget, setChannelTarget } = useContext(GlobalContext)!
 
-	const [channelIdTarget, setChannelIdTarget] = useState<number>(0)
-	const [channelTarget, setChannelTarget] = useState<Channel | undefined>()
-	const [chatWindowState, setChatWindowState] = useState<chatWindowStatus>(chatWindowStatus.CHANNEL)
-	
+	const [errorRequest, setErrorRequest] = useState<boolean>(false)
+
+	const [chatWindowState, setChatWindowState] = useState<chatWindowStatus>(chatWindowStatus.HOME)
 	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
-	const [channelNameOverview, setChannelNameOverview] = useState<string>()
-
-	useEffect(() => {
-		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
-
-		if (channels.length * 35 < maxHeight) // verifie si la taille max n'est pas depassee
-			setSecondaryContextualMenuHeight(channels.length * 35) // 35 = height d'une section
-		else
-			setSecondaryContextualMenuHeight(maxHeight) // height max
-	}, [channels])
+	const [bannerName, setBannerName] = useState<string>("Welcome")
 
 	useEffect(() => {
 		setZChatIndex(zCardIndex + 1)
 	}, [])
 
 	useEffect(() => {
-		setChannelTarget(channels.find((channel) => channel.id === channelIdTarget))
-	}, [channelIdTarget])
-
-	useEffect(() => {
-		if (channelTarget)
-			setChannelNameOverview(channelTarget.name)
-	}, [channelTarget])
-
-	useEffect(() => {
-		if (chatWindowState !== chatWindowStatus.CHANNEL)
-			setValueChannelCreateButton("<<")
-		else
+		
+		if (chatWindowState === chatWindowStatus.HOME)
+		{
 			setValueChannelCreateButton("Create")
-	}, [chatWindowState])
+			setBannerName("Welcome")
+		}
+		else if (channelTarget && chatWindowState === chatWindowStatus.CHANNEL)
+		{
+			setValueChannelCreateButton("Create")
+			setBannerName(channelTarget.name)
+		}
+		else if (channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
+		{
+			setValueChannelCreateButton("<<")
+			setBannerName(channelTarget.name)
+		}
+		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL)
+		{
+			setValueChannelCreateButton("<<")
+			setBannerName("Create")
+		}
+		else
+			setChatWindowState(chatWindowStatus.HOME)
+
+	}, [chatWindowState, channelTarget])
+
+	function handleClickCreateButton() {
+
+		if (chatWindowState === chatWindowStatus.HOME)
+			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
+		else if (chatWindowState === chatWindowStatus.CHANNEL)
+			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
+		else if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
+			setChatWindowState(chatWindowStatus.CHANNEL)
+		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL)
+		{
+			if (!channelTarget)
+				setChatWindowState(chatWindowStatus.HOME)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+	}
+
+	useEffect(() => {
+		if (channels[0])
+			setChatWindowState(chatWindowStatus.CHANNEL)
+	}, [channelTarget, channels])
 
 	return (
 		chat ?
@@ -123,34 +108,50 @@ function Chat() {
 			onContextMenu={(event) => event.preventDefault()}
 			onClick={() => {setZChatIndex(zCardIndex + 1)}}
 			$zIndex={zChatIndex}>
-			<TopChatWrapper>
-				<ChannelCreateButton onClick={handleClickCreateButton}>
-					{valueChannelCreateButton}
-				</ChannelCreateButton>
-			<Banner
-				chatWindowState={chatWindowState}
-				setChatWindowState={setChatWindowState}
-				channel={channelTarget}
-				channelNameOverview={channelNameOverview} />
-			</TopChatWrapper>
-			<BottomChatWrapper>
-			{
-				chatWindowState !== chatWindowStatus.CHANNEL ?
-				<ChannelInterface
-					channel={channelTarget}
+		{
+			!errorRequest ?
+			<>
+				<TopChatWrapper>
+					<ChannelCreateButton onClick={handleClickCreateButton}>
+						{valueChannelCreateButton}
+					</ChannelCreateButton>
+				<Banner
 					chatWindowState={chatWindowState}
 					setChatWindowState={setChatWindowState}
-					setChannelNameOverview={setChannelNameOverview} />
-				:
-				<>
-					<ChannelList
-						channels={channels}
-						setChannelIdTarget={setChannelIdTarget} />
-					<ChatInterface
-						channel={channelTarget} />
-				</>
-			}
-			</BottomChatWrapper>
+					bannerName={bannerName} 
+					setErrorRequest={setErrorRequest} />
+				</TopChatWrapper>
+				<BottomChatWrapper>
+				{
+					chatWindowState === chatWindowStatus.UPDATE_CHANNEL || 
+					chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
+					<ChannelInterface
+						channel={channelTarget}
+						chatWindowState={chatWindowState}
+						setChatWindowState={setChatWindowState}
+						setBannerName={setBannerName} />
+					:
+					<>
+						<ChannelList
+							channels={channels}
+							setChannelTarget={setChannelTarget}
+							setChatWindowState={setChatWindowState} />
+						{
+							chatWindowState === chatWindowStatus.HOME ||
+							!channelTarget ?
+							<div>
+								salut
+							</div>
+							:
+							<ChatInterface channelTarget={channelTarget} />
+						}
+					</>
+				}
+				</BottomChatWrapper>
+			</>
+			:
+			<ErrorRequest />
+		}
 		</Style>
 		:
 		<ChatButton $zIndex={zChatIndex + 1}>

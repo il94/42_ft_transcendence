@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useState
 } from "react"
+// import axios from "axios"
 
 import {
 	PseudoStyle,
@@ -18,66 +19,99 @@ import {
 	TwoFAValue
 } from "./style"
 
+import SelectAvatar from "./SelectAvatar"
 import Icon from "../../componentsLibrary/Icon"
-
-import CloseIcon from "../../assets/close.png"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
-import SelectAvatar from "./SelectAvatar"
-// import axios from "axios"
+
+import { UserAuthenticate } from "../../utils/types"
+
+import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
-	userData: {
-		username: string,
-		hash: string,
-		avatar: string,
-		email: string,
-		tel: string,
-		twoFA: boolean
-	}
-	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
+	userAuthenticate: UserAuthenticate,
 }
 
-function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
-
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
-
-		event.preventDefault()
-
-		if (username.error || password.error || email.error || phoneNumber.error)
-			return
-		else
-		{
-			// 	/* ============ Temporaire ============== */
-			
-			// Modifier le User avec un truc du style
-			// axios.patch("http://localhost:3333/user/me", {
-				// 	username: username,
-				// 	hash: hash,
-				// 	email: email,
-				// 	tel: tel,
-				// 	twoFA: twoFA,
-				// 	avatar: avatar
-				// })
-				// .then((response) => console.log(response))
-				// .catch((error) => console.log(error))
-			}
-	}
+function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMenu) {
 
 	type PropsSetting = {
-		value: string | boolean,
+		value: string,
 		error: boolean,
 		errorMessage?: string
 	}
 
-
-/* ============================== USERNAME ================================== */
+	type PropsTwoFA = {
+		value: boolean,
+		error: boolean,
+		errorMessage?: string
+	}
 
 	const [username, setUsername] = useState<PropsSetting>({
-		value: userData.username,
+		value: userAuthenticate.username,
 		error: false,
 		errorMessage: ''
 	})
+	const [password, setPassword] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+	const [email, setEmail] = useState<PropsSetting>({
+		value: userAuthenticate.email,
+		error: false,
+		errorMessage: ''
+	})
+	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
+		value: userAuthenticate.tel,
+		error: false,
+		errorMessage: ''
+	})
+	const [twoFA, setTwoFA] = useState<PropsTwoFA>({
+		value: userAuthenticate.twoFA,
+		error: false,
+		errorMessage: ''
+	})
+	const [avatar, setAvatar] = useState<string>(userAuthenticate.avatar)
+	
+
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		try {
+			event.preventDefault()
+			if (username.error || password.error || email.error || phoneNumber.error)
+				return
+		
+			const newUser: UserAuthenticate = {
+				...userAuthenticate,
+				
+				username: username.value,
+				avatar: avatar,
+				hash: password.value,
+				email: email.value,
+				tel: phoneNumber.value,
+			}
+			
+			/* ============ Temporaire ============== */
+			
+			// await axios.patch("http://localhost:3333/user/me", newUser)
+
+			/* ====================================== */
+
+			userAuthenticate.username = username.value,
+			userAuthenticate.avatar = avatar,
+			userAuthenticate.hash = password.value,
+			userAuthenticate.email = email.value,
+			userAuthenticate.tel = phoneNumber.value
+
+			displaySettingsMenu(false)
+		}
+		catch (error) {
+			
+		}
+	}
+
+/* ============================== USERNAME ================================== */
+
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (value.length > 8 )
@@ -137,12 +171,6 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 
 /* ============================== PASSWORD ================================== */
 
-	const [password, setPassword] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-
 	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		setPassword({
@@ -156,11 +184,6 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 
 /* =============================== EMAIL ==================================== */
 
-	const [email, setEmail] = useState<PropsSetting>({
-		value: userData.email,
-		error: false,
-		errorMessage: ''
-	})
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (!/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(value))
@@ -182,11 +205,6 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 
 /* ============================ PHONE NUMBER ================================ */
 
-	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
-		value: userData.tel,
-		error: false,
-		errorMessage: ''
-	})
 	function handleInputTelChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value) && value.length !== 0)
@@ -208,11 +226,6 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 
 /* ================================= 2FA ==================================== */
 
-	const [twoFA, setTwoFA] = useState<PropsSetting>({
-		value: userData.twoFA,
-		error: false,
-		errorMessage: ''
-	})
 	function handleClickTwoFAChange() {
 		if (email.error)
 		{
@@ -248,12 +261,6 @@ function SettingsMenu({ displaySettingsMenu, userData }: PropsSettingsMenu) {
 			}))
 		}
 	}, [email.value, phoneNumber.value])
-
-/* =============================== AVATAR =================================== */
-
-	const [avatar, setAvatar] = useState<string>(userData.avatar)
-
-/* ========================================================================== */
 
 	return (
 		<PseudoStyle>

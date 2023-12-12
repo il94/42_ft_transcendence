@@ -2,10 +2,8 @@ import {
 	Dispatch,
 	SetStateAction,
 	useContext,
-	useEffect,
-	useState
+	useEffect
 } from "react"
-import axios from "axios"
 
 import {
 	CloseButton,
@@ -21,6 +19,8 @@ import Icon from "../../componentsLibrary/Icon"
 
 import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
+import { User, UserAuthenticate } from "../../utils/types"
+
 import CloseIcon from "../../assets/close.png"
 
 type PropsCard = {
@@ -31,53 +31,16 @@ type PropsCard = {
 		bottom?: number
 	},
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	cardIdTarget: number
+	userTarget: User | UserAuthenticate
 }
 
-function Card({ cardPosition, displayCard, cardIdTarget }: PropsCard) {
+function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 
 	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(GlobalDisplayContext)!
-
-	type PropsUserTarget = {
-		username: string,
-		avatar: string,
-		scoreResume: {
-			wins: number,
-			draws: number,
-			looses: number
-		}
-	}
-
-	const [userTarget, setUserTarget] = useState<PropsUserTarget>({
-		username: "",
-		avatar: "",
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			looses: 0
-		}
-	})
 
 	useEffect(() => {
 		setZCardIndex(zChatIndex + 1)
 	}, [])
-
-	useEffect(() => {
-		axios.get(`http://localhost:3333/user/${cardIdTarget}`)
-			.then((response) => {
-				console.log(response)
-				setUserTarget({
-					username: response.data.username,
-					avatar: response.data.avatar,
-					scoreResume: {
-						wins: 0, // en attente de l'obtention par le back
-						draws: 0,
-						looses: 0
-					}
-				})
-			})
-			.catch((error) => console.log(error))
-	}, [cardIdTarget])
 
 	return (
 		<Style
@@ -98,11 +61,8 @@ function Card({ cardPosition, displayCard, cardIdTarget }: PropsCard) {
 			<UserName>
 				{userTarget.username}
 			</UserName>
-			<ScoreResume
-				wins={userTarget.scoreResume.wins}
-				draws={userTarget.scoreResume.draws}
-				looses={userTarget.scoreResume.looses} />
-			<MatchHistory username={userTarget.username} /* cardIdTarget={cardIdTarget} */ />
+			<ScoreResume scoreResume={userTarget.scoreResume} />
+			<MatchHistory userTarget={userTarget} />
 		</Style>
 	)
 }
