@@ -1,3 +1,2 @@
-export * from "./createChannel.dto"
-export * from "./updateChanneldto"
+export * from "./channels.dto"
 export * from "./message.dto"

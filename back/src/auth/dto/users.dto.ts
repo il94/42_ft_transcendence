@@ -1,5 +1,5 @@
 import { User, UserStatus } from "@prisma/client"
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsEmail, IsString, IsNotEmpty, 
 	IsMobilePhone, IsOptional, MaxLength, MinLength
  } from "class-validator";
@@ -38,4 +38,27 @@ export class CreateUserDto implements User {
 	tel: string;
 
 	status: UserStatus;
+}
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {
+
+	@IsString()
+	@ApiProperty()
+	username: string;
+
+	@IsEmail()
+	@ApiProperty()
+	email: string;
+
+	@IsString()
+	@ApiProperty()
+	hash: string;
+
+	@IsString()
+	@ApiProperty()
+	avatar: string;
+
+	@IsMobilePhone()
+	@ApiProperty()
+	tel: string;
 }

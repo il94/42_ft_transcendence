@@ -1,9 +1,7 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message } from "@prisma/client"
 
-export class ChannelEntity implements Channel {
-	constructor(partial: Partial<ChannelEntity>) {
-		Object.assign(this, partial);
-	}
+export class CreateChannelDto implements Channel {
 
 	id:          number;
 	createdAt:   Date;
@@ -15,3 +13,7 @@ export class ChannelEntity implements Channel {
 	content:     Message[];
 	
   }
+
+export class UpdateChannelDto extends PartialType(CreateChannelDto) {
+  id: number;
+}

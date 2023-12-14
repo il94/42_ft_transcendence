@@ -3,7 +3,7 @@ import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from "../dto/auth.dto";
-import { CreateUserDto } from "../dto/create-user.dto";
+import { CreateUserDto } from "../dto/users.dto";
 import { getUser } from "../decorators/users.decorator";
 import { User } from "@prisma/client"
 

@@ -22,6 +22,8 @@ enum RequestStatus {
   PENDING
   ACCEPTED
   DECLINED
+  PROGRESSING
+  FINISHED
 }
 
 enum Role {
@@ -30,13 +32,16 @@ enum Role {
   OWNER
 }
 
-enum Type {
+enum ChannelStatus {
   PRIVATE
   PUBLIC
+  PROTECTED
+  MP
 }
 
-enum Podium {
+enum MatchResult {
   WINNER
+  DRAW
   LOOSER
 }
 
@@ -89,7 +94,7 @@ model Channel {
   id          Int  @id @default(autoincrement())
   createdAt   DateTime @default(now())
   name        String
-  type        Type
+  type        ChannelStatus
   invitation  Invitation[]
 
   members     UsersOnChannels[]
@@ -145,7 +150,7 @@ model UsersOnGames {
   userId    Int
   game      Game  @relation(fields: [gameId], references: [id])
   gameId    Int
-  podium    Podium
+  podium    MatchResult
 
   @@id([userId, gameId])
 }

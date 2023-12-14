@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto } from './dto/createChannel.dto';
-import { UpdateChannelDto } from './dto/updateChanneldto';
+import { CreateChannelDto, UpdateChannelDto } from './dto/';
 import { Channel, User } from '@prisma/client';
 
 // Authenticated user
