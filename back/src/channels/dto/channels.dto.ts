@@ -3,14 +3,15 @@ import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message } from "@p
 
 export class CreateChannelDto implements Channel {
 
-	id:          number;
-	createdAt:   Date;
-	name:        string;
-	type:        ChannelStatus;
-	invitation:  Invitation[];
+	id:         number;
+	createdAt:  Date;
+	name:       string;
+	type:       ChannelStatus;
+	password:	string;
+	invitation: Invitation[];
   
-	members:     UsersOnChannels[];
-	content:     Message[];
+	members:    UsersOnChannels[];
+	content:    Message[];
 	
   }
 

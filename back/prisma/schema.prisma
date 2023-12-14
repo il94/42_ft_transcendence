@@ -95,6 +95,7 @@ model Channel {
   createdAt   DateTime @default(now())
   name        String
   type        ChannelStatus
+  password    String?
   invitation  Invitation[]
 
   members     UsersOnChannels[]

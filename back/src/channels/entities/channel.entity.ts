@@ -5,13 +5,14 @@ export class ChannelEntity implements Channel {
 		Object.assign(this, partial);
 	}
 
-	id:          number;
-	createdAt:   Date;
-	name:        string;
-	type:        ChannelStatus;
-	invitation:  Invitation[];
+	id:			number;
+	createdAt:	Date;
+	name:       string;
+	type:       ChannelStatus;
+	password:	string;
+	invitation: Invitation[];
   
-	members:     UsersOnChannels[];
-	content:     Message[];
+	members:    UsersOnChannels[];
+	content:    Message[];
 	
   }
