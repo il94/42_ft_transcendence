@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
 import Select from "react-select"
 import axios from "axios"
 
@@ -8,12 +8,17 @@ import GlobalContext from "../../contexts/GlobalContext"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import { ChannelData, User } from "../../utils/types"
-import { channelStatus } from "../../utils/status"
+import { channelStatus, chatWindowStatus } from "../../utils/status"
 
 import DefaultChannelPicture from "../../assets/default_channel.png"
 import TontonPicture from "../../assets/xavier_niel.webp"
 
-function SearchBar() {
+type PropsSearchBar = {
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
+	displayChat: Dispatch<SetStateAction<boolean>>
+}
+
+function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 
 	const { userAuthenticate, userTarget, setUserTarget, setChannelTarget } = useContext(GlobalContext)!
 
@@ -35,7 +40,7 @@ function SearchBar() {
 	type ChannelOption = Option & {
 		channel: ChannelData
 	}
-	
+
 	const [userOptions, setUserOptions] = useState<UserOption[]>([]);
 	const [channelOptions, setChannelOptions] = useState<ChannelOption[]>([]);
 
@@ -43,9 +48,9 @@ function SearchBar() {
 		async function fetchUsersAndChannels() {
 			try {
 				const users = await axios.get("http://localhost:3333/user")
-		
+
 				setUserOptions(users.data.map((user: User) => ({
-					user: {...user},
+					user: { ...user },
 					label: user.username,
 					optionType: optionType.USER
 				})))
@@ -54,7 +59,7 @@ function SearchBar() {
 
 				// const channels = await axios.get("http://localhost:3333/channel")
 
-				const tempResponse = [
+				const tempResponse: ChannelData[] = [
 					{
 						id: 0,
 						name: "Public 1",
@@ -67,6 +72,9 @@ function SearchBar() {
 						users: [
 							userAuthenticate,
 							userTarget
+						],
+						validUsers: [
+							userAuthenticate
 						],
 						mutedUsers: [],
 						bannedUsers: []
@@ -83,6 +91,9 @@ function SearchBar() {
 						users: [
 							userTarget,
 							userAuthenticate
+						],
+						validUsers: [
+							userTarget
 						],
 						mutedUsers: [],
 						bannedUsers: []
@@ -101,6 +112,9 @@ function SearchBar() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							userAuthenticate
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -118,6 +132,9 @@ function SearchBar() {
 							userTarget,
 							userAuthenticate
 						],
+						validUsers: [
+							userTarget
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -133,6 +150,9 @@ function SearchBar() {
 						users: [
 							userAuthenticate,
 							userTarget
+						],
+						validUsers: [
+							userAuthenticate
 						],
 						mutedUsers: [],
 						bannedUsers: []
@@ -150,20 +170,22 @@ function SearchBar() {
 							userTarget,
 							userAuthenticate
 						],
+						validUsers: [
+							userTarget
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					}
 				]
 
 				/* ============================================== */
-		
+
 				setChannelOptions(tempResponse.filter((channel: ChannelData) => (
 					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
-				))
-					.map((channel: ChannelData) => ({
-						channel: {...channel},
-						label: channel.name,
-						optionType: optionType.CHANNEL
+				)).map((channel: ChannelData) => ({
+					channel: { ...channel },
+					label: channel.name,
+					optionType: optionType.CHANNEL
 				})))
 			}
 			catch (error) {
@@ -175,28 +197,31 @@ function SearchBar() {
 
 	async function addFriendOrJoinChannel(option: UserOption | ChannelOption | any) {
 		try {
-			if (option.optionType === optionType.USER && !userAuthenticate.friends.includes(option.user))
-			{
+			if (option.optionType === optionType.USER && !userAuthenticate.friends.includes(option.user)) {
 				/* ============ Temporaire ============== */
 
 				// axios.post("http://localhost:3333/user/me/friends/${option.user.id}") 
 
 				/* ============================================== */
-				
+
 				setUserTarget(option.user)
 				userAuthenticate.friends.push(option.user)
 			}
-			else if (option.optionType === optionType.CHANNEL && !option.channel.users.includes(userAuthenticate))
-			{
+			else if (option.optionType === optionType.CHANNEL && !option.channel.users.includes(userAuthenticate)) {
 				/* ============ Temporaire ============== */
-				
+
 				// axios.post("http://localhost:3333/user/me/channels/${option.channel.id")
-				
+
 				/* ============================================== */
 
 				setChannelTarget(option.channel)
 				option.channel.users.push(userAuthenticate)
 				userAuthenticate.channels.push(option.channel)
+				if (option.channel.type === channelStatus.PUBLIC)
+					setChatWindowState(chatWindowStatus.CHANNEL)
+				else
+					setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+				displayChat(true)
 			}
 		}
 		catch (error) {
@@ -217,16 +242,16 @@ function SearchBar() {
 
 	return (
 		<Style>
-		{
-			!errorRequest ?
-			<Select
-				onChange={addFriendOrJoinChannel}
-				placeholder={"Search..."}
-				options={options}
-				styles={StylesAttributes} />
-			:
-			<ErrorRequest />
-		}
+			{
+				!errorRequest ?
+					<Select
+						onChange={addFriendOrJoinChannel}
+						placeholder={"Search..."}
+						options={options}
+						styles={StylesAttributes} />
+					:
+					<ErrorRequest />
+			}
 		</Style>
 	)
 }

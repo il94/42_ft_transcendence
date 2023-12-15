@@ -3,7 +3,7 @@ export enum userStatus {
 	OFFLINE = "Offline",
 	PLAYING = "Playing",
 	WAITING = "Looking for a game...",
-	WATCHING = "Spectator"	
+	WATCHING = "Spectator"
 }
 
 export enum challengeStatus {
@@ -11,7 +11,7 @@ export enum challengeStatus {
 	ACCEPTED = "accepted",
 	CANCELLED = "cancelled",
 	IN_PROGRESS = "in progress",
-	FINISHED = "finished"	
+	FINISHED = "finished"
 }
 
 export enum channelStatus {
@@ -24,6 +24,7 @@ export enum channelStatus {
 export enum chatWindowStatus {
 	HOME,
 	CHANNEL,
+	LOCKED_CHANNEL,
 	CREATE_CHANNEL,
 	UPDATE_CHANNEL
 }

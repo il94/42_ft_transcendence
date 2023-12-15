@@ -22,7 +22,7 @@ type PropsChatInterface = {
 	channelTarget: ChannelData
 }
 
-function ChatInterface({ channelTarget } : PropsChatInterface) {
+function ChatInterface({ channelTarget }: PropsChatInterface) {
 	return (
 		<Style>
 			<Discussion channelTarget={channelTarget} />

@@ -21,7 +21,7 @@ type PropsBanner = {
 	setErrorRequest: Dispatch<SetStateAction<boolean>>
 }
 
-function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorRequest } : PropsBanner) {
+function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorRequest }: PropsBanner) {
 
 	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(GlobalContext)!
 
@@ -31,24 +31,23 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 				throw (new Error)
 
 			/* ============ Temporaire ============== */
-			
+
 			// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/members/${userAuthenticate.id}`)
-			
+
 			/* ====================================== */
-			
+
 			channelTarget.users.splice(channelTarget.users.indexOf(userAuthenticate), 1)
 
 			/* ============ Temporaire ============== */
 
 			// await axios.delete(`http://localhost:3333/user/me/channels/${userAuthenticate.id}`)
-			
+
 			/* ====================================== */
 
 			userAuthenticate.channels.splice(userAuthenticate.channels.indexOf(channelTarget), 1)
 			if (userAuthenticate.channels.length > 0)
 				setChannelTarget(userAuthenticate.channels[0])
-			else
-			{
+			else {
 				setChannelTarget(undefined)
 				setChatWindowState(chatWindowStatus.HOME)
 			}
@@ -63,13 +62,13 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 	return (
 		<Style>
 			<LeaveButtonWrapper>
-			{
-				chatWindowState === chatWindowStatus.CHANNEL &&
-				<Icon
-					onClick={leaveChannel}
-					src={LeaveIcon} size={24}
-					alt="Leave button" title="Leave channel" />
-			}
+				{
+					chatWindowState === chatWindowStatus.CHANNEL &&
+					<Icon
+						onClick={leaveChannel}
+						src={LeaveIcon} size={24}
+						alt="Leave button" title="Leave channel" />
+				}
 			</LeaveButtonWrapper>
 			<ChannelName>
 				{bannerName}

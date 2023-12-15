@@ -32,7 +32,7 @@ import ContextualMenuContext from '../../contexts/ContextualMenuContext'
 import GlobalDisplayContext from '../../contexts/GlobalDisplayContext'
 
 import { ChannelData, User, UserAuthenticate } from '../../utils/types'
-import { channelStatus, userStatus } from '../../utils/status'
+import { channelStatus, chatWindowStatus, userStatus } from '../../utils/status'
 
 import breakpoints from '../../utils/breakpoints'
 
@@ -48,7 +48,7 @@ function Game() {
 
 	function getSecondaryContextualMenuHeight(numberOfChannels: number) {
 		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
-			
+
 		if (numberOfChannels * 35 < maxHeight) // verifie si la taille max n'est pas depassee
 			setSecondaryContextualMenuHeight(numberOfChannels * 35) // 35 = height d'une section
 		else
@@ -61,7 +61,7 @@ function Game() {
 	}
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	
+
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>({
 		id: 0,
 		username: '',
@@ -70,7 +70,7 @@ function Game() {
 		scoreResume: {
 			wins: 0,
 			draws: 0,
-			looses: 0	
+			looses: 0
 		}
 	})
 
@@ -82,7 +82,7 @@ function Game() {
 		scoreResume: {
 			wins: 100,
 			draws: 1,
-			looses: 0	
+			looses: 0
 		},
 		hash: "password",
 		email: "ilyes@test.fr",
@@ -102,7 +102,7 @@ function Game() {
 		scoreResume: {
 			wins: 0,
 			draws: 0,
-			looses: 0	
+			looses: 0
 		}
 	}
 
@@ -113,7 +113,7 @@ function Game() {
 			try {
 
 				/* ============ Temporaire ============== */
-				
+
 				// const result: UserAuthenticate = await axios.get("http://localhost:3333/user/me")
 				// setUserAuthenticate(result)
 				setUserAuthenticate({
@@ -124,7 +124,7 @@ function Game() {
 					scoreResume: {
 						wins: 100,
 						draws: 1,
-						looses: 0	
+						looses: 0
 					},
 					hash: "password",
 					email: "ilyes@test.fr",
@@ -147,24 +147,23 @@ function Game() {
 	useEffect(() => {
 		async function fetchFriends() {
 
-			function getStatus(status: string)
-			{
-				if (status === "ONLINE")
-					return (userStatus.ONLINE)
-				else if (status === "OFFLINE")
-					return (userStatus.OFFLINE)
-				else if (status === "PLAYING")
-					return (userStatus.PLAYING)
-				else if (status === "WAITING")
-					return (userStatus.WAITING)
-				else if (status === "WATCHING")
-					return (userStatus.WATCHING)
-			}
+			// function getStatus(status: string)
+			// {
+			// 	if (status === "ONLINE")
+			// 		return (userStatus.ONLINE)
+			// 	else if (status === "OFFLINE")
+			// 		return (userStatus.OFFLINE)
+			// 	else if (status === "PLAYING")
+			// 		return (userStatus.PLAYING)
+			// 	else if (status === "WAITING")
+			// 		return (userStatus.WAITING)
+			// 	else if (status === "WATCHING")
+			// 		return (userStatus.WATCHING)
+			// }
 
 			/* ============ Temporaire ============== */
 
-			function getRandomStatus()
-			{
+			function getRandomStatus() {
 				const status = [
 					userStatus.ONLINE,
 					userStatus.OFFLINE,
@@ -173,7 +172,7 @@ function Game() {
 					userStatus.WATCHING
 				]
 
-			/* ====================================== */
+				/* ====================================== */
 
 				const randomStatus = Math.floor(Math.random() * 5)
 
@@ -189,7 +188,7 @@ function Game() {
 				/* ============ Temporaire ============== */
 
 				// En attendant d'avoir le scoreResume retourne par le back
-				const tempResponse : User[] = response.data.map((friend: User) => ({
+				const tempResponse: User[] = response.data.map((friend: User) => ({
 					...friend,
 					status: getRandomStatus(),
 					// status: getStatus(friend.status),
@@ -237,6 +236,9 @@ function Game() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							userAuthenticate
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -252,6 +254,9 @@ function Game() {
 						users: [
 							userAuthenticate,
 							userTarget
+						],
+						validUsers: [
+							userAuthenticate
 						],
 						mutedUsers: [],
 						bannedUsers: []
@@ -269,6 +274,9 @@ function Game() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							osef
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -285,6 +293,9 @@ function Game() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							osef
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -299,6 +310,9 @@ function Game() {
 						],
 						users: [
 							userAuthenticate,
+							userTarget
+						],
+						validUsers: [
 							userTarget
 						],
 						mutedUsers: [],
@@ -318,6 +332,9 @@ function Game() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							osef
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -332,6 +349,9 @@ function Game() {
 						],
 						users: [
 							userAuthenticate,
+							userTarget
+						],
+						validUsers: [
 							userTarget
 						],
 						mutedUsers: [],
@@ -350,6 +370,9 @@ function Game() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							osef
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -365,6 +388,9 @@ function Game() {
 						users: [
 							userAuthenticate,
 							userTarget
+						],
+						validUsers: [
+							osef
 						],
 						mutedUsers: [],
 						bannedUsers: []
@@ -382,6 +408,9 @@ function Game() {
 							userAuthenticate,
 							userTarget
 						],
+						validUsers: [
+							userAuthenticate
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					},
@@ -398,11 +427,14 @@ function Game() {
 							userTarget,
 							userAuthenticate
 						],
+						validUsers: [
+							userTarget
+						],
 						mutedUsers: [],
 						bannedUsers: []
 					}
 				]
-				
+
 				userAuthenticate.channels = tempResponse
 				getSecondaryContextualMenuHeight(tempResponse.length)
 
@@ -424,14 +456,15 @@ function Game() {
 	const [channelListScrollValue, setChannelListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
+	const [chatWindowState, setChatWindowState] = useState<chatWindowStatus>(chatWindowStatus.HOME)
 
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
-	
+
 	const [contextualMenu, displayContextualMenu] = useState<{ display: boolean; type: string }>({ display: false, type: '' })
-	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom? : number }>({ left: 0, right: 0, top: 0, bottom: 0 })
+	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [secondaryContextualMenu, displaySecondaryContextualMenu] = useState<boolean>(false)
-	const [secondaryContextualMenuPosition, setSecondaryContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom? : number }>({ left: 0, right: 0, top: 0, bottom: 0 })
+	const [secondaryContextualMenuPosition, setSecondaryContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [secondaryContextualMenuHeight, setSecondaryContextualMenuHeight] = useState<number>(0)
 	const [errorContextualMenu, displayErrorContextualMenu] = useState<boolean>(false)
 
@@ -457,98 +490,103 @@ function Game() {
 
 	return (
 		<GamePage onClick={closeContextualMenus}>
-		{
-			!errorRequest ?
-			<GlobalContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-				<GlobalDisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, GameWrapperRef }}>
-					<GameWrapper ref={GameWrapperRef}>
-					{
-						contextualMenu.display &&
-						<ContextualMenu
-							type={contextualMenu.type}
-							displayContextualMenu={displayContextualMenu}
-							contextualMenuPosition={contextualMenuPosition}
-							userTarget={userTarget}
-							displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-							setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
-							secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-							displayErrorContextualMenu={displayErrorContextualMenu} />
-					}
-					{
-						secondaryContextualMenu &&
-						<SecondaryContextualMenu
-							displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-							userTarget={userTarget}
-							secondaryContextualMenuPosition={secondaryContextualMenuPosition}
-							secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-							channels={userAuthenticate.channels}
-							displayErrorContextualMenu={displayErrorContextualMenu} />
-					}
-					{
-						errorContextualMenu &&
-						<ErrorContextualMenu
-							displayErrorContextualMenu={displayErrorContextualMenu}
-							errorContextualMenuPosition={contextualMenuPosition}
-						/>
-					}
-					<LeftGameWrapper $social={social}>
-						<Logo />
-						<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-						<Social
-							social={social}
-							displaySocial={displaySocial}
-							friends={userAuthenticate.friends}
-							displayContextualMenu={displayContextualMenu}
-							setContextualMenuPosition={setContextualMenuPosition} />
-						</CardContext.Provider>
-					</LeftGameWrapper>
-					<RightGameWrapper>
-						<TopGameWrapper>
-							<Info />
-							<Profile
-								userAuthenticate={userAuthenticate}
-								card={card}
-								userTarget={userTarget}
-								setUserTarget={setUserTarget}
-								displayCard={displayCard}
-								setCardPosition={setCardPosition}
-								settings={settings}
-								displaySettingsMenu={displaySettingsMenu} />
-						</TopGameWrapper>
-						<BottomGameWrapper>
-							<Pong />
-							{
-								card &&
-								<Card
-									cardPosition={cardPosition}
-									displayCard={displayCard}
-									userTarget={userTarget} />
-							}
-							<TestsBack />
-							{
-								<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
+			{
+				!errorRequest ?
+					<GlobalContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+						<GlobalDisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, GameWrapperRef }}>
+							<GameWrapper ref={GameWrapperRef}>
+								{
+									contextualMenu.display &&
+									<ContextualMenu
+										type={contextualMenu.type}
+										displayContextualMenu={displayContextualMenu}
+										contextualMenuPosition={contextualMenuPosition}
+										userTarget={userTarget}
+										displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+										setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
+										secondaryContextualMenuHeight={secondaryContextualMenuHeight}
+										displayErrorContextualMenu={displayErrorContextualMenu} />
+								}
+								{
+									secondaryContextualMenu &&
+									<SecondaryContextualMenu
+										displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+										userTarget={userTarget}
+										secondaryContextualMenuPosition={secondaryContextualMenuPosition}
+										secondaryContextualMenuHeight={secondaryContextualMenuHeight}
+										channels={userAuthenticate.channels}
+										displayErrorContextualMenu={displayErrorContextualMenu} />
+								}
+								{
+									errorContextualMenu &&
+									<ErrorContextualMenu
+										displayErrorContextualMenu={displayErrorContextualMenu}
+										errorContextualMenuPosition={contextualMenuPosition}
+									/>
+								}
+								<LeftGameWrapper $social={social}>
+									<Logo />
 									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-										<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-											<Chat channels={userAuthenticate.channels} />
-										</ChatContext.Provider>
+										<Social
+											social={social}
+											displaySocial={displaySocial}
+											friends={userAuthenticate.friends}
+											displayContextualMenu={displayContextualMenu}
+											setContextualMenuPosition={setContextualMenuPosition} />
 									</CardContext.Provider>
-								</ContextualMenuContext.Provider>
-							}
-							{
-								settings &&
-								<SettingsMenu
-									userAuthenticate={userAuthenticate}
-									displaySettingsMenu={displaySettingsMenu}
-								/>
-							}
-							</BottomGameWrapper>
-						</RightGameWrapper>
-					</GameWrapper>
-				</GlobalDisplayContext.Provider>
-			</GlobalContext.Provider>
-			:
-			<ErrorRequest />
-		}
+								</LeftGameWrapper>
+								<RightGameWrapper>
+									<TopGameWrapper>
+										<Info
+											setChatWindowState={setChatWindowState}
+											displayChat={displayChat} />
+										<Profile
+											userAuthenticate={userAuthenticate}
+											card={card}
+											userTarget={userTarget}
+											setUserTarget={setUserTarget}
+											displayCard={displayCard}
+											setCardPosition={setCardPosition}
+											settings={settings}
+											displaySettingsMenu={displaySettingsMenu} />
+									</TopGameWrapper>
+									<BottomGameWrapper>
+										<Pong />
+										{
+											card &&
+											<Card
+												cardPosition={cardPosition}
+												displayCard={displayCard}
+												userTarget={userTarget} />
+										}
+										<TestsBack />
+										{
+											<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
+												<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
+													<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+														<Chat
+															channels={userAuthenticate.channels}
+															chatWindowState={chatWindowState}
+															setChatWindowState={setChatWindowState} />
+													</ChatContext.Provider>
+												</CardContext.Provider>
+											</ContextualMenuContext.Provider>
+										}
+										{
+											settings &&
+											<SettingsMenu
+												userAuthenticate={userAuthenticate}
+												displaySettingsMenu={displaySettingsMenu}
+											/>
+										}
+									</BottomGameWrapper>
+								</RightGameWrapper>
+							</GameWrapper>
+						</GlobalDisplayContext.Provider>
+					</GlobalContext.Provider>
+					:
+					<ErrorRequest />
+			}
 		</GamePage>
 	)
 }

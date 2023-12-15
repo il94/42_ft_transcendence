@@ -1,8 +1,7 @@
 import colors from "./colors"
 
 const effects = {
-
-	pixelateWindow : `
+	pixelateWindow: `
 		polygon(
 		0px 8px,
 		4px 8px,
@@ -26,8 +25,7 @@ const effects = {
 		0px calc(100% - 8px)
 		)
 	`,
-
-	pixelateIcon : `
+	pixelateIcon: `
 		polygon(
 		0px calc(100% - 4px),
 		4px calc(100% - 4px),
@@ -43,8 +41,7 @@ const effects = {
 		0px 4px
 		)
 	`,
-
-	shadowButton : `
+	shadowButton: `
 		border-style: solid;
 		border-width: 5px;
 		border-color:
@@ -53,8 +50,7 @@ const effects = {
 		${colors.shadowButton}
 		${colors.button}
 	`,
-
-	shadowIcon : `
+	shadowIcon: `
 		border-style: solid;
 		border-width: 3px;
 		border-color:
@@ -63,8 +59,6 @@ const effects = {
 		${colors.shadowButton}
 		${colors.button}
 	`
-
-
 }
 
 export default effects

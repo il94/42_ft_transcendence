@@ -6,6 +6,12 @@ ALL/ :
 -GET http://localhost:3333/user/:id :
 	Route deja implemantee, juste ajouter le scoreResume de l'utilisateur (win draw loose)
 
+-POST http://localhost:3333/auth/signup :
+	Route deja implemantee, juste set les autres attributs (scoreResume, status ...)
+
+-POST http://localhost:3333/auth/signin :
+	Route deja implemantee mais renvoie 400
+
 (======================================================================)
 
 Game/ :
@@ -30,6 +36,10 @@ ChannelInterface/ :
 		password?: string
 	}
 	A implementer, doit permettre de creer un channel
+
+LockedInterface/ :
+-POST http://localhost:3333/channel/:id/validusers/:id :
+	A implementer, doit permettre d'ajouter un user a liste des users valides du channel 
 
 -PATCH http://localhost:3333/channel/:id : {
 		name: string,

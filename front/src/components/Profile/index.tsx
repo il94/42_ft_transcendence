@@ -40,8 +40,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	function showCard() {
 		if (card && userTarget === userAuthenticate)
 			displayCard(false)
-		else
-		{				
+		else {
 			setUserTarget(userAuthenticate)
 			setCardPosition({ right: 0, top: 0 })
 			displayCard(true)
@@ -51,7 +50,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	async function handleDeconnexionClickButton() {
 		try {
 			// await axios.post("http://localhost:3333/auth/logout")
-		
+
 		}
 		catch {
 
@@ -61,7 +60,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	return (
 		<Style>
 			<ProfileWrapper onClick={showCard}>
-				<Avatar src={userAuthenticate.avatar}/>
+				<Avatar src={userAuthenticate.avatar} />
 				<ProfileName>
 					{userAuthenticate.username}
 				</ProfileName>
@@ -69,7 +68,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 			<ButtonsWrapper>
 				<Icon
 					onClick={() => displaySettingsMenu(!settings)}
-					src={settingsIcon} size={38} 
+					src={settingsIcon} size={38}
 					alt="Settings button" title="Settings" />
 				<Icon
 					onClick={() => handleDeconnexionClickButton()}

@@ -7,8 +7,8 @@ import {
 import { ChannelData, User, UserAuthenticate } from '../utils/types'
 
 const GlobalContext = createContext<{
-	userAuthenticate: UserAuthenticate, 
-	userTarget: User | UserAuthenticate, 
+	userAuthenticate: UserAuthenticate,
+	userTarget: User | UserAuthenticate,
 	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 	channelTarget: ChannelData | undefined,
 	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,

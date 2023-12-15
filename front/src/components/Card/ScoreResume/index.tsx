@@ -25,7 +25,7 @@ type PropsScoreResume = {
 	}
 }
 
-function ScoreResume({ scoreResume } : PropsScoreResume) {
+function ScoreResume({ scoreResume }: PropsScoreResume) {
 	return (
 		<Style>
 			<Win value={scoreResume.wins} />

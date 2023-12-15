@@ -6,9 +6,8 @@ import {
 	MainTitle,
 	CentralWindow,
 	StyledTitle,
-	TextInput,
-	SignupForm,
-	Label,
+	SettingsForm,
+	Setting,
 	FTRedirectWrapper,
 	Separator,
 	Line,
@@ -19,6 +18,7 @@ import {
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
 import LinkButtonImage from '../../componentsLibrary/LinkButtonImage'
+import InputText from '../../componentsLibrary/InputText'
 
 import colors from '../../utils/colors'
 
@@ -32,27 +32,6 @@ import DefaultYellowAvatar from "../../assets/default_yellow.png"
 import FTButton from "../../assets/42.png"
 
 function Signup() {
-
-	const [errorMessage, setErrorMessage] = useState('')
-	const [inputUsername, setInputUsername] = useState('')
-	const [inputPassword, setInputPassword] = useState('')
-
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
-
-		event.preventDefault()
-
-		axios.post("http://localhost:3333/auth/signup",
-		{
-			username: inputUsername,
-			hash: inputPassword,
-			email: `${inputUsername}_test@test.fr`,
-			avatar: getRandomDefaultAvatar(),
-			tel: "0000000000"
-		})
-		.then((response) => console.log(response))
-		.catch((error) => console.log(error))
-
-	}
 
 	function getRandomDefaultAvatar(): string {
 
@@ -71,24 +50,170 @@ function Signup() {
 		return (defaultAvatars[randomIndex])
 	}
 
-	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+	type PropsSetting = {
+		value: string,
+		error: boolean,
+		errorMessage?: string
+	}
 
-		const { name, value } = event.target
+	const [username, setUsername] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+	const [password, setPassword] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+	const [email, setEmail] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
 
-		if (name === "username")
-		{
-			if (value.length > 8 )
-				setErrorMessage("Username must be 8 characters max")
-			else if (!/^[a-zA-Z0-9-_.]*$/.test(value))
-				setErrorMessage("Username can't contain special characters")
-			else
-			{
-				setInputUsername(value)
-				setErrorMessage('')
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		try {
+			event.preventDefault()
+			if (username.value.length === 0 ||
+				password.value.length === 0 ||
+				email.value.length === 0 ||
+				phoneNumber.value.length === 0) {
+				if (username.value.length === 0) {
+					setUsername({
+						value: '',
+						error: true,
+						errorMessage: "Insert username",
+					})
+				}
+				if (password.value.length === 0) {
+					setPassword({
+						value: '',
+						error: true,
+						errorMessage: "Insert password",
+					})
+				}
+				if (email.value.length === 0) {
+					setEmail({
+						value: '',
+						error: true,
+						errorMessage: "Insert email",
+					})
+				}
+				if (phoneNumber.value.length === 0) {
+					setPhoneNumber({
+						value: '',
+						error: true,
+						errorMessage: "Insert phone number",
+					})
+				}
+				return
 			}
+			if (username.error || password.error || email.error || phoneNumber.error)
+				return
+
+			const newUser = {
+				username: username.value,
+				avatar: getRandomDefaultAvatar(),
+				hash: password.value,
+				email: email.value,
+				tel: phoneNumber.value,
+			}
+
+			await axios.post("http://localhost:3333/auth/signup", newUser)
 		}
-		else
-			setInputPassword(value.replace(/\./g, '*'))
+		catch (error) {
+
+		}
+	}
+
+	/* ============================== USERNAME ================================== */
+
+	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		if (value.length > 8) {
+			setUsername((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "8 characters max"
+			}))
+		}
+		else if (!/^[a-zA-Z0-9-_.]*$/.test(value)) {
+			setUsername((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username can't contain special characters",
+			}))
+		}
+		else {
+			setUsername({
+				value: value,
+				error: false
+			})
+		}
+	}
+
+	function handleInputUsernameBlur(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setUsername({
+			value: value,
+			error: false
+		})
+	}
+
+	/* ============================== PASSWORD ================================== */
+
+	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setPassword({
+			value: value,
+			error: false
+		})
+	}
+
+	const [showPassword, setShowPassword] = useState<boolean>(false)
+
+	/* =============================== EMAIL ==================================== */
+
+	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		if (!/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(value)) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Invalid email"
+			})
+		}
+		else {
+			setEmail({
+				value: value,
+				error: false
+			})
+		}
+	}
+
+	/* ============================ PHONE NUMBER ================================ */
+
+	function handleInputTelChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value) && value.length !== 0) {
+			setPhoneNumber({
+				value: value,
+				error: true,
+				errorMessage: "Invalid phone number"
+			})
+		}
+		else {
+			setPhoneNumber({
+				value: value,
+				error: false
+			})
+		}
 	}
 
 	return (
@@ -102,27 +227,81 @@ function Signup() {
 				<StyledTitle>
 					Sign up
 				</StyledTitle>
-				<SignupForm onSubmit={handleSubmit} autoComplete="off" spellCheck="false" >
-					<Label>
+				<SettingsForm
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					spellCheck="false">
+					<Setting>
 						Username
-						<TextInput type="text" onChange={handleInputChange}
-							name="username" value={inputUsername} />
-					</Label>
-					<Label>
-						Password
-						<TextInput type="password" onChange={handleInputChange}
-							name="password" value={inputPassword} />
-					</Label>
+						<InputText
+							onChange={handleInputUsernameChange}
+							onBlur={handleInputUsernameBlur}
+							type="text" value={username.value}
+							width={231}
+							fontSize={25}
+							$error={username.error} />
 						<ErrorMessage>
-							{errorMessage}
+							{username.error && username.errorMessage}
 						</ErrorMessage>
+					</Setting>
+					<Setting>
+						Password
+						<InputText
+							onChange={handleInputPasswordChange}
+							type={showPassword ? "text" : "password"}
+							value={password.value as string}
+							width={231}
+							fontSize={25}
+							$error={password.error} />
+						<ErrorMessage>
+							{password.error && password.errorMessage}
+						</ErrorMessage>
+						<Button
+							onClick={() => setShowPassword(!showPassword)}
+							type="button"
+							fontSize={18}
+							alt="Show password button"
+							title={showPassword ? "Hide password" : "Show password"}
+							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+							{
+								showPassword ?
+									"Hide password"
+									:
+									"Show password"
+							}
+						</Button>
+					</Setting>
+					<Setting>
+						E-mail
+						<InputText
+							onChange={handleInputEmailChange}
+							type="text" value={email.value as string}
+							width={231}
+							fontSize={25}
+							$error={email.error} />
+						<ErrorMessage>
+							{email.error && email.errorMessage}
+						</ErrorMessage>
+					</Setting>
+					<Setting>
+						Phone number
+						<InputText
+							onChange={handleInputTelChange}
+							type="text" value={phoneNumber.value as string}
+							width={231}
+							fontSize={25}
+							$error={phoneNumber.error} />
+						<ErrorMessage>
+							{phoneNumber.error && phoneNumber.errorMessage}
+						</ErrorMessage>
+					</Setting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SignupForm>
+				</SettingsForm>
 				<div>
 					Already have an account ?&nbsp;
 					<StyledLink to="/signin" color={colors.button}>
@@ -138,7 +317,7 @@ function Signup() {
 				</Separator>
 				<FTRedirectWrapper>
 					<LinkButtonImage to="http://localhost:3333/auth/api42/login">
-						<img src={FTButton} style={{ paddingRight: "7px"}} />
+						<img src={FTButton} style={{ paddingRight: "7px" }} />
 						Continue with 42
 					</LinkButtonImage>
 				</FTRedirectWrapper>

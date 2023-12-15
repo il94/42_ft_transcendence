@@ -1,4 +1,6 @@
 import {
+	Dispatch,
+	SetStateAction,
 	useContext,
 	useEffect,
 	useState
@@ -7,7 +9,7 @@ import {
 import {
 	Style,
 	ChatButton,
-	TopChatWrapper, 
+	TopChatWrapper,
 	BottomChatWrapper,
 	ChannelCreateButton
 } from "./style"
@@ -17,6 +19,8 @@ import ChatInterface from "./ChatInterface"
 import ChannelInterface from "./ChannelInterface"
 import Banner from "./Banner"
 import Icon from "../../componentsLibrary/Icon"
+import HomeInterface from "./HomeInterface"
+import LockedInterface from "./LockedInterface"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import ChatContext from "../../contexts/ChatContext"
@@ -29,11 +33,13 @@ import ChatIcon from "../../assets/chat.png"
 import GlobalContext from "../../contexts/GlobalContext"
 
 type PropsChat = {
-	channels: ChannelData[]
+	channels: ChannelData[],
+	chatWindowState: chatWindowStatus,
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
 }
 
-function Chat({ channels } : PropsChat) {
-	
+function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
+
 	function handleCickChatButton() {
 		displayChat(true)
 		setZChatIndex(zChatIndex + 1)
@@ -45,7 +51,6 @@ function Chat({ channels } : PropsChat) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
-	const [chatWindowState, setChatWindowState] = useState<chatWindowStatus>(chatWindowStatus.HOME)
 	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
 	const [bannerName, setBannerName] = useState<string>("Welcome")
 
@@ -54,24 +59,19 @@ function Chat({ channels } : PropsChat) {
 	}, [])
 
 	useEffect(() => {
-		
-		if (chatWindowState === chatWindowStatus.HOME)
-		{
+		if (chatWindowState === chatWindowStatus.HOME) {
 			setValueChannelCreateButton("Create")
 			setBannerName("Welcome")
 		}
-		else if (channelTarget && chatWindowState === chatWindowStatus.CHANNEL)
-		{
+		else if (channelTarget && (chatWindowState === chatWindowStatus.CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
 			setValueChannelCreateButton("Create")
 			setBannerName(channelTarget.name)
 		}
-		else if (channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
-		{
+		else if (channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 			setValueChannelCreateButton("<<")
 			setBannerName(channelTarget.name)
 		}
-		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL)
-		{
+		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
 			setValueChannelCreateButton("<<")
 			setBannerName("Create")
 		}
@@ -88,8 +88,7 @@ function Chat({ channels } : PropsChat) {
 			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
 		else if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
 			setChatWindowState(chatWindowStatus.CHANNEL)
-		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL)
-		{
+		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
 			if (!channelTarget)
 				setChatWindowState(chatWindowStatus.HOME)
 			else
@@ -97,69 +96,66 @@ function Chat({ channels } : PropsChat) {
 		}
 	}
 
-	useEffect(() => {
-		if (channels[0])
-			setChatWindowState(chatWindowStatus.CHANNEL)
-	}, [channelTarget, channels])
-
 	return (
 		chat ?
-		<Style
-			onContextMenu={(event) => event.preventDefault()}
-			onClick={() => {setZChatIndex(zCardIndex + 1)}}
-			$zIndex={zChatIndex}>
-		{
-			!errorRequest ?
-			<>
-				<TopChatWrapper>
-					<ChannelCreateButton onClick={handleClickCreateButton}>
-						{valueChannelCreateButton}
-					</ChannelCreateButton>
-				<Banner
-					chatWindowState={chatWindowState}
-					setChatWindowState={setChatWindowState}
-					bannerName={bannerName} 
-					setErrorRequest={setErrorRequest} />
-				</TopChatWrapper>
-				<BottomChatWrapper>
+			<Style
+				onContextMenu={(event) => event.preventDefault()}
+				onClick={() => { setZChatIndex(zCardIndex + 1) }}
+				$zIndex={zChatIndex}>
 				{
-					chatWindowState === chatWindowStatus.UPDATE_CHANNEL || 
-					chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
-					<ChannelInterface
-						channel={channelTarget}
-						chatWindowState={chatWindowState}
-						setChatWindowState={setChatWindowState}
-						setBannerName={setBannerName} />
-					:
-					<>
-						<ChannelList
-							channels={channels}
-							setChannelTarget={setChannelTarget}
-							setChatWindowState={setChatWindowState} />
-						{
-							chatWindowState === chatWindowStatus.HOME ||
-							!channelTarget ?
-							<div>
-								salut
-							</div>
-							:
-							<ChatInterface channelTarget={channelTarget} />
-						}
-					</>
+					!errorRequest ?
+						<>
+							<TopChatWrapper>
+								<ChannelCreateButton onClick={handleClickCreateButton}>
+									{valueChannelCreateButton}
+								</ChannelCreateButton>
+								<Banner
+									chatWindowState={chatWindowState}
+									setChatWindowState={setChatWindowState}
+									bannerName={bannerName}
+									setErrorRequest={setErrorRequest} />
+							</TopChatWrapper>
+							<BottomChatWrapper>
+								{
+									chatWindowState === chatWindowStatus.UPDATE_CHANNEL ||
+										chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
+										<ChannelInterface
+											channel={channelTarget}
+											chatWindowState={chatWindowState}
+											setChatWindowState={setChatWindowState}
+											setBannerName={setBannerName} />
+										:
+										<>
+											<ChannelList
+												channels={channels}
+												setChannelTarget={setChannelTarget}
+												setChatWindowState={setChatWindowState} />
+											{
+												chatWindowState === chatWindowStatus.HOME ||
+													!channelTarget ?
+													<HomeInterface />
+													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
+														<LockedInterface
+															channelTarget={channelTarget}
+															setChatWindowState={setChatWindowState} />
+														:
+														<ChatInterface channelTarget={channelTarget} />
+											}
+										</>
+								}
+							</BottomChatWrapper>
+						</>
+						:
+						<ErrorRequest />
 				}
-				</BottomChatWrapper>
-			</>
+			</Style>
 			:
-			<ErrorRequest />
-		}
-		</Style>
-		:
-		<ChatButton $zIndex={zChatIndex + 1}>
-			<Icon
-				onClick={handleCickChatButton}
-				src={ChatIcon} size={38}
-				alt="Chat button" title="Chat" />
-		</ChatButton>
+			<ChatButton $zIndex={zChatIndex + 1}>
+				<Icon
+					onClick={handleCickChatButton}
+					src={ChatIcon} size={38}
+					alt="Chat button" title="Chat" />
+			</ChatButton>
 	)
 }
 

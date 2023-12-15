@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const LinkButton = styled(Link)<{ width?: number, fontSize?: number, alt: string, title: string }>`
+const LinkButton = styled(Link) <{ width?: number, fontSize?: number, alt: string, title: string }>`
 
 	width: ${(props) => props.width ? props.width + "px" : "auto"};
 

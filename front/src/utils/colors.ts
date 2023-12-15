@@ -41,7 +41,7 @@ const colors = {
 	rankSilver: "#BEBEBE",
 	rankBronze: "#C9772C",
 	rankNull: "#995C2F",
-	
+
 	/* Profile */
 	profile: "#C9783C",
 	avatar: "#524FFD",

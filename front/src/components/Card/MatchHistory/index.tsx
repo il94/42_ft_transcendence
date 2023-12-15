@@ -14,7 +14,7 @@ type PropsMatchHistory = {
 	userTarget: User | UserAuthenticate
 }
 
-function MatchHistory({ userTarget } : PropsMatchHistory) {
+function MatchHistory({ userTarget }: PropsMatchHistory) {
 
 	const [matchs, setMatchs] = useState<MatchData[] | undefined>(undefined)
 
@@ -22,10 +22,10 @@ function MatchHistory({ userTarget } : PropsMatchHistory) {
 		async function fetchMatchs() {
 			try {
 
-			/* ============ Temporaire ============== */
+				/* ============ Temporaire ============== */
 
-			// const response = await axios.get("http://localhost:3333/user/:id/history") //(id etant userIdTarget)
-			// setMatchs(response.data)		
+				// const response = await axios.get("http://localhost:3333/user/:id/history") //(id etant userIdTarget)
+				// setMatchs(response.data)		
 
 				setMatchs([
 					{
@@ -54,7 +54,7 @@ function MatchHistory({ userTarget } : PropsMatchHistory) {
 					}
 				])
 
-			/* ====================================== */
+				/* ====================================== */
 
 			}
 			catch (error) {
@@ -66,25 +66,25 @@ function MatchHistory({ userTarget } : PropsMatchHistory) {
 
 	return (
 		<Style>
-		{
-			matchs ?
-			<ScrollBar>
 			{
-				matchs.map((match, index) => (
-					<Match
-						key={"match" + index} // a definir
-						username={match.user.username}
-						opponent={match.opponent.username}
-						result={match.result}
-						scoreUser={match.scoreUser}
-						scoreOpponent={match.scoreOpponent}
-					/>
-				))
+				matchs ?
+					<ScrollBar>
+						{
+							matchs.map((match, index) => (
+								<Match
+									key={"match" + index} // a definir
+									username={match.user.username}
+									opponent={match.opponent.username}
+									result={match.result}
+									scoreUser={match.scoreUser}
+									scoreOpponent={match.scoreOpponent}
+								/>
+							))
+						}
+					</ScrollBar>
+					:
+					<ErrorRequest />
 			}
-			</ScrollBar>
-			:
-			<ErrorRequest />
-		}
 		</Style>
 	)
 }

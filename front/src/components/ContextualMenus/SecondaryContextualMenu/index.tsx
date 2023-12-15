@@ -23,16 +23,15 @@ type PropsSecondaryContextualMenu = {
 	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu } : PropsSecondaryContextualMenu) {
+function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu }: PropsSecondaryContextualMenu) {
 
 	async function handleInviteClickEvent(channel: ChannelData) {
 		try {
-			if (!channel.users.includes(userTarget))
-			{
+			if (!channel.users.includes(userTarget)) {
 				/* ============ Temporaire ============== */
-	
+
 				// await axios.post(`http://localhost:3333/channel/${channel.id}/users/${userTarget.id}`, userTarget)
-	
+
 				/* ====================================== */
 				channel.users.push(userTarget)
 			}
@@ -50,22 +49,22 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 			$top={secondaryContextualMenuPosition.top}
 			$bottom={secondaryContextualMenuPosition.bottom}
 			$height={secondaryContextualMenuHeight}>
-		{
-			channels ?
-			<ScrollBar>
 			{
-				channels.map((channel, index) => (
-					<Section key={"channelSection" + index} onClick={() => handleInviteClickEvent(channel)}>
-						<SectionName> 
-							{channel.name}
-						</SectionName>
-					</Section>
-				))
+				channels ?
+					<ScrollBar>
+						{
+							channels.map((channel, index) => (
+								<Section key={"channelSection" + index} onClick={() => handleInviteClickEvent(channel)}>
+									<SectionName>
+										{channel.name}
+									</SectionName>
+								</Section>
+							))
+						}
+					</ScrollBar>
+					:
+					<ErrorRequest />
 			}
-			</ScrollBar>
-			:
-			<ErrorRequest />
-		}
 		</Style>
 	)
 }

@@ -38,6 +38,7 @@ export type ChannelData = {
 	owner: User | UserAuthenticate,
 	administrators: (User | UserAuthenticate)[],
 	users: (User | UserAuthenticate)[],
+	validUsers: (User | UserAuthenticate)[],
 	mutedUsers: (User | UserAuthenticate)[],
 	bannedUsers: (User | UserAuthenticate)[]
 }

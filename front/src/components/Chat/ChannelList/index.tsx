@@ -27,22 +27,22 @@ type PropsChannelList = {
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 }
 
-function ChannelList({ channels, setChannelTarget, setChatWindowState } : PropsChannelList) {
+function ChannelList({ channels, setChannelTarget, setChatWindowState }: PropsChannelList) {
 
 	return (
 		<Style>
 			<ScrollBar>
-			{
-				channels.map((channel, index) => (
-					<ChannelSection
-						key={"channel" + index} // a definir
-						channel={channel}
-						setChannelTarget={setChannelTarget}
-						setChatWindowState={setChatWindowState}
-						backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
-					/>
-				))
-			}
+				{
+					channels.map((channel, index) => (
+						<ChannelSection
+							key={"channel" + index} // a definir
+							channel={channel}
+							setChannelTarget={setChannelTarget}
+							setChatWindowState={setChatWindowState}
+							backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
+						/>
+					))
+				}
 			</ScrollBar>
 		</Style>
 	)

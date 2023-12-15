@@ -29,37 +29,37 @@ function Home() {
 					Transcendance
 				</StyledLink>
 			</MainTitle>
+			<button onClick={() => setIsAuth(!isAuth)} style={{ color: "black" }}>
+				Auth ?
+			</button>
 			<CentralWindow>
 				<StyledTitle>
 					Welcome
 				</StyledTitle>
 				{
-					isAuth ? 
-					<ButtonsWrapper>
-						<LinkButton
-							to="/game" fontSize={35}
-							alt="Game button" title="Game">
-							Game !
-						</LinkButton>
-					</ButtonsWrapper>
-					:
-					<ButtonsWrapper>
-						<LinkButton
-							to="/signin" width={165} fontSize={35}
-							alt="Sign in button" title="Sign in">
-							Sign in
-						</LinkButton>
-						<LinkButton
-							to="/signup" width={165} fontSize={35}
-							alt="Sign up button" title="Sign up">
-							Sign up
-						</LinkButton>
-					</ButtonsWrapper>
+					isAuth ?
+						<ButtonsWrapper>
+							<LinkButton
+								to="/game" fontSize={35}
+								alt="Game button" title="Game">
+								Game !
+							</LinkButton>
+						</ButtonsWrapper>
+						:
+						<ButtonsWrapper>
+							<LinkButton
+								to="/signin" width={165} fontSize={35}
+								alt="Sign in button" title="Sign in">
+								Sign in
+							</LinkButton>
+							<LinkButton
+								to="/signup" width={165} fontSize={35}
+								alt="Sign up button" title="Sign up">
+								Sign up
+							</LinkButton>
+						</ButtonsWrapper>
 				}
 			</CentralWindow>
-			<button onClick={() => setIsAuth(!isAuth)} style={{ color: "black" }}>
-				Auth ?
-			</button>
 		</HomePage>
 	)
 }

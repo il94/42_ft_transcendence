@@ -39,7 +39,7 @@ type PropsScore = {
 	scoreOpponent: number
 }
 
-function Score({ scoreUser, scoreOpponent } : PropsScore) {
+function Score({ scoreUser, scoreOpponent }: PropsScore) {
 	return (
 		<Style>
 			<ScoreUser>

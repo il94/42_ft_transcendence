@@ -8,10 +8,7 @@ export const HomePage = styled.div`
 	flex-direction: column;
 	align-items: center;
 
-	position: relative;
-
-	width: 100%;
-	height: 100%;
+	min-height: 100%;
 
 	background-color: ${colors.background}; 
 
@@ -33,12 +30,10 @@ export const CentralWindow = styled.div`
 	flex-direction: column;
 	align-items: center;
 
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-
 	width: 400px;
 
+	margin-top: auto;
+	margin-bottom: auto;
 	padding-bottom: 5px;
 
 	border-style: solid;
@@ -57,6 +52,7 @@ export const StyledTitle = styled.h2`
 	width: 100%;
 
 	font-size: 45px;
+	font-weight: bold;
 
 	text-align: center;
 

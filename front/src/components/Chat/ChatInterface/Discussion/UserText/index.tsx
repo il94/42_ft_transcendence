@@ -4,7 +4,7 @@ type PropsUserText = {
 	content: string
 }
 
-function UserText({ content } : PropsUserText) {
+function UserText({ content }: PropsUserText) {
 	return (
 		<Style className="UserTexts">
 			<Text>

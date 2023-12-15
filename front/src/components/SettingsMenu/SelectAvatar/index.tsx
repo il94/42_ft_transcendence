@@ -17,13 +17,12 @@ type PropsSelectAvatar = {
 	setAvatar: Dispatch<SetStateAction<string>>
 }
 
-function SelectAvatar({ avatar, setAvatar } : PropsSelectAvatar ) {
+function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 
 	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
 
 		const avatar = event.target.files?.[0]
-		if (avatar)
-		{
+		if (avatar) {
 			const reader = new FileReader()
 
 			reader.onloadend = () => {

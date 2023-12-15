@@ -52,8 +52,7 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 
 		const friendcontainer = friendContainerRef.current // sert a cibler le container et non ses enfants
 
-		if (friendcontainer)
-		{
+		if (friendcontainer) {
 			setUserTarget(friend)
 
 			const heightCard = 371 // height de la carte
@@ -119,7 +118,7 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 					</ProfileStatus>
 				</ProfileInfo>
 			}
-		</Style>		
+		</Style>
 	)
 }
 

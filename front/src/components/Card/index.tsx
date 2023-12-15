@@ -44,14 +44,14 @@ function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 
 	return (
 		<Style
-			onClick={() => {setZCardIndex(zChatIndex + 1)}}
+			onClick={() => { setZCardIndex(zChatIndex + 1) }}
 			$left={cardPosition.left}
 			$right={cardPosition.right}
 			$top={cardPosition.top}
 			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
 			<TopWrapper>
-				<Avatar src={userTarget.avatar}/>
+				<Avatar src={userTarget.avatar} />
 				<CloseButton>
 					<Icon onClick={() => displayCard(false)}
 						src={CloseIcon} size={24}

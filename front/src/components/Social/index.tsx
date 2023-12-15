@@ -31,7 +31,7 @@ type PropsSocial = {
 	}>>
 }
 
-function Social({ friends, social, displaySocial, displayContextualMenu, setContextualMenuPosition } : PropsSocial) {
+function Social({ friends, social, displaySocial, displayContextualMenu, setContextualMenuPosition }: PropsSocial) {
 
 	const { displayCard } = useContext(CardContext)!
 
@@ -43,28 +43,28 @@ function Social({ friends, social, displaySocial, displayContextualMenu, setCont
 
 	return (
 		<Style onContextMenu={(event) => event.preventDefault()}>
-		{
-			friends ?
-			<>
-				<ScrollBar>
-				{
-					friends.map((friend, index) => (
-						<FriendSection
-							key={"friend" + index} // a definir
-							friend={friend}
-							backgroundColor={!(index % 2) ? colors.section : colors.sectionAlt}
-							social={social}
-							displayContextualMenu={displayContextualMenu}
-							setContextualMenuPosition={setContextualMenuPosition}
-						/>
-					))
-				}
-				</ScrollBar>
-				<ReduceButton onClick={reduceSocial} title="Reduce" />
-			</>
-			:
-			<ErrorRequest />
-		}
+			{
+				friends ?
+					<>
+						<ScrollBar>
+							{
+								friends.map((friend, index) => (
+									<FriendSection
+										key={"friend" + index} // a definir
+										friend={friend}
+										backgroundColor={!(index % 2) ? colors.section : colors.sectionAlt}
+										social={social}
+										displayContextualMenu={displayContextualMenu}
+										setContextualMenuPosition={setContextualMenuPosition}
+									/>
+								))
+							}
+						</ScrollBar>
+						<ReduceButton onClick={reduceSocial} title="Reduce" />
+					</>
+					:
+					<ErrorRequest />
+			}
 		</Style>
 	)
 }

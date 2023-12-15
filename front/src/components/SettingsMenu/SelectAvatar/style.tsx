@@ -19,7 +19,7 @@ export const SettingTtile = styled.div`
 
 `
 
-export const Avatar = styled.label<{src: string}>`
+export const Avatar = styled.label<{ src: string }>`
 
 	position: relative;
 

@@ -1,4 +1,4 @@
-import { 
+import {
 	Style,
 	Text,
 	ButtonsWrapper,
@@ -16,7 +16,7 @@ type PropsUserInvitation = {
 	status: string
 }
 
-function UserInvitation({ target, status } : PropsUserInvitation ) {
+function UserInvitation({ target, status }: PropsUserInvitation) {
 	return (
 		<Style>
 			<Text>

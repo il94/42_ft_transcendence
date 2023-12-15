@@ -14,14 +14,14 @@ type PropsMatch = {
 	scoreOpponent: number
 }
 
-function Match({ username, opponent, result, scoreUser, scoreOpponent } : PropsMatch ) {
+function Match({ username, opponent, result, scoreUser, scoreOpponent }: PropsMatch) {
 
-	const backgroundColor = 
+	const backgroundColor =
 		result === matchResultStatus.WIN ?
 			colors.historyWin
-		: result === matchResultStatus.DRAW ?
-			colors.historyDraw
-		: colors.historyLoose
+			: result === matchResultStatus.DRAW ?
+				colors.historyDraw
+				: colors.historyLoose
 
 	return (
 		<Style $backgroundColor={backgroundColor}>

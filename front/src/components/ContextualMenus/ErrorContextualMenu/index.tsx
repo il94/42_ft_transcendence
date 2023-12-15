@@ -41,7 +41,7 @@ type PropsErrorContextualMenu = {
 	}
 }
 
-function ErrorContextualMenu({ displayErrorContextualMenu, errorContextualMenuPosition } : PropsErrorContextualMenu) {
+function ErrorContextualMenu({ displayErrorContextualMenu, errorContextualMenuPosition }: PropsErrorContextualMenu) {
 
 	useEffect(() => {
 		setTimeout(() => {

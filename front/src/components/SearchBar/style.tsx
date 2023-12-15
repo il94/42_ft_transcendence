@@ -13,14 +13,14 @@ export const Style = styled.div`
 `
 
 export const StylesAttributes: any = {
-					
+
 	// La barre en elle-meme
 	control: (props: CSSObjectWithLabel) => ({
 		...props,
 
 		border: "none",
 		boxShadow: "none",
-		
+
 		clipPath: effects.pixelateWindow,
 
 		backgroundColor: colors.section
@@ -43,17 +43,17 @@ export const StylesAttributes: any = {
 	// Le texte ecrit par l'utilisateur
 	input: (props: CSSObjectWithLabel) => ({
 		...props,
-		
+
 		color: colors.text
 	}),
 
 	// L'option selectionnee affichee dans la barre
 	singleValue: (props: CSSObjectWithLabel) => ({
 		...props,
-		
+
 		color: colors.text,
 	}),
-	
+
 	// Le separateur du champ texte et du bouton
 	indicatorSeparator: (props: CSSObjectWithLabel) => ({
 		...props,
@@ -64,7 +64,7 @@ export const StylesAttributes: any = {
 	// Le bouton avec la fleche (remplacer par une loupe si possible)
 	dropdownIndicator: (props: CSSObjectWithLabel) => ({
 		...props,
-		
+
 		color: colors.text, '&:hover': {
 			color: colors.sectionHover
 		},
@@ -81,7 +81,7 @@ export const StylesAttributes: any = {
 		backgroundColor: "none"
 
 	}),
-	
+
 	// Le conteneur des options et des groupes
 	menuList: (props: CSSObjectWithLabel) => ({
 		...props,
@@ -129,9 +129,9 @@ export const StylesAttributes: any = {
 		backgroundColor: state.isFocused ?
 			colors.sectionHover :
 			colors.section,
-			'&:active': {
-				backgroundColor: colors.reduceButtonHover
-			}
+		'&:active': {
+			backgroundColor: colors.reduceButtonHover
+		}
 	}),
 
 	// Le resultat affiche si aucune correspondance

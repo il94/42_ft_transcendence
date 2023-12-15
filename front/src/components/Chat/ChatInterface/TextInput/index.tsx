@@ -14,7 +14,7 @@ type PropsTextInput = {
 	channelTarget: ChannelData
 }
 
-function TextInput({ /* channelTarget */ } : PropsTextInput) {
+function TextInput({ /* channelTarget */ }: PropsTextInput) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
@@ -27,16 +27,16 @@ function TextInput({ /* channelTarget */ } : PropsTextInput) {
 		if (message === '')
 			return
 		try {
-			
+
 			/* ============ Temporaire ============== */
-			
+
 			// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/messages`, {
 			// 	sender: userAuthenticate,
 			// 	type: messageStatus.TEXT,
 			// 	content: message
 			// })
 			setMessage('')
-			
+
 			/* ====================================== */
 
 		}
@@ -63,17 +63,17 @@ function TextInput({ /* channelTarget */ } : PropsTextInput) {
 			onSubmit={handleSubmit}
 			autoComplete="off"
 			spellCheck="false">
-		{
-			!errorRequest ?
-			<Input
-				onFocus={removePlaceHolder}
-				onBlur={setPlaceHolder}
-				onChange={handleInputChange}
-				value={message}
-				placeholder="Type here..." />
-			:
-			<ErrorRequest />
-		}
+			{
+				!errorRequest ?
+					<Input
+						onFocus={removePlaceHolder}
+						onBlur={setPlaceHolder}
+						onChange={handleInputChange}
+						value={message}
+						placeholder="Type here..." />
+					:
+					<ErrorRequest />
+			}
 		</Style>
 	)
 }

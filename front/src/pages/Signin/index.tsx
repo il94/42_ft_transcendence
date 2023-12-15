@@ -5,9 +5,8 @@ import {
 	MainTitle,
 	CentralWindow,
 	StyledTitle,
-	TextInput,
-	SigninForm,
-	Label,
+	SettingsForm,
+	Setting,
 	FTRedirectWrapper,
 	Separator,
 	Line,
@@ -18,6 +17,7 @@ import {
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
 import LinkButtonImage from '../../componentsLibrary/LinkButtonImage'
+import InputText from '../../componentsLibrary/InputText'
 
 import colors from '../../utils/colors'
 
@@ -26,42 +26,83 @@ import axios from 'axios'
 
 function Signin() {
 
-	const [errorMessage, setErrorMessage] = useState('')
-	const [inputUsername, setInputUsername] = useState('')
-	const [inputPassword, setInputPassword] = useState('')
-
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
-
-		event.preventDefault()
-
-		axios.post("http://localhost:3333/auth/signin",
-		{
-			username: inputUsername,
-			hash: inputPassword,
-			email: `${inputUsername}_test@test.fr` // a retirer
-		})
-		.then((response) => console.log(response))
-		.catch((error) => console.log(error))
-
+	type PropsSetting = {
+		value: string,
+		error: boolean,
+		errorMessage?: string
 	}
 
-	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+	const [login, setLogin] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+	const [password, setPassword] = useState<PropsSetting>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
 
-		const { name, value } = event.target
-
-		if (name === "username") {
-			if (value.length > 8)
-				setErrorMessage("Username must be 8 characters max")
-			else if (!/^[a-zA-Z0-9-_.]*$/.test(value))
-				setErrorMessage("Username can't contain special characters")
-			else {
-				setInputUsername(value)
-				setErrorMessage('')
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		try {
+			event.preventDefault()
+			if (login.value.length === 0 ||
+				password.value.length === 0)
+			{
+				if (login.value.length === 0)
+				{
+					setLogin({
+						value: '',
+						error: true,
+						errorMessage: "Insert username or email",
+					})
+				}
+				if (password.value.length === 0) 
+				{
+					setPassword({
+						value: '',
+						error: true,
+						errorMessage: "Insert password",
+					})
+				}
+				return
 			}
+			if (login.error || password.error)
+				return
+
+			const user = {
+				login: login.value,
+				hash: password.value
+			}
+
+			await axios.post("http://localhost:3333/auth/signin", user)
 		}
-		else
-			setInputPassword(value.replace(/\./g, '*'))
+		catch (error) {
+
+		}
 	}
+
+	/* ============================== LOGIN ================================== */
+
+	function handleInputLoginChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setLogin({
+			value: value,
+			error: false
+		})
+	}
+
+	/* ============================== PASSWORD ================================== */
+
+	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setPassword({
+			value: value,
+			error: false
+		})
+	}
+
+	const [showPassword, setShowPassword] = useState<boolean>(false)
 
 	return (
 		<SigninPage>
@@ -74,27 +115,56 @@ function Signin() {
 				<StyledTitle>
 					Sign in
 				</StyledTitle>
-				<SigninForm onSubmit={handleSubmit} autoComplete="off" spellCheck="false">
-					<Label>
-						Username
-						<TextInput type="text" onChange={handleInputChange}
-							name="username" value={inputUsername} />
-					</Label>
-					<Label>
+				<SettingsForm
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					spellCheck="false">
+					<Setting>
+						Login or email
+						<InputText
+							onChange={handleInputLoginChange}
+							type="text" value={login.value}
+							width={231}
+							fontSize={25}
+							$error={login.error} />
+						<ErrorMessage>
+							{login.error && login.errorMessage}
+						</ErrorMessage>
+					</Setting>
+					<Setting>
 						Password
-						<TextInput type="password" onChange={handleInputChange}
-							name="password" value={inputPassword} />
-					</Label>
-					<ErrorMessage>
-						{errorMessage}
-					</ErrorMessage>
+						<InputText
+							onChange={handleInputPasswordChange}
+							type={showPassword ? "text" : "password"}
+							value={password.value as string}
+							width={231}
+							fontSize={25}
+							$error={password.error} />
+						<ErrorMessage>
+							{password.error && password.errorMessage}
+						</ErrorMessage>
+						<Button
+							onClick={() => setShowPassword(!showPassword)}
+							type="button"
+							fontSize={18}
+							alt="Show password button"
+							title={showPassword ? "Hide password" : "Show password"}
+							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+							{
+								showPassword ?
+									"Hide password"
+									:
+									"Show password"
+							}
+						</Button>
+					</Setting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SigninForm>
+				</SettingsForm>
 				<div>
 					Don't have an account?&nbsp;
 					<StyledLink to="/signup" color={colors.button}>
