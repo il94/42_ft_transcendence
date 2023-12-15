@@ -2,7 +2,7 @@ import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
-export const Style = styled.div<{$top?: number, $left?: number, $right?: number, $zIndex: number}>`
+export const Style = styled.div<{ $left?: number, $right?: number, $top?: number, $bottom?: number, $zIndex: number }>`
 
 	display: flex;
 
@@ -13,6 +13,7 @@ export const Style = styled.div<{$top?: number, $left?: number, $right?: number,
 	left: ${(props) => props.$left}px;
 	right: ${(props) => props.$right}px;
 	top: ${(props) => props.$top}px;
+	bottom: ${(props) => props.$bottom}px;
 	z-index: ${(props) => props.$zIndex};
 
 	width: 240px;

@@ -8,17 +8,17 @@ const CardContext = createContext<{
 	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
 	cardPosition: {
-		top?: number,
 		left?: number,
-		right?: number
+		right?: number,
+		top?: number,
+		bottom?: number
 	},
 	setCardPosition: Dispatch<SetStateAction<{
-		top?: number,
 		left?: number,
-		right?: number
-	}>>,
-	cardIdTarget: number,
-	setIdTargetCard: Dispatch<SetStateAction<number>>
+		right?: number,
+		top?: number,
+		bottom?: number
+	}>>
 } | undefined>(undefined)
 
 export default CardContext

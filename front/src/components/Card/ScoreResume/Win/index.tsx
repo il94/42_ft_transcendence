@@ -16,7 +16,7 @@ type PropsWin = {
 	value: number
 }
 
-function Win({ value } : PropsWin) {
+function Win({ value }: PropsWin) {
 	return (
 		<Style>
 			{value}W

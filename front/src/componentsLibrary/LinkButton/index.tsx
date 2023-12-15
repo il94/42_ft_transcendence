@@ -3,16 +3,18 @@ import { Link } from 'react-router-dom'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const LinkButton = styled(Link)`
+const LinkButton = styled(Link) <{ width?: number, fontSize?: number, alt: string, title: string }>`
+
+	width: ${(props) => props.width ? props.width + "px" : "auto"};
 
 	padding-top: 1px;
-	padding-left: 11px;
+	padding-left: ${(props) => props.width ? 1 : 11}px;
 	padding-bottom: 3px;
-	padding-right: 13px;
+	padding-right: ${(props) => props.width ? 3 : 13}px;;
 
 	cursor: pointer;
 
-	font-size: 35px;
+	font-size: ${(props) => props.fontSize}px;
 	text-decoration: none;
 	text-align: center;
 

@@ -16,11 +16,21 @@ const ScoreUser = styled.p`
 	
 	margin-right: 2px;
 
+	color: ${colors.textAlt};
+
 `
 
 const ScoreOpponent = styled.p`
 	
 	margin-left: 2px;
+	
+	color: ${colors.textAlt};
+
+`
+
+const Separator = styled.p`
+
+	color: ${colors.textAlt};
 	
 `
 
@@ -29,13 +39,15 @@ type PropsScore = {
 	scoreOpponent: number
 }
 
-function Score({ scoreUser, scoreOpponent } : PropsScore) {
+function Score({ scoreUser, scoreOpponent }: PropsScore) {
 	return (
 		<Style>
 			<ScoreUser>
 				{scoreUser}
 			</ScoreUser>
-			<p>-</p>
+			<Separator>
+				-
+			</Separator>
 			<ScoreOpponent>
 				{scoreOpponent}
 			</ScoreOpponent>

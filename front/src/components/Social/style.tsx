@@ -26,7 +26,6 @@ export const ReduceButton = styled.button`
 	background-color: ${colors.reduceButton};
 
 	&:hover {
-		cursor: pointer;
 		background-color: ${colors.reduceButtonHover};
 	}
 
