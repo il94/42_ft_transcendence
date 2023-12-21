@@ -1,7 +1,8 @@
+import { Dispatch, SetStateAction } from "react"
 import styled from "styled-components"
 import SearchBar from "../SearchBar"
-import { Dispatch, SetStateAction } from "react"
 import { chatWindowStatus } from "../../utils/status"
+import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
@@ -13,7 +14,7 @@ export const Style = styled.div`
 	height: 53px;
 	min-height: 53px;
 
-	background-color: #B197FA;
+	background-color: ${colors.profile};
 
 `
 
