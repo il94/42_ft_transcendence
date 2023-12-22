@@ -94,8 +94,8 @@ export class ChannelsService {
 
   /****************************** CRUD USER ON CHANNEL ***********************/
 
-  
 
+  
   // ROLE USER : BLOCK, INVITE_PONG, GET_PROFILE, LEAVE, SEND_MESSAGE
 
   // ROLE ADMIN : BLOCK, LEAVE, KICK, BAN, MUTE /!\ if target is not owner
