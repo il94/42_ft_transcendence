@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 
 import {
 	SigninPage,
@@ -23,8 +23,11 @@ import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
 import axios from 'axios'
+import AuthContext from '../../contexts/AuthContext'
 
 function Signin() {
+
+	console.log("YOP")
 
 	type PropsSetting = {
 		value: string,
@@ -75,7 +78,12 @@ function Signin() {
 				hash: password.value
 			}
 
-			await axios.post("http://localhost:3333/auth/signin", user)
+			const response = await axios.post("http://localhost:3333/auth/signin", user)
+
+			const { setToken } = useContext(AuthContext)!
+
+			console.log(response.data)
+			setToken(response.data)
 		}
 		catch (error) {
 
