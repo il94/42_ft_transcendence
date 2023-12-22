@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, UpdateChannelDto } from './dto/';
 import { Channel, User, ChannelStatus } from '@prisma/client';
@@ -51,7 +51,6 @@ export class ChannelsService {
     }
 
     return newChannel;
-
   }
 
   // retrieve all user's channels
@@ -73,18 +72,36 @@ export class ChannelsService {
 
   // decorer avec roleguard : le user doit etre owner ou admin 
   // get one channel by id
-  async findOne(chanId: number, member: User) {
+  async findOneChannel(chanId: number, member: User) {
     const channel = await this.prisma.usersOnChannels.findUnique({ 
       where: { userId_channelId: {
         userId: member.id,
         channelId: chanId }
       }},
     )
+    if (!channel)
+      throw new NotFoundException(`User with id ${member.id} is not related to channel id ${chanId}`);
     return channel;
   }
 
   // update a channel, by a user who has edit role
-  update(id: number, updateChannelDto: UpdateChannelDto) {
+  async updateChannel(updateChannelDto: UpdateChannelDto, member: User) {
+    //const chan = this.prisma.channel.findUnique
+    try {
+      const channel = this.findOneChannel(updateChannelDto.id, member);
+      await this.prisma.channel.update({ where: { id: updateChannelDto.id },
+        data: { 
+          name: updateChannelDto.name,
+	        type:       updateChannelDto.type,
+	        password:	updateChannelDto.password,
+        } 
+      })
+
+
+    } catch (error) {
+
+    }
+
     return `This action updates a #${id} chat`;
   }
 
@@ -95,7 +112,7 @@ export class ChannelsService {
   /****************************** CRUD USER ON CHANNEL ***********************/
 
 
-  
+
   // ROLE USER : BLOCK, INVITE_PONG, GET_PROFILE, LEAVE, SEND_MESSAGE
 
   // ROLE ADMIN : BLOCK, LEAVE, KICK, BAN, MUTE /!\ if target is not owner

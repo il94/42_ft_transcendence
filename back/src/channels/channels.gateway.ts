@@ -74,12 +74,12 @@ handlePrivateMessage(client: any, data: any) {
 
   @SubscribeMessage('findOneChannel')
   findOne(@MessageBody() id: number, @Request() member: User) {
-    return this.channelsService.findOne(id, member);
+    return this.channelsService.findOneChannel(id, member);
   }
 
   @SubscribeMessage('updateChannel')
-  update(@MessageBody() updateChannelDto: UpdateChannelDto) {
-    return this.channelsService.update(updateChannelDto.id, updateChannelDto);
+  update(@MessageBody() updateChannelDto: UpdateChannelDto, @Request() member: User) {
+    return this.channelsService.updateChannel(updateChannelDto, member);
   }
 
   @SubscribeMessage('removeChannel')
