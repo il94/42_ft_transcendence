@@ -2,7 +2,9 @@ import styled from 'styled-components'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const Button = styled.button`
+const Button = styled.button<{ width?: number, fontSize?: number, alt: string, title: string }>`
+
+	width: ${(props) => props.width ? props.width + "px" : "auto"};
 
 	padding-top: 1px;
 	padding-left: 11px;
@@ -11,7 +13,7 @@ const Button = styled.button`
 
 	cursor: pointer;
 
-	font-size: 35px;
+	font-size: ${(props) => props.fontSize && props.fontSize}px;
 	text-decoration: none;
 	text-align: center;
 

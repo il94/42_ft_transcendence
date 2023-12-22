@@ -1,19 +1,41 @@
+import { Dispatch, SetStateAction, useContext } from "react"
+
 import { Style, Avatar, ChannelName } from "./style"
 
+import { ChannelData } from "../../../../utils/types"
+import { channelStatus, chatWindowStatus } from "../../../../utils/status"
+import GlobalContext from "../../../../contexts/GlobalContext"
+
 type PropsChannel = {
-	// id: number,
-	name: string,
-	avatar: string,
-	// type: string,
-	color: string
+	channel: ChannelData,
+	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
+	backgroundColor: string
 }
 
-function ChannelSection({ /* id, */ name, avatar, /* type, */ color } : PropsChannel) {
+function ChannelSection({ channel, setChannelTarget, setChatWindowState, backgroundColor }: PropsChannel) {
+
+	const { userAuthenticate } = useContext(GlobalContext)!
+
+	function handleClickChannelButton() {
+
+		if (channel.type === channelStatus.PROTECTED && !channel.validUsers.includes(userAuthenticate)) {
+			console.log("efds")
+			setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+		}
+		else
+			setChatWindowState(chatWindowStatus.CHANNEL)
+
+		setChannelTarget(channel)
+	}
+
 	return (
-		<Style color={color}>
-			<Avatar src={avatar}/>
+		<Style
+			onClick={handleClickChannelButton}
+			$backgroundColor={backgroundColor}>
+			<Avatar src={channel.avatar} />
 			<ChannelName>
-				{name}
+				{channel.name}
 			</ChannelName>
 		</Style>
 	)

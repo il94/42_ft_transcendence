@@ -18,17 +18,19 @@ const Style = styled.div`
 `
 
 type PropsScoreResume = {
-	wins: number,
-	draws: number,
-	looses: number
+	scoreResume: {
+		wins: number,
+		draws: number,
+		looses: number
+	}
 }
 
-function ScoreResume({ wins, draws, looses } : PropsScoreResume) {
+function ScoreResume({ scoreResume }: PropsScoreResume) {
 	return (
 		<Style>
-			<Win value={wins} />
-			<Draw value={draws} />
-			<Loose value={looses} />
+			<Win value={scoreResume.wins} />
+			<Draw value={scoreResume.draws} />
+			<Loose value={scoreResume.looses} />
 		</Style>
 	)
 }

@@ -1,5 +1,8 @@
+import { Dispatch, SetStateAction } from "react"
 import styled from "styled-components"
 import SearchBar from "../SearchBar"
+import { chatWindowStatus } from "../../utils/status"
+import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
@@ -11,14 +14,21 @@ export const Style = styled.div`
 	height: 53px;
 	min-height: 53px;
 
-	background-color: #B197FA;
+	background-color: ${colors.profile};
 
 `
 
-function Info() {
+type PropsInfo = {
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
+	displayChat: Dispatch<SetStateAction<boolean>>
+}
+
+function Info({ setChatWindowState, displayChat }: PropsInfo) {
 	return (
 		<Style>
-			<SearchBar />
+			<SearchBar
+				setChatWindowState={setChatWindowState}
+				displayChat={displayChat} />
 		</Style>
 	)
 }

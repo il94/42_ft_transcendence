@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
 
-export const Style = styled.div`
+export const Style = styled.div<{ $backgroundColor: string }>`
 
 	display: flex;
 	align-items: center;
@@ -10,7 +10,7 @@ export const Style = styled.div`
 	height: 40px;
 	min-height: 40px;
 
-	background-color: ${(props) => props.color};
+	background-color: ${(props) => props.$backgroundColor};
 
 	&:hover {
 		cursor: pointer;
@@ -35,7 +35,5 @@ export const ChannelName = styled.p`
 	margin-left: 6px;
 
 	font-size: 12px;
-
-	color: ${colors.text};
 
 `

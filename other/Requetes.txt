@@ -1,0 +1,125 @@
+ALL/ :
+
+-GET http://localhost:3333/user/ :
+	Route deja implemantee, juste ajouter le scoreResume de l'utilisateur (win draw loose)
+
+-GET http://localhost:3333/user/:id :
+	Route deja implemantee, juste ajouter le scoreResume de l'utilisateur (win draw loose)
+
+-POST http://localhost:3333/auth/signup :
+	Route deja implemantee, juste set les autres attributs (scoreResume, status ...)
+
+-POST http://localhost:3333/auth/signin :
+	Route deja implemantee mais renvoie 400
+
+(======================================================================)
+
+Game/ :
+-GET http://localhost:3333/user/me :
+	A implementer, doit permettre de recuperer le user authentifie
+
+-GET http://localhost:3333/user/me/channels :
+	A implementer, doit permettre de recuperer les channel du user authentifie
+
+-GET http://localhost:3333/user/me/friends :
+	A implementer, doit permettre de recuperer les amis du user authentifie
+
+MatchHistory/ :
+-GET http://localhost:3333/user/:id/history :
+	A implementer, doit permettre de recuperer l'historique du user
+
+ChannelInterface/ :
+-POST http://localhost:3333/channel : { (Utilisee dans ContextualMenu aussi)
+		name: string,
+		avatar: string,
+		type: channelStatus, (enum, donc peut-etre string si pas le choix)
+		password?: string
+	}
+	A implementer, doit permettre de creer un channel
+
+LockedInterface/ :
+-POST http://localhost:3333/channel/:id/validusers/:id :
+	A implementer, doit permettre d'ajouter un user a liste des users valides du channel 
+
+-PATCH http://localhost:3333/channel/:id : {
+		name: string,
+		avatar: string,
+		type: channelStatus, (enum, donc peut-etre string si pas le choix)
+		password?: string
+	}
+	A implementer, doit permettre d'update un channel
+
+Discussion/ :
+-GET http://localhost:3333/channel/:id/messages :
+	A implementer, doit permettre de recuperer les messages d'un channel (invitations comprises)
+
+TextInput/ :
+-POST http://localhost:3333/channel/:id/messages : {
+		sender: userAuthenticate,
+		type: messageStatus, (enum, donc peut-etre string si pas le choix)
+		content: string
+	}
+	A implementer, doit permettre de poster un message dans un channel (textuel uniquement)
+
+ContextualMenu/ :
+-POST http://localhost:3333/user/me/friends/:id :  (Utilisee dans SearchBar aussi)
+	A implementer, doit permettre d'ajouter un user a la liste d'amis du user authentifie
+
+-POST http://localhost:3333/channel : { (Utilisee dans ChannelInterface aussi)
+		name: string,
+		avatar: string,
+		type: channelStatus, (enum, donc peut-etre string si pas le choix)
+		password?: string
+	}
+	A implementer, doit permettre de creer un channel
+
+-POST http://localhost:3333/user/me/challenge/:id : {
+		type: challengeStatus (enum, donc peut-etre string si pas le choix)
+	}
+	A implementer, doit permettre d'inviter un user a jouer
+
+-POST http://localhost:3333/user/me/blockedusers/:id :
+	A implementer, doit permettre d'ajouter un user dans la liste d'utilisateurs bloques du user authentifie
+
+-DELETE http://localhost:3333/user/me/friends/:id :
+	A implementer, doit permettre de supprimer un user de la liste d'amis du user authentifie
+
+-DELETE http://localhost:3333/user/me/blockedusers/:id :
+	A implementer, doit permettre de supprimer un user de sa liste d'utilisateurs bloques 
+
+-POST http://localhost:3333/channel/:id/administrators/:id :
+	A implementer, doit permettre d'ajouter un user a liste d'administrateurs du channel 
+
+-DELETE http://localhost:3333/channel/:id/administrators/:id :
+	A implementer, doit permettre de supprimer un user de liste d'administrateurs du channel 
+
+-POST http://localhost:3333/channel/:id/mutedusers/:id :
+	A implementer, doit permettre d'ajouter un user a liste des muets du channel 
+
+-DELETE http://localhost:3333/channel/:id/users/:id :
+	A implementer, doit permettre de supprimer un user du channel 
+
+-POST http://localhost:3333/channel/:id/bannedusers/:id :
+	A implementer, doit permettre d'ajouter un user a liste des bannis du channel 
+
+SecondaryContextualMenu/ :
+-POST http://localhost:3333/channel/:id/users/:id :
+	A implementer, doit permettre d'ajouter un user a liste des users du channel 
+
+Profile/ :
+-POST http://localhost:3333/auth/logout : (pas sur du type de la route)
+	A implementer, doit permettre de se deconnecter 
+
+SearchBar/ :
+-GET http://localhost:3333/channel : 
+	A implementer, doit permettre d'obtenir tout les channels
+
+-POST http://localhost:3333/user/me/friends/:id :  (Utilisee dans ContextualMenu aussi)
+	A implementer, doit permettre d'ajouter un user a la liste d'amis du user authentifie
+
+-POST http://localhost:3333/user/me/channels/:id :
+	A implementer, doit permettre d'ajouter un channels a la liste de channels du user authentifie
+
+SettingsMenu/ :
+-PATCH http://localhost:3333/user/me : 
+	A implementer, doit permettre d'update le user authentifie

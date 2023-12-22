@@ -65,7 +65,6 @@ const TrackVertical = styled.div<{ $onMouse: boolean }>`
 	padding: 0;
 	padding-bottom: 0;
 	
-
 `
 
 type PropsScrollBar = {
@@ -111,14 +110,14 @@ function ScrollBar({ state, firstRenderState, children }: PropsScrollBar) {
 
 	return (
 		<Scrollbars onMouseEnter={() => setOnMouse(true)}
-					onMouseLeave={() => setOnMouse(false)}
-					onScroll={handleScrollPosition}
-					ref={scrollBarRef}
-					renderThumbVertical={() => <ThumbVertical />}
-					renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}
-					renderThumbHorizontal={() => <ThumHorizontal />}
-					renderTrackHorizontal={() => <TrackHorizontal />}
-					renderView={() => <View />}>
+			onMouseLeave={() => setOnMouse(false)}
+			onScroll={handleScrollPosition}
+			ref={scrollBarRef}
+			renderThumbVertical={() => <ThumbVertical />}
+			renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}
+			renderThumbHorizontal={() => <ThumHorizontal />}
+			renderTrackHorizontal={() => <TrackHorizontal />}
+			renderView={() => <View />}>
 			{children}
 		</Scrollbars>
 	)

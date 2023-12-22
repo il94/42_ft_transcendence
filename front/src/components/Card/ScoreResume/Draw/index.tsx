@@ -9,13 +9,14 @@ const Style = styled.p`
 	text-align: center;
 
 	color: ${colors.historyDraw};
+
 `
 
 type PropsDraw = {
 	value: number
 }
 
-function Draw({ value } : PropsDraw) {
+function Draw({ value }: PropsDraw) {
 	return (
 		<Style>
 			{value}D
