@@ -16,66 +16,83 @@ import {
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
+import GlobalContext from "../../../contexts/GlobalContext"
+
+import { User } from "../../../utils/types"
+import { userStatus } from "../../../utils/status"
 
 type PropsFriendSection = {
-	id: number,
-	username: string,
-	avatar: string,
-	state: string,
+	friend: User,
+	backgroundColor: string,
 	social: boolean,
-	color: string,
-	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	displayContextualMenu: Dispatch<SetStateAction<{
+		display: boolean,
+		type: string
+	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
-		top: number,
-		left: number
+		left?: number,
+		top?: number,
+		bottom?: number
 	}>>
 }
 
-function FriendSection({ id, username, avatar, state, social, color, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
-	const { card, displayCard, setCardPosition, cardIdTarget, setIdTargetCard } = useContext(CardContext)!
+	const { card, displayCard, setCardPosition } = useContext(CardContext)!
+	const { userTarget, setUserTarget } = useContext(GlobalContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {
 
-		if (card && cardIdTarget === id) {
+		if (card && userTarget === friend) // verifie que la carte a afficher ne l'est pas deja
+		{
 			displayCard(false)
 			return;
 		}
 
-		const friendcontainer = friendContainerRef.current
+		const friendcontainer = friendContainerRef.current // sert a cibler le container et non ses enfants
 
 		if (friendcontainer) {
-			const topCurrentElement = friendcontainer.getBoundingClientRect().top
-			const { top: topParentElement, height: heightParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
+			setUserTarget(friend)
 
-			const topMax = heightParentElement - 371 // taille de la carte
+			const heightCard = 371 // height de la carte
+			const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
+			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
+			const maxBottom = window.innerHeight - horizontalBorder - heightNavBar - heightCard // valeur max avant que la carte ne depasse par le bas
 
-			const target = topCurrentElement - topParentElement
-			const topCard = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
+			let resultY = friendcontainer.getBoundingClientRect().top - horizontalBorder / 2 - heightNavBar // resultat par defaut (top container cible - bordure du haut - navbar)
 
-			setIdTargetCard(id)
-			setCardPosition({ top: topCard })
+			if (resultY > maxBottom) // verifie si la carte depasse sur l'axe vertical
+				resultY = maxBottom // ajuste le resultat vertical
 
+			setCardPosition({ top: resultY })
 			displayCard(true)
 		}
 	}
 
-	function showMenuContextual(event: MouseEvent<HTMLDivElement>) {
+	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const friendcontainer = friendContainerRef.current
-
-		if (friendcontainer) {
-			const { bottom: bottomParentElement } = friendcontainer.parentElement!.getBoundingClientRect()
-
-			const topMax = bottomParentElement - 175 // taille du menu
-			const target = event.clientY
-	
-			const topMenu = target > topMax ? topMax : target // s'assure que la carte ne sorte pas de l'écran si elle est trop basse
-
-			setContextualMenuPosition({ top: topMenu, left: event.clientX + 1 }) // +1 pour eviter que la souris soit directement sur le menu
-			displayContextualMenu(true)
+		function getContextualMenuHeight() { // determine la taille du menu par rapport au statut du user cible
+			if (userTarget.status === userStatus.OFFLINE)
+				return (140)
+			else
+				return (175)
 		}
+
+		setUserTarget(friend)
+
+		const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel de la liste d'amis
+		const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
+		const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
+
+		const resultX = event.clientX // resultat horizontal par defaut (position du clic)
+		let resultY = event.clientY // resultat vertical par defaut (position du clic)
+
+		if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
+			resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
+
+		setContextualMenuPosition({ left: resultX, top: resultY })
+		displayContextualMenu({ display: true, type: "social" })
 	}
 
 	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
@@ -85,18 +102,19 @@ function FriendSection({ id, username, avatar, state, social, color, displayCont
 	return (
 		<Style
 			onClick={showCard}
-			onAuxClick={showMenuContextual}
+			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
-			color={color} ref={friendContainerRef}>
-			<Avatar src={avatar} />
+			$backgroundColor={backgroundColor}
+			ref={friendContainerRef}>
+			<Avatar src={friend.avatar} />
 			{
 				!social &&
-				<ProfileInfo>
+				<ProfileInfo $offline={friend.status === "Offline"}>
 					<ProfileName>
-						{username}
+						{friend.username}
 					</ProfileName>
 					<ProfileStatus>
-						{state}
+						{friend.status}
 					</ProfileStatus>
 				</ProfileInfo>
 			}

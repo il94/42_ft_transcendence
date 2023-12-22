@@ -8,12 +8,8 @@ export const SigninPage = styled.div`
 	flex-direction: column;
 	align-items: center;
 
-	position: relative;
+	min-height: 100%;
 
-	width: 100%;
-	height: 100%;
-
-	color: ${colors.text}; 
 	background-color: ${colors.background}; 
 
 `
@@ -34,12 +30,10 @@ export const CentralWindow = styled.div`
 	flex-direction: column;
 	align-items: center;
 
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-
 	width: 400px;
 
+	margin-top: auto;
+	margin-bottom: auto;
 	padding-bottom: 5px;
 
 	border-style: solid;
@@ -53,11 +47,12 @@ export const CentralWindow = styled.div`
 
 `
 
-export const StyledTitle = styled.h2`
+export const StyledTitle = styled.p`
 
 	width: 100%;
 
 	font-size: 45px;
+	font-weight: bold;
 
 	text-align: center;
 
@@ -67,57 +62,36 @@ export const StyledTitle = styled.h2`
 
 `
 
-export const SigninForm = styled.form`
+export const SettingsForm = styled.form`
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 
-	width: 231px;
+	width: 100%;
 
 	margin-top: 20px;
 	margin-bottom: 20px;
 
 `
 
-export const Label = styled.label`
+export const Setting = styled.div`
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 
 	width: 100%;
-	height: 75px;
 
 	font-size: 20px;
-
-`
-
-export const TextInput = styled.input`
-
-	width: 100%;
-
-	border: none;
-	border-bottom: 1px solid ${colors.text};
-
-	font-size: 25px;
-	text-align: center;
-
-	color: ${colors.text};
-	background-color: ${colors.popup};
-
-	&:focus {
-		outline: none;
-		border-color: ${colors.focusBorderText};
-	}
 
 `
 
 export const ErrorMessage = styled.div`
 
 	display: flex;
-	align-items: center;
 	justify-content: center;
+	align-items: center;
 
 	width: 100%;
 	height: 15px;
@@ -126,7 +100,7 @@ export const ErrorMessage = styled.div`
 	font-size: 12px;
 	text-align: center;
 
-	color: #c70505;
+	color: ${colors.textError};
 
 `
 
@@ -145,7 +119,7 @@ export const Line = styled.div`
 
 	width: 100%;
 
-	border-bottom: 0.5px solid ${colors.text};
+	border-bottom: 0.5px solid;
 
 `
 

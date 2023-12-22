@@ -2,6 +2,7 @@ import {
 	SetStateAction,
 	Dispatch
 } from "react"
+// import axios from "axios"
 
 import {
 	Style,
@@ -11,61 +12,67 @@ import {
 	Avatar,
 } from "./style"
 
-
 import Icon from "../../componentsLibrary/Icon"
+
+import { User, UserAuthenticate } from "../../utils/types"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 
 type PropsProfile = {
-	userData: {
-		username: string,
-		avatar: string,
-		id: number,
-		scoreResume: {
-			wins: number,
-			draws: number,
-			looses: number
-		}
-	},
+	userAuthenticate: UserAuthenticate,
 	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	cardIdTarget: number,
-	setIdTargetCard: Dispatch<SetStateAction<number>>,
+	userTarget: User | UserAuthenticate,
+	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 	setCardPosition: Dispatch<SetStateAction<{
 		left?: number,
 		right?: number,
-		top?: number
+		top?: number,
+		bottom?: number
 	}>>,
 	settings: boolean,
-	displayMenuSettings: Dispatch<SetStateAction<boolean>>
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ userData, card, displayCard, cardIdTarget, setIdTargetCard, setCardPosition, settings, displayMenuSettings }: PropsProfile) {
+function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarget, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
 	function showCard() {
-		if (card && cardIdTarget === userData.id)
+		if (card && userTarget === userAuthenticate)
 			displayCard(false)
-		else
-		{				
-			setIdTargetCard(userData.id)
+		else {
+			setUserTarget(userAuthenticate)
 			setCardPosition({ right: 0, top: 0 })
 			displayCard(true)
+		}
+	}
+
+	async function handleDeconnexionClickButton() {
+		try {
+			// await axios.post("http://localhost:3333/auth/logout")
+
+		}
+		catch {
+
 		}
 	}
 
 	return (
 		<Style>
 			<ProfileWrapper onClick={showCard}>
-				<Avatar src={userData.avatar}/>
+				<Avatar src={userAuthenticate.avatar} />
 				<ProfileName>
-					{userData.username}
+					{userAuthenticate.username}
 				</ProfileName>
 			</ProfileWrapper>
 			<ButtonsWrapper>
-				<Icon src={settingsIcon} size="38px" onClick={() => displayMenuSettings(!settings)}
+				<Icon
+					onClick={() => displaySettingsMenu(!settings)}
+					src={settingsIcon} size={38}
 					alt="Settings button" title="Settings" />
-				<Icon src={deconnexionIcon} size="38px"
+				<Icon
+					onClick={() => handleDeconnexionClickButton()}
+					src={deconnexionIcon} size={38}
 					alt="Deconnexion button" title="Deconnexion" />
 			</ButtonsWrapper>
 		</Style>

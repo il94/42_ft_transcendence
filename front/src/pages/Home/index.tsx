@@ -7,10 +7,8 @@ import {
 } from './style'
 
 import LinkButton from '../../componentsLibrary/LinkButton'
-import LinkButtonFix from '../../componentsLibrary/LinkButtonFix'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
-import colors from '../../utils/colors'
 import { useState } from 'react'
 
 function Home() {
@@ -27,35 +25,41 @@ function Home() {
 	return (
 		<HomePage>
 			<MainTitle>
-				<StyledLink to="/" color={colors.text}>
+				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
+			<button onClick={() => setIsAuth(!isAuth)} style={{ color: "black" }}>
+				Auth ?
+			</button>
 			<CentralWindow>
 				<StyledTitle>
 					Welcome
 				</StyledTitle>
 				{
-					isAuth ? 
-					<ButtonsWrapper>
-						<LinkButton to="/game">
-							Game !
-						</LinkButton>
-					</ButtonsWrapper>
-					:
-					<ButtonsWrapper>
-						<LinkButtonFix to="/signin" width="165px">
-							Sign in
-						</LinkButtonFix>
-						<LinkButtonFix to="/signup" width="165px">
-							Sign up
-						</LinkButtonFix>
-					</ButtonsWrapper>
+					isAuth ?
+						<ButtonsWrapper>
+							<LinkButton
+								to="/game" fontSize={35}
+								alt="Game button" title="Game">
+								Game !
+							</LinkButton>
+						</ButtonsWrapper>
+						:
+						<ButtonsWrapper>
+							<LinkButton
+								to="/signin" width={165} fontSize={35}
+								alt="Sign in button" title="Sign in">
+								Sign in
+							</LinkButton>
+							<LinkButton
+								to="/signup" width={165} fontSize={35}
+								alt="Sign up button" title="Sign up">
+								Sign up
+							</LinkButton>
+						</ButtonsWrapper>
 				}
 			</CentralWindow>
-			<button onClick={() => setIsAuth(!isAuth)}>
-				Auth ?
-			</button>
 		</HomePage>
 	)
 }

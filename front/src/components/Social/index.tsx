@@ -1,16 +1,14 @@
 import {
 	Dispatch,
 	SetStateAction,
-	useContext,
-	useEffect,
-	useState
+	useContext
 } from "react"
-import axios from "axios"
 
 import { Style, ReduceButton } from "./style"
 
 import FriendSection from "./FriendSection"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
+import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import CardContext from "../../contexts/CardContext"
 
@@ -21,26 +19,21 @@ import colors from "../../utils/colors"
 type PropsSocial = {
 	social: boolean,
 	displaySocial: Dispatch<SetStateAction<boolean>>,
-	displayContextualMenu: Dispatch<SetStateAction<boolean>>,
+	friends: User[] | undefined,
+	displayContextualMenu: Dispatch<SetStateAction<{
+		display: boolean,
+		type: string
+	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
-		top: number,
-		left: number
+		left?: number,
+		top?: number,
+		bottom?: number
 	}>>
 }
 
-function Social({ social, displaySocial, displayContextualMenu, setContextualMenuPosition } : PropsSocial) {
+function Social({ friends, social, displaySocial, displayContextualMenu, setContextualMenuPosition }: PropsSocial) {
 
 	const { displayCard } = useContext(CardContext)!
-
-	const [friends, setFriendSections] = useState<User[]>([])
-
-	useEffect(() => {
-		axios.get("http://localhost:3333/user")
-			.then((response) => {
-				setFriendSections(response.data)
-			})
-			.catch()
-	}, [])
 
 	function reduceSocial() {
 		displaySocial(!social)
@@ -50,23 +43,28 @@ function Social({ social, displaySocial, displayContextualMenu, setContextualMen
 
 	return (
 		<Style onContextMenu={(event) => event.preventDefault()}>
-			<ScrollBar>
 			{
-				friends.map((friend, index) => (
-					<FriendSection
-						key={"friend" + index} // a definir
-						id={friend.id}
-						username={friend.username}
-						avatar={friend.avatar}
-						state={friend.state}
-						social={social}
-						color={!(index % 2) ? colors.section : colors.sectionAlt}
-						displayContextualMenu={displayContextualMenu}
-						setContextualMenuPosition={setContextualMenuPosition} />
-				))
+				friends ?
+					<>
+						<ScrollBar>
+							{
+								friends.map((friend, index) => (
+									<FriendSection
+										key={"friend" + index} // a definir
+										friend={friend}
+										backgroundColor={!(index % 2) ? colors.section : colors.sectionAlt}
+										social={social}
+										displayContextualMenu={displayContextualMenu}
+										setContextualMenuPosition={setContextualMenuPosition}
+									/>
+								))
+							}
+						</ScrollBar>
+						<ReduceButton onClick={reduceSocial} title="Reduce" />
+					</>
+					:
+					<ErrorRequest />
 			}
-			</ScrollBar>
-			<ReduceButton onClick={reduceSocial} title="Reduce" />
 		</Style>
 	)
 }

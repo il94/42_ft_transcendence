@@ -16,7 +16,7 @@ type PropsLoose = {
 	value: number
 }
 
-function Loose({ value } : PropsLoose) {
+function Loose({ value }: PropsLoose) {
 	return (
 		<Style>
 			{value}L

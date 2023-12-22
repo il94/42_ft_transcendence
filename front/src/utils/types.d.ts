@@ -1,44 +1,67 @@
-import status from "./status"
+import {
+	userStatus,
+	challengeStatus,
+	MatchResultStatus,
+	messageStatus,
+	channelStatus
+} from "./status"
 
 export type User = {
 	id: number,
 	username: string,
 	avatar: string,
-	state: string,
+	status: userStatus,
 	scoreResume: {
 		wins: number,
 		draws: number,
 		looses: number
 	}
 }
-
 export type UserAuthenticate = User & {
 	hash: string,
 	email: string,
 	tel: string,
+	twoFA: boolean,
 	createdAt: string,
+	friends: User[],
+	blockedUsers: User[],
+	channels: ChannelData[]
 }
 
-export type Channel = {
+export type ChannelData = {
 	id: number,
 	createdAt?: string,
 	name: string,
 	avatar: string,
-	type: string
+	type: channelStatus,
+	password?: string,
+	owner: User | UserAuthenticate,
+	administrators: (User | UserAuthenticate)[],
+	users: (User | UserAuthenticate)[],
+	validUsers: (User | UserAuthenticate)[],
+	mutedUsers: (User | UserAuthenticate)[],
+	bannedUsers: (User | UserAuthenticate)[]
 }
 
 export type Message = {
 	id: number,
 	createdAt?: string,
-	sender: string, // a remplacer par User
-	type: string
+	sender: User | UserAuthenticate,
+	type: messageStatus
 }
-
 export type MessageText = Message & {
 	content: string,
 }
-
 export type MessageInvitation = Message & {
-	target: string // a remplacer par User
-	state: status
+	target: User | UserAuthenticate,
+	status: string
+}
+
+export type MatchData = {
+	id: number,
+	user: User | UserAuthenticate,
+	opponent: User | UserAuthenticate,
+	result: matchResultStatus,
+	scoreUser: number,
+	scoreOpponent: number
 }

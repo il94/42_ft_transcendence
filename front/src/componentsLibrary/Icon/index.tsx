@@ -2,16 +2,16 @@ import styled from 'styled-components'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const Icon = styled.button<{ src: string, size: string, alt: string }>`
+const Icon = styled.button<{ src?: string, size?: number, fontSize?: number, alt: string, title: string }>`
 
-	width: ${(props) => props.size};
-	height: ${(props) => props.size};
+	width: ${(props) => props.size ? props.size + "px" : "auto"};
+	height: ${(props) => props.size ? props.size + "px" : "auto"};
 
 	padding: 0;
 
 	cursor: pointer;
 	
-	font-size: 16px;
+	font-size: ${(props) => props.fontSize && props.fontSize}px;
 	text-decoration: none;
 	text-align: center;
 	
@@ -25,7 +25,7 @@ const Icon = styled.button<{ src: string, size: string, alt: string }>`
 	background-color: ${colors.button};
 
 	&:hover {
-		transform: scale(1.015);
+		transform: scale(1.035);
 	}
 	&:active {
 		transform: scale(0.95);

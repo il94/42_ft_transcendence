@@ -1,4 +1,9 @@
-import { Dispatch, SetStateAction, useContext, useEffect } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext,
+	useEffect
+} from "react"
 
 import {
 	CloseButton,
@@ -12,74 +17,52 @@ import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
 import Icon from "../../componentsLibrary/Icon"
 
-import ZIndexContext from "../../contexts/ZIndexContext"
+import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
-import { User } from "../../utils/types"
+import { User, UserAuthenticate } from "../../utils/types"
 
 import CloseIcon from "../../assets/close.png"
-import DefaultAvatar from "../../assets/default_blue.png"
 
 type PropsCard = {
 	cardPosition: {
 		left?: number,
 		right?: number
 		top?: number,
+		bottom?: number
 	},
-	displayCard: Dispatch<SetStateAction<boolean>>
+	displayCard: Dispatch<SetStateAction<boolean>>,
+	userTarget: User | UserAuthenticate
 }
 
-function Card({ cardPosition, displayCard }: PropsCard) {
+function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 
-	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(ZIndexContext)!
+	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(GlobalDisplayContext)!
 
 	useEffect(() => {
 		setZCardIndex(zChatIndex + 1)
 	}, [])
 
-
-	/* ============ Temporaire ============== */
-
-	// ROUTE TESTABLE
-	// Recup le bon User avec un truc du style
-	// axios.get("http://localhost:3333/user/:id (id etant defini par le param id de la fonction)")
-
-	const userTest: User = {
-		id: 0,
-		username: "ilandols",
-		avatar: DefaultAvatar,
-		state: "En ligne",
-		scoreResume: {
-			wins: 100,
-			draws: 1,
-			looses: 0	
-		}
-	}
-
-	/* ============================================== */
-
 	return (
 		<Style
-			onClick={() => {setZCardIndex(zChatIndex + 1)}}
+			onClick={() => { setZCardIndex(zChatIndex + 1) }}
 			$left={cardPosition.left}
 			$right={cardPosition.right}
 			$top={cardPosition.top}
+			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
 			<TopWrapper>
-				<Avatar src={userTest.avatar}/>
+				<Avatar src={userTarget.avatar} />
 				<CloseButton>
-					<Icon src={CloseIcon} size="24px" onClick={() => displayCard(false)}
+					<Icon onClick={() => displayCard(false)}
+						src={CloseIcon} size={24}
 						alt="Close button" title="Close" />
 				</CloseButton>
 			</TopWrapper>
 			<UserName>
-				{userTest.username}
+				{userTarget.username}
 			</UserName>
-			<ScoreResume
-				wins={userTest.scoreResume.wins}
-				draws={userTest.scoreResume.draws}
-				looses={userTest.scoreResume.looses}
-			/>
-			<MatchHistory />
+			<ScoreResume scoreResume={userTarget.scoreResume} />
+			<MatchHistory userTarget={userTarget} />
 		</Style>
 	)
 }

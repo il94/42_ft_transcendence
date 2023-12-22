@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
 
-export const Style = styled.div`
+export const Style = styled.div<{ $backgroundColor: string }>`
 
 	display: flex;
 	justify-content: space-between;
@@ -12,12 +12,12 @@ export const Style = styled.div`
 
 	font-size: 10px;
 
-	background-color: ${(props) => props.color};
+	background-color: ${(props) => props.$backgroundColor};
 
 `
 export const Username = styled.p`
 
-	width: 70px; // definir par rapport a la taille max de pseudo
+	width: 70px; // ???
 
 	margin-left: 5px;
 
@@ -29,7 +29,7 @@ export const Username = styled.p`
 
 export const Opponent = styled.p`
 
-	width: 70px; // definir par rapport a la taille max de pseudo
+	width: 70px; // ???
 
 	margin-right: 5px;
 
