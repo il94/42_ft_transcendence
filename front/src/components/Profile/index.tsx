@@ -1,8 +1,9 @@
 import {
 	SetStateAction,
-	Dispatch
+	Dispatch,
+	useContext
 } from "react"
-// import axios from "axios"
+import { useNavigate } from "react-router"
 
 import {
 	Style,
@@ -13,6 +14,8 @@ import {
 } from "./style"
 
 import Icon from "../../componentsLibrary/Icon"
+
+import AuthContext from "../../contexts/AuthContext"
 
 import { User, UserAuthenticate } from "../../utils/types"
 
@@ -37,6 +40,9 @@ type PropsProfile = {
 
 function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarget, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
+	const { setToken } = useContext(AuthContext)!
+	const navigate = useNavigate()
+
 	function showCard() {
 		if (card && userTarget === userAuthenticate)
 			displayCard(false)
@@ -48,13 +54,9 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	}
 
 	async function handleDeconnexionClickButton() {
-		try {
-			// await axios.post("http://localhost:3333/auth/logout")
-
-		}
-		catch {
-
-		}
+		localStorage.removeItem('token')
+		setToken('')
+		navigate("/")
 	}
 
 	return (
@@ -71,7 +73,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 					src={settingsIcon} size={38}
 					alt="Settings button" title="Settings" />
 				<Icon
-					onClick={() => handleDeconnexionClickButton()}
+					onClick={handleDeconnexionClickButton}
 					src={deconnexionIcon} size={38}
 					alt="Deconnexion button" title="Deconnexion" />
 			</ButtonsWrapper>

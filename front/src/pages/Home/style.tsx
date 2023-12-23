@@ -30,16 +30,11 @@ export const CentralWindow = styled.div`
 	flex-direction: column;
 	align-items: center;
 
-	width: 400px;
+	width: 420px;
 
 	margin-top: auto;
 	margin-bottom: auto;
-	padding-bottom: 5px;
-
-	border-style: solid;
-	border-width: 15px;
-	border-color: ${colors.popup};
-	box-shadow: 10px;
+	padding: 5px;
 
 	clip-path: ${effects.pixelateWindow};
 
@@ -51,6 +46,8 @@ export const StyledTitle = styled.h2`
 
 	width: 100%;
 
+	padding: 10px;
+	
 	font-size: 45px;
 	font-weight: bold;
 
@@ -59,7 +56,6 @@ export const StyledTitle = styled.h2`
 	&:hover {
 		transform: scale(1.015);
 	}
-
 `
 
 export const ButtonsWrapper = styled.div`
@@ -69,6 +65,6 @@ export const ButtonsWrapper = styled.div`
 
 	width: 100%;
 
-	margin-top: 20px;
-
+	padding: 5px;
+	padding-bottom: 10px;
 `
