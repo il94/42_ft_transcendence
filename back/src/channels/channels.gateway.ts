@@ -36,9 +36,9 @@ export class ChannelsGateway implements OnModuleInit {
     this.server.emit('recMessage', payload);
   }
 
-  afterInit(server: Server) {
-    console.log(server);
-  }
+  // afterInit(server: Server) {
+  //   console.log("server after init" );
+  // }
 
   handleDisconnect(client: Socket) {
     console.log(`Disconnected: ${client.id}`);

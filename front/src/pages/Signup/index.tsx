@@ -129,7 +129,7 @@ function Signup() {
 				username: username.value,
 				hash: password.value,
 				email: email.value,
-				tel: phoneNumber.value,
+				phoneNumber: phoneNumber.value,
 				avatar: getRandomDefaultAvatar()
 			}
 

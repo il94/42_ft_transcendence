@@ -19,15 +19,18 @@ export class UsersService {
 			if (userExists)
 				throw new BadRequestException("User already exists");
 			const hash = await argon.hash(createUserDto.hash);
-			let avatar = process.env.AVATAR;
-			if (createUserDto.avatar) { avatar = createUserDto.avatar };
 			const user = await this.prisma.user.create({
 				data: {
-					email: createUserDto.email,
-					hash,
-					avatar,
 					username: createUserDto.username,
+					hash,
+					email: createUserDto.email,
+					phoneNumber: createUserDto.phoneNumber,
+					twoFA: false,
+					avatar: createUserDto.avatar,
 					status: UserStatus.ONLINE,
+					wins: 0,
+					draws: 0,
+					losses: 0,
 				},
 			});
             console.log(`User ${user.username} with id ${user.id} created successfully`);
@@ -44,10 +47,12 @@ export class UsersService {
 	findAll() {
 		const users = this.prisma.user.findMany({ 
 			select: { id: true,
-					username: true,
-					email: true,
-					avatar: true,
-					status: true
+				username: true,
+				avatar: true,
+				status: true,
+				wins: true,
+				draws: true,
+				losses: true,
 			},});
 		return users;
 	}
@@ -58,7 +63,10 @@ export class UsersService {
 			select: {  id: true,
 				  username: true,
 				  avatar: true,
-				  status: true, }})
+				  status: true,
+				  wins: true,
+				  draws: true,
+				  losses: true, }})
 		if (!user)
 			throw new NotFoundException(`User with ${id} does not exist.`);
 		return user;
@@ -73,12 +81,13 @@ export class UsersService {
 		const hash = await argon.hash(updateUserDto.hash);
 		const updateUser = await this.prisma.user.update({
 			data: { 
-			email: updateUserDto.email,
 			username: updateUserDto.username,
-			avatar: updateUserDto.avatar,
 			hash,
-			tel: updateUserDto.tel },
-			where: { id: id},
+			email: updateUserDto.email,
+			phoneNumber: updateUserDto.phoneNumber,
+			avatar: updateUserDto.avatar,
+			},
+			where: { id: id },
 		});
 		return updateUser;
 	}
