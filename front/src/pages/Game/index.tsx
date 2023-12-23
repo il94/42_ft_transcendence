@@ -37,7 +37,6 @@ import { channelStatus, chatWindowStatus, userStatus } from '../../utils/status'
 
 import breakpoints from '../../utils/breakpoints'
 
-import DefaultAvatar from "../../assets/default_blue.png"
 import DefaultChannelPicture from "../../assets/default_channel.png"
 import TontonPicture from "../../assets/xavier_niel.webp"
 import GlobalContext from '../../contexts/GlobalContext'
