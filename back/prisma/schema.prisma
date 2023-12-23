@@ -10,17 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
+enum UserStatus {
   ONLINE
   OFFLINE
   PLAYING
   WAITING
   WATCHING
 }
-enum Invitation {
+
+enum RequestStatus {
   PENDING
   ACCEPTED
   DECLINED
+  PROGRESSING
+  FINISHED
 }
 
 enum Role {
@@ -29,13 +32,16 @@ enum Role {
   OWNER
 }
 
-enum Type {
+enum ChannelStatus {
   PRIVATE
   PUBLIC
+  PROTECTED
+  MP
 }
 
-enum Podium {
+enum MatchResult {
   WINNER
+  DRAW
   LOOSER
 }
 
@@ -47,8 +53,13 @@ model User {
   email       String  @unique
   hash        String
   avatar      String
-  tel         String?
-  status      Status
+  phoneNumber String
+  twoFA       Boolean
+  wins        Int
+	draws       Int
+	losses      Int
+  status      UserStatus
+  requests    Invitation[]
 
   games       UsersOnGames[]
 
@@ -61,33 +72,51 @@ model User {
   @@map("users")
 }
 
+// self relation m-m user-user
 model Friends {
   hasFriends   User @relation("hasFriends", fields: [hasFriendsId], references: [id])
   hasFriendsId Int
   isFriend    User @relation("isFriend", fields: [isFriendId], references: [id])
   isFriendId  Int
-  request     Invitation
+  request     RequestStatus
 
   @@id([hasFriendsId, isFriendId])
 }
 
 model Channel {
-  id        Int  @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  type      Type
+  id          Int  @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  name        String
+  type        ChannelStatus
+  password    String?
+  invitation  Invitation[]
 
-  members   UsersOnChannels[]
-  content   Message[]
+  members     UsersOnChannels[]
+  content     Message[]
 }
 
 model Game {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  players   UsersOnGames[]   
-  level     Int
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  players     UsersOnGames[]
+  invitation  Invitation[] 
+  level       Int
 }
 
-// Relation 1-m user-message et user-channel ?
+// relation 1-m user-invitation channel-invitation game-invitation
+model Invitation {
+  id        Int  @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  sender    User @relation(fields: [senderId], references: [id])
+  senderId  Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  channelId Int
+  game      Game @relation(fields: [gameId], references: [id])
+  gameId    Int
+  status    RequestStatus
+}
+
+// Relation 1-m user-message et channel-message 
 model Message {
   id        Int  @id @default(autoincrement())
   author    User @relation(fields: [authorId], references: [id])
@@ -111,11 +140,11 @@ model UsersOnChannels {
 
 // Relation m-m user-game
 model UsersOnGames {
-  user      User    @relation(fields: [userId], references: [id])
+  user      User  @relation(fields: [userId], references: [id])
   userId    Int
-  game      Game @relation(fields: [gameId], references: [id])
+  game      Game  @relation(fields: [gameId], references: [id])
   gameId    Int
-  podium    Podium
+  podium    MatchResult
 
   @@id([userId, gameId])
 }

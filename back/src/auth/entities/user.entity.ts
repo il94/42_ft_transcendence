@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User, Status, Friends, Role, Channel, Game, Message, UsersOnChannels, UsersOnGames } from '@prisma/client';
+import { User, UserStatus, Friends, Role, Channel, Game, Message, UsersOnChannels, UsersOnGames } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
 export class UserEntity implements User {
@@ -26,8 +26,20 @@ export class UserEntity implements User {
 	avatar: string;
 	
 	@ApiProperty()
-	tel: string;
+	phoneNumber: string;
 
 	@ApiProperty()
-	status: Status;
+	status: UserStatus;
+
+	@ApiProperty()
+	twoFA: boolean;
+
+	@ApiProperty()
+	wins: number;
+
+	@ApiProperty()
+	draws: number;
+
+	@ApiProperty()
+	losses: number;
 }

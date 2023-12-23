@@ -18,4 +18,6 @@ export class AuthDto {
 	@ApiProperty()
 	hash: string;
 
+
+
 }

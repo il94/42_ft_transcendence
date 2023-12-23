@@ -1,11 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { PrismaClient, User, Prisma, Role, Status } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from "./users.service";
 import * as argon from 'argon2';
 import { AuthDto } from "../dto/auth.dto";
-import { CreateUserDto } from "../dto/create-user.dto";
+import { CreateUserDto } from "../dto/users.dto";
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
 	async signup(dto: CreateUserDto) {
 		const newUser = await this.userService.createUser(dto);
 		delete newUser.hash;
-		return newUser; // ou signtoken ?
+		return this.signToken(newUser.id, newUser.username);
 	}
 
 	async signin(dto: AuthDto) {
@@ -28,12 +28,12 @@ export class AuthService {
 			if (!user)
 				throw new BadRequestException('user not found');
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
-			if (!pwdMatch) 
+			if (!pwdMatch)
 				throw new ForbiddenException('incorrect password');
-			return this.signToken(user.id, user.username);
+			return this.signToken(user.id, user.username)
 		} catch (error) {
             const err = error as Error;
-            console.log(err.message);
+            console.log("ICI erreur: ", err.message);
               throw new BadRequestException(err.message)
         }
 	}
@@ -47,17 +47,22 @@ export class AuthService {
 			console.log ("jai pas trouve le user");
 			const newUser = await this.prisma.user.create({
 				data: {
-					email: profile.email,
-					hash: "00", // fonction setHash ? module pour generer un password ?
-					avatar: process.env.AVATAR,
 					username: profile.username,
-					status: Status.ONLINE,
+					hash: "00",
+					email: profile.email,
+					avatar: "string",
+					phoneNumber: profile.phoneNumber,
+					twoFA: false,
+					status: UserStatus.ONLINE,
+					wins: 0,
+					draws: 0,
+					losses: 0,
 				},
 			});
-			return newUser; // signtoken ?
+			return this.signToken(user.id, user.username);
 		}
 		console.log("user data: ", user);
-		return user;
+		return this.signToken(user.id, user.username);
 	}
 
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
