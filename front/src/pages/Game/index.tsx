@@ -86,7 +86,7 @@ function Game() {
 			looses: 0
 		},
 		email: "",
-		tel: "",
+		phoneNumber: "",
 		twoFA: false,
 		friends: [],
 		blockedUsers: [],
@@ -123,13 +123,14 @@ function Game() {
 					username: response.data.username,
 					avatar: response.data.avatar,
 					status: userStatus.ONLINE,
+					// temporaire
 					scoreResume: { // a recuperer depuis la reponse
 						wins: 100,
 						draws: 1,
 						looses: 0
 					},
 					email:response.data.email,
-					tel: response.data.tel,
+					phoneNumber: response.data.phoneNumber,
 					twoFA: false, // a recuperer depuis la reponse
 					friends: [], // a recuperer depuis la reponse
 					blockedUsers: [], // a recuperer depuis la reponse

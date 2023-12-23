@@ -63,7 +63,7 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 		errorMessage: ''
 	})
 	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
-		value: userAuthenticate.tel,
+		value: userAuthenticate.phoneNumber,
 		error: false,
 		errorMessage: ''
 	})
@@ -91,7 +91,7 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 			// 	avatar: avatar,
 			// 	hash: password.value,
 			// 	email: email.value,
-			// 	tel: phoneNumber.value,
+			// 	phoneNumber: phoneNumber.value,
 			// }
 
 			/* ============ Temporaire ============== */
@@ -103,7 +103,7 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 			userAuthenticate.username = username.value,
 				userAuthenticate.avatar = avatar,
 				userAuthenticate.email = email.value,
-				userAuthenticate.tel = phoneNumber.value
+				userAuthenticate.phoneNumber = phoneNumber.value
 
 			displaySettingsMenu(false)
 		}

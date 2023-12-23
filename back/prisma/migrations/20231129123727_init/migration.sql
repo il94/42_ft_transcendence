@@ -21,7 +21,7 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
     "avatar" TEXT NOT NULL,
-    "tel" TEXT,
+    "phoneNumber" TEXT,
     "status" "Status" NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")

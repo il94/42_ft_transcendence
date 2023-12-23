@@ -77,7 +77,7 @@ function TestsBack() {
 					hash: "123456",
 					email: "user@test.fr",
 					avatar: getRandomDefaultAvatar(),
-					tel: "0000000000"
+					phoneNumber: "0000000000"
 				})
 				.then(response => console.log(response.data))
 				.catch(error => console.log(error))
@@ -96,7 +96,7 @@ function TestsBack() {
 							hash: "123456",
 							email: `friend_${i}@test.fr`,
 							avatar: getRandomDefaultAvatar(),
-							tel: "0000000000"
+							phoneNumber: "0000000000"
 						})
 						.then(response => console.log(response.data))
 						.catch(error => console.log(error))
