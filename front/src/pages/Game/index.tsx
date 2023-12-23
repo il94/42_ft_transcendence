@@ -114,7 +114,7 @@ function Game() {
 
 				/* ============ Temporaire ============== */
 
-				// const result: UserAuthenticate = await axios.get("http://localhost:3333/user/me")
+				const result: UserAuthenticate = await axios.get("http://localhost:3333/user/me", { headers: { "Authorization": }})
 				// setUserAuthenticate(result)
 				setUserAuthenticate({
 					id: 42,

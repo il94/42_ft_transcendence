@@ -20,17 +20,19 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+
+  @UseGuards(JwtGuard)
+	@Get('me')
+	async getMe(@getUser() user: User) {
+    console.log(user);
+		return user;
+	}
+
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
   async findById(@Param('id', ParseIntPipe) id: number) {
     return new UserEntity(await this.usersService.findById(id));
   }
-
-	@Get('me')
-	getMe(@getUser() user: User) {
-    console.log(user);
-		return user;
-	}
 
   @Patch(':id')
   @ApiCreatedResponse({ type: UserEntity })

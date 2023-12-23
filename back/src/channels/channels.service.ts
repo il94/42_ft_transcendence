@@ -101,8 +101,7 @@ export class ChannelsService {
     } catch (error) {
 
     }
-
-    return `This action updates a #${id} chat`;
+    
   }
 
   remove(id: number) {
