@@ -8,7 +8,7 @@ import { UserEntity } from '../entities/user.entity';
 import { getUser } from '../decorators/users.decorator'
 import { User } from '@prisma/client';
 
-//@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
@@ -19,14 +19,13 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
-
-
+  
   @UseGuards(JwtGuard)
-	@Get('me')
-	async getMe(@getUser() user: User) {
+  @Get('me')
+  async getMe(@getUser() user: User) {
     console.log(user);
-		return user;
-	}
+    return user;
+  }
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })

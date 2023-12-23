@@ -1,4 +1,5 @@
 import {
+	useContext,
 	useEffect,
 	useRef,
 	useState
@@ -43,6 +44,7 @@ import GlobalContext from '../../contexts/GlobalContext'
 import axios from 'axios'
 import ErrorRequest from '../../componentsLibrary/ErrorRequest'
 import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
+import AuthContext from '../../contexts/AuthContext'
 
 function Game() {
 
@@ -75,20 +77,20 @@ function Game() {
 	})
 
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>({
-		id: 42,
-		username: "ilandols",
-		avatar: DefaultAvatar,
+		id: -1,
+		username: "",
+		avatar: "",
 		status: userStatus.ONLINE,
 		scoreResume: {
-			wins: 100,
-			draws: 1,
+			wins: 0,
+			draws: 0,
 			looses: 0
 		},
-		hash: "password",
-		email: "ilyes@test.fr",
-		tel: "0000000000",
+		hash: "",
+		email: "",
+		tel: "",
 		twoFA: false,
-		createdAt: "???",
+		createdAt: "",
 		friends: [],
 		blockedUsers: [],
 		channels: []
@@ -108,18 +110,23 @@ function Game() {
 
 	const [channelTarget, setChannelTarget] = useState<ChannelData | undefined>(undefined)
 
+	const { token } = useContext(AuthContext)!
+
 	useEffect(() => {
 		async function fetchUserAuthenticate() {
 			try {
 
 				/* ============ Temporaire ============== */
 
-				const result: UserAuthenticate = await axios.get("http://localhost:3333/user/me", { headers: { "Authorization": }})
-				// setUserAuthenticate(result)
+				const response = await axios.get("http://localhost:3333/user/me", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 				setUserAuthenticate({
-					id: 42,
-					username: "ilandols",
-					avatar: DefaultAvatar,
+					id: response.data.id,
+					username: response.data.username,
+					avatar: response.data.avatar,
 					status: userStatus.ONLINE,
 					scoreResume: {
 						wins: 100,
@@ -127,8 +134,8 @@ function Game() {
 						looses: 0
 					},
 					hash: "password",
-					email: "ilyes@test.fr",
-					tel: "0000000000",
+					email:response.data.email,
+					tel: response.data.tel,
 					twoFA: false,
 					createdAt: "???",
 					friends: [],
@@ -138,6 +145,7 @@ function Game() {
 				/* ============================================== */
 			}
 			catch (error) {
+				console.log(error)
 				setErrorRequest(true)
 			}
 		}

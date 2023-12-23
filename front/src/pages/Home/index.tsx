@@ -9,7 +9,8 @@ import {
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
-import { useState } from 'react'
+import { useContext, useState } from 'react'
+import AuthContext from '../../contexts/AuthContext'
 
 function Home() {
 
@@ -19,8 +20,10 @@ function Home() {
 
 	const [isAuth, setIsAuth] = useState<boolean>(false)
 
+
 	/* ============================================== */
 
+	const { token } = useContext(AuthContext)!
 
 	return (
 		<HomePage>
@@ -37,7 +40,7 @@ function Home() {
 					Welcome
 				</StyledTitle>
 				{
-					isAuth ?
+					token ?
 						<ButtonsWrapper>
 							<LinkButton
 								to="/game" fontSize={35}
