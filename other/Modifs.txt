@@ -3,3 +3,6 @@ Signin/ :
 
 Signup/ :
 	Gestion d'erreurs utilisateur a faire
+
+Game/ :
+	Recuperer les donnees manquantes pour le user authenticate
