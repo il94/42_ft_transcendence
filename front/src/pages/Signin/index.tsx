@@ -24,10 +24,9 @@ import colors from '../../utils/colors'
 import FTButton from "../../assets/42.png"
 import axios from 'axios'
 import AuthContext from '../../contexts/AuthContext'
+import { useNavigate } from 'react-router'
 
 function Signin() {
-
-	console.log("YOP")
 
 	type PropsSetting = {
 		value: string,
@@ -45,6 +44,9 @@ function Signin() {
 		error: false,
 		errorMessage: ''
 	})
+
+	const { setToken } = useContext(AuthContext)!
+	const navigate = useNavigate()
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -74,16 +76,13 @@ function Signin() {
 				return
 
 			const user = {
-				login: login.value,
+				username: login.value,
 				hash: password.value
 			}
 
 			const response = await axios.post("http://localhost:3333/auth/signin", user)
-
-			const { setToken } = useContext(AuthContext)!
-
-			console.log(response.data)
-			setToken(response.data)
+			setToken(response.data.access_token)
+			navigate("/game")
 		}
 		catch (error) {
 

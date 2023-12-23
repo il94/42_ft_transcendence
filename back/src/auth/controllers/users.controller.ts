@@ -9,7 +9,7 @@ import { UserEntity, FriendsEntity } from '../entities/';
 import { getUser } from '../decorators/users.decorator'
 import { User } from '@prisma/client';
 
-//@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
@@ -20,6 +20,13 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
+  
+  @UseGuards(JwtGuard)
+  @Get('me')
+  getMe(@getUser() user: User) {
+    console.log(user);
+    return user;
+  }
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
@@ -27,11 +34,6 @@ export class UsersController {
     return new UserEntity(await this.usersService.findById(id));
   }
 
-	@Get('me')
-	getMe(@getUser() user: User) {
-    console.log(user);
-		return user;
-	}
 
   @Patch(':id')
   @ApiCreatedResponse({ type: UserEntity })
