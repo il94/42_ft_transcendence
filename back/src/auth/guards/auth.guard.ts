@@ -3,6 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
+
+@Injectable()
+export class LocalAuthGuard extends AuthGuard('local') {}
   
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {

@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
-import { ChatsModule } from './chats/chats.module';
+import { ChatsModule } from './channels/channels.module';
 
 @Module({
   imports: [
