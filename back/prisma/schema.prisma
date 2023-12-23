@@ -53,9 +53,12 @@ model User {
   email       String  @unique
   hash        String
   avatar      String
-  tel         String?
+  phoneNumber String
+  twoFA       Boolean
+  wins        Int
+	draws       Int
+	losses      Int
   status      UserStatus
-  scoreResume ScoreResume[]
   requests    Invitation[]
 
   games       UsersOnGames[]
@@ -67,16 +70,6 @@ model User {
   messages  Message[]
 
   @@map("users")
-}
-
-// relation 1-1 user-scoreResume
-model ScoreResume {
-  id          Int   @id @default(autoincrement())
-  user        User  @relation(fields: [userId], references: [id])
-  userId      Int
-  wins        Int
-	draws       Int
-	losses      Int
 }
 
 // self relation m-m user-user

@@ -5,7 +5,7 @@ import { JwtGuard } from '../guards/auth.guard';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from '../entities/user.entity';
-import { getUser } from '../decorators/users.decorator'
+import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 
 // @UseGuards(JwtGuard)

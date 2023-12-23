@@ -16,28 +16,34 @@ export class CreateUserDto implements User {
 	@ApiProperty()
 	username: string;
 
-	@IsEmail()
-	@IsNotEmpty()
-	@ApiProperty()
-	email: string;
-
 	@IsString()
 	@IsNotEmpty()
 	@MinLength(5)
 	@ApiProperty()
 	hash: string;
 
+	@IsEmail()
+	@IsNotEmpty()
+	@ApiProperty()
+	email: string;
+
+	@IsMobilePhone()
+	@IsOptional()
+	@ApiProperty()
+	phoneNumber: string;
+
+	twoFA: boolean;
+
 	@IsString()
 	@IsOptional()
 	@ApiProperty()
 	avatar: string;
 
-	@IsMobilePhone()
-	@IsOptional()
-	@ApiProperty()
-	tel: string;
-
 	status: UserStatus;
+
+	wins: number;
+	draws: number;
+	losses: number;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
@@ -46,19 +52,20 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 	@ApiProperty()
 	username: string;
 
+	@IsString()
+	@ApiProperty()
+	hash: string;
+
 	@IsEmail()
 	@ApiProperty()
 	email: string;
 
-	@IsString()
+	@IsMobilePhone()
 	@ApiProperty()
-	hash: string;
+	phoneNumber: string;
 
 	@IsString()
 	@ApiProperty()
 	avatar: string;
 
-	@IsMobilePhone()
-	@ApiProperty()
-	tel: string;
 }

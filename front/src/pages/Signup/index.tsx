@@ -122,13 +122,13 @@ function Signup() {
 				avatar: getRandomDefaultAvatar(),
 				hash: password.value,
 				email: email.value,
-				tel: phoneNumber.value,
+				phoneNumber: phoneNumber.value,
 			}
 
 			await axios.post("http://localhost:3333/auth/signup", newUser)
 		}
 		catch (error) {
-
+			console.log("FRONT", error)
 		}
 	}
 

@@ -26,8 +26,20 @@ export class UserEntity implements User {
 	avatar: string;
 	
 	@ApiProperty()
-	tel: string;
+	phoneNumber: string;
 
 	@ApiProperty()
 	status: UserStatus;
+
+	@ApiProperty()
+	twoFA: boolean;
+
+	@ApiProperty()
+	wins: number;
+
+	@ApiProperty()
+	draws: number;
+
+	@ApiProperty()
+	losses: number;
 }

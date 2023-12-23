@@ -85,7 +85,7 @@ function Signin() {
 			navigate("/game")
 		}
 		catch (error) {
-
+			console.log(error)
 		}
 	}
 

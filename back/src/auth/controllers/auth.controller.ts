@@ -5,7 +5,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
 import { getUser } from "../decorators/users.decorator";
-import { User } from "@prisma/client"
+import { User } from "@prisma/client";
 
 @Controller('auth')
 @ApiTags('authenticate')
@@ -15,25 +15,28 @@ export class AuthController {
 	@UseGuards(Api42AuthGuard)
 	@Get('/api42/login')
 	handleLogin() {
-		return {msg: 'api42 Authentication'};
+		//console.log(req.user)
+		// bad callbackURL on Api42AuthGuard
+		//return this.authService.validate42User(req.user);
 	}
 
 	@UseGuards(Api42AuthGuard)
+	@UseGuards(JwtGuard)
 	@Get('api42/redirect')
-	handleRedirect() {
-		return {msg: 'ok'};
+	handleRedirect(@getUser() user: User) {
+		return user;
 	}
 
 	@HttpCode(HttpStatus.OK)
-	@UseGuards(LocalAuthGuard)
 	@Post('signin')
-	signin(@Request() req) {
-		return this.authService.signin(req.user);
+	signin(@Body() dto: AuthDto) {
+		return this.authService.signin(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('signup')
 	signup(@Body() dto: CreateUserDto) {
+		console.log("FHEUIFHIUDHFKSDKDSHJK")
 		return this.authService.signup(dto);
 	}
 
@@ -51,7 +54,6 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	@Get('profile')
 	getProfile(@Request() req) {
-		console.log(req.user);
 		if (req.user) {
 			return { msg: 'Authenticated' };
 		} else { 
