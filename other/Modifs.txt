@@ -1,2 +1,5 @@
 Signin/ :
 	Codes d'erreur a recuperer
+
+Signup/ :
+	Gestion d'erreurs utilisateur a faire
