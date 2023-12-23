@@ -37,7 +37,6 @@ import { channelStatus, chatWindowStatus, userStatus } from '../../utils/status'
 
 import breakpoints from '../../utils/breakpoints'
 
-//import DefaultAvatar from "../../assets/default_blue.png"
 import DefaultChannelPicture from "../../assets/default_channel.png"
 import TontonPicture from "../../assets/xavier_niel.webp"
 import GlobalContext from '../../contexts/GlobalContext'
@@ -86,11 +85,9 @@ function Game() {
 			draws: 0,
 			looses: 0
 		},
-		hash: "",
 		email: "",
 		tel: "",
 		twoFA: false,
-		createdAt: "",
 		friends: [],
 		blockedUsers: [],
 		channels: []
@@ -115,37 +112,33 @@ function Game() {
 	useEffect(() => {
 		async function fetchUserAuthenticate() {
 			try {
-
-				/* ============ Temporaire ============== */
-
 				const response = await axios.get("http://localhost:3333/user/me", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
+
 				setUserAuthenticate({
 					id: response.data.id,
 					username: response.data.username,
 					avatar: response.data.avatar,
 					status: userStatus.ONLINE,
-					scoreResume: {
+					scoreResume: { // a recuperer depuis la reponse
 						wins: 100,
 						draws: 1,
 						looses: 0
 					},
-					hash: "password",
 					email:response.data.email,
 					tel: response.data.tel,
-					twoFA: false,
-					createdAt: "???",
-					friends: [],
-					blockedUsers: [],
-					channels: []
+					twoFA: false, // a recuperer depuis la reponse
+					friends: [], // a recuperer depuis la reponse
+					blockedUsers: [], // a recuperer depuis la reponse
+					channels: [] // a recuperer depuis la reponse
 				})
 				/* ============================================== */
 			}
 			catch (error) {
-				console.log(error)
+				localStorage.removeItem('token')
 				setErrorRequest(true)
 			}
 		}

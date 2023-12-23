@@ -102,7 +102,6 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 
 			userAuthenticate.username = username.value,
 				userAuthenticate.avatar = avatar,
-				userAuthenticate.hash = password.value,
 				userAuthenticate.email = email.value,
 				userAuthenticate.tel = phoneNumber.value
 

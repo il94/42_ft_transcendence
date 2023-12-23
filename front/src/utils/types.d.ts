@@ -18,11 +18,9 @@ export type User = {
 	}
 }
 export type UserAuthenticate = User & {
-	hash: string,
 	email: string,
 	tel: string,
 	twoFA: boolean,
-	createdAt: string,
 	friends: User[],
 	blockedUsers: User[],
 	channels: ChannelData[]
