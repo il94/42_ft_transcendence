@@ -119,10 +119,10 @@ function Signup() {
 
 			const newUser = {
 				username: username.value,
-				avatar: getRandomDefaultAvatar(),
 				hash: password.value,
 				email: email.value,
 				tel: phoneNumber.value,
+				avatar: getRandomDefaultAvatar()
 			}
 
 			await axios.post("http://localhost:3333/auth/signup", newUser)

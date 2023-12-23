@@ -10,7 +10,8 @@ import AuthContext from './contexts/AuthContext'
 
 function App() {
 
-	const [token, setToken] = useState<string>('')
+	const localToken = localStorage.getItem('token')
+	const [token, setToken] = useState<string>(localToken ? localToken : '')
 
 	return (
 		<AuthContext.Provider value={{ token, setToken }}>
