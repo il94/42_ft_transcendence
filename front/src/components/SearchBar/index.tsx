@@ -89,6 +89,7 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 						name: "Public 1",
 						avatar: DefaultChannelPicture,
 						type: channelStatus.PUBLIC,
+						messages: [],
 						owner: userAuthenticate,
 						administrators: [
 							userAuthenticate
@@ -108,6 +109,7 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 						name: "Public 2",
 						avatar: DefaultChannelPicture,
 						type: channelStatus.PUBLIC,
+						messages: [],
 						owner: userTarget,
 						administrators: [
 							userTarget
@@ -128,6 +130,7 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 						avatar: DefaultChannelPicture,
 						type: channelStatus.PROTECTED,
 						password: "password",
+						messages: [],
 						owner: userAuthenticate,
 						administrators: [
 							userAuthenticate
@@ -148,6 +151,7 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 						avatar: DefaultChannelPicture,
 						type: channelStatus.PROTECTED,
 						password: "password",
+						messages: [],
 						owner: userTarget,
 						administrators: [
 							userTarget
@@ -167,6 +171,7 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 						name: "Private",
 						avatar: DefaultChannelPicture,
 						type: channelStatus.PRIVATE,
+						messages: [],
 						owner: userAuthenticate,
 						administrators: [
 							userAuthenticate
@@ -186,6 +191,7 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 						name: "MP",
 						avatar: TontonPicture,
 						type: channelStatus.MP,
+						messages: [],
 						owner: userTarget,
 						administrators: [
 							userTarget

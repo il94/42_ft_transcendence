@@ -5,6 +5,7 @@ import {
 	useState
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
+import axios from 'axios'
 
 import {
 	GamePage,
@@ -26,26 +27,26 @@ import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
+import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
+
+import ErrorRequest from '../../componentsLibrary/ErrorRequest'
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
 import ContextualMenuContext from '../../contexts/ContextualMenuContext'
 import GlobalDisplayContext from '../../contexts/GlobalDisplayContext'
+import GlobalContext from '../../contexts/GlobalContext'
+import AuthContext from '../../contexts/AuthContext'
 
 import { ChannelData, User, UserAuthenticate } from '../../utils/types'
-import { channelStatus, chatWindowStatus, userStatus } from '../../utils/status'
+import { chatWindowStatus, userStatus } from '../../utils/status'
+import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import DefaultChannelPicture from "../../assets/default_channel.png"
-import TontonPicture from "../../assets/xavier_niel.webp"
-import GlobalContext from '../../contexts/GlobalContext'
-import axios from 'axios'
-import ErrorRequest from '../../componentsLibrary/ErrorRequest'
-import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
-import AuthContext from '../../contexts/AuthContext'
+import { getRandomStatus, getTempChannels } from '../../temp/getTempChannels'
 
-function Game() {
+function Game() {	
 
 	function getSecondaryContextualMenuHeight(numberOfChannels: number) {
 		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
@@ -61,137 +62,29 @@ function Game() {
 		displaySecondaryContextualMenu(false)
 	}
 
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
+/* ============================== AUTH STATES =============================== */
 
-	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>({
-		id: 0,
-		username: '',
-		avatar: '',
-		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			looses: 0
-		}
-	})
-
-	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>({
-		id: -1,
-		username: "",
-		avatar: "",
-		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			looses: 0
-		},
-		email: "",
-		phoneNumber: "",
-		twoFA: false,
-		friends: [],
-		blockedUsers: [],
-		channels: []
-	})
-
-	const osef = {
-		id: 0,
-		username: "Osef",
-		avatar: '',
-		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			looses: 0
-		}
-	}
-
+	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
+	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<ChannelData | undefined>(undefined)
 
 	const { token } = useContext(AuthContext)!
-
-	useEffect(() => {
-		async function fetchUserAuthenticate() {
-			try {
-				const response = await axios.get("http://localhost:3333/user/me", {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
-
-				setUserAuthenticate({
-					id: response.data.id,
-					username: response.data.username,
-					avatar: response.data.avatar,
-					status: userStatus.ONLINE,
-					// temporaire
-					scoreResume: { // a recuperer depuis la reponse
-						wins: 100,
-						draws: 1,
-						looses: 0
-					},
-					email:response.data.email,
-					phoneNumber: response.data.phoneNumber,
-					twoFA: false, // a recuperer depuis la reponse
-					friends: [], // a recuperer depuis la reponse
-					blockedUsers: [], // a recuperer depuis la reponse
-					channels: [] // a recuperer depuis la reponse
-				})
-				/* ============================================== */
-			}
-			catch (error) {
-				localStorage.removeItem('token')
-				setErrorRequest(true)
-			}
-		}
-		fetchUserAuthenticate()
-	}, [])
+	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
 		async function fetchFriends() {
-
-			// function getStatus(status: string)
-			// {
-			// 	if (status === "ONLINE")
-			// 		return (userStatus.ONLINE)
-			// 	else if (status === "OFFLINE")
-			// 		return (userStatus.OFFLINE)
-			// 	else if (status === "PLAYING")
-			// 		return (userStatus.PLAYING)
-			// 	else if (status === "WAITING")
-			// 		return (userStatus.WAITING)
-			// 	else if (status === "WATCHING")
-			// 		return (userStatus.WATCHING)
-			// }
-
-				/* ============ Temporaire ============== */
-
-			function getRandomStatus() {
-				const status = [
-					userStatus.ONLINE,
-					userStatus.OFFLINE,
-					userStatus.PLAYING,
-					userStatus.WAITING,
-					userStatus.WATCHING
-				]
-
-				/* ====================================== */
-
-				const randomStatus = Math.floor(Math.random() * 5)
-
-				return (status[randomStatus])
-			}
-
 			try {
-				/* ============ Temporaire ============== */
-				// const response = await axios.get("http://localhost:3333/user/me/friends")
-
-				const response = await axios.get("http://localhost:3333/user")
 
 				/* ============ Temporaire ============== */
+
+				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
+
+				const friendsResponse = await axios.get("http://localhost:3333/user")
 
 				// En attendant d'avoir le scoreResume retourne par le back
-				const tempResponse: User[] = response.data.map((friend: User) => ({
+				const tempFriendsResponse: User[] = friendsResponse.data.map((friend: User) => ({
 					...friend,
+					//temporaire
 					status: getRandomStatus(),
 					// status: getStatus(friend.status),
 					scoreResume: {
@@ -201,256 +94,75 @@ function Game() {
 					}
 				}))
 
-				// userAuthenticate.friends = tempResponse
-				userAuthenticate.friends = tempResponse.splice(0, 10)
+				return (tempFriendsResponse.slice(0, 10))
 
 				/* ====================================== */
-
 			}
-			catch {
-				userAuthenticate.friends = []
+			catch (error)
+			{
+				throw (error)
 			}
 		}
-		fetchFriends()
-	}, [userAuthenticate])
 
-	useEffect(() => {
 		async function fetchChannels() {
 			try {
 
 				/* ============ Temporaire ============== */
 
-				// const response = await axios.get("http://localhost:3333/user/me/channels")
-				// setChannels(response.data)
-
-				const tempResponse = [
-					{
-						id: 0,
-						name: "Owner / A",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: userAuthenticate,
-						administrators: [
-							userAuthenticate,
-							userTarget
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							userAuthenticate
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Owner / M",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: userAuthenticate,
-						administrators: [
-							userAuthenticate
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							userAuthenticate
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Admin / M",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: osef,
-						administrators: [
-							userAuthenticate
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							osef
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Member / M",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: osef,
-						administrators: [
-							osef
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							osef
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Admin / O",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: userTarget,
-						administrators: [
-							userAuthenticate
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							userTarget
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Admin / A",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: osef,
-						administrators: [
-							userAuthenticate,
-							userTarget
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							osef
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Member / O",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: userTarget,
-						administrators: [
-							userTarget
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							userTarget
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Member / A",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: osef,
-						administrators: [
-							userTarget
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							osef
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 0,
-						name: "Member / M",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PUBLIC,
-						owner: osef,
-						administrators: [
-							osef
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							osef
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 4,
-						name: "Private",
-						avatar: DefaultChannelPicture,
-						type: channelStatus.PRIVATE,
-						owner: userAuthenticate,
-						administrators: [
-							userAuthenticate
-						],
-						users: [
-							userAuthenticate,
-							userTarget
-						],
-						validUsers: [
-							userAuthenticate
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					},
-					{
-						id: 5,
-						name: "MP",
-						avatar: TontonPicture,
-						type: channelStatus.PRIVATE,
-						owner: userTarget,
-						administrators: [
-							userTarget
-						],
-						users: [
-							userTarget,
-							userAuthenticate
-						],
-						validUsers: [
-							userTarget
-						],
-						mutedUsers: [],
-						bannedUsers: []
-					}
-				]
-
-				userAuthenticate.channels = tempResponse
-				getSecondaryContextualMenuHeight(tempResponse.length)
-
+				// const channelsResponse = await axios.get("http://localhost:3333/user/me/channels")
+				const channelsResponse: ChannelData[] = getTempChannels(userAuthenticate, userTarget)
+				return (channelsResponse)
+			
 				/* ====================================== */
-
 			}
 			catch (error) {
-				userAuthenticate.channels = []
+				throw (error)
 			}
 		}
-		fetchChannels()
-	}, [userAuthenticate])
 
-	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
+		async function fetchMe() {
+			try {
+				const friends = await fetchFriends()
+				const channels = await fetchChannels()
+
+				const responseMe = await axios.get("http://localhost:3333/user/me", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+				
+				setUserAuthenticate({
+					id: responseMe.data.id,
+					username: responseMe.data.username,
+					avatar: responseMe.data.avatar,
+					status: userStatus.ONLINE,
+					// temporaire
+					scoreResume: { // a recuperer depuis la reponse
+						wins: 100,
+						draws: 1,
+						looses: 0
+					},
+					email:responseMe.data.email,
+					phoneNumber: responseMe.data.phoneNumber,
+					twoFA: false, // a recuperer depuis la reponse
+					friends: friends, // a recuperer depuis la reponse
+					blockedUsers: [], // a recuperer depuis la reponse
+					channels: channels // a recuperer depuis la reponse
+				})
+			}
+			catch (error) {
+				localStorage.removeItem('token')
+				setErrorRequest(true)
+			}
+		}
+		fetchMe()
+	}, [])
+
+	useEffect(() => {
+		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
+	}, [userAuthenticate.channels])
+
+/* ========================== COMPONENTS STATES ============================= */
 
 	const [social, displaySocial] = useState<boolean>(true)
 
@@ -470,17 +182,21 @@ function Game() {
 	const [secondaryContextualMenuHeight, setSecondaryContextualMenuHeight] = useState<number>(0)
 	const [errorContextualMenu, displayErrorContextualMenu] = useState<boolean>(false)
 
-	const [zCardIndex, setZCardIndex] = useState<number>(0)
-	const [zChatIndex, setZChatIndex] = useState<number>(0)
-	const GameWrapperRef = useRef(null)
-
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
+
+/* ============================ DISPLAY STATES ============================== */
+
+	const GameWrapperRef = useRef(null)
+	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
 	useEffect(() => {
 		displaySocial(isSmallDesktop)
 		if (!social)
 			displayCard(false)
 	}, [isSmallDesktop])
+
+	const [zCardIndex, setZCardIndex] = useState<number>(0)
+	const [zChatIndex, setZChatIndex] = useState<number>(0)
 
 	useEffect(() => {
 		if (zCardIndex > 0 && zChatIndex > 0) {
@@ -489,8 +205,9 @@ function Game() {
 		}
 	}, [zCardIndex, zChatIndex])
 
+/* ========================================================================== */
 
-	return (
+return (
 		<GamePage onClick={closeContextualMenus}>
 			{
 				!errorRequest ?

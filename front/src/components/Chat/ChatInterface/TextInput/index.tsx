@@ -1,24 +1,25 @@
-import { ChangeEvent, FocusEvent, FormEvent, /* useContext, */ useState } from "react"
+import { ChangeEvent, FocusEvent, FormEvent, useContext, useState } from "react"
 // import axios from "axios"
 
 import { Input, Style } from "./style"
 
 import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
-// import GlobalContext from "../../../../contexts/GlobalContext"
+import GlobalContext from "../../../../contexts/GlobalContext"
 
 import { ChannelData } from "../../../../utils/types"
-// import { messageStatus } from "../../../../utils/status"
+import { messageStatus } from "../../../../utils/status"
 
 type PropsTextInput = {
 	channelTarget: ChannelData
 }
 
-function TextInput({ /* channelTarget */ }: PropsTextInput) {
+function TextInput({ channelTarget }: PropsTextInput) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 
+	const { userAuthenticate } = useContext(GlobalContext)!
 	// const { userAuthenticate } = useContext(GlobalContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -35,6 +36,14 @@ function TextInput({ /* channelTarget */ }: PropsTextInput) {
 			// 	type: messageStatus.TEXT,
 			// 	content: message
 			// })
+
+			channelTarget.messages.push({
+				id: -1,
+				sender: userAuthenticate,
+				type: messageStatus.TEXT,
+				content: message
+			})
+
 			setMessage('')
 
 			/* ====================================== */
