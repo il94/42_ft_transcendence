@@ -20,7 +20,7 @@ import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
 			  signOptions: { expiresIn: '1d' },
 			}),
 		}),
-		PassportModule.register({ defaultStrategy: '42' }), // est-ce la cause de me pb avec jwt ?
+		PassportModule.register({ defaultStrategy: '42' }),
 	],
 	providers: [JwtStrategy, Api42Strategy, AuthService, UsersService, SessionSerializer, JwtGuard, Api42AuthGuard],
 	controllers: [AuthController, UsersController],

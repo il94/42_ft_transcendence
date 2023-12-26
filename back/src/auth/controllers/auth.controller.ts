@@ -13,21 +13,14 @@ export class AuthController {
 	constructor(private authService: AuthService) {}
 
 	@UseGuards(Api42AuthGuard)
-	@Get('/api42/login')
-	handleLogin() {
-		//console.log(req.user)
-		// bad callbackURL on Api42AuthGuard
-		//return this.authService.validate42User(req.user);
-	}
-
-	@UseGuards(Api42AuthGuard)
-	@UseGuards(JwtGuard)
-	@Get('api42/redirect')
-	handleRedirect(@getUser() user: User) {
-		return user;
+	@Get('api42')
+	handleLogin(@Request() req) {
+		console.log(req.user);
+		return req.user;
 	}
 
 	@HttpCode(HttpStatus.OK)
+	@UseGuards(LocalAuthGuard)
 	@Post('signin')
 	signin(@Body() dto: AuthDto) {
 		return this.authService.signin(dto);
@@ -36,13 +29,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Post('signup')
 	signup(@Body() dto: CreateUserDto) {
-		console.log("FHEUIFHIUDHFKSDKDSHJK")
 		return this.authService.signup(dto);
-	}
-
-	@Get('logout')
-	logout() {
-		return "TODO";
 	}
 
 	@HttpCode(HttpStatus.OK)
@@ -51,9 +38,11 @@ export class AuthController {
 		return "Coucou!";
 	}
 
-	@UseGuards(JwtGuard)
+	@UseGuards(Api42AuthGuard)
+	//@UseGuards(JwtGuard)
 	@Get('profile')
 	getProfile(@Request() req) {
+		console.log("profile: ", req.user);
 		if (req.user) {
 			return { msg: 'Authenticated' };
 		} else { 

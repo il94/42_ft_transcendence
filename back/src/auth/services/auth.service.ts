@@ -14,6 +14,10 @@ export class AuthService {
 		private jwt: JwtService, 
 		private userService: UsersService) {}
 
+	validateApiKey(apiKey: string) {
+		
+	}
+
 	async signup(dto: CreateUserDto) {
 		const newUser = await this.userService.createUser(dto);
 		delete newUser.hash;
@@ -51,18 +55,19 @@ export class AuthService {
 					hash: "00",
 					email: profile.email,
 					avatar: "string",
-					phoneNumber: profile.phoneNumber,
 					twoFA: false,
 					status: UserStatus.ONLINE,
 					wins: 0,
 					draws: 0,
 					losses: 0,
+					phoneNumber: "profile.phoneNumber",
 				},
 			});
-			return this.signToken(user.id, user.username);
+			return this.signToken(newUser.id, newUser.username);
+			//return newUser;
 		}
-		console.log("user data: ", user);
 		return this.signToken(user.id, user.username);
+		//return user; 
 	}
 
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
