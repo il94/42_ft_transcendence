@@ -8,7 +8,7 @@ import GlobalContext from "../../contexts/GlobalContext"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import { ChannelData, User } from "../../utils/types"
-import { channelStatus, chatWindowStatus } from "../../utils/status"
+import { channelStatus, chatWindowStatus, userStatus } from "../../utils/status"
 
 import DefaultChannelPicture from "../../assets/default_channel.png"
 import TontonPicture from "../../assets/xavier_niel.webp"
@@ -44,15 +44,39 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 	const [userOptions, setUserOptions] = useState<UserOption[]>([]);
 	const [channelOptions, setChannelOptions] = useState<ChannelOption[]>([]);
 
+	function getRandomStatus() {
+		const status = [
+			userStatus.ONLINE,
+			userStatus.OFFLINE,
+			userStatus.PLAYING,
+			userStatus.WAITING,
+			userStatus.WATCHING
+		]
+
+		/* ====================================== */
+
+		const randomStatus = Math.floor(Math.random() * 5)
+
+		return (status[randomStatus])
+	}
+
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
 				const users = await axios.get("http://localhost:3333/user")
 
 				setUserOptions(users.data.map((user: User) => ({
-					user: { ...user },
+					user: {
+						...user ,
+						status: getRandomStatus(),
+						scoreResume: {
+							wins: 0,
+							draws: 0,
+							looses: 0
+						}
+					},
 					label: user.username,
-					optionType: optionType.USER
+					optionType: optionType.USER,
 				})))
 
 				/* ============ Temporaire ============== */

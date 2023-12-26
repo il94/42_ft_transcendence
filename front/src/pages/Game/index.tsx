@@ -163,7 +163,7 @@ function Game() {
 			// 		return (userStatus.WATCHING)
 			// }
 
-			/* ============ Temporaire ============== */
+				/* ============ Temporaire ============== */
 
 			function getRandomStatus() {
 				const status = [
