@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect } from "react"
 // import axios from "axios"
 
 import { Style } from "./style"
@@ -8,7 +8,6 @@ import UserText from "./UserText"
 import ScrollBar from "../../../../componentsLibrary/ScrollBar"
 import ContactInvitation from "./ContactInvitation"
 import UserInvitation from "./UserInvitation"
-import Error from "../../../../componentsLibrary/ErrorRequest"
 
 import ChatContext from "../../../../contexts/ChatContext"
 import GlobalContext from "../../../../contexts/GlobalContext"
@@ -22,128 +21,47 @@ type PropsDiscussion = {
 	channelTarget: ChannelData
 }
 
-function Discussion({ /* channelTarget */ }: PropsDiscussion) {
-
-	const [messages, setMessages] = useState<(MessageText | MessageInvitation)[] | undefined>(undefined)
+function Discussion({ channelTarget }: PropsDiscussion) {
 
 	const { userAuthenticate } = useContext(GlobalContext)!
 
-	useEffect(() => {
-		async function fetchData() {
-			try {
-
-				/* ============ Temporaire ============== */
-
-				// const response = await axios.get("http://localhost:3333/channel/${channelTarget.id}/messages")
-				// setMessages(response)
-
-				const userTest: User = {
-					id: 5,
-					username: "Someone",
-					avatar: DefaultBlueAvatar,
-					status: userStatus.ONLINE,
-					scoreResume: {
-						wins: 0,
-						draws: 0,
-						looses: 0
-					}
-				}
-
-				setMessages([
-					{
-						id: 0,
-						sender: userAuthenticate,
-						type: messageStatus.TEXT,
-						content: "Contact message"
-					},
-					{
-						id: 1,
-						sender: userTest,
-						type: messageStatus.TEXT,
-						content: "User message"
-					},
-					{
-						id: 2,
-						sender: userAuthenticate,
-						type: messageStatus.INVITATION,
-						target: userTest,
-						status: challengeStatus.PENDING
-					},
-					{
-						id: 3,
-						sender: userAuthenticate,
-						type: messageStatus.INVITATION,
-						target: userTest,
-						status: challengeStatus.ACCEPTED
-					},
-					{
-						id: 4,
-						sender: userAuthenticate,
-						type: messageStatus.INVITATION,
-						target: userTest,
-						status: challengeStatus.CANCELLED
-					},
-					{
-						id: 5,
-						sender: userAuthenticate,
-						type: messageStatus.INVITATION,
-						target: userTest,
-						status: challengeStatus.IN_PROGRESS
-					},
-					{
-						id: 6,
-						sender: userAuthenticate,
-						type: messageStatus.INVITATION,
-						target: userTest,
-						status: challengeStatus.FINISHED
-					},
-					{
-						id: 7,
-						sender: userTest,
-						type: messageStatus.INVITATION,
-						target: userAuthenticate,
-						status: challengeStatus.PENDING
-					},
-					{
-						id: 8,
-						sender: userTest,
-						type: messageStatus.INVITATION,
-						target: userAuthenticate,
-						status: challengeStatus.ACCEPTED
-					},
-					{
-						id: 9,
-						sender: userTest,
-						type: messageStatus.INVITATION,
-						target: userAuthenticate,
-						status: challengeStatus.CANCELLED
-					},
-					{
-						id: 10,
-						sender: userTest,
-						type: messageStatus.INVITATION,
-						target: userAuthenticate,
-						status: challengeStatus.IN_PROGRESS
-					},
-					{
-						id: 11,
-						sender: userTest,
-						type: messageStatus.INVITATION,
-						target: userAuthenticate,
-						status: challengeStatus.FINISHED
-					}
-				]
-				)
-
-				/* ============================================== */
-
-			}
-			catch (error) {
-				setMessages(undefined)
-			}
+	const userTest: User = {
+		id: 5,
+		username: "Someone",
+		avatar: DefaultBlueAvatar,
+		status: userStatus.ONLINE,
+		scoreResume: {
+			wins: 0,
+			draws: 0,
+			looses: 0
 		}
-		fetchData()
-	}, [])
+	}
+
+
+	useEffect(() => {
+
+		const randomIndex = Math.floor(Math.random() * 2)
+		
+		if (randomIndex == 0)
+		{
+			channelTarget.messages.push({
+				id: 1,
+				sender: userTest,
+				type: messageStatus.TEXT,
+				content: "tg"
+			})
+		}
+		else
+		{
+			channelTarget.messages.push({
+				id: 7,
+				sender: userTest,
+				type: messageStatus.INVITATION,
+				target: userAuthenticate,
+				status: challengeStatus.PENDING
+			})
+		}
+	}, [channelTarget.messages])
 
 	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
 
@@ -151,51 +69,48 @@ function Discussion({ /* channelTarget */ }: PropsDiscussion) {
 	return (
 		<Style>
 			{
-				messages ?
-					<ScrollBar
-						state={{
-							value: chatScrollValue,
-							setter: setChatScrollValue
-						}}
-						firstRenderState={{
-							value: chatRender,
-							setter: setChatRender
-						}}
-					>
-						{
-							messages.map((message, index) => (
-								message.sender.id === userAuthenticate.id ?
-									message.type === messageStatus.TEXT ?
-										<UserText
-											key={"message" + index} // a definir
-											content={(message as MessageText).content}
-										/>
-										:
-										<UserInvitation
-											key={"message" + index} // a definir
-											target={(message as MessageInvitation).target}
-											status={(message as MessageInvitation).status}
-										/>
+				<ScrollBar
+					state={{
+						value: chatScrollValue,
+						setter: setChatScrollValue
+					}}
+					firstRenderState={{
+						value: chatRender,
+						setter: setChatRender
+					}}
+				>
+					{
+						channelTarget.messages.map((message, index) => (
+							message.sender.id === userAuthenticate.id ?
+								message.type === messageStatus.TEXT ?
+									<UserText
+										key={"message" + index} // a definir
+										content={(message as MessageText).content}
+									/>
 									:
-									message.type === messageStatus.TEXT ?
-										<ContactText
-											key={"message" + index} // a definir
-											sender={message.sender}
-											content={(message as MessageText).content}
-										/>
-										:
-										<ContactInvitation
-											key={"message" + index} // a definir
-											sender={message.sender}
-											target={(message as MessageInvitation).target}
-											status={(message as MessageInvitation).status}
-										/>
-							))
-						}
-						<div style={{ marginTop: "3px" }} />
-					</ScrollBar>
-					:
-					<Error />
+									<UserInvitation
+										key={"message" + index} // a definir
+										target={(message as MessageInvitation).target}
+										status={(message as MessageInvitation).status}
+									/>
+								:
+								message.type === messageStatus.TEXT ?
+									<ContactText
+										key={"message" + index} // a definir
+										sender={message.sender}
+										content={(message as MessageText).content}
+									/>
+									:
+									<ContactInvitation
+										key={"message" + index} // a definir
+										sender={message.sender}
+										target={(message as MessageInvitation).target}
+										status={(message as MessageInvitation).status}
+									/>
+						))
+					}
+					<div style={{ marginTop: "3px" }} />
+				</ScrollBar>
 			}
 		</Style>
 	)

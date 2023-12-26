@@ -28,6 +28,7 @@ export const Text = styled.p`
 	padding-bottom: 1px;
 
 	user-select: text;
+	word-break: break-all;
 
 	color: ${colors.textAlt};
 	background-color: ${colors.messageUser};

@@ -33,6 +33,7 @@ export type ChannelData = {
 	avatar: string,
 	type: channelStatus,
 	password?: string,
+	messages: (MessageText | MessageInvitation)[],
 	owner: User | UserAuthenticate,
 	administrators: (User | UserAuthenticate)[],
 	users: (User | UserAuthenticate)[],

@@ -67,6 +67,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 			avatar: avatar,
 			type: channelType,
 			password: password,
+			messages: [],
 			owner: userAuthenticate,
 			administrators: [
 				userAuthenticate
@@ -84,6 +85,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
+					newChannel.messages = channel.messages
 					newChannel.administrators = channel.administrators
 					newChannel.users = channel.users
 					newChannel.validUsers = channel.validUsers
