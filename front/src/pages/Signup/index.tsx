@@ -24,65 +24,19 @@ import ErrorRequest from '../../componentsLibrary/ErrorRequest'
 
 import AuthContext from '../../contexts/AuthContext'
 
+import { getRandomDefaultAvatar } from '../../utils/functions'
+
+import { SettingData } from '../../utils/types'
+import { emptySetting } from '../../utils/emptyObjects'
+
 import colors from '../../utils/colors'
 
-import DefaultBlackAvatar from "../../assets/default_black.png"
-import DefaultBlueAvatar from "../../assets/default_blue.png"
-import DefaultGreenAvatar from "../../assets/default_green.png"
-import DefaultPinkAvatar from "../../assets/default_pink.png"
-import DefaultPurpleAvatar from "../../assets/default_purple.png"
-import DefaultRedAvatar from "../../assets/default_red.png"
-import DefaultYellowAvatar from "../../assets/default_yellow.png"
 import FTButton from "../../assets/42.png"
 
 function Signup() {
 
-	function getRandomDefaultAvatar(): string {
-
-		const defaultAvatars: string[] = [
-			DefaultBlackAvatar,
-			DefaultBlueAvatar,
-			DefaultGreenAvatar,
-			DefaultPinkAvatar,
-			DefaultPurpleAvatar,
-			DefaultRedAvatar,
-			DefaultYellowAvatar
-		]
-
-		const randomIndex = Math.floor(Math.random() * defaultAvatars.length)
-
-		return (defaultAvatars[randomIndex])
-	}
-
-	type PropsSetting = {
-		value: string,
-		error: boolean,
-		errorMessage?: string
-	}
-
-	const [username, setUsername] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-	const [password, setPassword] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-	const [email, setEmail] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const { token, setToken } = useContext(AuthContext)!
+	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const navigate = useNavigate()
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -149,7 +103,9 @@ function Signup() {
 		}
 	}
 
-	/* ============================== USERNAME ================================== */
+/* ============================== USERNAME ================================== */
+
+	const [username, setUsername] = useState<SettingData>(emptySetting)
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
@@ -183,7 +139,9 @@ function Signup() {
 		})
 	}
 
-	/* ============================== PASSWORD ================================== */
+/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<SettingData>(emptySetting)
 
 	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
@@ -195,7 +153,9 @@ function Signup() {
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
-	/* =============================== EMAIL ==================================== */
+/* =============================== EMAIL ==================================== */
+
+	const [email, setEmail] = useState<SettingData>(emptySetting)
 
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
@@ -214,9 +174,11 @@ function Signup() {
 		}
 	}
 
-	/* ============================ PHONE NUMBER ================================ */
+/* ============================ PHONE NUMBER ================================ */
 
-	function handleInputTelChange(event: ChangeEvent<HTMLInputElement>) {
+	const [phoneNumber, setPhoneNumber] = useState<SettingData>(emptySetting)
+
+	function handleInputPhoneNumberChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value) && value.length !== 0) {
 			setPhoneNumber({
@@ -232,6 +194,8 @@ function Signup() {
 			})
 		}
 	}
+	
+/* ========================================================================== */
 
 	useEffect(() => {
 		if (token)
@@ -311,7 +275,7 @@ function Signup() {
 						<Setting>
 							Phone number
 							<InputText
-								onChange={handleInputTelChange}
+								onChange={handleInputPhoneNumberChange}
 								type="text" value={phoneNumber.value as string}
 								width={231}
 								fontSize={25}

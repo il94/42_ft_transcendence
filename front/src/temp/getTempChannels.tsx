@@ -4,9 +4,6 @@ import DefaultChannelPicture from "../assets/default_channel.png"
 import TontonPicture from "../assets/xavier_niel.webp"
 
 export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: User) : ChannelData[] {
-	console.log("PLOP")
-
-	console.log("POURR")
 
 	const osef = {
 		id: 0,

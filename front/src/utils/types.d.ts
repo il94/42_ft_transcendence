@@ -64,3 +64,9 @@ export type MatchData = {
 	scoreUser: number,
 	scoreOpponent: number
 }
+
+export type SettingData = {
+	value: string,
+	error: boolean,
+	errorMessage?: string
+}

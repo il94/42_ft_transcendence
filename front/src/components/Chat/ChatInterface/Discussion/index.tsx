@@ -63,21 +63,18 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 		}
 	}, [channelTarget.messages])
 
-	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
+	const { chatRender, setChatRender } = useContext(ChatContext)!
 
 
 	return (
 		<Style>
 			{
 				<ScrollBar
-					state={{
-						value: chatScrollValue,
-						setter: setChatScrollValue
-					}}
 					firstRenderState={{
 						value: chatRender,
 						setter: setChatRender
 					}}
+					activeState
 				>
 					{
 						channelTarget.messages.map((message, index) => (

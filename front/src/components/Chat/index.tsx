@@ -139,7 +139,9 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 															channelTarget={channelTarget}
 															setChatWindowState={setChatWindowState} />
 														:
-														<ChatInterface channelTarget={channelTarget} />
+														<ChatInterface
+															channelTarget={channelTarget}
+															setChannelTarget={setChannelTarget}/>
 											}
 										</>
 								}

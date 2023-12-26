@@ -6,6 +6,7 @@ import Discussion from "./Discussion"
 import { ChannelData } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
+import { Dispatch, SetStateAction } from "react"
 
 const Style = styled.div`
 
@@ -19,14 +20,15 @@ const Style = styled.div`
 `
 
 type PropsChatInterface = {
-	channelTarget: ChannelData
+	channelTarget: ChannelData | undefined,
+	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>
 }
 
-function ChatInterface({ channelTarget }: PropsChatInterface) {
+function ChatInterface({ channelTarget, setChannelTarget }: PropsChatInterface) {
 	return (
 		<Style>
 			<Discussion channelTarget={channelTarget} />
-			<TextInput channelTarget={channelTarget} />
+			<TextInput setChannelTarget={setChannelTarget} />
 		</Style>
 	)
 }

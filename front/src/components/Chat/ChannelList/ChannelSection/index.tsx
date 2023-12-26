@@ -19,10 +19,8 @@ function ChannelSection({ channel, setChannelTarget, setChatWindowState, backgro
 
 	function handleClickChannelButton() {
 
-		if (channel.type === channelStatus.PROTECTED && !channel.validUsers.includes(userAuthenticate)) {
-			console.log("efds")
+		if (channel.type === channelStatus.PROTECTED && !channel.validUsers.includes(userAuthenticate))
 			setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
-		}
 		else
 			setChatWindowState(chatWindowStatus.CHANNEL)
 
