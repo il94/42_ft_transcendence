@@ -243,7 +243,7 @@ function Game() {
 									/>
 								}
 								<LeftGameWrapper $social={social}>
-									<Logo />
+									<Logo social={social} />
 									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
 										<Social
 											social={social}
