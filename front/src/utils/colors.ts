@@ -12,6 +12,7 @@ const colors = {
 	sectionTransparent: "#aa6736b3",
 	sectionAltTransparent: "#995c2fb3",
 	sectionContextualMenu: "#8a4615",
+	navbar: "#C9783C",
 
 	/* Texts */
 	text: "#FFFFFF",
@@ -41,10 +42,6 @@ const colors = {
 	rankSilver: "#BEBEBE",
 	rankBronze: "#C9772C",
 	rankNull: "#995C2F",
-
-	/* Profile */
-	profile: "#C9783C",
-	avatar: "#524FFD",
 
 	/* Chat */
 	chatWindow: "#f3a76080",

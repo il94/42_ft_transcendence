@@ -14,7 +14,7 @@ export const Style = styled.div`
 	height: 53px;
 	min-height: 53px;
 
-	background-color: ${colors.profile};
+	background-color: ${colors.navbar};
 
 `
 
