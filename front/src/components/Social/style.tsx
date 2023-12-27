@@ -23,6 +23,8 @@ export const ReduceButton = styled.button`
 	padding: 0;
 	border: 0;
 
+	font-size: 8px;
+
 	background-color: ${colors.reduceButton};
 
 	&:hover {

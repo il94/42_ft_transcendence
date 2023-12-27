@@ -60,7 +60,18 @@ function Social({ friends, social, displaySocial, displayContextualMenu, setCont
 								))
 							}
 						</ScrollBar>
-						<ReduceButton onClick={reduceSocial} title="Reduce" />
+						<ReduceButton onClick={reduceSocial} title="Reduce">
+							{
+								social ?
+								<>
+									&gt;&gt;
+								</>
+								:
+								<>
+									&lt;&lt;
+								</>
+							}
+						</ReduceButton>
 					</>
 					:
 					<ErrorRequest />
