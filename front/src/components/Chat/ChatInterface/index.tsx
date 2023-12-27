@@ -20,15 +20,15 @@ const Style = styled.div`
 `
 
 type PropsChatInterface = {
-	channelTarget: ChannelData | undefined,
-	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>
+	channel: ChannelData,
+	setChannel: Dispatch<SetStateAction<ChannelData>>
 }
 
-function ChatInterface({ channelTarget, setChannelTarget }: PropsChatInterface) {
+function ChatInterface({ channel, setChannel }: PropsChatInterface) {
 	return (
 		<Style>
-			<Discussion channelTarget={channelTarget} />
-			<TextInput setChannelTarget={setChannelTarget} />
+			<Discussion channel={channel} />
+			<TextInput setChannel={setChannel} />
 		</Style>
 	)
 }

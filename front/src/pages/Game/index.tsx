@@ -284,7 +284,11 @@ return (
 												<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
 													<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 														<Chat
+															chat={chat}
+															displayChat={displayChat}
 															channels={userAuthenticate.channels}
+															channelTarget={channelTarget}
+															setChannelTarget={setChannelTarget}
 															chatWindowState={chatWindowState}
 															setChatWindowState={setChatWindowState} />
 													</ChatContext.Provider>

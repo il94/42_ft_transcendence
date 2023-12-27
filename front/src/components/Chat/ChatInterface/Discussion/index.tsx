@@ -18,10 +18,10 @@ import { challengeStatus, messageStatus, userStatus } from "../../../../utils/st
 import DefaultBlueAvatar from "../../../../assets/default_blue.png"
 
 type PropsDiscussion = {
-	channelTarget: ChannelData
+	channel: ChannelData
 }
 
-function Discussion({ channelTarget }: PropsDiscussion) {
+function Discussion({ channel } : PropsDiscussion) {
 
 	const { userAuthenticate } = useContext(GlobalContext)!
 
@@ -44,7 +44,7 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 		
 		if (randomIndex == 0)
 		{
-			channelTarget.messages.push({
+			channel.messages.push({
 				id: 1,
 				sender: userTest,
 				type: messageStatus.TEXT,
@@ -53,7 +53,7 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 		}
 		else
 		{
-			channelTarget.messages.push({
+			channel.messages.push({
 				id: 7,
 				sender: userTest,
 				type: messageStatus.INVITATION,
@@ -61,7 +61,7 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 				status: challengeStatus.PENDING
 			})
 		}
-	}, [channelTarget.messages])
+	}, [channel.messages])
 
 	const { chatRender, setChatRender } = useContext(ChatContext)!
 
@@ -77,7 +77,7 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 					activeState
 				>
 					{
-						channelTarget.messages.map((message, index) => (
+						channel.messages.map((message, index) => (
 							message.sender.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?
 									<UserText

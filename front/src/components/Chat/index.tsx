@@ -23,31 +23,31 @@ import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
-import ChatContext from "../../contexts/ChatContext"
 import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
 
 import { ChannelData } from "../../utils/types"
 import { chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
-import GlobalContext from "../../contexts/GlobalContext"
 
 type PropsChat = {
+	chat: boolean,
+	displayChat: Dispatch<SetStateAction<boolean>>,
 	channels: ChannelData[],
+	channelTarget: ChannelData | undefined,
+	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
 }
 
-function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
+function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, chatWindowState, setChatWindowState }: PropsChat) {
 
 	function handleCickChatButton() {
 		displayChat(true)
 		setZChatIndex(zChatIndex + 1)
 	}
 
-	const { chat, displayChat } = useContext(ChatContext)!
 	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(GlobalDisplayContext)!
-	const { channelTarget, setChannelTarget } = useContext(GlobalContext)!
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
@@ -140,8 +140,8 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 															setChatWindowState={setChatWindowState} />
 														:
 														<ChatInterface
-															channelTarget={channelTarget}
-															setChannelTarget={setChannelTarget}/>
+															channel={channelTarget}
+															setChannel={setChannelTarget as Dispatch<SetStateAction<ChannelData>>}/>
 											}
 										</>
 								}

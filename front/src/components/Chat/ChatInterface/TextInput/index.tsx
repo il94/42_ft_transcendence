@@ -11,10 +11,10 @@ import { ChannelData } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
 
 type PropsTextInput = {
-	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>
+	setChannel: Dispatch<SetStateAction<ChannelData>>
 }
 
-function TextInput({ setChannelTarget }: PropsTextInput) {
+function TextInput({ setChannel }: PropsTextInput) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
@@ -37,7 +37,7 @@ function TextInput({ setChannelTarget }: PropsTextInput) {
 			// })
 
 			// if ()
-			setChannelTarget((prevState) => ({
+			setChannel((prevState) => ({
 				...prevState,
 				messages: [
 					...prevState.messages,
