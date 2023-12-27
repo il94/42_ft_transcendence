@@ -82,7 +82,6 @@ function Signin() {
 			navigate("/game")
 		}
 		catch (error) {
-			console.log(error)
 			const axiosError = error as AxiosError
 
 			// if (axiosError.response?.status === 404)

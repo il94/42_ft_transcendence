@@ -5,7 +5,7 @@ import { Input, Style } from "./style"
 
 import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
-import GlobalContext from "../../../../contexts/GlobalContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { ChannelData } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
@@ -19,7 +19,7 @@ function TextInput({ setChannel }: PropsTextInput) {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 
-	const { userAuthenticate } = useContext(GlobalContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 

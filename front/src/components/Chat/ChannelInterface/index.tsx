@@ -26,7 +26,7 @@ import Icon from "../../../componentsLibrary/Icon"
 import IconUploadFile, { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
 import { ChannelData } from "../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
@@ -45,7 +45,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 
 	const [error, setError] = useState<boolean>(false)
 
-	const { userAuthenticate, setChannelTarget } = useContext(GlobalContext)!
+	const { userAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 

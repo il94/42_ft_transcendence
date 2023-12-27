@@ -4,7 +4,7 @@ import {
 	SetStateAction
 } from 'react'
 
-export const GlobalDisplayContext = createContext<{
+export const DisplayContext = createContext<{
 	zCardIndex: number,
 	setZCardIndex: Dispatch<SetStateAction<number>>,
 	zChatIndex: number,
@@ -12,4 +12,4 @@ export const GlobalDisplayContext = createContext<{
 	GameWrapperRef: any
 } | undefined>(undefined)
 
-export default GlobalDisplayContext
+export default DisplayContext

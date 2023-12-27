@@ -6,7 +6,7 @@ import {
 
 import { ChannelData, User, UserAuthenticate } from '../utils/types'
 
-const GlobalContext = createContext<{
+const InteractionContext = createContext<{
 	userAuthenticate: UserAuthenticate,
 	userTarget: User | UserAuthenticate,
 	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
@@ -15,4 +15,4 @@ const GlobalContext = createContext<{
 
 } | undefined>(undefined)
 
-export default GlobalContext
+export default InteractionContext

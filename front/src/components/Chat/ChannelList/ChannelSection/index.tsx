@@ -4,7 +4,7 @@ import { Style, Avatar, ChannelName } from "./style"
 
 import { ChannelData } from "../../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../../utils/status"
-import GlobalContext from "../../../../contexts/GlobalContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
 
 type PropsChannel = {
 	channel: ChannelData,
@@ -15,7 +15,7 @@ type PropsChannel = {
 
 function ChannelSection({ channel, setChannelTarget, setChatWindowState, backgroundColor }: PropsChannel) {
 
-	const { userAuthenticate } = useContext(GlobalContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
 	function handleClickChannelButton() {
 

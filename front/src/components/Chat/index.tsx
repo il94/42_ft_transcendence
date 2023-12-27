@@ -23,7 +23,7 @@ import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
-import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
+import DisplayContext from "../../contexts/DisplayContext"
 
 import { ChannelData } from "../../utils/types"
 import { chatWindowStatus } from "../../utils/status"
@@ -47,7 +47,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 		setZChatIndex(zChatIndex + 1)
 	}
 
-	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(GlobalDisplayContext)!
+	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(DisplayContext)!
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 

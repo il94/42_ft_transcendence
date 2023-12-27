@@ -10,7 +10,7 @@ import ContactInvitation from "./ContactInvitation"
 import UserInvitation from "./UserInvitation"
 
 import ChatContext from "../../../../contexts/ChatContext"
-import GlobalContext from "../../../../contexts/GlobalContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { ChannelData, MessageInvitation, MessageText, User } from "../../../../utils/types"
 import { challengeStatus, messageStatus, userStatus } from "../../../../utils/status"
@@ -23,7 +23,7 @@ type PropsDiscussion = {
 
 function Discussion({ channel } : PropsDiscussion) {
 
-	const { userAuthenticate } = useContext(GlobalContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
 	const userTest: User = {
 		id: 5,

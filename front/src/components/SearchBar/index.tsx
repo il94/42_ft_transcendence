@@ -4,7 +4,7 @@ import axios from "axios"
 
 import { Style, StylesAttributes } from "./style"
 
-import GlobalContext from "../../contexts/GlobalContext"
+import InteractionContext from "../../contexts/InteractionContext"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import { ChannelData, User } from "../../utils/types"
@@ -20,7 +20,7 @@ type PropsSearchBar = {
 
 function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 
-	const { userAuthenticate, userTarget, setUserTarget, setChannelTarget } = useContext(GlobalContext)!
+	const { userAuthenticate, userTarget, setUserTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 

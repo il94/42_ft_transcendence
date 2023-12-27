@@ -13,7 +13,7 @@ import { Style } from "./style"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
 import { User } from "../../../utils/types"
 import { challengeStatus, channelStatus, userStatus } from "../../../utils/status"
@@ -84,7 +84,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayAdminSections(false)
 	}, [])
 
-	const { userAuthenticate, channelTarget } = useContext(GlobalContext)!
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	async function handleContactClickEvent() {
 		try {

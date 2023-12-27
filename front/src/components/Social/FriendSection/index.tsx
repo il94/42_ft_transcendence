@@ -16,7 +16,7 @@ import {
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
 import { User } from "../../../utils/types"
 import { userStatus } from "../../../utils/status"
@@ -39,7 +39,7 @@ type PropsFriendSection = {
 function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition } = useContext(CardContext)!
-	const { userTarget, setUserTarget } = useContext(GlobalContext)!
+	const { userTarget, setUserTarget } = useContext(InteractionContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {

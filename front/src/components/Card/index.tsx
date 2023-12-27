@@ -17,7 +17,7 @@ import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
 import Icon from "../../componentsLibrary/Icon"
 
-import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
+import DisplayContext from "../../contexts/DisplayContext"
 
 import { User, UserAuthenticate } from "../../utils/types"
 
@@ -36,7 +36,7 @@ type PropsCard = {
 
 function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 
-	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(GlobalDisplayContext)!
+	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(DisplayContext)!
 
 	useEffect(() => {
 		setZCardIndex(zChatIndex + 1)

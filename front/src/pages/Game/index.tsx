@@ -34,8 +34,8 @@ import ErrorRequest from '../../componentsLibrary/ErrorRequest'
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
 import ContextualMenuContext from '../../contexts/ContextualMenuContext'
-import GlobalDisplayContext from '../../contexts/GlobalDisplayContext'
-import GlobalContext from '../../contexts/GlobalContext'
+import DisplayContext from '../../contexts/DisplayContext'
+import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
 import { ChannelData, User, UserAuthenticate } from '../../utils/types'
@@ -46,7 +46,7 @@ import breakpoints from '../../utils/breakpoints'
 
 import { getRandomStatus, getTempChannels } from '../../temp/getTempChannels'
 
-function Game() {	
+function Game() {
 
 	function getSecondaryContextualMenuHeight(numberOfChannels: number) {
 		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
@@ -62,7 +62,7 @@ function Game() {
 		displaySecondaryContextualMenu(false)
 	}
 
-/* ============================== AUTH STATES =============================== */
+	/* ============================== AUTH STATES =============================== */
 
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
@@ -98,8 +98,7 @@ function Game() {
 
 				/* ====================================== */
 			}
-			catch (error)
-			{
+			catch (error) {
 				throw (error)
 			}
 		}
@@ -112,7 +111,7 @@ function Game() {
 				// const channelsResponse = await axios.get("http://localhost:3333/user/me/channels")
 				const channelsResponse: ChannelData[] = getTempChannels(userAuthenticate, userTarget)
 				return (channelsResponse)
-			
+
 				/* ====================================== */
 			}
 			catch (error) {
@@ -130,7 +129,7 @@ function Game() {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				
+
 				setUserAuthenticate({
 					id: responseMe.data.id,
 					username: responseMe.data.username,
@@ -142,7 +141,7 @@ function Game() {
 						draws: 1,
 						looses: 0
 					},
-					email:responseMe.data.email,
+					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: false, // a recuperer depuis la reponse
 					friends: friends, // a recuperer depuis la reponse
@@ -162,7 +161,7 @@ function Game() {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
 	}, [userAuthenticate.channels])
 
-/* ========================== COMPONENTS STATES ============================= */
+	/* ========================== COMPONENTS STATES ============================= */
 
 	const [social, displaySocial] = useState<boolean>(true)
 
@@ -184,7 +183,7 @@ function Game() {
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 
-/* ============================ DISPLAY STATES ============================== */
+	/* ============================ DISPLAY STATES ============================== */
 
 	const GameWrapperRef = useRef(null)
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
@@ -205,14 +204,14 @@ function Game() {
 		}
 	}, [zCardIndex, zChatIndex])
 
-/* ========================================================================== */
+	/* ========================================================================== */
 
-return (
+	return (
 		<GamePage onClick={closeContextualMenus}>
 			{
 				!errorRequest ?
-					<GlobalContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-						<GlobalDisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, GameWrapperRef }}>
+					<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+						<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, GameWrapperRef }}>
 							<GameWrapper ref={GameWrapperRef}>
 								{
 									contextualMenu.display &&
@@ -299,14 +298,13 @@ return (
 											settings &&
 											<SettingsMenu
 												userAuthenticate={userAuthenticate}
-												displaySettingsMenu={displaySettingsMenu}
-											/>
+												displaySettingsMenu={displaySettingsMenu} />
 										}
 									</BottomGameWrapper>
 								</RightGameWrapper>
 							</GameWrapper>
-						</GlobalDisplayContext.Provider>
-					</GlobalContext.Provider>
+						</DisplayContext.Provider>
+					</InteractionContext.Provider>
 					:
 					<ErrorRequest />
 			}

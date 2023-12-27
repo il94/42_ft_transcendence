@@ -10,8 +10,8 @@ import {
 
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 import CardContext from "../../../../../contexts/CardContext"
-import GlobalDisplayContext from "../../../../../contexts/GlobalDisplayContext"
-import GlobalContext from "../../../../../contexts/GlobalContext"
+import DisplayContext from "../../../../../contexts/DisplayContext"
+import InteractionContext from "../../../../../contexts/InteractionContext"
 
 import { User } from "../../../../../utils/types"
 import { userStatus } from "../../../../../utils/status"
@@ -25,8 +25,8 @@ function ContactText({ sender, content }: PropsContactText) {
 
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
-	const { setZCardIndex, zChatIndex, GameWrapperRef } = useContext(GlobalDisplayContext)!
-	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(GlobalContext)!
+	const { setZCardIndex, zChatIndex, GameWrapperRef } = useContext(DisplayContext)!
+	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	function showCard(event: MouseEvent<HTMLDivElement>) {
 

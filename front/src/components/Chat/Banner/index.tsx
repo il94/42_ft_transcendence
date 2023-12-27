@@ -6,7 +6,7 @@ import { ChannelName, ButtonsWrapper, Style, LeaveButtonWrapper } from "./style"
 import Icon from "../../../componentsLibrary/Icon"
 
 import ChatContext from "../../../contexts/ChatContext"
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 
@@ -23,7 +23,7 @@ type PropsBanner = {
 
 function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorRequest }: PropsBanner) {
 
-	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(GlobalContext)!
+	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function leaveChannel() {
 		try {
