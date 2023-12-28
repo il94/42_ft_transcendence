@@ -44,3 +44,6 @@ button {
 	background-color: #83562cb3; /* colors.textSelection */
 }
 
+::-webkit-scrollbar {
+	width: 15px; /* sert à masquer la scrollbar de chrome sur windows */
+}
