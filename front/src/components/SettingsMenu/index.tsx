@@ -3,13 +3,13 @@ import {
 	Dispatch,
 	FormEvent,
 	SetStateAction,
+	useContext,
 	useEffect,
 	useState
 } from "react"
 // import axios from "axios"
 
 import {
-	PseudoStyle,
 	Setting,
 	SettingTtile,
 	Style,
@@ -23,6 +23,9 @@ import SelectAvatar from "./SelectAvatar"
 import Icon from "../../componentsLibrary/Icon"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
+import ScrollBar from "../../componentsLibrary/ScrollBar"
+
+import DisplayContext from "../../contexts/DisplayContext"
 
 import { UserAuthenticate } from "../../utils/types"
 
@@ -249,9 +252,19 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 		}
 	}, [email.value, phoneNumber.value])
 
+	/* ========================================================================== */
+
+	const { zSettingsIndex, setZSettingsIndex, zMaxIndex } = useContext(DisplayContext)!
+
+	useEffect(() => {
+		setZSettingsIndex(zMaxIndex + 1)
+	}, [])
+
 	return (
-		<PseudoStyle>
-			<Style>
+		<Style
+			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
+			$zIndex={zSettingsIndex}>
+			<ScrollBar>
 				<CloseButtonWrapper>
 					<Icon src={CloseIcon} size={24}
 						onClick={() => displaySettingsMenu(false)}
@@ -370,8 +383,8 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 						Save
 					</Button>
 				</SettingsForm>
-			</Style>
-		</PseudoStyle>
+			</ScrollBar>
+		</Style>
 	)
 }
 

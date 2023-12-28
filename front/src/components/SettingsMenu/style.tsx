@@ -2,28 +2,21 @@ import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
-export const PseudoStyle = styled.div`
+export const Style = styled.div<{ $zIndex: number }>`
 
 	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: rgba(0, 0, 0, 0.1);
-	
-`
-
-export const Style = styled.div`
-
-	position: relative;
 	top: 50%;
 	left: 50%;
-	z-index: 998;
+	z-index: ${(props) => props.$zIndex};
 	transform: translate(-50%, -50%);
 
 	width: 350px;
 
-	padding-bottom: 15px;
+	height: inherit;
+	max-height: 636px;
+	min-height: 159px;
+
+	overflow-y: auto;
 
 	clip-path: ${effects.pixelateWindow};
 

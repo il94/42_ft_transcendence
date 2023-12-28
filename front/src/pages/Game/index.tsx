@@ -196,22 +196,36 @@ function Game() {
 
 	const [zCardIndex, setZCardIndex] = useState<number>(0)
 	const [zChatIndex, setZChatIndex] = useState<number>(0)
+	const [zSettingsIndex, setZSettingsIndex] = useState<number>(0)
+	const [zMaxIndex, setZMaxIndex] = useState<number>(0)
 
 	useEffect(() => {
-		if (zCardIndex > 0 && zChatIndex > 0) {
+		if (zCardIndex > 0 && zChatIndex > 0 && zSettingsIndex > 0) {
 			setZCardIndex(zCardIndex - 1)
 			setZChatIndex(zChatIndex - 1)
+			setZSettingsIndex(zSettingsIndex - 1)
 		}
-	}, [zCardIndex, zChatIndex])
+		setZMaxIndex(Math.max(zCardIndex, zChatIndex, zSettingsIndex))
+	}, [zCardIndex, zChatIndex, zSettingsIndex])
+		
+	useEffect(() => {
+		window.addEventListener('resize', closeContextualMenus);
+
+		return () => {
+			window.removeEventListener('resize', closeContextualMenus);
+		}
+	}, [])
+	
 
 	/* ========================================================================== */
 
 	return (
-		<GamePage onClick={closeContextualMenus}>
+		<GamePage
+			onClick={closeContextualMenus}>
 			{
 				!errorRequest ?
 					<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-						<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, GameWrapperRef }}>
+						<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
 							<GameWrapper ref={GameWrapperRef}>
 								{
 									contextualMenu.display &&
@@ -277,6 +291,12 @@ function Game() {
 												displayCard={displayCard}
 												userTarget={userTarget} />
 										}
+										{
+											settings &&
+											<SettingsMenu
+												userAuthenticate={userAuthenticate}
+												displaySettingsMenu={displaySettingsMenu} />
+										}
 										<TestsBack />
 										{
 											<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
@@ -293,12 +313,6 @@ function Game() {
 													</ChatContext.Provider>
 												</CardContext.Provider>
 											</ContextualMenuContext.Provider>
-										}
-										{
-											settings &&
-											<SettingsMenu
-												userAuthenticate={userAuthenticate}
-												displaySettingsMenu={displaySettingsMenu} />
 										}
 									</BottomGameWrapper>
 								</RightGameWrapper>

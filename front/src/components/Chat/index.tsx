@@ -47,7 +47,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 		setZChatIndex(zChatIndex + 1)
 	}
 
-	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(DisplayContext)!
+	const { zChatIndex, setZChatIndex, zMaxIndex } = useContext(DisplayContext)!
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
@@ -55,7 +55,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 	const [bannerName, setBannerName] = useState<string>("Welcome")
 
 	useEffect(() => {
-		setZChatIndex(zCardIndex + 1)
+		setZChatIndex(zMaxIndex + 1)
 	}, [])
 
 	useEffect(() => {
@@ -100,7 +100,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 		chat ?
 			<Style
 				onContextMenu={(event) => event.preventDefault()}
-				onClick={() => { setZChatIndex(zCardIndex + 1) }}
+				onClick={() => { setZChatIndex(zMaxIndex + 1) }}
 				$zIndex={zChatIndex}>
 				{
 					!errorRequest ?

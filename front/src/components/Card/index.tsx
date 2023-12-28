@@ -36,15 +36,15 @@ type PropsCard = {
 
 function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 
-	const { zChatIndex, zCardIndex, setZCardIndex } = useContext(DisplayContext)!
+	const { zCardIndex, setZCardIndex, zMaxIndex } = useContext(DisplayContext)!
 
 	useEffect(() => {
-		setZCardIndex(zChatIndex + 1)
+		setZCardIndex(zMaxIndex + 1)
 	}, [])
 
 	return (
 		<Style
-			onClick={() => { setZCardIndex(zChatIndex + 1) }}
+			onClick={() => { setZCardIndex(zMaxIndex + 1) }}
 			$left={cardPosition.left}
 			$right={cardPosition.right}
 			$top={cardPosition.top}

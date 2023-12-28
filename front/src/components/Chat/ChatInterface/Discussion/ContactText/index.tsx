@@ -25,7 +25,7 @@ function ContactText({ sender, content }: PropsContactText) {
 
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
-	const { setZCardIndex, zChatIndex, GameWrapperRef } = useContext(DisplayContext)!
+	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
 	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	function showCard(event: MouseEvent<HTMLDivElement>) {
@@ -45,7 +45,7 @@ function ContactText({ sender, content }: PropsContactText) {
 			const resultY = event.clientY - heightCard - horizontalBorder / 2 - heightNavBar // resultat vertical par defaut (position du clic - height de la carte - bordure du haut - navbar)
 
 			setCardPosition({ right: resultX, top: resultY })
-			setZCardIndex(zChatIndex + 1)
+			setZCardIndex(zMaxIndex + 1)
 			displayCard(true)
 		}
 	}
