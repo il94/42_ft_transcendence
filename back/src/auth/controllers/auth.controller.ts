@@ -1,53 +1,58 @@
-import { Body, Controller, Get, Post, HttpCode, HttpStatus, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, LocalAuthGuard } from '../guards/auth.guard';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { AuthDto } from "../dto/auth.dto";
-import { CreateUserDto } from "../dto/users.dto";
-import { getUser } from "../decorators/users.decorator";
-import { User } from "@prisma/client";
+import { AuthDto, CreateUserDto } from "../dto/";
+import { Public, getUser } from "../decorators/users.decorator";
+import { response } from "express";
 
 @Controller('auth')
-@ApiTags('authenticate')
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-	@UseGuards(Api42AuthGuard)
+	@Public()
 	@Get('api42')
-	handleLogin(@Request() req) {
+	@UseGuards(Api42AuthGuard)
+	async get42User(@Req() req) {
 		console.log(req.user);
 		return req.user;
 	}
 
-	@HttpCode(HttpStatus.OK)
-	@UseGuards(LocalAuthGuard)
-	@Post('signin')
-	signin(@Body() dto: AuthDto) {
-		return this.authService.signin(dto);
+	@Public()
+	@Get('api42/callback')
+	@UseGuards(Api42AuthGuard)
+	async handle42Redirect(@Req() req: any, @Res() res: Response) {
+		const token = await this.authService.validateUser(req.user as AuthDto);
+
+		const url = new URL(`${req.protocol}:${req.hostname}`);
+		url.port = process.env.FRONT_PORT;
+		url.pathname = 'login';
+		url.searchParams.set('code', token.access_token);
+	
+		response.status(302).redirect(url.href);
 	}
 
+	@Post('signin')
+	@UseGuards(LocalAuthGuard)
 	@HttpCode(HttpStatus.OK)
+	async signin(@Body() dto: AuthDto) {
+		return this.authService.validateUser(dto);
+	}
+
+	@Public()
 	@Post('signup')
-	signup(@Body() dto: CreateUserDto) {
+	@HttpCode(HttpStatus.OK)
+	async signup(@Body() dto: CreateUserDto) {
 		return this.authService.signup(dto);
 	}
 
-	@HttpCode(HttpStatus.OK)
-	@Get()
-	getHello() {
-		return "Coucou!";
-	}
-
-	@UseGuards(Api42AuthGuard)
-	//@UseGuards(JwtGuard)
 	@Get('profile')
-	getProfile(@Request() req) {
+	@UseGuards(Api42AuthGuard)
+	getProfile(@Req() req) {
 		console.log("profile: ", req.user);
 		if (req.user) {
 			return { msg: 'Authenticated' };
 		} else { 
 			return { msg: 'NOT Authenticated' };
 		}
-
 	}
 }

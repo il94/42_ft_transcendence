@@ -14,21 +14,22 @@ export class AuthService {
 		private jwt: JwtService, 
 		private userService: UsersService) {}
 
-	validateApiKey(apiKey: string) {
-		
-	}
-
 	async signup(dto: CreateUserDto) {
 		const newUser = await this.userService.createUser(dto);
 		delete newUser.hash;
 		return this.signToken(newUser.id, newUser.username);
 	}
 
-	async signin(dto: AuthDto) {
+	async validateUser(dto: AuthDto) {
 		try {
-			const user = await this.prisma.user.findUnique({
-				where: { username: dto.username, },
-			});
+			let user = await this.prisma.user.findUnique({
+					where: { username: dto.username, },
+				});
+			if (!user) {
+				user = await this.prisma.user.findUnique({
+					where: { email: dto.email, },
+				});
+			}
 			if (!user)
 				throw new BadRequestException('user not found');
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
@@ -37,37 +38,42 @@ export class AuthService {
 			return this.signToken(user.id, user.username)
 		} catch (error) {
             const err = error as Error;
-            console.log("ICI erreur: ", err.message);
-              throw new BadRequestException(err.message)
+            console.log("Validate user error: ", err.message);
+            throw new BadRequestException(err.message)
         }
 	}
 
-	// TODO proteger avec un try catch
-	async validate42User(profile: any) { // profile: any => profile: AuthDTO
-		const user = await this.prisma.user.findUnique({
-			where: { username: profile.username, },
-		});
-		if (!user) {
-			console.log ("jai pas trouve le user");
-			const newUser = await this.prisma.user.create({
-				data: {
-					username: profile.username,
-					hash: "00",
-					email: profile.email,
-					avatar: "string",
-					twoFA: false,
-					status: UserStatus.ONLINE,
-					wins: 0,
-					draws: 0,
-					losses: 0,
-					phoneNumber: "profile.phoneNumber",
-				},
+	async validate42User(profile: any) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { username: profile.username, },
 			});
-			return this.signToken(newUser.id, newUser.username);
-			//return newUser;
+			if (!user) {
+				console.log ("jai pas trouve le user");
+				const newUser = await this.prisma.user.create({
+					data: {
+						username: profile.username,
+						hash: "00",
+						email: profile.email,
+						avatar: "string",
+						twoFA: false,
+						status: UserStatus.ONLINE,
+						wins: 0,
+						draws: 0,
+						losses: 0,
+						phoneNumber: "profile.phoneNumber",
+					},
+				});
+				if (!newUser)
+					throw new ForbiddenException('Failed to create new 42 user');
+				return this.signToken(newUser.id, newUser.username);
+			}
+			return this.signToken(user.id, user.username);
+		} catch (error) {
+			const err = error as Error;
+            console.log("Validate 42 user error: ", err.message);
+            throw new BadRequestException(err.message)
 		}
-		return this.signToken(user.id, user.username);
-		//return user; 
 	}
 
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
@@ -78,5 +84,4 @@ export class AuthService {
 		const token =  await this.jwt.signAsync(payload, { expiresIn: '50m', secret: process.env.JWT_SECRET })
 		return { access_token: token, }
 	}
-
 }

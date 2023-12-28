@@ -13,9 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 	
 	async validate(payload: {sub: number; username: string; }) {
 		const user = await this.prisma.user.findUnique({
-			where: {
-			  id: payload.sub,
-			},
+			where: { id: payload.sub, },
 		  });
 		if (!user) {
 			console.log("Non non pas de user");
