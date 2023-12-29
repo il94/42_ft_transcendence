@@ -109,7 +109,7 @@ function Game() {
 				/* ============ Temporaire ============== */
 
 				// const channelsResponse = await axios.get("http://localhost:3333/user/me/channels")
-				const channelsResponse: ChannelData[] = getTempChannels(userAuthenticate, userTarget)
+				const channelsResponse: ChannelData[] = []
 				return (channelsResponse)
 
 				/* ====================================== */
@@ -160,6 +160,12 @@ function Game() {
 	useEffect(() => {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
 	}, [userAuthenticate.channels])
+
+	//temporaire
+	// a supprimer quand la route qui renvoie les channels sera dispo
+	useEffect(() => {
+		userAuthenticate.channels = getTempChannels(userAuthenticate, userTarget)
+	}, [userAuthenticate])
 
 	/* ========================== COMPONENTS STATES ============================= */
 
