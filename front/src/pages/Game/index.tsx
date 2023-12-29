@@ -44,7 +44,7 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import { getRandomStatus, getTempChannels } from '../../temp/getTempChannels'
+import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
 
 function Game() {
 
@@ -164,8 +164,8 @@ function Game() {
 	//temporaire
 	// a supprimer quand la route qui renvoie les channels sera dispo
 	useEffect(() => {
-		userAuthenticate.channels = getTempChannels(userAuthenticate, userTarget)
-	}, [userAuthenticate])
+		userAuthenticate.channels = getTempChannels(userAuthenticate)
+	}, [userAuthenticate, userTarget])
 
 	/* ========================== COMPONENTS STATES ============================= */
 
@@ -226,109 +226,113 @@ function Game() {
 	/* ========================================================================== */
 
 	return (
-		<GamePage
-			onClick={closeContextualMenus}>
-			{
-				!errorRequest ?
-					<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-						<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
-							<GameWrapper ref={GameWrapperRef}>
-								{
-									contextualMenu.display &&
-									<ContextualMenu
-										type={contextualMenu.type}
-										displayContextualMenu={displayContextualMenu}
-										contextualMenuPosition={contextualMenuPosition}
-										userTarget={userTarget}
-										displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-										setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
-										secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-										displayErrorContextualMenu={displayErrorContextualMenu} />
-								}
-								{
-									secondaryContextualMenu &&
-									<SecondaryContextualMenu
-										displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-										userTarget={userTarget}
-										secondaryContextualMenuPosition={secondaryContextualMenuPosition}
-										secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-										channels={userAuthenticate.channels}
-										displayErrorContextualMenu={displayErrorContextualMenu} />
-								}
-								{
-									errorContextualMenu &&
-									<ErrorContextualMenu
-										displayErrorContextualMenu={displayErrorContextualMenu}
-										errorContextualMenuPosition={contextualMenuPosition}
-									/>
-								}
-								<LeftGameWrapper $social={social}>
-									<Logo social={social} />
-									<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-										<Social
-											social={social}
-											displaySocial={displaySocial}
-											friends={userAuthenticate.friends}
+		<TempContext.Provider value={{ userSomeone }}>
+			<GamePage
+				onClick={closeContextualMenus}>
+				{
+					!errorRequest ?
+						<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+							<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
+								<GameWrapper ref={GameWrapperRef}>
+									{
+										contextualMenu.display &&
+										<ContextualMenu
+											type={contextualMenu.type}
 											displayContextualMenu={displayContextualMenu}
-											setContextualMenuPosition={setContextualMenuPosition} />
-									</CardContext.Provider>
-								</LeftGameWrapper>
-								<RightGameWrapper>
-									<TopGameWrapper>
-										<Info
-											setChatWindowState={setChatWindowState}
-											displayChat={displayChat} />
-										<Profile
-											userAuthenticate={userAuthenticate}
-											card={card}
+											contextualMenuPosition={contextualMenuPosition}
 											userTarget={userTarget}
-											setUserTarget={setUserTarget}
-											displayCard={displayCard}
-											setCardPosition={setCardPosition}
-											settings={settings}
-											displaySettingsMenu={displaySettingsMenu} />
-									</TopGameWrapper>
-									<BottomGameWrapper>
-										<Pong />
-										{
-											card &&
-											<Card
-												cardPosition={cardPosition}
-												displayCard={displayCard}
-												userTarget={userTarget} />
-										}
-										{
-											settings &&
-											<SettingsMenu
+											displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+											setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
+											secondaryContextualMenuHeight={secondaryContextualMenuHeight}
+											displayErrorContextualMenu={displayErrorContextualMenu}
+											displayChat={displayChat} />
+									}
+									{
+										secondaryContextualMenu &&
+										<SecondaryContextualMenu
+											displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+											userTarget={userTarget}
+											secondaryContextualMenuPosition={secondaryContextualMenuPosition}
+											secondaryContextualMenuHeight={secondaryContextualMenuHeight}
+											channels={userAuthenticate.channels}
+											displayErrorContextualMenu={displayErrorContextualMenu} />
+									}
+									{
+										errorContextualMenu &&
+										<ErrorContextualMenu
+											displayErrorContextualMenu={displayErrorContextualMenu}
+											errorContextualMenuPosition={contextualMenuPosition}
+										/>
+									}
+									<LeftGameWrapper $social={social}>
+										<Logo social={social} />
+										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
+											<Social
+												social={social}
+												displaySocial={displaySocial}
+												friends={userAuthenticate.friends}
+												displayContextualMenu={displayContextualMenu}
+												setContextualMenuPosition={setContextualMenuPosition} />
+										</CardContext.Provider>
+									</LeftGameWrapper>
+									<RightGameWrapper>
+										<TopGameWrapper>
+											<Info
+												setChatWindowState={setChatWindowState}
+												displayChat={displayChat} />
+											<Profile
 												userAuthenticate={userAuthenticate}
+												card={card}
+												userTarget={userTarget}
+												setUserTarget={setUserTarget}
+												displayCard={displayCard}
+												setCardPosition={setCardPosition}
+												settings={settings}
 												displaySettingsMenu={displaySettingsMenu} />
-										}
-										<TestsBack />
-										{
-											<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
-												<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-													<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-														<Chat
-															chat={chat}
-															displayChat={displayChat}
-															channels={userAuthenticate.channels}
-															channelTarget={channelTarget}
-															setChannelTarget={setChannelTarget}
-															chatWindowState={chatWindowState}
-															setChatWindowState={setChatWindowState} />
-													</ChatContext.Provider>
-												</CardContext.Provider>
-											</ContextualMenuContext.Provider>
-										}
-									</BottomGameWrapper>
-								</RightGameWrapper>
-							</GameWrapper>
-						</DisplayContext.Provider>
-					</InteractionContext.Provider>
-					:
-					<ErrorRequest />
-			}
-		</GamePage>
+										</TopGameWrapper>
+										<BottomGameWrapper>
+											<Pong />
+											{
+												card &&
+												<Card
+													cardPosition={cardPosition}
+													displayCard={displayCard}
+													userTarget={userTarget} />
+											}
+											{
+												settings &&
+												<SettingsMenu
+													userAuthenticate={userAuthenticate}
+													displaySettingsMenu={displaySettingsMenu} />
+											}
+											<TestsBack />
+											{
+												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
+													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
+														<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+															<Chat
+																chat={chat}
+																displayChat={displayChat}
+																channels={userAuthenticate.channels}
+																channelTarget={channelTarget}
+																setChannelTarget={setChannelTarget}
+																chatWindowState={chatWindowState}
+																setChatWindowState={setChatWindowState}
+																userAuthenticate={userAuthenticate} />
+														</ChatContext.Provider>
+													</CardContext.Provider>
+												</ContextualMenuContext.Provider>
+											}
+										</BottomGameWrapper>
+									</RightGameWrapper>
+								</GameWrapper>
+							</DisplayContext.Provider>
+						</InteractionContext.Provider>
+						:
+						<ErrorRequest />
+				}
+			</GamePage>
+		</TempContext.Provider>
 	)
 }
 

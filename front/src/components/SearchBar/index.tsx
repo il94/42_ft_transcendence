@@ -227,7 +227,8 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 
 	async function addFriendOrJoinChannel(option: UserOption | ChannelOption | any) {
 		try {
-			if (option.optionType === optionType.USER && !userAuthenticate.friends.includes(option.user)) {
+			if (option.optionType === optionType.USER && !userAuthenticate.friends.includes(option.user))
+			{
 				/* ============ Temporaire ============== */
 
 				// axios.post("http://localhost:3333/user/me/friends/${option.user.id}") 
@@ -247,10 +248,6 @@ function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
 				setChannelTarget(option.channel)
 				option.channel.users.push(userAuthenticate)
 				userAuthenticate.channels.push(option.channel)
-				if (option.channel.type === channelStatus.PUBLIC)
-					setChatWindowState(chatWindowStatus.CHANNEL)
-				else
-					setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
 				displayChat(true)
 			}
 		}

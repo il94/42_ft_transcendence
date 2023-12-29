@@ -25,10 +25,11 @@ import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import DisplayContext from "../../contexts/DisplayContext"
 
-import { ChannelData } from "../../utils/types"
-import { chatWindowStatus } from "../../utils/status"
+import { ChannelData, UserAuthenticate } from "../../utils/types"
+import { channelStatus, chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
+import InteractionContext from "../../contexts/InteractionContext"
 
 type PropsChat = {
 	chat: boolean,
@@ -37,10 +38,11 @@ type PropsChat = {
 	channelTarget: ChannelData | undefined,
 	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
 	chatWindowState: chatWindowStatus,
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
+	userAuthenticate: UserAuthenticate
 }
 
-function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, chatWindowState, setChatWindowState }: PropsChat) {
+function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
 
 	function handleCickChatButton() {
 		displayChat(true)
@@ -79,6 +81,18 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 			setChatWindowState(chatWindowStatus.HOME)
 
 	}, [chatWindowState, channelTarget])
+
+	useEffect(() => {
+		if (channelTarget)
+		{
+			if (channelTarget.type === channelStatus.PROTECTED && !channelTarget.validUsers.includes(userAuthenticate))
+				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+		else
+			setChatWindowState(chatWindowStatus.HOME)
+	}, [channelTarget])
 
 	function handleClickCreateButton() {
 

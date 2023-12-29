@@ -119,7 +119,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 				userAuthenticate.channels.push(newChannel)
 			}
 			setChannelTarget(newChannel)
-			setChatWindowState(chatWindowStatus.CHANNEL)
 		}
 		catch (error) {
 			setError(true)

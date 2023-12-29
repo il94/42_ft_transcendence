@@ -12,10 +12,10 @@ import UserInvitation from "./UserInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { ChannelData, MessageInvitation, MessageText, User } from "../../../../utils/types"
-import { challengeStatus, messageStatus, userStatus } from "../../../../utils/status"
+import { ChannelData, MessageInvitation, MessageText } from "../../../../utils/types"
+import { challengeStatus, messageStatus } from "../../../../utils/status"
 
-import DefaultBlueAvatar from "../../../../assets/default_blue.png"
+import { TempContext } from "../../../../temp/temp"
 
 type PropsDiscussion = {
 	channel: ChannelData
@@ -25,19 +25,9 @@ function Discussion({ channel } : PropsDiscussion) {
 
 	const { userAuthenticate } = useContext(InteractionContext)!
 
-	const userTest: User = {
-		id: 5,
-		username: "Someone",
-		avatar: DefaultBlueAvatar,
-		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			looses: 0
-		}
-	}
+	const { userSomeone } = useContext(TempContext)!
 
-
+	// temporaire
 	useEffect(() => {
 
 		const randomIndex = Math.floor(Math.random() * 2)
@@ -46,7 +36,7 @@ function Discussion({ channel } : PropsDiscussion) {
 		{
 			channel.messages.push({
 				id: 1,
-				sender: userTest,
+				sender: userSomeone,
 				type: messageStatus.TEXT,
 				content: "tg"
 			})
@@ -55,7 +45,7 @@ function Discussion({ channel } : PropsDiscussion) {
 		{
 			channel.messages.push({
 				id: 7,
-				sender: userTest,
+				sender: userSomeone,
 				type: messageStatus.INVITATION,
 				target: userAuthenticate,
 				status: challengeStatus.PENDING
@@ -64,7 +54,6 @@ function Discussion({ channel } : PropsDiscussion) {
 	}, [channel.messages])
 
 	const { chatRender, setChatRender } = useContext(ChatContext)!
-
 
 	return (
 		<Style>

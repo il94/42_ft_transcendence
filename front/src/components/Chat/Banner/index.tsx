@@ -45,12 +45,8 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 			/* ====================================== */
 
 			userAuthenticate.channels.splice(userAuthenticate.channels.indexOf(channelTarget), 1)
-			if (userAuthenticate.channels.length > 0)
-				setChannelTarget(userAuthenticate.channels[0])
-			else {
-				setChannelTarget(undefined)
-				setChatWindowState(chatWindowStatus.HOME)
-			}
+
+			setChannelTarget(undefined)
 		}
 		catch (error) {
 			setErrorRequest(true)

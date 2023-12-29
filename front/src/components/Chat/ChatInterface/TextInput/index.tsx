@@ -48,7 +48,6 @@ function TextInput({ setChannel }: PropsTextInput) {
 						content: message
 					}
 				]
-
 			}))
 
 			setMessage('')

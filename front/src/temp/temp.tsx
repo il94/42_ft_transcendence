@@ -1,9 +1,11 @@
 import { channelStatus, userStatus } from "../utils/status";
 import { ChannelData, User, UserAuthenticate } from "../utils/types";
 import DefaultChannelPicture from "../assets/default_channel.png"
+import DefaultBluePicture from "../assets/default_blue.png"
 import TontonPicture from "../assets/xavier_niel.webp"
+import { createContext } from "react";
 
-export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: User) : ChannelData[] {
+export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelData[] {
 
 	const osef = {
 		id: 0,
@@ -28,11 +30,11 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			owner: userAuthenticate,
 			administrators: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				userAuthenticate
@@ -52,7 +54,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				userAuthenticate
@@ -72,7 +74,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				osef
@@ -92,7 +94,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				osef
@@ -106,16 +108,16 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
 			messages: [],
-			owner: userTarget,
+			owner: userSomeone,
 			administrators: [
 				userAuthenticate
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
-				userTarget
+				userSomeone
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -129,11 +131,11 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			owner: osef,
 			administrators: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				osef
@@ -147,16 +149,16 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
 			messages: [],
-			owner: userTarget,
+			owner: userSomeone,
 			administrators: [
-				userTarget
+				userSomeone
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
-				userTarget
+				userSomeone
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -169,11 +171,11 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			messages: [],
 			owner: osef,
 			administrators: [
-				userTarget
+				userSomeone
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				osef
@@ -193,7 +195,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				osef
@@ -213,7 +215,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			],
 			users: [
 				userAuthenticate,
-				userTarget
+				userSomeone
 			],
 			validUsers: [
 				userAuthenticate
@@ -225,18 +227,16 @@ export function getTempChannels(userAuthenticate: UserAuthenticate, userTarget: 
 			id: 5,
 			name: "MP",
 			avatar: TontonPicture,
-			type: channelStatus.PRIVATE,
+			type: channelStatus.MP,
 			messages: [],
-			owner: userTarget,
-			administrators: [
-				userTarget
-			],
+			owner: userSomeone,
+			administrators: [],
 			users: [
-				userTarget,
+				userSomeone,
 				userAuthenticate
 			],
 			validUsers: [
-				userTarget
+				userSomeone
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -261,3 +261,20 @@ export function getRandomStatus() {
 
 	return (status[randomStatus])
 }
+
+//temporaire
+export const userSomeone: User = {
+	id: 5,
+	username: "Someone",
+	avatar: DefaultBluePicture,
+	status: userStatus.ONLINE,
+	scoreResume: {
+		wins: 0,
+		draws: 0,
+		looses: 0
+	}
+}
+
+export const TempContext = createContext<{
+	userSomeone: User,
+} | undefined>(undefined)
