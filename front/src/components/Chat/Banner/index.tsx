@@ -63,7 +63,8 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		<Style>
 			<LeaveButtonWrapper>
 				{
-					chatWindowState === chatWindowStatus.CHANNEL &&
+					(chatWindowState === chatWindowStatus.CHANNEL ||
+					chatWindowState === chatWindowStatus.LOCKED_CHANNEL) &&
 					<Icon
 						onClick={leaveChannel}
 						src={LeaveIcon} size={24}
