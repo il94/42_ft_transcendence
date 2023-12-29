@@ -30,13 +30,13 @@ function ContactText({ sender, content }: PropsContactText) {
 
 	function showCard(event: MouseEvent<HTMLDivElement>) {
 
-		const GameWrapperContainer = GameWrapperRef.current
+		const gameWrapperContainer = GameWrapperRef.current
 
-		if (GameWrapperContainer) {
+		if (gameWrapperContainer) {
 			setUserTarget(sender)
 
 			const heightCard = 371 // height de la carte
-			const { height: GameWrapperHeight, width: GameWrapperWidth } = GameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
+			const { height: GameWrapperHeight, width: GameWrapperWidth } = gameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const verticalBorder = window.innerWidth - GameWrapperWidth // height des bordures verticales autour du jeu
 			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
@@ -52,9 +52,9 @@ function ContactText({ sender, content }: PropsContactText) {
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const GameWrapperContainer = GameWrapperRef.current
+		const gameWrapperContainer = GameWrapperRef.current
 
-		if (GameWrapperContainer) {
+		if (gameWrapperContainer) {
 			function getContextualMenuHeight() { // determine la taille du menu par rapport aux status du user authentifie et de la cible
 				if (channelTarget) {
 					if (channelTarget.owner === userAuthenticate) {
@@ -77,7 +77,7 @@ function ContactText({ sender, content }: PropsContactText) {
 			setUserTarget(sender)
 
 			const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel du chat
-			const { height: GameWrapperHeight } = GameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
+			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 
