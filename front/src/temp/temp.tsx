@@ -1,4 +1,4 @@
-import { channelStatus, userStatus } from "../utils/status";
+import { challengeStatus, channelStatus, messageStatus, userStatus } from "../utils/status";
 import { ChannelData, User, UserAuthenticate } from "../utils/types";
 import DefaultChannelPicture from "../assets/default_channel.png"
 import DefaultBluePicture from "../assets/default_blue.png"
@@ -8,7 +8,7 @@ import { createContext } from "react";
 export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelData[] {
 
 	const osef = {
-		id: 0,
+		id: -1,
 		username: "Osef",
 		avatar: '',
 		status: userStatus.ONLINE,
@@ -19,14 +19,118 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 		}
 	}
 
-
 	const result: ChannelData[] = [
 		{
-			id: 0,
+			id: -1,
+			name: "BAGARRE",
+			avatar: DefaultChannelPicture,
+			type: channelStatus.PUBLIC,
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.INVITATION,
+					target: userSomeone,
+					status: challengeStatus.PENDING
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.INVITATION,
+					target: userAuthenticate,
+					status: challengeStatus.PENDING
+				},
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.INVITATION,
+					target: userSomeone,
+					status: challengeStatus.ACCEPTED
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.INVITATION,
+					target: userAuthenticate,
+					status: challengeStatus.ACCEPTED
+				},
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.INVITATION,
+					target: userSomeone,
+					status: challengeStatus.CANCELLED
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.INVITATION,
+					target: userAuthenticate,
+					status: challengeStatus.CANCELLED
+				},
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.INVITATION,
+					target: userSomeone,
+					status: challengeStatus.IN_PROGRESS
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.INVITATION,
+					target: userAuthenticate,
+					status: challengeStatus.IN_PROGRESS
+				},
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.INVITATION,
+					target: userSomeone,
+					status: challengeStatus.FINISHED
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.INVITATION,
+					target: userAuthenticate,
+					status: challengeStatus.FINISHED
+				},
+			],
+			owner: userAuthenticate,
+			administrators: [
+				userAuthenticate,
+				userSomeone
+			],
+			users: [
+				userAuthenticate,
+				userSomeone
+			],
+			validUsers: [
+				userAuthenticate
+			],
+			mutedUsers: [],
+			bannedUsers: []
+		},
+		{
+			id: -1,
 			name: "Owner / A",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Owner"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Admin"
+				}
+			],
 			owner: userAuthenticate,
 			administrators: [
 				userAuthenticate,
@@ -43,11 +147,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Owner / M",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Owner"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				}
+			],
+
 			owner: userAuthenticate,
 			administrators: [
 				userAuthenticate
@@ -63,11 +181,24 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Admin / M",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Admin"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				}
+			],
 			owner: osef,
 			administrators: [
 				userAuthenticate
@@ -83,11 +214,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Member / M",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				},
+			],
+
 			owner: osef,
 			administrators: [
 				osef
@@ -103,11 +248,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Admin / O",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Admin"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Owner"
+				},
+			],
+
 			owner: userSomeone,
 			administrators: [
 				userAuthenticate
@@ -123,11 +282,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Admin / A",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Admin"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Admin"
+				},
+			],
+
 			owner: osef,
 			administrators: [
 				userAuthenticate,
@@ -144,11 +317,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Member / O",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Owner"
+				},
+			],
+
 			owner: userSomeone,
 			administrators: [
 				userSomeone
@@ -164,11 +351,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Member / A",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi l'Admin"
+				},
+			],
+
 			owner: osef,
 			administrators: [
 				userSomeone
@@ -184,11 +385,25 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			bannedUsers: []
 		},
 		{
-			id: 0,
+			id: -1,
 			name: "Member / M",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PUBLIC,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userAuthenticate,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				},
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Salut c'est moi le Membre"
+				},
+			],
+
 			owner: osef,
 			administrators: [
 				osef
@@ -208,7 +423,15 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			name: "Private",
 			avatar: DefaultChannelPicture,
 			type: channelStatus.PRIVATE,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "Channel prive"
+				},
+			],
+
 			owner: userAuthenticate,
 			administrators: [
 				userAuthenticate
@@ -228,7 +451,15 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			name: "MP",
 			avatar: TontonPicture,
 			type: channelStatus.MP,
-			messages: [],
+			messages: [
+				{
+					id: -1,
+					sender: userSomeone,
+					type: messageStatus.TEXT,
+					content: "MP"
+				}
+			],
+
 			owner: userSomeone,
 			administrators: [],
 			users: [
