@@ -3,15 +3,16 @@ import {
 	Dispatch,
 	SetStateAction
 } from 'react'
+import { contextualMenuStatus } from '../utils/status'
 
 const ContextualMenuContext = createContext<{
 	contextualMenu: {
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	},
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	}>>,
 	contextualMenuPosition: {
 		left?: number,

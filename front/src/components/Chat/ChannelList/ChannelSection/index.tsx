@@ -1,14 +1,12 @@
-import { Dispatch, SetStateAction, useContext } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 import { Style, Avatar, ChannelName } from "./style"
 
 import { ChannelData } from "../../../../utils/types"
-import { chatWindowStatus } from "../../../../utils/status"
 
 type PropsChannel = {
 	channel: ChannelData,
 	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	backgroundColor: string
 }
 

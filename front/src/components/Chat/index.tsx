@@ -29,7 +29,6 @@ import { ChannelData, UserAuthenticate } from "../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
-import InteractionContext from "../../contexts/InteractionContext"
 
 type PropsChat = {
 	chat: boolean,
@@ -142,8 +141,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget}
-												setChatWindowState={setChatWindowState} />
+												setChannelTarget={setChannelTarget} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?

@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction } from "react"
 import styled from "styled-components"
 import SearchBar from "../SearchBar"
-import { chatWindowStatus } from "../../utils/status"
 import colors from "../../utils/colors"
 
 export const Style = styled.div`
@@ -19,15 +18,13 @@ export const Style = styled.div`
 `
 
 type PropsInfo = {
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function Info({ setChatWindowState, displayChat }: PropsInfo) {
+function Info({ displayChat }: PropsInfo) {
 	return (
 		<Style>
 			<SearchBar
-				setChatWindowState={setChatWindowState}
 				displayChat={displayChat} />
 		</Style>
 	)

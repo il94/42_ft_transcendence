@@ -53,7 +53,7 @@ export type MessageText = Message & {
 }
 export type MessageInvitation = Message & {
 	target: User | UserAuthenticate,
-	status: string
+	status: challengeStatus
 }
 
 export type MatchData = {

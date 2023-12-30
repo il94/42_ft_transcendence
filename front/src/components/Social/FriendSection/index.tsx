@@ -19,7 +19,7 @@ import CardContext from "../../../contexts/CardContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
 import { User } from "../../../utils/types"
-import { userStatus } from "../../../utils/status"
+import { contextualMenuStatus, userStatus } from "../../../utils/status"
 import DisplayContext from "../../../contexts/DisplayContext"
 
 type PropsFriendSection = {
@@ -28,7 +28,7 @@ type PropsFriendSection = {
 	social: boolean,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
 		left?: number,
@@ -95,7 +95,7 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 			resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
 		setContextualMenuPosition({ left: resultX, top: resultY })
-		displayContextualMenu({ display: true, type: "social" })
+		displayContextualMenu({ display: true, type: contextualMenuStatus.SOCIAL })
 	}
 
 	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {

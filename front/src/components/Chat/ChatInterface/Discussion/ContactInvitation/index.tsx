@@ -14,7 +14,7 @@ import CardContext from "../../../../../contexts/CardContext"
 import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
 
-import { challengeStatus, userStatus } from "../../../../../utils/status"
+import { challengeStatus, contextualMenuStatus, userStatus } from "../../../../../utils/status"
 import { User, UserAuthenticate } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
@@ -91,9 +91,8 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 			if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
 				resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
-
 			setContextualMenuPosition({ right: resultX, top: resultY })
-			displayContextualMenu({ display: true, type: "chat" })
+			displayContextualMenu({ display: true, type: contextualMenuStatus.CHAT })
 		}
 	}
 

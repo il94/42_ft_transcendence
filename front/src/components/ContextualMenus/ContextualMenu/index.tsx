@@ -16,13 +16,19 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 
 import { ChannelData, MessageInvitation, User } from "../../../utils/types"
-import { challengeStatus, channelStatus, messageStatus, userStatus } from "../../../utils/status"
+import {
+	challengeStatus,
+	channelStatus,
+	contextualMenuStatus,
+	messageStatus,
+	userStatus
+} from "../../../utils/status"
 
 type PropsContextualMenu = {
-	type: string,
+	type: contextualMenuStatus | undefined,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	}>>,
 	userTarget: User,
 	contextualMenuPosition: {
@@ -75,7 +81,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	useEffect(() => {
 	
-		if (channelTarget && type === "chat" &&
+		if (channelTarget && type === contextualMenuStatus.CHAT &&
 			(channelTarget.owner === userAuthenticate ||
 				(channelTarget.administrators.includes(userAuthenticate) &&
 				!channelTarget.administrators.includes(userTarget)) &&
@@ -156,7 +162,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 			/* ====================================== */
 
-			if (type === "social")
+			if (type === contextualMenuStatus.SOCIAL)
 			{
 				const findResult = userAuthenticate.channels.find((channel) => (
 					channel.name === userTarget.username && channel.type === channelStatus.MP
@@ -401,7 +407,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 								</SectionName>
 							</Section>
 							{
-								type === "chat" && channelTarget?.type !== channelStatus.MP &&
+								type === contextualMenuStatus.CHAT && channelTarget?.type !== channelStatus.MP &&
 								<>
 									{
 										channelTarget ?

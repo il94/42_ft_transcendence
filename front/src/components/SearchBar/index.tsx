@@ -8,17 +8,16 @@ import InteractionContext from "../../contexts/InteractionContext"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import { ChannelData, User } from "../../utils/types"
-import { channelStatus, chatWindowStatus, userStatus } from "../../utils/status"
+import { channelStatus, userStatus } from "../../utils/status"
 
 import DefaultChannelPicture from "../../assets/default_channel.png"
 import TontonPicture from "../../assets/xavier_niel.webp"
 
 type PropsSearchBar = {
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function SearchBar({ setChatWindowState, displayChat }: PropsSearchBar) {
+function SearchBar({ displayChat }: PropsSearchBar) {
 
 	const { userAuthenticate, userTarget, setUserTarget, setChannelTarget } = useContext(InteractionContext)!
 

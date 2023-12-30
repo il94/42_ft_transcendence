@@ -60,11 +60,13 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 			<LeaveButtonWrapper>
 				{
 					(chatWindowState === chatWindowStatus.CHANNEL ||
-					chatWindowState === chatWindowStatus.LOCKED_CHANNEL) &&
+					chatWindowState === chatWindowStatus.LOCKED_CHANNEL) ?
 					<Icon
 						onClick={leaveChannel}
 						src={LeaveIcon} size={24}
 						alt="Leave button" title="Leave channel" />
+					:
+					<div style={{ width: "26.5px" }} />
 				}
 			</LeaveButtonWrapper>
 			<ChannelName>
@@ -76,14 +78,16 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 					src={ReduceIcon} size={24}
 					alt="Reduce button" title="Reduce" />
 				{
-					channelTarget &&
+					(channelTarget &&
 					channelTarget.owner === userAuthenticate &&
 					channelTarget.type !== channelStatus.MP &&
-					chatWindowState === chatWindowStatus.CHANNEL &&
+					chatWindowState === chatWindowStatus.CHANNEL) ?
 					<Icon
 						onClick={() => setChatWindowState(chatWindowStatus.UPDATE_CHANNEL)}
 						src={SettingsIcon} size={24}
 						alt="Settings button" title="Settings" />
+					:
+					<div style={{ width: "24px" }} />
 				}
 			</ButtonsWrapper>
 		</Style>

@@ -39,7 +39,7 @@ import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
 import { ChannelData, User, UserAuthenticate } from '../../utils/types'
-import { chatWindowStatus, userStatus } from '../../utils/status'
+import { chatWindowStatus, contextualMenuStatus, userStatus } from '../../utils/status'
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
@@ -58,7 +58,7 @@ function Game() {
 	}
 
 	function closeContextualMenus() {
-		displayContextualMenu({ display: false, type: '' })
+		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)
 	}
 
@@ -180,7 +180,7 @@ function Game() {
 	const [card, displayCard] = useState<boolean>(false)
 	const [cardPosition, setCardPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 
-	const [contextualMenu, displayContextualMenu] = useState<{ display: boolean; type: string }>({ display: false, type: '' })
+	const [contextualMenu, displayContextualMenu] = useState<{ display: boolean; type: contextualMenuStatus | undefined }>({ display: false, type: undefined })
 	const [contextualMenuPosition, setContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [secondaryContextualMenu, displaySecondaryContextualMenu] = useState<boolean>(false)
 	const [secondaryContextualMenuPosition, setSecondaryContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
@@ -277,9 +277,7 @@ function Game() {
 									</LeftGameWrapper>
 									<RightGameWrapper>
 										<TopGameWrapper>
-											<Info
-												setChatWindowState={setChatWindowState}
-												displayChat={displayChat} />
+											<Info displayChat={displayChat} />
 											<Profile
 												userAuthenticate={userAuthenticate}
 												card={card}

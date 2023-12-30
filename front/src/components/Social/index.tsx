@@ -13,6 +13,7 @@ import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 import CardContext from "../../contexts/CardContext"
 
 import { User } from "../../utils/types"
+import { contextualMenuStatus } from "../../utils/status"
 
 import colors from "../../utils/colors"
 
@@ -22,7 +23,7 @@ type PropsSocial = {
 	friends: User[] | undefined,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
 		left?: number,
