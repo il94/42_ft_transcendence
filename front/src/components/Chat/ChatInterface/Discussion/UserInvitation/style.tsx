@@ -30,7 +30,6 @@ export const Text = styled.div`
 
 	text-align: center;
 	font-size: 10px;
-	user-select: text;
 
 	color: ${colors.textAlt};
 	background-color: ${colors.messageUser};
@@ -43,18 +42,5 @@ export const ButtonsWrapper = styled.div`
 
 	width: 185px;
 	height: 50%;
-
-`
-
-export const Button = styled.button`
-
-	width: 100%;
-	height: 100%;
-
-	border: 0;
-
-	font-size: 10px;
-	
-	background-color: ${(props) => props.color};
 
 `

@@ -1,13 +1,14 @@
-import { MouseEvent, useContext } from "react"
+import { MouseEvent, useContext, useState } from "react"
 
 import {
 	Avatar,
 	Style,
 	Text,
 	InvitationContent,
-	ButtonsWrapper,
-	Button
+	ButtonsWrapper
 } from "./style"
+
+import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 import CardContext from "../../../../../contexts/CardContext"
@@ -22,10 +23,10 @@ import colors from "../../../../../utils/colors"
 type PropsContactInvitation = {
 	sender: User,
 	target: User | UserAuthenticate,
-	status: string
+	initialStatus: challengeStatus
 }
 
-function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
+function ContactInvitation({ sender, target, initialStatus }: PropsContactInvitation) {
 
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
@@ -96,6 +97,8 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 		}
 	}
 
+	const [status, setStatus] = useState<challengeStatus>(initialStatus)
+
 	return (
 		<Style>
 			<Avatar
@@ -109,44 +112,52 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 				{
 					status === challengeStatus.PENDING &&
 					<ButtonsWrapper>
-						<Button color={colors.buttonGreen}>
+						<ButtonChallenge
+							onClick={() => setStatus(challengeStatus.ACCEPTED)}
+							color={colors.buttonGreen}>
 							Accept
-						</Button>
-						<Button color={colors.buttonRed}>
+						</ButtonChallenge>
+						<ButtonChallenge
+							onClick={() => setStatus(challengeStatus.CANCELLED)}
+							color={colors.buttonRed}>
 							Decline
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.ACCEPTED &&
 					<ButtonsWrapper>
-						<Button color={colors.buttonGreen}>
+						<ButtonChallenge
+							color={colors.buttonGreen}>
 							Accepted !
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.CANCELLED &&
 					<ButtonsWrapper>
-						<Button color={colors.buttonGray}>
+						<ButtonChallenge
+							color={colors.buttonGray}>
 							Cancelled
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.IN_PROGRESS &&
 					<ButtonsWrapper>
-						<Button color={colors.button}>
+						<ButtonChallenge
+							color={colors.button}>
 							Spectate
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.FINISHED &&
 					<ButtonsWrapper>
-						<Button color={colors.button}>
+						<ButtonChallenge
+							color={colors.button}>
 							Finished
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 			</InvitationContent>

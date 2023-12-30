@@ -63,8 +63,7 @@ function Discussion({ channel } : PropsDiscussion) {
 						value: chatRender,
 						setter: setChatRender
 					}}
-					activeState
-				>
+					activeState>
 					{
 						channel.messages.map((message, index) => (
 							message.sender.id === userAuthenticate.id ?
@@ -77,7 +76,7 @@ function Discussion({ channel } : PropsDiscussion) {
 									<UserInvitation
 										key={"message" + index} // a definir
 										target={(message as MessageInvitation).target}
-										status={(message as MessageInvitation).status}
+										initialStatus={(message as MessageInvitation).status}
 									/>
 								:
 								message.type === messageStatus.TEXT ?
@@ -91,7 +90,7 @@ function Discussion({ channel } : PropsDiscussion) {
 										key={"message" + index} // a definir
 										sender={message.sender}
 										target={(message as MessageInvitation).target}
-										status={(message as MessageInvitation).status}
+										initialStatus={(message as MessageInvitation).status}
 									/>
 						))
 					}
