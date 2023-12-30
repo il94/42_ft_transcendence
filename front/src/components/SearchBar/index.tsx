@@ -62,9 +62,11 @@ function SearchBar({ displayChat }: PropsSearchBar) {
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
-				const users = await axios.get("http://localhost:3333/user")
+				const response = await axios.get("http://localhost:3333/user")
 
-				setUserOptions(users.data.map((user: User) => ({
+				setUserOptions(response.data.filter((user: User) => (
+					user.username != userAuthenticate.username
+				)).map((user: User) => ({
 					user: {
 						...user ,
 						status: getRandomStatus(),
@@ -222,7 +224,7 @@ function SearchBar({ displayChat }: PropsSearchBar) {
 			}
 		}
 		fetchUsersAndChannels()
-	}, [])
+	}, [userAuthenticate])
 
 	async function addFriendOrJoinChannel(option: UserOption | ChannelOption | any) {
 		try {
