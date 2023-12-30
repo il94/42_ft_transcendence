@@ -1,5 +1,4 @@
 import { styled } from 'styled-components'
-import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
 export const GamePage = styled.div`
@@ -12,8 +11,6 @@ export const GamePage = styled.div`
 	height: 100%;
 
 	overflow: hidden;
-
-	background-color: ${colors.background}; 
 
 `
 

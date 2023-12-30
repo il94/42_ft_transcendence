@@ -10,8 +10,6 @@ export const SigninPage = styled.div`
 
 	min-height: 100%;
 
-	background-color: ${colors.background}; 
-
 `
 
 export const MainTitle = styled.h1`

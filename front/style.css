@@ -21,9 +21,14 @@
 html,
 body {
 	width: 100vw;
-	height: 100vh;
+	height: 100%;
 
 	overflow-x: hidden;
+
+	background-image: url("./src/assets/anim11.gif");
+	background-repeat: no-repeat;
+	background-size: cover ;
+	background-position: center;
 }
 
 #root {
