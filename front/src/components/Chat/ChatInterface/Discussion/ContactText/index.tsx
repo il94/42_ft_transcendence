@@ -1,11 +1,12 @@
-import { MouseEvent, useContext } from "react"
+import { MouseEvent, useContext, useEffect, useState } from "react"
 
 import {
 	Avatar,
 	Style,
 	UserName,
 	Text,
-	MessageContent
+	MessageContent,
+	MaskedMessage
 } from "./style"
 
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
@@ -14,7 +15,7 @@ import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
 
 import { User } from "../../../../../utils/types"
-import { userStatus } from "../../../../../utils/status"
+import { contextualMenuStatus, userStatus } from "../../../../../utils/status"
 
 type PropsContactText = {
 	sender: User,
@@ -87,26 +88,47 @@ function ContactText({ sender, content }: PropsContactText) {
 			if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
 				resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
-
 			setContextualMenuPosition({ right: resultX, top: resultY })
-			displayContextualMenu({ display: true, type: "chat" })
+			displayContextualMenu({ display: true, type: contextualMenuStatus.CHAT })
 		}
 	}
 
+	const [showMessage, setShowMessage] = useState(true)
+	const senderIsBlocked = userAuthenticate.blockedUsers.includes(sender)
+
+	function handleClickEvent() {
+		if (senderIsBlocked)
+			setShowMessage(!showMessage)
+	}
+
+	useEffect(() => {
+		setShowMessage(!senderIsBlocked)
+	}, [senderIsBlocked])
+
 	return (
-		<Style>
-			<Avatar
-				src={sender.avatar}
-				onClick={showCard}
-				onAuxClick={showContextualMenu} />
-			<MessageContent>
-				<UserName>
-					{sender.username}
-				</UserName>
-				<Text>
-					{content}
-				</Text>
-			</MessageContent>
+		<Style $masked={senderIsBlocked}>
+			{
+				showMessage ?
+				<>
+					<Avatar
+						src={sender.avatar}
+						onClick={showCard}
+						onAuxClick={showContextualMenu} />
+					<MessageContent
+						onClick={handleClickEvent}>
+						<UserName>
+							{sender.username}
+						</UserName>
+						<Text $masked={senderIsBlocked}>
+							{content}
+						</Text>
+					</MessageContent>
+				</>
+				:
+				<MaskedMessage onClick={handleClickEvent}>
+					Masked message
+				</MaskedMessage>
+			}
 		</Style>
 	)
 }

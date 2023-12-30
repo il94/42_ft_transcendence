@@ -1,16 +1,25 @@
 import styled from "styled-components"
 import colors from "../../../../../utils/colors"
 
-export const Style = styled.div`
+export const Style = styled.div<{ $masked: boolean }>`
 
 	display: flex;
 	align-items: flex-end;
 
 	min-width: 31px;
 	max-width: 182px;
-	min-height: 35px;
 
 	margin-top: 5px;
+
+	cursor: ${(props) => props.$masked && "pointer"};
+
+	opacity: ${(props) => props.$masked && 0.5};
+
+	user-select: ${(props) => props.$masked ? "none" : "text"};
+
+	&:hover {
+		opacity: ${(props) => props.$masked && 0.7};
+	}
 
 `
 
@@ -56,7 +65,7 @@ export const UserName = styled.div`
 
 `
 
-export const Text = styled.p`
+export const Text = styled.p<{ $masked: boolean }>`
 
 	min-height: 15px;
 
@@ -66,8 +75,27 @@ export const Text = styled.p`
 	padding-bottom: 1px;
 
 	font-size: 10px;
-	user-select: text;
+	user-select: ${(props) => !props.$masked && "text"};
 	word-break: break-all;
+
+	color: ${colors.textAlt};
+	background-color: ${colors.messageFriend};
+
+`
+
+export const MaskedMessage = styled.p`
+
+	min-width: 105px;
+	min-height: 15px;
+
+	margin-left: auto;
+
+	padding-left: 3px;
+	padding-right: 2px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+
+	font-size: 10px;
 
 	color: ${colors.textAlt};
 	background-color: ${colors.messageFriend};
