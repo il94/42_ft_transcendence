@@ -17,7 +17,7 @@ import {
 } from './style'
 
 import Logo from '../../components/Logo'
-import Info from '../../components/Info'
+import SearchBarWrapper from '../../components/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
@@ -60,6 +60,8 @@ function Game() {
 	function closeContextualMenus() {
 		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)
+		if (searchBarResults)
+			displaySearchBarResults(false)
 	}
 
 	/* ============================== AUTH STATES =============================== */
@@ -187,6 +189,8 @@ function Game() {
 	const [secondaryContextualMenuHeight, setSecondaryContextualMenuHeight] = useState<number>(0)
 	const [errorContextualMenu, displayErrorContextualMenu] = useState<boolean>(false)
 
+	const [searchBarResults, displaySearchBarResults] = useState<boolean>(false)
+
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 
 	/* ============================ DISPLAY STATES ============================== */
@@ -276,7 +280,10 @@ function Game() {
 									</LeftGameWrapper>
 									<RightGameWrapper>
 										<TopGameWrapper>
-											<Info displayChat={displayChat} />
+											<SearchBarWrapper
+												searchBarResults={searchBarResults}
+												displaySearchBarResults={displaySearchBarResults}
+												displayChat={displayChat} />
 											<Profile
 												userAuthenticate={userAuthenticate}
 												card={card}

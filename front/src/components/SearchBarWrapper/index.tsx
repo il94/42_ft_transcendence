@@ -9,6 +9,8 @@ export const Style = styled.div`
 	justify-content: center;
 	align-items: center;
 
+	position: relative;
+
 	width: 100%;
 	height: 53px;
 	min-height: 53px;
@@ -17,16 +19,21 @@ export const Style = styled.div`
 
 `
 
-type PropsInfo = {
+type PropsSearchBarWrapper = {
+	searchBarResults: boolean,
+	displaySearchBarResults: Dispatch<SetStateAction<boolean>>,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function Info({ displayChat }: PropsInfo) {
+function SearchBarWrapper({ searchBarResults, displaySearchBarResults, displayChat }: PropsSearchBarWrapper) {
 	return (
 		<Style>
-			<SearchBar displayChat={displayChat} />
+			<SearchBar 
+				searchBarResults={searchBarResults}
+				displaySearchBarResults={displaySearchBarResults}
+				displayChat={displayChat} />
 		</Style>
 	)
 }
 
-export default Info
+export default SearchBarWrapper

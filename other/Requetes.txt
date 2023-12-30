@@ -111,6 +111,13 @@ Profile/ :
 	A implementer, doit permettre de se deconnecter 
 
 SearchBar/ :
+
+-GET http://localhost:3333/user/search : 
+	A implementer, doit permettre d'obtenir des users en fonction d'un parametre (a definir)
+
+-GET http://localhost:3333/channel/search : 
+	A implementer, doit permettre d'obtenir des channels en fonction d'un parametre (a definir)
+
 -GET http://localhost:3333/channel : 
 	A implementer, doit permettre d'obtenir tout les channels
 
