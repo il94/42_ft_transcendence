@@ -26,6 +26,7 @@ export class UsersService {
 					email: createUserDto.email,
 					phoneNumber: createUserDto.phoneNumber,
 					twoFA: false,
+					twoFASecret: "string",
 					avatar: createUserDto.avatar,
 					status: UserStatus.ONLINE,
 					wins: 0,
@@ -97,6 +98,30 @@ export class UsersService {
 			where: { id: id },
 		});
 		return deleteUser;
+	}
+
+	async turnOnTwoFA(userId: number) {
+		const user = this.prisma.user.update({
+			where: {
+			  id: userId,
+			},
+			data: {
+			  twoFA: true,
+			},
+		});
+		return user;
+	}
+
+	async setTwoFASecret(secret: string, userId: number) {
+		const user = this.prisma.user.update({
+			where: {
+			  id: userId,
+			},
+			data: {
+			  twoFASecret: secret,
+			},
+		});
+		return user;
 	}
 
 }

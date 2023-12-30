@@ -1,13 +1,15 @@
-import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, Response,  UseGuards, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, LocalAuthGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
 import { Public, getUser } from "../decorators/users.decorator";
 import { response } from "express";
+import { UsersService } from "../services/users.service";
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService, 
+		private userService: UsersService) {}
 
 	@Public()
 	@Get('api42')
@@ -55,4 +57,34 @@ export class AuthController {
 			return { msg: 'NOT Authenticated' };
 		}
 	}
+
+	@Post('2fa/turn-on')
+	@UseGuards(JwtGuard)
+	async turnOnTwoFA(@Req() request, @Body() body) {
+	  const isCodeValid =
+		this.authService.isTwoFACodeValid(
+		  body.twoFACode,
+		  request.user,
+		);
+	  if (!isCodeValid) {
+		throw new UnauthorizedException('Wrong authentication code');
+	  }
+	  await this.userService.turnOnTwoFA(request.user.id);
+	}
+
+@Post('2fa/authenticate')
+  @HttpCode(200)
+  @UseGuards(JwtGuard)
+  async authenticate(@Req() request, @Body() body) {
+    const isCodeValid = this.authService.isTwoFACodeValid(
+      body.twoFACode,
+      request.user,
+    );
+
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+
+    return this.authService.loginWith2fa(request.user);
+  }
 }

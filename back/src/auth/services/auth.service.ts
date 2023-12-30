@@ -6,6 +6,7 @@ import { UsersService } from "./users.service";
 import * as argon from 'argon2';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
+import { authenticator } from "otplib";
 
 @Injectable()
 export class AuthService {
@@ -57,6 +58,7 @@ export class AuthService {
 						email: profile.email,
 						avatar: "string",
 						twoFA: false,
+						twoFASecret: "string",
 						status: UserStatus.ONLINE,
 						wins: 0,
 						draws: 0,
@@ -83,5 +85,34 @@ export class AuthService {
 		};
 		const token =  await this.jwt.signAsync(payload, { expiresIn: '50m', secret: process.env.JWT_SECRET })
 		return { access_token: token, }
+	}
+
+	async generateTwoFASecret(user: User) {
+		const secret = authenticator.generateSecret();
+
+		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
+		await this.userService.setTwoFASecret(secret, user.id);
+
+		return { secret, otpAuthURL };
+	}
+
+	async isTwoFACodeValid(twoFACode: string, user: User) {
+		return authenticator.verify({
+			token: twoFACode,
+			secret: user.twoFASecret,
+		  });
+	}
+
+	async loginWith2fa(userWithoutPsw: Partial<User>) {
+		const payload = {
+		  email: userWithoutPsw.email,
+		  isTwoFAOn: !!userWithoutPsw.twoFA,
+		  isTwoFAuthenticated: true,
+		};
+	
+		return {
+		  email: payload.email,
+		  access_token: await this.signToken(userWithoutPsw.id, userWithoutPsw.username),
+		};
 	}
 }

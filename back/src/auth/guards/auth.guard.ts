@@ -12,7 +12,7 @@ export class JwtGuard extends AuthGuard('jwt') {
 	constructor() {
 	  super();
 	}
-  }
+}
 
 @Injectable()
 export class Api42AuthGuard extends AuthGuard('42') {
@@ -23,3 +23,6 @@ export class Api42AuthGuard extends AuthGuard('42') {
 		return activate; 
 	}
 }
+
+@Injectable()
+export class Jwt2faAuthGuard extends AuthGuard('jwt-2fa') {}

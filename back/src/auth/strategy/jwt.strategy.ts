@@ -28,3 +28,28 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   //   return user;
   // }
 }
+
+@Injectable()
+export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
+  constructor(private readonly prisma: PrismaService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: 'secret',
+    });
+  }
+
+  async validate(payload: any) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    if (!user.twoFA) {
+      return user;
+    }
+    if (payload.isTwoFAuthenticated) {
+      return user;
+    }
+  }
+}
