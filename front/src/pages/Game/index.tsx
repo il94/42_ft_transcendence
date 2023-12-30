@@ -261,8 +261,7 @@ function Game() {
 										errorContextualMenu &&
 										<ErrorContextualMenu
 											displayErrorContextualMenu={displayErrorContextualMenu}
-											errorContextualMenuPosition={contextualMenuPosition}
-										/>
+											errorContextualMenuPosition={contextualMenuPosition} />
 									}
 									<LeftGameWrapper $social={social}>
 										<Logo social={social} />

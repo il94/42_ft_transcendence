@@ -24,8 +24,7 @@ type PropsInfo = {
 function Info({ displayChat }: PropsInfo) {
 	return (
 		<Style>
-			<SearchBar
-				displayChat={displayChat} />
+			<SearchBar displayChat={displayChat} />
 		</Style>
 	)
 }
