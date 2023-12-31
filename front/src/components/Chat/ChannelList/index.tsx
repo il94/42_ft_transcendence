@@ -6,7 +6,6 @@ import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
 import { ChannelData } from "../../../utils/types"
-import { chatWindowStatus } from "../../../utils/status"
 
 import colors from "../../../utils/colors"
 

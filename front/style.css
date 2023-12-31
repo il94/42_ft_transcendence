@@ -25,10 +25,10 @@ body {
 
 	overflow-x: hidden;
 
-	background-image: url("./src/assets/anim11.gif");
+	background-image: url("./src/assets/anim2.gif");
 	background-repeat: no-repeat;
-	background-size: cover ;
-	background-position: center;
+	background-size: cover;
+	background-position: 0 80%;
 }
 
 #root {
