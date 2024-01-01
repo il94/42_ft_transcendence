@@ -1,4 +1,5 @@
 import { userStatus } from "./status"
+import { User } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -7,7 +8,6 @@ import DefaultPinkAvatar from "../assets/default_pink.png"
 import DefaultPurpleAvatar from "../assets/default_purple.png"
 import DefaultRedAvatar from "../assets/default_red.png"
 import DefaultYellowAvatar from "../assets/default_yellow.png"
-
 
 export function getStatus(status: string)
 {
@@ -38,4 +38,18 @@ export function getRandomDefaultAvatar(): string {
 	const randomIndex = Math.floor(Math.random() * defaultAvatars.length)
 
 	return (defaultAvatars[randomIndex])
+}
+
+export function sortUserByName(a: User, b: User) {
+	return (a.username.localeCompare(b.username))
+}
+
+export function sortUserByStatus(a: User, b: User) {
+
+	const status = [userStatus.ONLINE, userStatus.WATCHING, userStatus.WAITING, userStatus.PLAYING, userStatus.OFFLINE]
+
+	const aValue = status.indexOf(a.status)
+	const bValue = status.indexOf(b.status)
+
+	return (aValue - bValue)
 }
