@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react"
-import { ArrowButton, InputText, Style } from "./style"
+import { ArrowButton, ImageButton, InputText, Style } from "./style"
+import ArrowIcon from "../../../assets/down_arrow.png"
 
 type PropsInputSearchBar = {
 	value: string,
@@ -17,7 +18,9 @@ function InputSearchBar({ value, setValue, displaySearchBarResults } : PropsInpu
 				autoComplete="off"
 				spellCheck="false"
 				value={value} />
-			<ArrowButton />
+			<ArrowButton>
+				<ImageButton src={ArrowIcon} />
+			</ArrowButton>
 		</Style>
 	)
 }

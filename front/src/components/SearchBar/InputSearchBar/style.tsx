@@ -33,8 +33,18 @@ export const InputText = styled.input`
 `
 export const ArrowButton = styled.button`
 	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
 	width: 36px;
 	
 	background-color: ${colors.sectionAlt};
+
+`
+
+export const ImageButton = styled.img`
+
+	width: 60%;
 
 `
