@@ -21,7 +21,7 @@ type PropsScoreResume = {
 	scoreResume: {
 		wins: number,
 		draws: number,
-		looses: number
+		losses: number
 	}
 }
 
@@ -30,7 +30,7 @@ function ScoreResume({ scoreResume }: PropsScoreResume) {
 		<Style>
 			<Win value={scoreResume.wins} />
 			<Draw value={scoreResume.draws} />
-			<Loose value={scoreResume.looses} />
+			<Loose value={scoreResume.losses} />
 		</Style>
 	)
 }
