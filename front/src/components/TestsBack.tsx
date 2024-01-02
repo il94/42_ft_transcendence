@@ -89,7 +89,7 @@ function TestsBack() {
 
 				let i = 0
 
-				while (i < 15) {
+				while (i < 5) {
 					axios.post("http://localhost:3333/auth/signup",
 						{
 							username: `friend_${i}`,
@@ -105,6 +105,20 @@ function TestsBack() {
 			}
 			}>
 				post users
+			</Bout>
+
+			<Bout onClick={() => axios.post("http://localhost:3333/auth/signup",
+				{
+					username: "user",
+					hash: "123456",
+					email: "user@test.fr",
+					avatar: getRandomDefaultAvatar(),
+					phoneNumber: "0000000000"
+				})
+				.then(response => console.log(response.data))
+				.catch(error => console.log(error))
+			}>
+				post user
 			</Bout>
 
 
