@@ -11,7 +11,6 @@ const Style = styled.div`
 
 	position: absolute;
 	top: 7.5px;
-	z-index: 999;
 
 	width: 90%;
 	height: 326px;
