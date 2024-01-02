@@ -6,7 +6,6 @@ import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
 import { ChannelData } from "../../../utils/types"
-import { chatWindowStatus } from "../../../utils/status"
 
 import colors from "../../../utils/colors"
 
@@ -24,10 +23,9 @@ const Style = styled.div`
 type PropsChannelList = {
 	channels: ChannelData[],
 	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 }
 
-function ChannelList({ channels, setChannelTarget, setChatWindowState }: PropsChannelList) {
+function ChannelList({ channels, setChannelTarget }: PropsChannelList) {
 
 	return (
 		<Style>
@@ -38,7 +36,6 @@ function ChannelList({ channels, setChannelTarget, setChatWindowState }: PropsCh
 							key={"channel" + index} // a definir
 							channel={channel}
 							setChannelTarget={setChannelTarget}
-							setChatWindowState={setChatWindowState}
 							backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 						/>
 					))

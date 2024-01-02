@@ -29,3 +29,9 @@ export const emptyUserAuthenticate = {
 	blockedUsers: [],
 	channels: []
 }
+
+export const emptySetting = {
+	value: '',
+	error: false,
+	errorMessage: ''
+}

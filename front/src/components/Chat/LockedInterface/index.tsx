@@ -6,7 +6,7 @@ import { ErrorMessage, Input, Style, Text } from "./style"
 import Button from "../../../componentsLibrary/Button"
 
 import { ChannelData } from "../../../utils/types"
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 import { chatWindowStatus } from "../../../utils/status"
 
 type PropsLockedInterface = {
@@ -36,7 +36,7 @@ function LockedInterface({ channelTarget, setChatWindowState }: PropsLockedInter
 		})
 	}
 
-	const { userAuthenticate } = useContext(GlobalContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {

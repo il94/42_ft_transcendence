@@ -30,29 +30,14 @@ import ErrorRequest from '../../componentsLibrary/ErrorRequest'
 
 import AuthContext from '../../contexts/AuthContext'
 
+import { SettingData } from '../../utils/types'
+import { emptySetting } from '../../utils/emptyObjects'
+
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
 
 function Signin() {
-
-	type PropsSetting = {
-		value: string,
-		error: boolean,
-		errorMessage?: string
-	}
-
-	const [login, setLogin] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-	const [password, setPassword] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const { token, setToken } = useContext(AuthContext)!
 	const navigate = useNavigate()
@@ -130,7 +115,9 @@ function Signin() {
 		}
 	}
 
-	/* ============================== LOGIN ================================== */
+/* ================================ LOGIN =================================== */
+
+	const [login, setLogin] = useState<SettingData>(emptySetting)
 
 	function handleInputLoginChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
@@ -140,7 +127,9 @@ function Signin() {
 		})
 	}
 
-	/* ============================== PASSWORD ================================== */
+/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<SettingData>(emptySetting)
 
 	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
@@ -151,6 +140,8 @@ function Signin() {
 	}
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
+
+/* ========================================================================== */
 
 	useEffect(() => {
 		if (token)

@@ -10,8 +10,6 @@ export const SignupPage = styled.div`
 
 	min-height: 100%;
 
-	background-color: ${colors.background}; 
-
 `
 
 export const MainTitle = styled.h1`
@@ -30,10 +28,13 @@ export const CentralWindow = styled.div`
 	flex-direction: column;
 	align-items: center;
 
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
 	width: 400px;
 
-	margin-top: auto;
-	margin-bottom: auto;
 	padding-bottom: 5px;
 
 	border-style: solid;

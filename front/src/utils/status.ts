@@ -39,3 +39,8 @@ export enum matchResultStatus {
 	DRAW,
 	LOOSE
 }
+
+export enum contextualMenuStatus {
+	SOCIAL,
+	CHAT
+}

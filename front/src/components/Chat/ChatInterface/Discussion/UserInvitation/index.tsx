@@ -1,22 +1,27 @@
 import {
 	Style,
 	Text,
-	ButtonsWrapper,
-	Button
+	ButtonsWrapper
 } from "./style"
+
+import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
 import { challengeStatus } from "../../../../../utils/status"
 
 import { User } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
+import { useState } from "react"
 
 type PropsUserInvitation = {
 	target: User,
-	status: string
+	initialStatus: challengeStatus
 }
 
-function UserInvitation({ target, status }: PropsUserInvitation) {
+function UserInvitation({ target, initialStatus }: PropsUserInvitation) {
+
+	const [status, setStatus] = useState<challengeStatus>(initialStatus)
+
 	return (
 		<Style>
 			<Text>
@@ -25,41 +30,47 @@ function UserInvitation({ target, status }: PropsUserInvitation) {
 			{
 				status === challengeStatus.PENDING &&
 				<ButtonsWrapper>
-					<Button color={colors.buttonRed}>
+					<ButtonChallenge
+						onClick={() => setStatus(challengeStatus.CANCELLED)}
+						color={colors.buttonRed}>
 						Cancel
-					</Button>
+					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 			{
 				status === challengeStatus.ACCEPTED &&
 				<ButtonsWrapper>
-					<Button color={colors.buttonGreen}>
+					<ButtonChallenge
+						color={colors.buttonGreen}>
 						Accepted !
-					</Button>
+					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 			{
 				status === challengeStatus.CANCELLED &&
 				<ButtonsWrapper>
-					<Button color={colors.buttonGray}>
+					<ButtonChallenge
+						color={colors.buttonGray}>
 						Cancelled
-					</Button>
+					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 			{
 				status === challengeStatus.IN_PROGRESS &&
 				<ButtonsWrapper>
-					<Button color={colors.button}>
-						Spectate
-					</Button>
+					<ButtonChallenge
+						color={colors.button}>
+						In progress
+					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 			{
 				status === challengeStatus.FINISHED &&
 				<ButtonsWrapper>
-					<Button color={colors.button}>
+					<ButtonChallenge
+						color={colors.button}>
 						Finished
-					</Button>
+					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 		</Style>

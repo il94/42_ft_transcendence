@@ -5,7 +5,8 @@ import {
 	ReactNode,
 	UIEvent,
 	SetStateAction,
-	Dispatch
+	Dispatch,
+	Children
 } from "react"
 
 import { Scrollbars } from "react-custom-scrollbars"
@@ -76,10 +77,11 @@ type PropsScrollBar = {
 		value: boolean,
 		setter: Dispatch<SetStateAction<boolean>>
 	},
+	activeState?: boolean,
 	children: ReactNode
 }
 
-function ScrollBar({ state, firstRenderState, children }: PropsScrollBar) {
+function ScrollBar({ state, firstRenderState, activeState, children }: PropsScrollBar) {
 
 	const scrollBarRef = useRef<Scrollbars>(null)
 	const [onMouse, setOnMouse] = useState<boolean>(false)
@@ -90,6 +92,11 @@ function ScrollBar({ state, firstRenderState, children }: PropsScrollBar) {
 			setCurrentPosition()
 		}
 	}, [])
+
+	useEffect(() => { // Met a jour la position de la scrollbar a chaque changements
+		if (activeState && scrollBarRef.current)
+			scrollBarRef.current!.scrollToBottom()
+	}, [Children.count(children)])
 
 	function setFirstPosition() { // Definit la position de depart de la scrollbar
 		if (firstRenderState && !firstRenderState.value) {

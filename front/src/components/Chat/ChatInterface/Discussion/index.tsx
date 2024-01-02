@@ -10,77 +10,62 @@ import ContactInvitation from "./ContactInvitation"
 import UserInvitation from "./UserInvitation"
 
 import ChatContext from "../../../../contexts/ChatContext"
-import GlobalContext from "../../../../contexts/GlobalContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { ChannelData, MessageInvitation, MessageText, User } from "../../../../utils/types"
-import { challengeStatus, messageStatus, userStatus } from "../../../../utils/status"
+import { ChannelData, MessageInvitation, MessageText } from "../../../../utils/types"
+import { challengeStatus, messageStatus } from "../../../../utils/status"
 
-import DefaultBlueAvatar from "../../../../assets/default_blue.png"
+import { TempContext } from "../../../../temp/temp"
 
 type PropsDiscussion = {
-	channelTarget: ChannelData
+	channel: ChannelData
 }
 
-function Discussion({ channelTarget }: PropsDiscussion) {
+function Discussion({ channel } : PropsDiscussion) {
 
-	const { userAuthenticate } = useContext(GlobalContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
-	const userTest: User = {
-		id: 5,
-		username: "Someone",
-		avatar: DefaultBlueAvatar,
-		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			looses: 0
-		}
-	}
+	const { userSomeone } = useContext(TempContext)!
 
-
+	// temporaire
 	useEffect(() => {
 
 		const randomIndex = Math.floor(Math.random() * 2)
 		
 		if (randomIndex == 0)
 		{
-			channelTarget.messages.push({
+			channel.messages.push({
 				id: 1,
-				sender: userTest,
+				sender: userSomeone,
 				type: messageStatus.TEXT,
 				content: "tg"
 			})
 		}
 		else
 		{
-			channelTarget.messages.push({
+			channel.messages.push({
 				id: 7,
-				sender: userTest,
+				sender: userSomeone,
 				type: messageStatus.INVITATION,
 				target: userAuthenticate,
 				status: challengeStatus.PENDING
 			})
 		}
-	}, [channelTarget.messages])
+	}, [channel.messages])
 
-	const { chatScrollValue, setChatScrollValue, chatRender, setChatRender } = useContext(ChatContext)!
-
+	const { chatRender, setChatRender } = useContext(ChatContext)!
 
 	return (
 		<Style>
 			{
 				<ScrollBar
-					state={{
-						value: chatScrollValue,
-						setter: setChatScrollValue
-					}}
 					firstRenderState={{
 						value: chatRender,
 						setter: setChatRender
 					}}
-				>
+					activeState>
 					{
-						channelTarget.messages.map((message, index) => (
+						channel.messages.map((message, index) => (
 							message.sender.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?
 									<UserText
@@ -91,7 +76,7 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 									<UserInvitation
 										key={"message" + index} // a definir
 										target={(message as MessageInvitation).target}
-										status={(message as MessageInvitation).status}
+										initialStatus={(message as MessageInvitation).status}
 									/>
 								:
 								message.type === messageStatus.TEXT ?
@@ -105,7 +90,7 @@ function Discussion({ channelTarget }: PropsDiscussion) {
 										key={"message" + index} // a definir
 										sender={message.sender}
 										target={(message as MessageInvitation).target}
-										status={(message as MessageInvitation).status}
+										initialStatus={(message as MessageInvitation).status}
 									/>
 						))
 					}

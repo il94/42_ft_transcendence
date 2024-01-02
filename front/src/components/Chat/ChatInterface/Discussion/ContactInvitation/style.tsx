@@ -49,7 +49,6 @@ export const Text = styled.div`
 
 	text-align: center;
 	font-size: 10px;
-	user-select: text;
 
 	color: ${colors.textAlt};
 	background-color: ${colors.messageUser};

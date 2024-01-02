@@ -11,7 +11,7 @@ export const Style = styled.div`
 	width: 240px;
 	min-width: 240px;
 
-	background-color: ${colors.profile};
+	background-color: ${colors.navbar};
 	
 `
 

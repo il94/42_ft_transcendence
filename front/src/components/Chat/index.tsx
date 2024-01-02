@@ -23,31 +23,32 @@ import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
-import ChatContext from "../../contexts/ChatContext"
-import GlobalDisplayContext from "../../contexts/GlobalDisplayContext"
+import DisplayContext from "../../contexts/DisplayContext"
 
-import { ChannelData } from "../../utils/types"
-import { chatWindowStatus } from "../../utils/status"
+import { ChannelData, UserAuthenticate } from "../../utils/types"
+import { channelStatus, chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
-import GlobalContext from "../../contexts/GlobalContext"
 
 type PropsChat = {
+	chat: boolean,
+	displayChat: Dispatch<SetStateAction<boolean>>,
 	channels: ChannelData[],
+	channelTarget: ChannelData | undefined,
+	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
 	chatWindowState: chatWindowStatus,
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
+	userAuthenticate: UserAuthenticate
 }
 
-function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
+function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
 
 	function handleCickChatButton() {
 		displayChat(true)
 		setZChatIndex(zChatIndex + 1)
 	}
 
-	const { chat, displayChat } = useContext(ChatContext)!
-	const { zChatIndex, zCardIndex, setZChatIndex } = useContext(GlobalDisplayContext)!
-	const { channelTarget, setChannelTarget } = useContext(GlobalContext)!
+	const { zChatIndex, setZChatIndex, zMaxIndex } = useContext(DisplayContext)!
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
@@ -55,7 +56,7 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 	const [bannerName, setBannerName] = useState<string>("Welcome")
 
 	useEffect(() => {
-		setZChatIndex(zCardIndex + 1)
+		setZChatIndex(zMaxIndex + 1)
 	}, [])
 
 	useEffect(() => {
@@ -80,6 +81,18 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 
 	}, [chatWindowState, channelTarget])
 
+	useEffect(() => {
+		if (channelTarget)
+		{
+			if (channelTarget.type === channelStatus.PROTECTED && !channelTarget.validUsers.includes(userAuthenticate))
+				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+		else
+			setChatWindowState(chatWindowStatus.HOME)
+	}, [channelTarget])
+
 	function handleClickCreateButton() {
 
 		if (chatWindowState === chatWindowStatus.HOME)
@@ -100,7 +113,7 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 		chat ?
 			<Style
 				onContextMenu={(event) => event.preventDefault()}
-				onClick={() => { setZChatIndex(zCardIndex + 1) }}
+				onClick={() => { setZChatIndex(zMaxIndex + 1) }}
 				$zIndex={zChatIndex}>
 				{
 					!errorRequest ?
@@ -128,8 +141,7 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget}
-												setChatWindowState={setChatWindowState} />
+												setChannelTarget={setChannelTarget} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?
@@ -139,7 +151,9 @@ function Chat({ channels, chatWindowState, setChatWindowState }: PropsChat) {
 															channelTarget={channelTarget}
 															setChatWindowState={setChatWindowState} />
 														:
-														<ChatInterface channelTarget={channelTarget} />
+														<ChatInterface
+															channel={channelTarget}
+															setChannel={setChannelTarget as Dispatch<SetStateAction<ChannelData>>}/>
 											}
 										</>
 								}

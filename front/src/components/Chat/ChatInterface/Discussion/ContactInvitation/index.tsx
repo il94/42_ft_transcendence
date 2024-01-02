@@ -1,20 +1,21 @@
-import { MouseEvent, useContext } from "react"
+import { MouseEvent, useContext, useState } from "react"
 
 import {
 	Avatar,
 	Style,
 	Text,
 	InvitationContent,
-	ButtonsWrapper,
-	Button
+	ButtonsWrapper
 } from "./style"
+
+import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 import CardContext from "../../../../../contexts/CardContext"
-import GlobalDisplayContext from "../../../../../contexts/GlobalDisplayContext"
-import GlobalContext from "../../../../../contexts/GlobalContext"
+import DisplayContext from "../../../../../contexts/DisplayContext"
+import InteractionContext from "../../../../../contexts/InteractionContext"
 
-import { challengeStatus, userStatus } from "../../../../../utils/status"
+import { challengeStatus, contextualMenuStatus, userStatus } from "../../../../../utils/status"
 import { User, UserAuthenticate } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
@@ -22,25 +23,25 @@ import colors from "../../../../../utils/colors"
 type PropsContactInvitation = {
 	sender: User,
 	target: User | UserAuthenticate,
-	status: string
+	initialStatus: challengeStatus
 }
 
-function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
+function ContactInvitation({ sender, target, initialStatus }: PropsContactInvitation) {
 
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
-	const { setZCardIndex, zChatIndex, GameWrapperRef } = useContext(GlobalDisplayContext)!
-	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(GlobalContext)!
+	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
+	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	function showCard(event: MouseEvent<HTMLDivElement>) {
 
-		const GameWrapperContainer = GameWrapperRef.current
+		const gameWrapperContainer = GameWrapperRef.current
 
-		if (GameWrapperContainer) {
+		if (gameWrapperContainer) {
 			setUserTarget(sender)
 
 			const heightCard = 371 // height de la carte
-			const { height: GameWrapperHeight, width: GameWrapperWidth } = GameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
+			const { height: GameWrapperHeight, width: GameWrapperWidth } = gameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const verticalBorder = window.innerWidth - GameWrapperWidth // height des bordures verticales autour du jeu
 			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
@@ -49,16 +50,16 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 			const resultY = event.clientY - heightCard - horizontalBorder / 2 - heightNavBar // resultat vertical par defaut (position du clic - height de la carte - bordure du haut - navbar)
 
 			setCardPosition({ right: resultX, top: resultY })
-			setZCardIndex(zChatIndex + 1)
+			setZCardIndex(zMaxIndex + 1)
 			displayCard(true)
 		}
 	}
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		const GameWrapperContainer = GameWrapperRef.current
+		const gameWrapperContainer = GameWrapperRef.current
 
-		if (GameWrapperContainer) {
+		if (gameWrapperContainer) {
 			function getContextualMenuHeight() { // determine la taille du menu par rapport aux status du user authentifie et de la cible
 				if (channelTarget) {
 					if (channelTarget.owner === userAuthenticate) {
@@ -81,7 +82,7 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 			setUserTarget(sender)
 
 			const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel du chat
-			const { height: GameWrapperHeight } = GameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
+			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 
@@ -91,11 +92,12 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 			if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
 				resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
-
 			setContextualMenuPosition({ right: resultX, top: resultY })
-			displayContextualMenu({ display: true, type: "chat" })
+			displayContextualMenu({ display: true, type: contextualMenuStatus.CHAT })
 		}
 	}
+
+	const [status, setStatus] = useState<challengeStatus>(initialStatus)
 
 	return (
 		<Style>
@@ -110,44 +112,52 @@ function ContactInvitation({ sender, target, status }: PropsContactInvitation) {
 				{
 					status === challengeStatus.PENDING &&
 					<ButtonsWrapper>
-						<Button color={colors.buttonGreen}>
+						<ButtonChallenge
+							onClick={() => setStatus(challengeStatus.ACCEPTED)}
+							color={colors.buttonGreen}>
 							Accept
-						</Button>
-						<Button color={colors.buttonRed}>
+						</ButtonChallenge>
+						<ButtonChallenge
+							onClick={() => setStatus(challengeStatus.CANCELLED)}
+							color={colors.buttonRed}>
 							Decline
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.ACCEPTED &&
 					<ButtonsWrapper>
-						<Button color={colors.buttonGreen}>
+						<ButtonChallenge
+							color={colors.buttonGreen}>
 							Accepted !
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.CANCELLED &&
 					<ButtonsWrapper>
-						<Button color={colors.buttonGray}>
+						<ButtonChallenge
+							color={colors.buttonGray}>
 							Cancelled
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.IN_PROGRESS &&
 					<ButtonsWrapper>
-						<Button color={colors.button}>
+						<ButtonChallenge
+							color={colors.button}>
 							Spectate
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
 					status === challengeStatus.FINISHED &&
 					<ButtonsWrapper>
-						<Button color={colors.button}>
+						<ButtonChallenge
+							color={colors.button}>
 							Finished
-						</Button>
+						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 			</InvitationContent>

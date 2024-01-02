@@ -1,5 +1,4 @@
 import { styled } from 'styled-components'
-import colors from '../../utils/colors'
 
 export const ErrorPage = styled.div`
 
@@ -12,7 +11,5 @@ export const ErrorPage = styled.div`
 	min-height: 212px;
 
 	font-size: 404px;
-
-	background-color: ${colors.background}; 
 
 `

@@ -6,23 +6,29 @@ import {
 	useEffect,
 	useState
 } from "react"
-import axios from "axios"
+// import axios from "axios"
 
 import { Style } from "./style"
 
 import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
-import { User } from "../../../utils/types"
-import { challengeStatus, channelStatus, userStatus } from "../../../utils/status"
+import { ChannelData, MessageInvitation, User } from "../../../utils/types"
+import {
+	challengeStatus,
+	channelStatus,
+	contextualMenuStatus,
+	messageStatus,
+	userStatus
+} from "../../../utils/status"
 
 type PropsContextualMenu = {
-	type: string,
+	type: contextualMenuStatus | undefined,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	}>>,
 	userTarget: User,
 	contextualMenuPosition: {
@@ -40,9 +46,10 @@ type PropsContextualMenu = {
 	}>>,
 	secondaryContextualMenuHeight: number,
 	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>,
+	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, userTarget, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu }: PropsContextualMenu) {
+function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, userTarget, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
 
 	function showSecondaryContextualMenu(event: MouseEvent<HTMLButtonElement>) {
 
@@ -73,9 +80,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	const [adminSections, displayAdminSections] = useState<boolean>(false)
 
 	useEffect(() => {
-		if (channelTarget && type === "chat" &&
+	
+		if (channelTarget && type === contextualMenuStatus.CHAT &&
 			(channelTarget.owner === userAuthenticate ||
-				channelTarget.administrators.includes(userAuthenticate) &&
+				(channelTarget.administrators.includes(userAuthenticate) &&
+				!channelTarget.administrators.includes(userTarget)) &&
 				(channelTarget.owner !== userTarget &&
 					!channelTarget.administrators.includes(userTarget)))) {
 			displayAdminSections(true)
@@ -84,21 +93,49 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayAdminSections(false)
 	}, [])
 
-	const { userAuthenticate, channelTarget } = useContext(GlobalContext)!
+	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleContactClickEvent() {
 		try {
+			const findResult = userAuthenticate.channels.find((channel) => (
+				channel.name === userTarget.username && channel.type === channelStatus.MP
+			))
+			if (findResult)
+				setChannelTarget(findResult)
+			else
+			{
+				const newChannel: ChannelData = {
+					id: -1, //???
+					name: userTarget.username,
+					avatar: userTarget.avatar,
+					type: channelStatus.MP,
+					messages: [],
+					owner: userAuthenticate,
+					administrators: [],
+					users: [
+						userAuthenticate,
+						userTarget
+					],
+					validUsers: [],
+					mutedUsers: [],
+					bannedUsers: []
+				}
 
-			/* ============ Temporaire ============== */
+				/* ============ Temporaire ============== */
 
-			// Verifier si le channel mp n'existe pas deja
-			await axios.post(`http://localhost:3333/channel`, {
-				name: userTarget.id,
-				avatar: userTarget.avatar,
-				type: channelStatus.MP
-			})
+				// Verifier si le channel mp n'existe pas deja
+				// await axios.post(`http://localhost:3333/channel`, {
+				// 	name: userTarget.id,
+				// 	avatar: userTarget.avatar,
+				// 	type: channelStatus.MP
+				// })
 
-			/* ====================================== */
+				/* ====================================== */
+
+				userAuthenticate.channels.push(newChannel)
+				setChannelTarget(newChannel)
+			}
+			displayChat(true)
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
@@ -108,14 +145,76 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleChallengeClickEvent() {
 		try {
 
+			const challengeInvitation: MessageInvitation = {
+				id: -1, //???
+				sender: userAuthenticate,
+				type: messageStatus.INVITATION,
+				target: userTarget,
+				status: challengeStatus.PENDING
+			}
+
 			/* ============ Temporaire ============== */
 
 			// Verifier si une invitation n'existe pas deja
-			await axios.post(`http://localhost:3333/user/me/challenge/${userTarget.id}`, {
-				type: challengeStatus.PENDING
-			})
+			// await axios.post(`http://localhost:3333/user/me/challenge/${userTarget.id}`, {
+			// 	type: challengeStatus.PENDING
+			// })
 
 			/* ====================================== */
+
+			if (type === contextualMenuStatus.SOCIAL)
+			{
+				const findResult = userAuthenticate.channels.find((channel) => (
+					channel.name === userTarget.username && channel.type === channelStatus.MP
+				))
+				if (findResult)
+				{
+					findResult.messages.push(challengeInvitation)
+					setChannelTarget(findResult)
+				}
+				else
+				{
+					const newChannel: ChannelData = {
+						id: -1, //???
+						name: userTarget.username,
+						avatar: userTarget.avatar,
+						type: channelStatus.MP,
+						messages: [],
+						owner: userAuthenticate,
+						administrators: [],
+						users: [
+							userAuthenticate,
+							userTarget
+						],
+						validUsers: [],
+						mutedUsers: [],
+						bannedUsers: []
+					}
+
+					/* ============ Temporaire ============== */
+
+					// Verifier si le channel mp n'existe pas deja
+					// await axios.post(`http://localhost:3333/channel`, {
+					// 	name: userTarget.id,
+					// 	avatar: userTarget.avatar,
+					// 	type: channelStatus.MP
+					// })
+
+					/* ====================================== */
+
+					newChannel.messages.push(challengeInvitation)
+					userAuthenticate.channels.push(newChannel)
+					setChannelTarget(newChannel)
+				}
+				displayChat(true)
+			}
+			else
+			{
+				if (channelTarget)
+					channelTarget.messages.push(challengeInvitation)
+				else
+					throw new Error
+			}
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
@@ -308,7 +407,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 								</SectionName>
 							</Section>
 							{
-								type === "chat" && channelTarget?.type !== channelStatus.MP &&
+								type === contextualMenuStatus.CHAT && channelTarget?.type !== channelStatus.MP &&
 								<>
 									{
 										channelTarget ?

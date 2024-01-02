@@ -16,10 +16,11 @@ import {
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
 import { User } from "../../../utils/types"
-import { userStatus } from "../../../utils/status"
+import { contextualMenuStatus, userStatus } from "../../../utils/status"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 type PropsFriendSection = {
 	friend: User,
@@ -27,7 +28,7 @@ type PropsFriendSection = {
 	social: boolean,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
-		type: string
+		type: contextualMenuStatus | undefined
 	}>>,
 	setContextualMenuPosition: Dispatch<SetStateAction<{
 		left?: number,
@@ -39,32 +40,34 @@ type PropsFriendSection = {
 function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition } = useContext(CardContext)!
-	const { userTarget, setUserTarget } = useContext(GlobalContext)!
+	const { userTarget, setUserTarget } = useContext(InteractionContext)!
+	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
 	function showCard() {
-
 		if (card && userTarget === friend) // verifie que la carte a afficher ne l'est pas deja
 		{
 			displayCard(false)
 			return;
 		}
 
-		const friendcontainer = friendContainerRef.current // sert a cibler le container et non ses enfants
+		const friendContainer: HTMLElement | null = friendContainerRef.current // sert a cibler le container et non ses enfants
+		const gameWrapperContainer: HTMLElement | null = GameWrapperRef.current
 
-		if (friendcontainer) {
+		if (friendContainer && gameWrapperContainer) {
 			setUserTarget(friend)
 
 			const heightCard = 371 // height de la carte
-			const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
+			const horizontalBorder = window.innerHeight - gameWrapperContainer.getBoundingClientRect().height // height des bordures horizontales autour du jeu
 			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
 			const maxBottom = window.innerHeight - horizontalBorder - heightNavBar - heightCard // valeur max avant que la carte ne depasse par le bas
 
-			let resultY = friendcontainer.getBoundingClientRect().top - horizontalBorder / 2 - heightNavBar // resultat par defaut (top container cible - bordure du haut - navbar)
+			let resultY = friendContainer.getBoundingClientRect().top - horizontalBorder / 2 - heightNavBar // resultat par defaut (top container cible - bordure du haut - navbar)
 
 			if (resultY > maxBottom) // verifie si la carte depasse sur l'axe vertical
 				resultY = maxBottom // ajuste le resultat vertical
 
+			setZCardIndex(zMaxIndex + 1)
 			setCardPosition({ top: resultY })
 			displayCard(true)
 		}
@@ -92,7 +95,7 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 			resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
 		setContextualMenuPosition({ left: resultX, top: resultY })
-		displayContextualMenu({ display: true, type: "social" })
+		displayContextualMenu({ display: true, type: contextualMenuStatus.SOCIAL })
 	}
 
 	function handleContextMenu(event: MouseEvent<HTMLDivElement>) {

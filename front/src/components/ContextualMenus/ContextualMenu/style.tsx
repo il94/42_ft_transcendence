@@ -7,7 +7,7 @@ export const Style = styled.div<{ $left?: number, $right?: number, $bottom?: num
 	display: flex;
 	flex-direction: column;
 
-	position: absolute;
+	position: fixed;
 	left: ${(props) => props.$left ? props.$left + "px" : "auto"};
 	right: ${(props) => props.$right ? props.$right + "px" : "auto"};
 	top: ${(props) => props.$top ? props.$top + "px" : "auto"};

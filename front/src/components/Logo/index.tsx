@@ -1,9 +1,25 @@
-import { Style, StyledLink } from "./style"
+import { useNavigate } from "react-router-dom"
+import { LogoFull, LogoReduced, Style } from "./style"
+import HomeIcon from "../../assets/home.png"
 
-function Logo() {
+type LogoProps = {
+	social: boolean
+}
+
+function Logo({ social }: LogoProps) {
+
+	const navigate = useNavigate()
+
 	return (
-		<Style>
-			<StyledLink to="/" title="Main menu" />
+		<Style onClick={() => navigate("/")}>
+			{
+				social ?
+				<LogoReduced src={HomeIcon} />
+				:
+				<LogoFull>
+					Transcendence
+				</LogoFull>
+			}
 		</Style>
 	)
 }

@@ -1,26 +1,25 @@
-import { ChangeEvent, FocusEvent, FormEvent, useContext, useState } from "react"
+import { ChangeEvent, Dispatch, FocusEvent, FormEvent, SetStateAction, useContext, useState } from "react"
 // import axios from "axios"
 
 import { Input, Style } from "./style"
 
 import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
-import GlobalContext from "../../../../contexts/GlobalContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { ChannelData } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
 
 type PropsTextInput = {
-	channelTarget: ChannelData
+	setChannel: Dispatch<SetStateAction<ChannelData>>
 }
 
-function TextInput({ channelTarget }: PropsTextInput) {
+function TextInput({ setChannel }: PropsTextInput) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 
-	const { userAuthenticate } = useContext(GlobalContext)!
-	// const { userAuthenticate } = useContext(GlobalContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 
@@ -37,12 +36,19 @@ function TextInput({ channelTarget }: PropsTextInput) {
 			// 	content: message
 			// })
 
-			channelTarget.messages.push({
-				id: -1,
-				sender: userAuthenticate,
-				type: messageStatus.TEXT,
-				content: message
-			})
+			// if ()
+			setChannel((prevState) => ({
+				...prevState,
+				messages: [
+					...prevState.messages,
+					{
+						id: -1,
+						sender: userAuthenticate,
+						type: messageStatus.TEXT,
+						content: message
+					}
+				]
+			}))
 
 			setMessage('')
 

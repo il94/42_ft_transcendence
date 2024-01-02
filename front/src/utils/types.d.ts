@@ -53,7 +53,7 @@ export type MessageText = Message & {
 }
 export type MessageInvitation = Message & {
 	target: User | UserAuthenticate,
-	status: string
+	status: challengeStatus
 }
 
 export type MatchData = {
@@ -63,4 +63,10 @@ export type MatchData = {
 	result: matchResultStatus,
 	scoreUser: number,
 	scoreOpponent: number
+}
+
+export type SettingData = {
+	value: string,
+	error: boolean,
+	errorMessage?: string
 }

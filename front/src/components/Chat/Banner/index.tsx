@@ -6,7 +6,7 @@ import { ChannelName, ButtonsWrapper, Style, LeaveButtonWrapper } from "./style"
 import Icon from "../../../componentsLibrary/Icon"
 
 import ChatContext from "../../../contexts/ChatContext"
-import GlobalContext from "../../../contexts/GlobalContext"
+import InteractionContext from "../../../contexts/InteractionContext"
 
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 
@@ -23,7 +23,7 @@ type PropsBanner = {
 
 function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorRequest }: PropsBanner) {
 
-	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(GlobalContext)!
+	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function leaveChannel() {
 		try {
@@ -45,12 +45,8 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 			/* ====================================== */
 
 			userAuthenticate.channels.splice(userAuthenticate.channels.indexOf(channelTarget), 1)
-			if (userAuthenticate.channels.length > 0)
-				setChannelTarget(userAuthenticate.channels[0])
-			else {
-				setChannelTarget(undefined)
-				setChatWindowState(chatWindowStatus.HOME)
-			}
+
+			setChannelTarget(undefined)
 		}
 		catch (error) {
 			setErrorRequest(true)
@@ -63,11 +59,14 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		<Style>
 			<LeaveButtonWrapper>
 				{
-					chatWindowState === chatWindowStatus.CHANNEL &&
+					(chatWindowState === chatWindowStatus.CHANNEL ||
+					chatWindowState === chatWindowStatus.LOCKED_CHANNEL) ?
 					<Icon
 						onClick={leaveChannel}
 						src={LeaveIcon} size={24}
 						alt="Leave button" title="Leave channel" />
+					:
+					<div style={{ width: "26.5px" }} />
 				}
 			</LeaveButtonWrapper>
 			<ChannelName>
@@ -79,14 +78,16 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 					src={ReduceIcon} size={24}
 					alt="Reduce button" title="Reduce" />
 				{
-					channelTarget &&
+					(channelTarget &&
 					channelTarget.owner === userAuthenticate &&
 					channelTarget.type !== channelStatus.MP &&
-					chatWindowState === chatWindowStatus.CHANNEL &&
+					chatWindowState === chatWindowStatus.CHANNEL) ?
 					<Icon
 						onClick={() => setChatWindowState(chatWindowStatus.UPDATE_CHANNEL)}
 						src={SettingsIcon} size={24}
 						alt="Settings button" title="Settings" />
+					:
+					<div style={{ width: "24px" }} />
 				}
 			</ButtonsWrapper>
 		</Style>

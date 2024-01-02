@@ -1,23 +1,43 @@
-import { Link } from 'react-router-dom'
 import styled from "styled-components"
+import colors from "../../utils/colors"
 
 export const Style = styled.div`
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	width: 100%;
 	height: 53px;
 	min-width: 100%;
 	min-height: 53px;
 
-	background-color: #FDE14F;
+	background-color: ${colors.navbar};
 
 `
 
-export const StyledLink = styled(Link)`
+export const LogoFull = styled.p`
 
-	padding-right: 100%;
-	padding-bottom: 33px; // ???
-	
+	cursor: pointer;
+
+	font-size: 20px;
+
 	&:hover {
-		background-color: #ffe76e;
+		transform: scale(1.015);
 	}
+
+`
+
+export const LogoReduced = styled.img`
+
+	width: 70%;
+	height: 70%;
+
+	cursor: pointer;
+
+	&:hover {
+		width: 72.5%;
+		height: 72.5%;
+	}
+
 `
