@@ -9,7 +9,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+#RUN npm run build
 
 COPY ./start.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/start.sh

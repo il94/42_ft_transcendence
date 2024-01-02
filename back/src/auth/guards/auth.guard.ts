@@ -16,12 +16,12 @@ export class JwtGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class Api42AuthGuard extends AuthGuard('42') {
-	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const activate = (await super.canActivate(context)) as boolean;
-		const request = context.switchToHttp().getRequest();
-		await super.logIn(request);
-		return activate; 
-	}
+	// async canActivate(context: ExecutionContext): Promise<boolean> {
+	// 	const activate = (await super.canActivate(context)) as boolean;
+	// 	const request = context.switchToHttp().getRequest();
+	// 	await super.logIn(request);
+	// 	return activate; 
+	// }
 }
 
 @Injectable()

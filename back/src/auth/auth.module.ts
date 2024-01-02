@@ -27,10 +27,10 @@ import { APP_GUARD } from '@nestjs/core';
 		Api42Strategy, 
 		AuthService, 
 		UsersService, 
-		SessionSerializer, 
+		//SessionSerializer, 
 		Api42AuthGuard,
-		{	provide: APP_GUARD,
-			useClass: JwtGuard, },
+		//{	provide: APP_GUARD,
+		//	useClass: JwtGuard, },
 	],
 		
 	controllers: [AuthController, UsersController],
