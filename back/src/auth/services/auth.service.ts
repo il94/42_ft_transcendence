@@ -51,21 +51,23 @@ export class AuthService {
 			});
 			if (!user) {
 				console.log ("jai pas trouve le user");
-				const newUser = await this.prisma.user.create({
-					data: {
-						username: profile.username,
-						hash: "00",
-						email: profile.email,
-						avatar: "string",
-						twoFA: false,
-						twoFASecret: "string",
-						status: UserStatus.ONLINE,
-						wins: 0,
-						draws: 0,
-						losses: 0,
-						phoneNumber: "profile.phoneNumber",
-					},
-				});
+				profile.hash = "default";
+				const newUser = await this.userService.createUser(profile as CreateUserDto)
+				// const newUser = await this.prisma.user.create({
+				// 	data: {
+				// 		username: profile.username,
+				// 		hash: "00",
+				// 		email: profile.email,
+				// 		avatar: "string",
+				// 		twoFA: false,
+				// 		twoFASecret,
+				// 		status: UserStatus.ONLINE,
+				// 		wins: 0,
+				// 		draws: 0,
+				// 		losses: 0,
+				// 		phoneNumber,
+				// 	},
+				// });
 				if (!newUser)
 					throw new ForbiddenException('Failed to create new 42 user');
 				return this.signToken(newUser.id, newUser.username);

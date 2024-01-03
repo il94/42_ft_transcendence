@@ -64,22 +64,22 @@ export class AuthController {
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@Req() req: any, @Res() res: Response) {
-		console.log(req.user);
+		console.log("user in api42/callback : ", req.user);
 		//const token = this.authService.validateUser(req.user as AuthDto);
 
 		// const url = new URL(`${req.protocol}:${req.hostname}`);
 		// url.port = process.env.FRONT_PORT;
 		// url.pathname = 'login';
-		// url.searchParams.set('code', token.access_token);
-		// response.status(302).redirect(url.href);
+		// url.searchParams.set('code', req.user.access_token);
+		// res.status(302).redirect(url.href);
 
-		res.cookie('acces-token', req.user.access_token, {
-		maxAge: 2592000000,
-		sameSite: true,
-		secure: false,
-		});
-	  
-		return res.status(HttpStatus.OK);
+		// res.cookie('acces-token', req.user.access_token, {
+		// maxAge: 2592000000,
+		// sameSite: true,
+		// secure: false,
+		// });
+
+		return "OK tu es CO";
 	}
 
 	@Get('profile')

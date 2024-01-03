@@ -4,8 +4,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, Friends, RequestStatus, Invitation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
-import { from, Observable, of, throwError } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class UsersService {
