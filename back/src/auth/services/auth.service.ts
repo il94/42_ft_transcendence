@@ -26,11 +26,6 @@ export class AuthService {
 			let user = await this.prisma.user.findUnique({
 					where: { username: dto.username, },
 				});
-			if (!user) {
-				user = await this.prisma.user.findUnique({
-					where: { email: dto.email, },
-				});
-			}
 			if (!user)
 				throw new BadRequestException('user not found');
 			const pwdMatch = await argon.verify(user.hash, dto.hash);

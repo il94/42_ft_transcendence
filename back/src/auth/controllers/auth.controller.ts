@@ -18,9 +18,10 @@ export class AuthController {
 	}
 
 	@Post('signin')
-	@UseGuards(LocalAuthGuard)
+	//@UseGuards(LocalAuthGuard)
 	@HttpCode(HttpStatus.OK)
 	async signin(@Body() dto: AuthDto) {
+		console.log("contenu : ", dto);
 		return this.authService.validateUser(dto);
 	}
 
