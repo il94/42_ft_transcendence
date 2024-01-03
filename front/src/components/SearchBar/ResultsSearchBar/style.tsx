@@ -7,6 +7,8 @@ export const Style = styled.div`
 	display: flex;
 	flex-direction: column;
 
+	z-index: 999;
+	
 	min-height: 35px;
 	max-height: 280px;
 	

@@ -3,6 +3,7 @@ import {
 	SetStateAction,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from "react"
 import axios from "axios"
@@ -119,8 +120,23 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 		fetchUsersAndChannels()
 	}, [userAuthenticate])
 
+	const resultsSearchBarRef = useRef<HTMLDivElement>(null)
+	const [littleResults, setLittleResults] = useState<boolean>(true)
+
+	useEffect(() => {
+		const resultsSearchBarContainer: HTMLDivElement | null = resultsSearchBarRef.current
+		if (resultsSearchBarContainer)
+		{
+			if (resultsSearchBarContainer.getBoundingClientRect().width < 152)
+				setLittleResults(true)
+			else
+				setLittleResults(false)
+			console.log(resultsSearchBarContainer.getBoundingClientRect().width)
+		}
+	})
+
 	return (
-		<Style>
+		<Style ref={resultsSearchBarRef}>
 			{
 				!errorRequest ?
 				<>
@@ -131,11 +147,20 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 					</Group>
 				}
 				{
+					littleResults ?	
 					usersFound.map((user, index) => (
 						<Result
 							key={"user_result" + index} // a definir
 							onClick={() => addUserToFriendList(user)}>
-							<AvatarResult src={user.avatar} />
+							{user.username}
+						</Result>
+					))
+					:
+					usersFound.map((user, index) => (
+						<Result
+							key={"user_result" + index} // a definir
+							onClick={() => addUserToFriendList(user)}>
+								<AvatarResult src={user.avatar} />
 							{user.username}
 						</Result>
 					))
