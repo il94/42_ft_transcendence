@@ -18,10 +18,8 @@ export class AuthController {
 	}
 
 	@Post('signin')
-	//@UseGuards(LocalAuthGuard)
 	@HttpCode(HttpStatus.OK)
 	async signin(@Body() dto: AuthDto) {
-		console.log("contenu : ", dto);
 		return this.authService.validateUser(dto);
 	}
 
@@ -58,7 +56,6 @@ export class AuthController {
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
 	async get42User(@Req() req) {
-		console.log(req.user);
 		return req.user;
 	}
 

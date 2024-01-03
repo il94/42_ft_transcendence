@@ -23,7 +23,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Get('me')
   async getMe(@getUser() user: User) {
-    console.log(user);
+    // console.log("guard passed ; ", user);
     return user;
   }
 

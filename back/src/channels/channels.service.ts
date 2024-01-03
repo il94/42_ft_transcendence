@@ -13,15 +13,15 @@ export class ChannelsService {
 
   async createChannel(createChannelDto: CreateChannelDto, creator: User) {
     // creating channel
-    const newChannel = await this.prisma.channel.create({
+    let newChannel = await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,
         type: createChannelDto.type,
       }
     })
-
+    console.log("new channe id: ", newChannel.id);
     // connecting channel-user
-    await this.prisma.channel.update({ where: { id: newChannel.id },
+    newChannel = await this.prisma.channel.update({ where: { id: newChannel.id },
       data: {
         members: {
           connect: [{ userId_channelId: { 
@@ -32,7 +32,7 @@ export class ChannelsService {
     });
 
     // defining user's role in channel
-    await this.prisma.channel.update({ where: { id: newChannel.id },
+    newChannel = await this.prisma.channel.update({ where: { id: newChannel.id },
       data: { members: {
         update: { where: { userId_channelId: {
                           userId: creator.id, 
@@ -65,9 +65,18 @@ export class ChannelsService {
   //retrieve all public channels
   async findAllChannels() {
     const publicChannels = await this.prisma.channel.findMany({
-      where: { type: 'PUBLIC' }
+      where: { type: 'PUBLIC' || 'PROTECTED' }
     })
     return publicChannels;
+  }
+
+  async findChannel(chanId: number) {
+    const channel = await this.prisma.channel.findUnique({ 
+      where: { id: chanId }},
+    )
+    if (!channel)
+      throw new NotFoundException(`User with id ${chanId} is not related to channel id ${chanId}`);
+    return channel;
   }
 
   // decorer avec roleguard : le user doit etre owner ou admin 

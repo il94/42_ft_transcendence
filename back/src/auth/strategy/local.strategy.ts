@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
 			throw new UnauthorizedException();
 		}
 		delete user.hash;
-		console.log("user valide: ", user);
+		// console.log("user valide: ", user);
 		return user;
 	}
 }
