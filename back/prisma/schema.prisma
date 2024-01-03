@@ -55,6 +55,7 @@ model User {
   avatar      String
   phoneNumber String
   twoFA       Boolean
+  twoFASecret String
   wins        Int
 	draws       Int
 	losses      Int

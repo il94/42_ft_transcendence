@@ -35,6 +35,9 @@ export class UserEntity implements User {
 	twoFA: boolean;
 
 	@ApiProperty()
+	twoFASecret: string;
+
+	@ApiProperty()
 	wins: number;
 
 	@ApiProperty()

@@ -4,8 +4,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, Friends, RequestStatus, Invitation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
-import { from, Observable, of, throwError } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +24,7 @@ export class UsersService {
 					email: createUserDto.email,
 					phoneNumber: createUserDto.phoneNumber,
 					twoFA: false,
+					twoFASecret: "string",
 					avatar: createUserDto.avatar,
 					status: UserStatus.ONLINE,
 					wins: 0,
@@ -97,6 +96,30 @@ export class UsersService {
 			where: { id: id },
 		});
 		return deleteUser;
+	}
+
+	async turnOnTwoFA(userId: number) {
+		const user = this.prisma.user.update({
+			where: {
+			  id: userId,
+			},
+			data: {
+			  twoFA: true,
+			},
+		});
+		return user;
+	}
+
+	async setTwoFASecret(secret: string, userId: number) {
+		const user = this.prisma.user.update({
+			where: {
+			  id: userId,
+			},
+			data: {
+			  twoFASecret: secret,
+			},
+		});
+		return user;
 	}
 
 }
