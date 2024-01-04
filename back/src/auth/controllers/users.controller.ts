@@ -33,20 +33,17 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: UserEntity })
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);
   }
 
   @Patch(':id')
-  @ApiCreatedResponse({ type: UserEntity })
   async update(@Param('id', ParseIntPipe) id: number, 
   @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }

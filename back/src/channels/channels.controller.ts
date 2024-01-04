@@ -29,8 +29,6 @@ export class ChannelController {
     return this.channelsService.findChannel(id);
   }
 
-
-
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, 
   @Body() updateChannelDto: UpdateChannelDto, 

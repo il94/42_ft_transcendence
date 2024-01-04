@@ -85,6 +85,7 @@ model Relations {
   isInRelations   User @relation("isInRelations", fields: [isInRelationsId], references: [id])
   isInRelationsId Int
   RelationType    RelationStatus
+  request         RequestStatus
 
   @@id([hasRelationsId, isInRelationsId])
 }

@@ -1,48 +1,48 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateFriendDto, UpdateFriendDto } from './dto/friends.dto';
+import { RelationDto } from './dto/friends.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, UserStatus, Friends, RequestStatus, Invitation } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus, Relations, RequestStatus, RelationStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class FriendsService {
   constructor(private prisma: PrismaService) {}
 
-  async isSent(sender: User, receiver: User) {
-		const request = await this.prisma.friends.findUnique({
-			where: { hasFriendsId_isFriendId: {
-				hasFriendsId: sender.id,
-				isFriendId: receiver.id,
-				}}
-		})
-		if (!request)
-			return false;
-		return true;
-	} 
-
-  async addFriend(userId: number, friendId: number) 
+	async addFriend(userId: number, friendId: number) 
 	{
 		if (userId === friendId) 
 			return { error: 'It is not possible to add yourself!' };
+		
 		try {
 			const friend: User = await this.prisma.user.findUnique({where: { id: friendId }});
-		if (!friend)
-			throw new NotFoundException(`User with id ${friendId} does not exist.`);
+			if (!friend)
+				throw new NotFoundException(`User with id ${friendId} does not exist.`);
 		
-		const isFriend  =  await this.prisma.friends.findUnique({
-			where: { hasFriendsId_isFriendId: {
-				hasFriendsId: userId,
-				isFriendId: friendId,}}
+			const isFriend  =  await this.prisma.relations.findUnique({
+				where: { hasRelationsId_isInRelationsId: {
+					hasRelationsId: userId,
+					isInRelationsId: friendId,}}
+				})
+			if (isFriend && isFriend.RelationType == RelationStatus.FRIEND)
+				return { error: `User with id ${friendId} is already your friend.` };
+			if (isFriend && isFriend.RelationType == RelationStatus.BLOCKED) {
+				isFriend.RelationType = RelationStatus.FRIEND;
+				return isFriend;
+			}
+			const newFriend = await this.prisma.user.update({where: { id: userId},
+				data: { 
+					hasRelations: {
+						connect: [{ hasRelationsId_isInRelationsId: {
+							hasRelationsId: userId,
+							isInRelationsId: friendId,
+							} }],
+						create : [{ isInRelationsId: friendId, 
+							request: RequestStatus.ACCEPTED,
+							RelationType: RelationStatus.FRIEND }]
+					}}
+				
 			})
-		if (isFriend)
-			return { error: `User with id ${friendId} is already your friend.` };
-
-		const newFriend = await this.prisma.friends.create({
-			data: { hasFriendsId: userId,
-			isFriendId: friendId,
-			request: 'ACCEPTED', }
-			});
-		return newFriend;
+			return newFriend;
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
 				return { error: 'An error occurred while addind friend' };
@@ -50,7 +50,79 @@ export class FriendsService {
 		}
 	}
 
-	async sendFriendRequest(receiverId: number, sender: User): Promise<Friends | { error: string }> {
+	async getFriends(userId: number) {
+		const user = await this.prisma.user.findFirst({ 
+			where: { id: userId },
+			include: { hasRelations: true, },
+		})
+		return user;
+	}
+
+	async getUserFriends(userId: number) {
+		const friends = await this.prisma.relations.findMany({
+			where: { hasRelationsId: userId }
+		})
+		return friends;
+	}
+
+	async getNonFriends(UserId: number) {
+		//TODO ?
+	}
+
+	async updateRelation(UserId: number, updateRelationDto) {
+		
+	}
+
+	async removeFriend(userId: number, friendId: number) {
+		if (userId === friendId)
+			return { error: 'user has same id as friend' };
+		try {
+			const result = await this.prisma.user.update({ 
+				where: { id: userId, },
+				data: {
+					hasRelations: {
+						disconnect: [{ hasRelationsId_isInRelationsId: {
+							hasRelationsId: userId,
+							isInRelationsId: friendId,
+							} }],
+					}
+				}})
+			return result;
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				return { error: 'An error occurred while removing friend' };
+			throw error;
+		}
+	}
+
+  create(createFriendDto: RelationDto) {
+    return 'This action adds a new friend';
+  }
+
+  findAll() {
+    return `This action returns all friends`;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} friend`;
+  }
+
+  update(id: number, updateFriendDto: RelationDto) {
+    return `This action updates a #${id} friend`;
+  }
+
+	async isSent(sender: User, receiver: User) {
+		const request = await this.prisma.relations.findUnique({
+			where: { hasRelationsId_isInRelationsId: {
+				hasRelationsId: sender.id,
+				isInRelationsId: receiver.id,}}
+			})
+		if (!request)
+			return false;
+		return true;
+	} 
+
+	async sendFriendRequest(receiverId: number, sender: User): Promise<Relations | { error: string }> {
 		if (receiverId === sender.id)
 			return { error: 'It is not possible to add yourself!' };
 
@@ -63,12 +135,12 @@ export class FriendsService {
 			if (isSent === true)
 				return { error: 'A friend request has already been sent or received to your account!' };
 
-			const friendRequest = await this.prisma.friends.create({
-				data: { hasFriendsId: sender.id,
-				isFriendId: receiver.id,
-				request: 'PENDING', }
-				});
-			return friendRequest;
+			// const friendRequest = await this.prisma.user.create({
+			// 	data: { hasRelationsId: sender.id,
+			// 	isInRelationsId: receiver.id,
+			// 	request: 'PENDING', }
+			// 	});
+			// return friendRequest;
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
 				return { error: 'An error occurred while processing the friend request.' };
@@ -80,10 +152,10 @@ export class FriendsService {
 		const receiver = await this.prisma.user.findUnique({
 			where: { id: isFriendId },
 		})
-		const friendRequest = await this.prisma.friends.findUnique({
-			where : { hasFriendsId_isFriendId: {
-				hasFriendsId: currentUser.id,
-				isFriendId: receiver.id,
+		const friendRequest = await this.prisma.relations.findUnique({
+			where : { hasRelationsId_isInRelationsId: {
+				hasRelationsId: currentUser.id,
+				isInRelationsId: receiver.id,
 				}}
 		})
 		if (friendRequest)
@@ -91,64 +163,4 @@ export class FriendsService {
 		return { error : 'friend request not sent'};
 	}
 
-	async getFriends(userId: number) {
-		const user = await this.prisma.user.findFirst({ 
-			where: { id: userId },
-			include: { hasFriends: true, },
-		})
-		return user;
-	}
-
-	async getUserFriends(userId: number) {
-		const friends = await this.prisma.friends.findMany({
-			where: { hasFriendsId: userId }
-		})
-		return friends;
-	}
-
-	async getNonFriends(UserId: number) {
-		//TODO ?
-	}
-
-	async removeFriend(userId: number, friendId: number) {
-		if (userId === friendId)
-			return { error: 'user has same id as friend' };
-		try {
-			const result = await this.prisma.user.update({ 
-				where: { id: userId, },
-				data: {
-					hasFriends: {
-						disconnect: [{ hasFriendsId_isFriendId: {
-							hasFriendsId: userId,
-							isFriendId: friendId,
-							} }],
-					}
-				}})
-			return result;
-		} catch (error) {
-			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				return { error: 'An error occurred while removing friend' };
-			throw error;
-		}
-	}
-
-  create(createFriendDto: CreateFriendDto) {
-    return 'This action adds a new friend';
-  }
-
-  findAll() {
-    return `This action returns all friends`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} friend`;
-  }
-
-  update(id: number, updateFriendDto: UpdateFriendDto) {
-    return `This action updates a #${id} friend`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} friend`;
-  }
 }

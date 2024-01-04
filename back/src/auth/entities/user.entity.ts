@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User, UserStatus, Friends, Role, Channel, Game, Message, UsersOnChannels, UsersOnGames } from '@prisma/client';
+import { User, UserStatus, Role, Channel, Game, Message, UsersOnChannels, UsersOnGames } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
 export class UserEntity implements User {

@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
 import { FriendsService } from './friends.service';
-import { CreateFriendDto, UpdateFriendDto } from './dto/friends.dto';
-import { FriendsEntity } from './entities/friend.entity';
+import { RelationDto } from './dto/friends.dto';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 //import { AuthGuard } from '../auth/guards/auth.guard';
@@ -14,7 +13,7 @@ export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
   @Post('friend-request/send/:isFriendId')
-  @ApiOkResponse({ type: UserEntity })
+
   async sendFriendRequest(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
     @Request() user: User) {
@@ -22,7 +21,6 @@ export class FriendsController {
   }
 
   @Get('friend-request/status/:isFriendId')
-  @ApiOkResponse({ type: UserEntity })
   async getFriendRequestStatus(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
     @Request() user: User) {
@@ -35,7 +33,6 @@ export class FriendsController {
     }
 
   @Get('friends/:id')
-  @ApiOkResponse({ type: FriendsEntity })
   async getUserFriends(
     @Param('id', ParseIntPipe) id: number) {
     return await this.friendsService.getUserFriends(id);
@@ -45,7 +42,6 @@ export class FriendsController {
   // @Patch
 
   @Delete("friends-remove/:id")
-  @ApiOkResponse({ type: FriendsEntity })
   async removeFriend(
     @Param('id', ParseIntPipe) id: number, 
     @Body('friendId', ParseIntPipe) friendId: number) {
@@ -53,8 +49,8 @@ export class FriendsController {
     }
 
   @Post()
-  create(@Body() createFriendDto: CreateFriendDto) {
-    return this.friendsService.create(createFriendDto);
+  create(@Body() createRelationDto: RelationDto) {
+    return this.friendsService.create(createRelationDto);
   }
 
   @Get()
@@ -68,12 +64,8 @@ export class FriendsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFriendDto: UpdateFriendDto) {
-    return this.friendsService.update(+id, updateFriendDto);
+  update(@Param('id') id: string, @Body() relationDto: RelationDto) {
+    return this.friendsService.update(+id, relationDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.friendsService.remove(+id);
-  }
 }

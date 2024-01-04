@@ -76,7 +76,6 @@ export class UsersService {
 	}
 
 	async updateUser(id: number, updateUserDto: UpdateUserDto) {
-		//authenticate
 		const hash = await argon.hash(updateUserDto.hash);
 		const updateUser = await this.prisma.user.update({
 			data: { 
@@ -130,5 +129,4 @@ export class UsersService {
 		})
 		return userChannels;
 		}
-
 }
