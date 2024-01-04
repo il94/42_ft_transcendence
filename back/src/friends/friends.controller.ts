@@ -7,41 +7,46 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 //import { JwtPayload } from 'src/users/constants';
 import { getUser } from '../auth/decorators/users.decorator';
 import { User } from '@prisma/client';
+import { JwtGuard } from 'src/auth/guards/auth.guard';
 
+@UseGuards(JwtGuard)
 @Controller('friends')
 export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
-  @Post('friend-request/send/:isFriendId')
+  @Post('add')
+  async addNewFriend(@getUser() user: User, @Body() payload: { userId: number }) {
+        return this.friendsService.addFriend(user.id, payload.userId);
+  }
 
+  @Post('request/:isFriendId')
   async sendFriendRequest(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
     @Request() user: User) {
     return await this.friendsService.sendFriendRequest(isFriendId, user);
   }
 
-  @Get('friend-request/status/:isFriendId')
+  @Get(':id')
+  async getUserFriends(
+    @Param('id', ParseIntPipe) id: number) {
+    return await this.friendsService.getUserFriends(id);
+  }
+
+  @Get('request/status/:isFriendId')
   async getFriendRequestStatus(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
     @Request() user: User) {
     return await this.friendsService.getFriendRequestStatus(isFriendId, user);
   }
 
-  @Post("friends/add/")
-    addNewFriend(@getUser() user: User, @Body() payload: { userId: number }) {
-        return this.friendsService.addFriend(user.id, payload.userId);
+  @Patch('update/:id')
+  async updateRelation(
+    @Param('id', ParseIntPipe) id: number, 
+    @Body() dto: RelationDto) {
+        return this.friendsService.updateRelation(id, dto);
     }
 
-  @Get('friends/:id')
-  async getUserFriends(
-    @Param('id', ParseIntPipe) id: number) {
-    return await this.friendsService.getUserFriends(id);
-  }
-
-  //
-  // @Patch
-
-  @Delete("friends-remove/:id")
+  @Delete('remove/:id')
   async removeFriend(
     @Param('id', ParseIntPipe) id: number, 
     @Body('friendId', ParseIntPipe) friendId: number) {
