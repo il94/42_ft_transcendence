@@ -1,10 +1,11 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message } from "@prisma/client"
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateChannelDto implements Channel {
-
+	
 	id:         number;
+	
 	createdAt:  Date;
 
 	@IsString()

@@ -12,7 +12,7 @@ export class ChannelsService {
   constructor(private prisma: PrismaService) {}
 
   async createChannel(createChannelDto: CreateChannelDto, creator: User) {
-    // creating channel
+    console.log("creator :", creator);
     const newChannel = await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,

@@ -8,7 +8,7 @@ import { UserEntity } from '../entities/user.entity';
 import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 
-@UseGuards(JwtGuard)
+//@UseGuards(JwtGuard)
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
