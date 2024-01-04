@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, UserStatus, Friends, RequestStatus, Invitation } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 
@@ -121,5 +121,14 @@ export class UsersService {
 		});
 		return user;
 	}
+
+	// retrieve all user's channels
+	async findUserChannel(member: User) {
+		const userChannels = await this.prisma.user.findUnique({
+			where: { id: member.id },
+			include: { channels: true, }
+		})
+		return userChannels;
+		}
 
 }

@@ -5,6 +5,9 @@ CREATE TYPE "UserStatus" AS ENUM ('ONLINE', 'OFFLINE', 'PLAYING', 'WAITING', 'WA
 CREATE TYPE "RequestStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'PROGRESSING', 'FINISHED');
 
 -- CreateEnum
+CREATE TYPE "RelationStatus" AS ENUM ('FRIEND', 'BLOCKED');
+
+-- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN', 'OWNER');
 
 -- CreateEnum
@@ -33,12 +36,12 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "Friends" (
-    "hasFriendsId" INTEGER NOT NULL,
-    "isFriendId" INTEGER NOT NULL,
-    "request" "RequestStatus" NOT NULL,
+CREATE TABLE "Relations" (
+    "hasRelationsId" INTEGER NOT NULL,
+    "isInRelationsId" INTEGER NOT NULL,
+    "RelationType" "RelationStatus" NOT NULL,
 
-    CONSTRAINT "Friends_pkey" PRIMARY KEY ("hasFriendsId","isFriendId")
+    CONSTRAINT "Relations_pkey" PRIMARY KEY ("hasRelationsId","isInRelationsId")
 );
 
 -- CreateTable
@@ -46,6 +49,7 @@ CREATE TABLE "Channel" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
+    "avatar" TEXT NOT NULL,
     "type" "ChannelStatus" NOT NULL,
     "password" TEXT,
 
@@ -109,10 +113,10 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
-ALTER TABLE "Friends" ADD CONSTRAINT "Friends_hasFriendsId_fkey" FOREIGN KEY ("hasFriendsId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Relations" ADD CONSTRAINT "Relations_hasRelationsId_fkey" FOREIGN KEY ("hasRelationsId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Friends" ADD CONSTRAINT "Friends_isFriendId_fkey" FOREIGN KEY ("isFriendId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Relations" ADD CONSTRAINT "Relations_isInRelationsId_fkey" FOREIGN KEY ("isInRelationsId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

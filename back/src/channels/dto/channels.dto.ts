@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message } from "@prisma/client"
-import { IsString } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateChannelDto implements Channel {
 
@@ -8,15 +8,20 @@ export class CreateChannelDto implements Channel {
 	createdAt:  Date;
 
 	@IsString()
+	@MaxLength(8)
 	name:       string;
 
 	@IsString()
 	type:       ChannelStatus;
 
+	@IsOptional()
+	@IsString()
 	password:	string;
 	
 	@IsString()
+	@IsOptional()
 	avatar:		string;
+
 	invitation: Invitation[];
   
 	members:    UsersOnChannels[];

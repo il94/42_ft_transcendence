@@ -8,15 +8,14 @@ import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
 
-@UseGuards(JwtGuard)
+//@UseGuards(JwtGuard)
 @Controller('channel')
 export class ChannelController {
   constructor(private readonly channelsService: ChannelsService) {}
 
   @Post()
   create(@Body() createChannelDto: CreateChannelDto, @Request() req) {
-  console.log("guard passed in channel : ", req.user)
-	return this.channelsService.createChannel(createChannelDto, req.user);
+	  return this.channelsService.createChannel(createChannelDto, req.user);
   }
 
   @Get()
@@ -24,15 +23,13 @@ export class ChannelController {
     return this.channelsService.findAllChannels();
   }
 
+  // RQPR channel par son id => inutile
   @Get(':id')
   findUserOne(@Param('id', ParseIntPipe) id: number) {
     return this.channelsService.findChannel(id);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Request() member: User) {
-    return this.channelsService.findOneChannel(id, member);
-  }
+
 
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, 
