@@ -76,10 +76,16 @@ function Signin() {
 
 			const response = await axios.post("http://localhost:3333/auth/signin", user)
 	
-			setToken(response.data.access_token)
-			localStorage.setItem('token', response.data.access_token)
-
-			navigate("/game")
+			//temporaire
+			if (response.data.twoFA)
+				navigate("/twofa")
+			else
+			{
+				setToken(response.data.access_token)
+				localStorage.setItem('token', response.data.access_token)
+				
+				navigate("/game")
+			}
 		}
 		catch (error) {
 			const axiosError = error as AxiosError

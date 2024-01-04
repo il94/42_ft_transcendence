@@ -5,7 +5,9 @@ import Home from './pages/Home'
 import Game from './pages/Game'
 import Signin from './pages/Signin'
 import Signup from './pages/Signup'
+import TwoFA from './pages/twoFA'
 import Error from './pages/Error'
+
 import AuthContext from './contexts/AuthContext'
 
 function App() {
@@ -20,6 +22,7 @@ function App() {
 					<Route path="/" element={<Home />} />
 					<Route path="/signin" element={<Signin />} />
 					<Route path="/signup" element={<Signup />} />
+					<Route path="/twofa" element={<TwoFA />} />
 					<Route path="/game" element={<Game />} />
 					<Route path="*" element={<Error />} />
 				</Routes>

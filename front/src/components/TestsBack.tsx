@@ -11,7 +11,6 @@ import DefaultYellowAvatar from "../assets/default_yellow.png"
 import DefaultChannel from "../assets/default_channel.png"
 import { useContext } from "react"
 import AuthContext from "../contexts/AuthContext"
-import { channelStatus } from "../utils/status"
 
 const Style = styled.div`
 
