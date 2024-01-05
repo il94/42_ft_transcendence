@@ -1,5 +1,5 @@
 import { userStatus } from "./status"
-import { User } from "./types"
+import { ChannelData, User } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -42,6 +42,10 @@ export function getRandomDefaultAvatar(): string {
 
 export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
+}
+
+export function sortChannelByName(a: ChannelData, b: ChannelData) {
+	return (a.name.localeCompare(b.name))
 }
 
 export function sortUserByStatus(a: User, b: User) {
