@@ -264,7 +264,7 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 		<Style
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
-			<ScrollBar>
+			<ScrollBar visible>
 				<CloseButtonWrapper>
 					<Icon src={CloseIcon} size={24}
 						onClick={() => displaySettingsMenu(false)}

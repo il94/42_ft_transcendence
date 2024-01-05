@@ -35,7 +35,7 @@ const colors = {
 
 	/* Scrolling bar */
 	scrollingBar: "#804400",
-	scrollingBarTransparent: "#80440080",
+	scrollingBarTransparent: "rgba(0, 0, 0, 0.2)",
 
 	/* Ranks */
 	rankGold: "#FFE175",
