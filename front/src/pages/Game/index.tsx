@@ -46,6 +46,7 @@ import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
 import { deleteScoreFormatFromBack } from '../../utils/functions'
+import PongWrapper from '../../components/Pong/PongWrapper'
 
 function Game() {
 
@@ -300,7 +301,14 @@ function Game() {
 												displaySettingsMenu={displaySettingsMenu} />
 										</TopGameWrapper>
 										<BottomGameWrapper>
-											<Pong />
+											{
+												settings &&
+												<SettingsMenu
+													userAuthenticate={userAuthenticate}
+													displaySettingsMenu={displaySettingsMenu} />
+											}
+											{/* /* <TestsBack /> */}
+											<PongWrapper/>
 											{
 												card &&
 												<Card
@@ -308,13 +316,6 @@ function Game() {
 													displayCard={displayCard}
 													userTarget={userTarget} />
 											}
-											{
-												settings &&
-												<SettingsMenu
-													userAuthenticate={userAuthenticate}
-													displaySettingsMenu={displaySettingsMenu} />
-											}
-											<TestsBack />
 											{
 												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
