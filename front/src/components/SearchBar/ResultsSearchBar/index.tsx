@@ -152,7 +152,8 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 					usersFound.map((user, index) => (
 						<Result
 							key={"user_result" + index} // a definir
-							onClick={() => addUserToFriendList(user)}>
+							onClick={() => addUserToFriendList(user)}
+							$noAvatar>
 							{user.username}
 						</Result>
 					))
@@ -173,6 +174,16 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 					</Group>
 				}
 				{
+					littleResults ?	
+					channelsFound.map((channel, index) => (
+						<Result
+							key={"channel_result" + index} // a definir
+							onClick={() => addChannelToChannelList(channel)}
+							$noAvatar>
+							{channel.name}
+						</Result>
+					))
+					:
 					channelsFound.map((channel, index) => (
 						<Result
 							key={"channel_result" + index} // a definir

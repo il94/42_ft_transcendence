@@ -33,14 +33,13 @@ export const Group = styled.div`
 
 `
 
-export const Result = styled.div`
+export const Result = styled.div<{ $noAvatar?: boolean }>`
 
 	display: flex;
 	align-items: center;
+	justify-content: ${(props) => props.$noAvatar && "center"};
 
 	min-height: 35px;
-	
-	padding-left: 10px;
 
 	background-color: ${colors.section};
 
@@ -68,6 +67,7 @@ export const AvatarResult = styled.img`
 	height: 28px;
 
 	margin-right: 10px;
+	padding-left: 10px;
 
 	border-radius: 50%;
 
