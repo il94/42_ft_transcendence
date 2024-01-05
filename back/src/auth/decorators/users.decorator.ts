@@ -13,7 +13,6 @@ export const userStatus = (...status: UserStatus[]) => SetMetadata(STATUS_KEY, s
 export const getUser = createParamDecorator(
     (data: string | undefined, ctx: ExecutionContext) => {
         const request = ctx.switchToHttp().getRequest();
-		console.log('user dans le decorator : ', request.user);
 		if (data) {
 			return request.user[data];
 		}
