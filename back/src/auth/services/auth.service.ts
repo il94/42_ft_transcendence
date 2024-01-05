@@ -65,9 +65,9 @@ export class AuthService {
 				// });
 				if (!newUser)
 					throw new ForbiddenException('Failed to create new 42 user');
-				return this.signToken(newUser.id, newUser.username);
+				return user;
 			}
-			return this.signToken(user.id, user.username);
+			return user;
 		} catch (error) {
 			const err = error as Error;
             console.log("Validate 42 user error: ", err.message);

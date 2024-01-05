@@ -8,16 +8,24 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { getUser } from '../auth/decorators/users.decorator';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { CreateUserDto } from 'src/auth/dto';
 
 @UseGuards(JwtGuard)
 @Controller('friends')
 export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
+  // @Post(':id')
+  // async addNewFriend(@Param() isFriendId) {
+  //   console.log("taget id: ", isFriendId);
+  //     return "LOL";
+  // }
+
   @Post(':id')
   addNewFriend(@getUser() user: User, 
   @Param('id', ParseIntPipe) id: number) {
-        return this.friendsService.addFriend(user.id, id);
+      console.log("taget id: ", id);
+      return this.friendsService.addFriend(user.id, id);
   }
 
   @Post('request/:isFriendId')
@@ -27,10 +35,9 @@ export class FriendsController {
     return this.friendsService.sendFriendRequest(isFriendId, user);
   }
 
-  @Get(':id')
-  getUserFriends(
-    @Param('id', ParseIntPipe) id: number) {
-    return this.friendsService.getUserFriends(id);
+  @Get()
+  async getUserFriends(@getUser() user: User ) {
+    return await this.friendsService.getUserFriends(user.id);
   }
 
   @Get('request/status/:isFriendId')

@@ -13,8 +13,8 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
         });
     }
     async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
-        const token = this.authService.validate42User({ email: profile.emails[0].value, username: profile.username });
-        return token;
+        const user = this.authService.validate42User({ email: profile.emails[0].value, username: profile.username });
+        return user;
     }
 }
 

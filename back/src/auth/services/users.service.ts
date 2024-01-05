@@ -24,7 +24,7 @@ export class UsersService {
 					email: createUserDto.email,
 					phoneNumber: createUserDto.phoneNumber,
 					twoFA: false,
-					twoFASecret: "string",
+					twoFASecret: "",
 					avatar: createUserDto.avatar,
 					status: UserStatus.ONLINE,
 					wins: 0,
