@@ -6,6 +6,7 @@ import {
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import axios from 'axios'
+import io from 'socket.io-client';
 
 import {
 	GamePage,
@@ -137,6 +138,13 @@ function Game() {
 					}
 				})
 
+				const socket = io('http://localhost:3333', { transports: ["websocket"]} );
+		
+				socket.on('connect_error', (error) => {
+					console.error('Erreur de connexion à la socket :', error.message);
+					throw new Error;
+				});
+				
 				setUserAuthenticate({
 					id: responseMe.data.id,
 					username: responseMe.data.username,
@@ -153,7 +161,8 @@ function Game() {
 					twoFA: false, // a recuperer depuis la reponse
 					friends: friends, // a recuperer depuis la reponse
 					blockedUsers: [], // a recuperer depuis la reponse
-					channels: channels // a recuperer depuis la reponse
+					channels: channels, // a recuperer depuis la reponse
+					socket: socket
 				})
 			}
 			catch (error) {
