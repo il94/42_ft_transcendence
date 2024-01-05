@@ -14,22 +14,23 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
-  @Post('add')
-  async addNewFriend(@getUser() user: User, @Body() payload: { userId: number }) {
-        return this.friendsService.addFriend(user.id, payload.userId);
+  @Post(':id')
+  addNewFriend(@getUser() user: User, 
+  @Param('id', ParseIntPipe) id: number) {
+        return this.friendsService.addFriend(user.id, id);
   }
 
   @Post('request/:isFriendId')
-  async sendFriendRequest(
+  sendFriendRequest(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
     @Request() user: User) {
-    return await this.friendsService.sendFriendRequest(isFriendId, user);
+    return this.friendsService.sendFriendRequest(isFriendId, user);
   }
 
   @Get(':id')
-  async getUserFriends(
+  getUserFriends(
     @Param('id', ParseIntPipe) id: number) {
-    return await this.friendsService.getUserFriends(id);
+    return this.friendsService.getUserFriends(id);
   }
 
   @Get('request/status/:isFriendId')
@@ -40,7 +41,7 @@ export class FriendsController {
   }
 
   @Patch('update/:id')
-  async updateRelation(
+  updateRelation(
     @Param('id', ParseIntPipe) id: number, 
     @Body() dto: RelationDto) {
         return this.friendsService.updateRelation(id, dto);
@@ -52,25 +53,5 @@ export class FriendsController {
     @Body('friendId', ParseIntPipe) friendId: number) {
         return this.friendsService.removeFriend(id, friendId);
     }
-
-  @Post()
-  create(@Body() createRelationDto: RelationDto) {
-    return this.friendsService.create(createRelationDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.friendsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.friendsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() relationDto: RelationDto) {
-    return this.friendsService.update(+id, relationDto);
-  }
 
 }
