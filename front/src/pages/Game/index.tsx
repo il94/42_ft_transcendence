@@ -81,7 +81,11 @@ function Game() {
 
 				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
 
-				const friendsResponse = await axios.get("http://localhost:3333/user")
+				const friendsResponse = await axios.get("http://localhost:3333/user", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
 				// En attendant d'avoir le scoreResume retourne par le back
 				const tempFriendsResponse: User[] = friendsResponse.data.map((friend: User) => ({
@@ -132,6 +136,14 @@ function Game() {
 					}
 				})
 
+				const test = await axios.get("http://localhost:3333/friends", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				console.log(test)
+				
 				setUserAuthenticate({
 					id: responseMe.data.id,
 					username: responseMe.data.username,
@@ -152,6 +164,9 @@ function Game() {
 				})
 			}
 			catch (error) {
+
+				console.log(error)
+
 				localStorage.removeItem('token')
 				setErrorRequest(true)
 			}

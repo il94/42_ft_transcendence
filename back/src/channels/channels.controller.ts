@@ -8,7 +8,7 @@ import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
 
-//@UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('channel')
 export class ChannelController {
   constructor(private readonly channelsService: ChannelsService) {}

@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useState
 } from "react"
-// import axios from "axios"
+import axios from "axios"
 
 import { Style } from "./style"
 
@@ -23,6 +23,7 @@ import {
 	messageStatus,
 	userStatus
 } from "../../../utils/status"
+import AuthContext from "../../../contexts/AuthContext"
 
 type PropsContextualMenu = {
 	type: contextualMenuStatus | undefined,
@@ -50,6 +51,8 @@ type PropsContextualMenu = {
 }
 
 function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, userTarget, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
+
+	const { token } = useContext(AuthContext)!
 
 	function showSecondaryContextualMenu(event: MouseEvent<HTMLButtonElement>) {
 
@@ -228,6 +231,20 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 				// await axios.post(`http://localhost:3333/user/me/friends/${userTarget.id}`)
 
+				const test = await axios.post("http://localhost:3333/friends/add", {
+					id: userTarget.id
+				})
+
+				console.log("post", test)
+
+				const responseMe = await axios.get("http://localhost:3333/user/me", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				console.log("get", responseMe)
+
 				/* ====================================== */
 				userAuthenticate.friends.push(userTarget)
 			}
@@ -238,10 +255,37 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 				/* ====================================== */
 
+				// const test = await axios.post(`http://localhost:3333/friends/request/${userTarget.id}/`, {
+				// 	headers: {
+				// 		'Authorization': `Bearer ${token}`
+				// 	}
+				// })
+
+				const test = await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				console.log("post", test)
+
+				const responseMe = await axios.get("http://localhost:3333/user/me", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				console.log("get", responseMe)
+
+
+
 				userAuthenticate.friends.splice(userAuthenticate.friends.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {
+
+			console.log(error)
+			
 			displayErrorContextualMenu(true)
 		}
 	}

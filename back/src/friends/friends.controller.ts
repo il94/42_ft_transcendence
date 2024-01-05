@@ -8,15 +8,24 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { getUser } from '../auth/decorators/users.decorator';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { CreateUserDto } from 'src/auth/dto';
 
 @UseGuards(JwtGuard)
 @Controller('friends')
 export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
-  @Post('add')
-  async addNewFriend(@getUser() user: User, @Body() payload: { userId: number }) {
-        return this.friendsService.addFriend(user.id, payload.userId);
+  // @Post(':id')
+  // async addNewFriend(@Param() isFriendId) {
+  //   console.log("taget id: ", isFriendId);
+  //     return "LOL";
+  // }
+
+  @Post(':id')
+  addNewFriend(@getUser() user: User, 
+  @Param('id', ParseIntPipe) id: number) {
+      console.log("taget id: ", id);
+      return this.friendsService.addFriend(user.id, id);
   }
 
   @Post('request/:isFriendId')
@@ -26,10 +35,10 @@ export class FriendsController {
     return await this.friendsService.sendFriendRequest(isFriendId, user);
   }
 
-  @Get(':id')
-  async getUserFriends(
-    @Param('id', ParseIntPipe) id: number) {
-    return await this.friendsService.getUserFriends(id);
+  @UseGuards(JwtGuard)
+  @Get()
+  async getUserFriends(@getUser() user: User ) {
+    return await this.friendsService.getUserFriends(user.id);
   }
 
   @Get('request/status/:isFriendId')
@@ -52,25 +61,5 @@ export class FriendsController {
     @Body('friendId', ParseIntPipe) friendId: number) {
         return this.friendsService.removeFriend(id, friendId);
     }
-
-  @Post()
-  create(@Body() createRelationDto: RelationDto) {
-    return this.friendsService.create(createRelationDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.friendsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.friendsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() relationDto: RelationDto) {
-    return this.friendsService.update(+id, relationDto);
-  }
 
 }
