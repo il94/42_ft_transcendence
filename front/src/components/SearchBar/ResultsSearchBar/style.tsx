@@ -9,7 +9,6 @@ export const Style = styled.div`
 
 	z-index: 999;
 	
-	min-height: 35px;
 	max-height: 280px;
 	
 	margin-top: 8px;
@@ -19,11 +18,18 @@ export const Style = styled.div`
 `
 
 export const Group = styled.div`
-	
+
+	max-height: 140px;
+
+`
+
+export const GroupName = styled.p`
+
 	display: flex;
 	align-items: center;
 
-	min-height: 35px;
+	width: 100%;
+	height: 35px;
 
 	padding-left: 10px;
 
@@ -33,13 +39,19 @@ export const Group = styled.div`
 
 `
 
+export const ResultsWrapper = styled.div`
+
+	height: 105px;
+
+`
+
 export const Result = styled.div<{ $noAvatar?: boolean }>`
 
 	display: flex;
 	align-items: center;
 	justify-content: ${(props) => props.$noAvatar && "center"};
 
-	min-height: 35px;
+	height: 35px;
 
 	background-color: ${colors.section};
 
@@ -67,7 +79,7 @@ export const AvatarResult = styled.img`
 	height: 28px;
 
 	margin-right: 10px;
-	padding-left: 10px;
+	margin-left: 10px;
 
 	border-radius: 50%;
 

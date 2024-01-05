@@ -11,11 +11,14 @@ import axios from "axios"
 import {
 	AvatarResult,
 	Group,
+	GroupName,
 	NoResult,
 	Result,
+	ResultsWrapper,
 	Style
 } from "./style"
 
+import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
@@ -30,6 +33,83 @@ type PropsSearchBar = {
 }
 
 function ResultsSearchBar({ displayChat } : PropsSearchBar) {
+
+	function generateResults(results: User[] | ChannelData[], type: string, littleResults: boolean) {
+		return (
+			<Group>
+				<GroupName>
+					{
+					type === "user" ?
+					<>
+						USERS
+					</>
+					:
+					<>
+						CHANNELS
+					</>
+				}
+				</GroupName>
+				{
+					results.length > 3 ?
+					<ResultsWrapper>
+						<ScrollBar>
+						{
+							results.map((result, index) => (
+								<Result
+									key={`${type}_result` + index} // a definir
+									onClick={() => {
+										type === "user" ?
+											addUserToFriendList(result as User)
+											:
+											addChannelToChannelList(result as ChannelData)
+										}
+									}
+									$noAvatar={littleResults}>
+									{
+										!littleResults &&
+										<AvatarResult src={result.avatar} />
+									}
+									{
+										type === "user" ?
+										<>
+											{(result as User).username}
+										</>
+										:
+										<>
+											{(result as ChannelData).name}
+										</>
+									}
+								</Result>
+							))
+						}
+						</ScrollBar>
+					</ResultsWrapper>
+					:
+					<>
+						{
+							results.map((result, index) => (
+								<Result
+									key={`${type}_result` + index} // a definir
+									onClick={() => {
+										type === "user" ?
+											addUserToFriendList(result as User)
+											:
+											addChannelToChannelList(result as ChannelData)
+										}
+									}
+									$noAvatar={littleResults}>
+									{
+										!littleResults &&
+										<AvatarResult src={result.avatar} />
+									}
+								</Result>
+							))
+						}
+					</>
+			}
+			</Group>
+		)
+	}
 
 	const [usersFound, setUsersFound] = useState<User[]>([])
 	const [channelsFound, setChannelsFound] = useState<ChannelData[]>([])
@@ -100,7 +180,7 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 						draws: user.draws,
 						losses: user.losses
 					}
-				})).slice(0, 3))
+				})))
 
 				/* ============ Temporaire ============== */
 
@@ -132,7 +212,6 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 				setLittleResults(true)
 			else
 				setLittleResults(false)
-			console.log(resultsSearchBarContainer.getBoundingClientRect().width)
 		}
 	})
 
@@ -143,61 +222,23 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 				<>
 				{
 					usersFound.length > 0 &&
-					<Group>
-						USERS
-					</Group>
-				}
-				{
-					littleResults ?	
-					usersFound.map((user, index) => (
-						<Result
-							key={"user_result" + index} // a definir
-							onClick={() => addUserToFriendList(user)}
-							$noAvatar>
-							{user.username}
-						</Result>
-					))
-					:
-					usersFound.map((user, index) => (
-						<Result
-							key={"user_result" + index} // a definir
-							onClick={() => addUserToFriendList(user)}>
-								<AvatarResult src={user.avatar} />
-							{user.username}
-						</Result>
-					))
+					<>
+					{
+						generateResults(usersFound, "user", littleResults)
+					}
+					</>
 				}
 				{
 					channelsFound.length > 0 &&
-					<Group>
-						CHANNELS
-					</Group>
+					<>
+					{
+						generateResults(channelsFound, "channel", littleResults)
+					}
+					</>
 				}
 				{
-					littleResults ?	
-					channelsFound.map((channel, index) => (
-						<Result
-							key={"channel_result" + index} // a definir
-							onClick={() => addChannelToChannelList(channel)}
-							$noAvatar>
-							{channel.name}
-						</Result>
-					))
-					:
-					channelsFound.map((channel, index) => (
-						<Result
-							key={"channel_result" + index} // a definir
-							onClick={() => addChannelToChannelList(channel)}>
-							<AvatarResult src={channel.avatar} />
-							{channel.name}
-						</Result>
-					))
-				}
-				{
-					usersFound.length > 0 && channelsFound.length > 0 &&
-					<NoResult>
-						No result found
-					</NoResult>
+					usersFound.length === 0 && channelsFound.length === 0 &&
+					<NoResult />
 				}
 				</>
 				:
