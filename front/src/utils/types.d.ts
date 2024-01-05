@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client"
 import {
 	userStatus,
 	challengeStatus,
@@ -15,8 +16,10 @@ export type User = {
 		wins: number,
 		draws: number,
 		losses: number
-	}
+	},
+	socket: Socket
 }
+
 export type UserAuthenticate = User & {
 	email: string,
 	phoneNumber: string,
