@@ -51,7 +51,7 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 			$height={secondaryContextualMenuHeight}>
 			{
 				channels ?
-					<ScrollBar>
+					<ScrollBar visible>
 						{
 							channels.map((channel, index) => (
 								<Section key={"channelSection" + index} onClick={() => handleInviteClickEvent(channel)}>

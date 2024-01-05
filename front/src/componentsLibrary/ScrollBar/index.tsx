@@ -39,21 +39,20 @@ const TrackHorizontal = styled.div`
 	
 `
 
-const ThumbVertical = styled.div`
-
-	background-color: ${colors.scrollingBarTransparent};
+const ThumbVertical = styled.div<{ $visible?: boolean }>`
 
 	margin: 0;
 	margin-bottom: 0;
 	padding: 0;
 	padding-bottom: 0;
 	
+	background-color: ${colors.scrollingBarTransparent};
 
 `
 
-const TrackVertical = styled.div<{ $onMouse: boolean }>`
+const TrackVertical = styled.div<{ $onMouse: boolean, $visible?: boolean }>`
 
-	display: ${(props) => props.$onMouse ? "block" : "none"};
+	display: ${(props) => (props.$onMouse || props.$visible) ? "block" : "none"};
 
 	position: absolute;
 	right: 0px;
@@ -65,7 +64,7 @@ const TrackVertical = styled.div<{ $onMouse: boolean }>`
 	margin-bottom: 0;
 	padding: 0;
 	padding-bottom: 0;
-	
+
 `
 
 type PropsScrollBar = {
@@ -78,10 +77,11 @@ type PropsScrollBar = {
 		setter: Dispatch<SetStateAction<boolean>>
 	},
 	activeState?: boolean,
+	visible?: boolean,
 	children: ReactNode
 }
 
-function ScrollBar({ state, firstRenderState, activeState, children }: PropsScrollBar) {
+function ScrollBar({ state, firstRenderState, activeState, visible, children }: PropsScrollBar) {
 
 	const scrollBarRef = useRef<Scrollbars>(null)
 	const [onMouse, setOnMouse] = useState<boolean>(false)
@@ -120,8 +120,8 @@ function ScrollBar({ state, firstRenderState, activeState, children }: PropsScro
 			onMouseLeave={() => setOnMouse(false)}
 			onScroll={handleScrollPosition}
 			ref={scrollBarRef}
-			renderThumbVertical={() => <ThumbVertical />}
-			renderTrackVertical={() => <TrackVertical $onMouse={onMouse} />}
+			renderThumbVertical={() => <ThumbVertical $visible={visible} />}
+			renderTrackVertical={() => <TrackVertical $onMouse={onMouse} $visible={visible} />}
 			renderThumbHorizontal={() => <ThumHorizontal />}
 			renderTrackHorizontal={() => <TrackHorizontal />}
 			renderView={() => <View />}>
