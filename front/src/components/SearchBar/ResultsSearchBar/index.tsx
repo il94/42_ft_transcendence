@@ -102,6 +102,16 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 										!littleResults &&
 										<AvatarResult src={result.avatar} />
 									}
+									{
+										type === "user" ?
+										<>
+											{(result as User).username}
+										</>
+										:
+										<>
+											{(result as ChannelData).name}
+										</>
+									}
 								</Result>
 							))
 						}
