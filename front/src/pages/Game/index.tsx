@@ -45,8 +45,8 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
-import { deleteScoreFormatFromBack } from '../../utils/functions'
+import { TempContext, userSomeone } from '../../temp/temp'
+import { deleteScoreFormatFromBack, getStatus } from '../../utils/functions'
 
 function Game() {
 
@@ -90,8 +90,8 @@ function Game() {
 
 					...friend,
 					//temporaire
-					status: getRandomStatus(),
-					// status: getStatus(friend.status),
+					// status: getRandomStatus(),
+					status: getStatus(friend.status),
 					scoreResume: {
 						wins: friend.wins,
 						draws: friend.draws,
@@ -106,7 +106,6 @@ function Game() {
 				/* ====================================== */
 			}
 			catch (error) {
-				console.log(error)
 				throw (error)
 			}
 		}
@@ -116,9 +115,13 @@ function Game() {
 
 				/* ============ Temporaire ============== */
 
-				// const channelsResponse = await axios.get("http://localhost:3333/user/me/channels")
-				const channelsResponse: ChannelData[] = []
-				return (channelsResponse)
+				const channelsResponse = await axios.get("http://localhost:3333/channel", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				return (channelsResponse.data)
 
 				/* ====================================== */
 			}
@@ -177,11 +180,6 @@ function Game() {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
 	}, [userAuthenticate.channels.length])
 
-	//temporaire
-	// a supprimer quand la route qui renvoie les channels sera dispo
-	useEffect(() => {
-		userAuthenticate.channels = getTempChannels(userAuthenticate)
-	}, [userAuthenticate, userTarget])
 
 	/* ========================== COMPONENTS STATES ============================= */
 

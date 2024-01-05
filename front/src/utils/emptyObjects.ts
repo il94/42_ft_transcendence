@@ -9,7 +9,8 @@ export const emptyUser = {
 		wins: 0,
 		draws: 0,
 		losses: 0
-	}
+	},
+	socket: undefined
 }
 
 export const emptyUserAuthenticate = {
@@ -22,6 +23,7 @@ export const emptyUserAuthenticate = {
 		draws: 0,
 		losses: 0
 	},
+	socket: undefined,
 	email: "",
 	phoneNumber: "",
 	twoFA: false,

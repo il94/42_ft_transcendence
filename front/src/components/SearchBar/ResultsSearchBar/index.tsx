@@ -21,6 +21,7 @@ import {
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
+import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
 import { sortChannelByName, sortUserByName } from "../../../utils/functions"
@@ -28,7 +29,7 @@ import { sortChannelByName, sortUserByName } from "../../../utils/functions"
 import { ChannelData, User } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
-import { getRandomStatus, getTempChannels } from "../../../temp/temp"
+import { getRandomStatus } from "../../../temp/temp"
 
 type PropsSearchBar = {
 	value: string,
@@ -36,6 +37,8 @@ type PropsSearchBar = {
 }
 
 function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
+
+	const { token } = useContext(AuthContext)!
 
 	function generateResults(results: User[] | ChannelData[], type: string, littleResults: boolean) {
 		return (
@@ -192,15 +195,13 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})).sort(sortUserByName))
 
-				/* ============ Temporaire ============== */
-			
-				// const channels = await axios.get("http://localhost:3333/channel")
+				const channelsResponse = await axios.get("http://localhost:3333/channel", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				const channelsResponse: ChannelData[] = getTempChannels(userAuthenticate)
-
-				/* ============================================== */
-
-				setChannels(channelsResponse.filter((channel: ChannelData) => (
+				setChannels(channelsResponse.data.filter((channel: ChannelData) => (
 					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
 				)).sort(sortChannelByName))
 			}

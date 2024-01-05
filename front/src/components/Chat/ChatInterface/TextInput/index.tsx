@@ -26,11 +26,11 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 
 	const [arraySocket, setArraySocket] = useState<Socket[]>([])
 
-	useEffect(() => {
-		setArraySocket(channel.users.map((user) => (
-			user.socket
-		)))
-	}, [channel.users])
+	// useEffect(() => {
+	// 	setArraySocket(channel.users.map((user) => (
+	// 		user.socket
+	// 	)))
+	// }, [channel.users])
 	
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {

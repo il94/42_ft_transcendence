@@ -17,7 +17,7 @@ export type User = {
 		draws: number,
 		losses: number
 	},
-	socket: Socket
+	socket: Socket | undefined
 }
 
 export type UserAuthenticate = User & {
