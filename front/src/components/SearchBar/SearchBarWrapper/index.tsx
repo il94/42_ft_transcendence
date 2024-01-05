@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react"
 import styled from "styled-components"
-import SearchBar from "../SearchBar"
-import colors from "../../utils/colors"
+import SearchBar from ".."
+import colors from "../../../utils/colors"
 
 export const Style = styled.div`
 

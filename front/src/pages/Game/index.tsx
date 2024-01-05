@@ -17,7 +17,7 @@ import {
 } from './style'
 
 import Logo from '../../components/Logo'
-import SearchBarWrapper from '../../components/SearchBarWrapper'
+import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
