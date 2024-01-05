@@ -35,7 +35,9 @@ function SearchBar({ searchBarResults, displaySearchBarResults, displayChat } : 
 				displaySearchBarResults={displaySearchBarResults} />
 				{
 					searchBarResults &&
-					<ResultsSearchBar displayChat={displayChat} />
+					<ResultsSearchBar
+						value={value}
+						displayChat={displayChat} />
 				}
 		</Style>
 	)

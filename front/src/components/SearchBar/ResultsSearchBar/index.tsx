@@ -23,16 +23,19 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 
+import { sortChannelByName, sortUserByName } from "../../../utils/functions"
+
 import { ChannelData, User } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
 import { getRandomStatus, getTempChannels } from "../../../temp/temp"
 
 type PropsSearchBar = {
+	value: string,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function ResultsSearchBar({ displayChat } : PropsSearchBar) {
+function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	function generateResults(results: User[] | ChannelData[], type: string, littleResults: boolean) {
 		return (
@@ -121,7 +124,9 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 		)
 	}
 
+	const [users, setUsers] = useState<User[]>([])
 	const [usersFound, setUsersFound] = useState<User[]>([])
+	const [channels, setChannels] = useState<ChannelData[]>([])
 	const [channelsFound, setChannelsFound] = useState<ChannelData[]>([])
 
 	const { userAuthenticate, setChannelTarget } = useContext(InteractionContext)!
@@ -170,14 +175,9 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 		async function fetchUsersAndChannels() {
 			try {
 
-				/* ============ Temporaire ============== */
+				const userResponse = await axios.get("http://localhost:3333/user")
 
-				const response = await axios.get("http://localhost:3333/user")
-				// const response = await axios.get("http://localhost:3333/user/search")
-
-				/* ============================================== */
-
-				setUsersFound(response.data.filter((user: User) => (
+				setUsers(userResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
 				)).map((user: any) => ({
 					// temporaire
@@ -190,19 +190,19 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 						draws: user.draws,
 						losses: user.losses
 					}
-				})))
+				})).sort(sortUserByName))
 
 				/* ============ Temporaire ============== */
+			
+				// const channels = await axios.get("http://localhost:3333/channel")
 
-				// const channels = await axios.get("http://localhost:3333/channel/search")
-
-				const tempResponse: ChannelData[] = getTempChannels(userAuthenticate)
+				const channelsResponse: ChannelData[] = getTempChannels(userAuthenticate)
 
 				/* ============================================== */
 
-				setChannelsFound(tempResponse.filter((channel: ChannelData) => (
+				setChannels(channelsResponse.filter((channel: ChannelData) => (
 					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
-				)))
+				)).sort(sortChannelByName))
 			}
 			catch (error) {
 				setErrorRequest(true)
@@ -210,6 +210,16 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 		}
 		fetchUsersAndChannels()
 	}, [userAuthenticate])
+
+	useEffect(() => {
+		setUsersFound(users.filter((user: User) => user.username.startsWith(value)))
+		setChannelsFound(channels.filter((channel: ChannelData) => channel.name.startsWith(value)))
+	}, [value])
+
+	useEffect(() => {
+		setUsersFound(users)
+		setChannelsFound(channels)
+	}, [users, channels])
 
 	const resultsSearchBarRef = useRef<HTMLDivElement>(null)
 	const [littleResults, setLittleResults] = useState<boolean>(true)
@@ -248,7 +258,9 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 				}
 				{
 					usersFound.length === 0 && channelsFound.length === 0 &&
-					<NoResult />
+					<NoResult>
+						No result found
+					</NoResult>
 				}
 				</>
 				:
