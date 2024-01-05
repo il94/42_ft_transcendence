@@ -1,5 +1,6 @@
 Signin/ :
 	Codes d'erreur a recuperer
+	Recuperer le boolean twofa du user pour savoir si on redirige vers Game ou pas
 
 Signup/ :
 	Gestion d'erreurs utilisateur a faire
