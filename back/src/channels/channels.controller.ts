@@ -20,8 +20,10 @@ export class ChannelController {
   }
 
   @Get()
-  findAll() {
-    return this.channelsService.findAllChannels();
+  async findAll() {
+    const channels = await this.channelsService.findAllChannels();
+    console.log("les channels : ", channels);
+    return channels;
   }
 
   // RQPR channel par son id => inutile
@@ -32,10 +34,18 @@ export class ChannelController {
 
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, 
-  @Body() updateChannelDto: UpdateChannelDto, 
+  @Body() dto: UpdateChannelDto, 
   @Request() member: User) {
-    return this.channelsService.updateChannel(updateChannelDto, member);
+    return this.channelsService.updateChannel(dto, member);
   }
+
+  @Patch(':id')
+  addUser(@Param('id', ParseIntPipe) id: number,  
+  @Request() member: User) {
+    return this.channelsService.addUserChannel(id, member);
+  }
+
+
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {

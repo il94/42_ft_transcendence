@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, UpdateChannelDto } from './dto/';
 import { Channel, User, ChannelStatus } from '@prisma/client';
 import * as argon from 'argon2';
+import { getEventListeners } from 'events';
 
 // Authenticated user
 // Role guard : creator is owner
@@ -39,11 +40,19 @@ export class ChannelsService {
     return newChannel;
   }
 
+  async addUserChannel(friendId: number, member: User) {
+    try {
+ 
+    } catch (error) { }   
+  }
+
   //retrieve all public channels
   async findAllChannels() {
     const publicChannels = await this.prisma.channel.findMany({
-      where: { type: 'PUBLIC' || 'PROTECTED' }
+     where: { type: 'PUBLIC' || 'PROTECTED' },
     })
+    if (publicChannels)
+      console.log("YES");
     return publicChannels;
   }
 
@@ -75,8 +84,7 @@ export class ChannelsService {
   async updateChannel(updateChannelDto: UpdateChannelDto, member: User) {
     //const chan = this.prisma.channel.findUnique
     try {
-      const channel = this.findOneChannel(updateChannelDto.id, member);
-      await this.prisma.channel.update({ where: { id: updateChannelDto.id },
+      const channel = await this.prisma.channel.update({ where: { id: updateChannelDto.id },
         data: { 
           name: updateChannelDto.name,
 	        type:       updateChannelDto.type,
