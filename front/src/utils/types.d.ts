@@ -14,7 +14,7 @@ export type User = {
 	scoreResume: {
 		wins: number,
 		draws: number,
-		looses: number
+		losses: number
 	}
 }
 export type UserAuthenticate = User & {

@@ -89,15 +89,16 @@ function ResultsSearchBar({ displayChat } : PropsSearchBar) {
 
 				setUsersFound(response.data.filter((user: User) => (
 					user.username != userAuthenticate.username
-				)).map((user: User) => ({
+				)).map((user: any) => ({
 					// temporaire
-					// retirer map quand la route retournera le status et le score resume
+					// En attendant de pouvoir tester avec plusieurs Users
+					// Wins Draws et Looses en trop !
 					...user ,
 					status: getRandomStatus(),
 					scoreResume: {
-						wins: 0,
-						draws: 0,
-						looses: 0
+						wins: user.wins,
+						draws: user.draws,
+						losses: user.losses
 					}
 				})).slice(0, 3))
 

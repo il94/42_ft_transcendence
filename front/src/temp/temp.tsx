@@ -15,7 +15,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 		scoreResume: {
 			wins: 0,
 			draws: 0,
-			looses: 0
+			losses: 0
 		}
 	}
 
@@ -502,7 +502,7 @@ export const userSomeone: User = {
 	scoreResume: {
 		wins: 0,
 		draws: 0,
-		looses: 0
+		losses: 0
 	}
 }
 

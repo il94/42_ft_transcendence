@@ -144,7 +144,7 @@ function TestsBack() {
 
 				let i = 0
 
-				while (i < 15) {
+				while (i < 5) {
 					axios.post("http://localhost:3333/auth/signup",
 						{
 							username: `friend_${i}`,

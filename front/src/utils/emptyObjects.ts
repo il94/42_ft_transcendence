@@ -8,7 +8,7 @@ export const emptyUser = {
 	scoreResume: {
 		wins: 0,
 		draws: 0,
-		looses: 0
+		losses: 0
 	}
 }
 
@@ -20,7 +20,7 @@ export const emptyUserAuthenticate = {
 	scoreResume: {
 		wins: 0,
 		draws: 0,
-		looses: 0
+		losses: 0
 	},
 	email: "",
 	phoneNumber: "",

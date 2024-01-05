@@ -45,6 +45,7 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
+import { deleteScoreFormatFromBack } from '../../utils/functions'
 
 function Game() {
 
@@ -83,24 +84,28 @@ function Game() {
 
 				const friendsResponse = await axios.get("http://localhost:3333/user")
 
-				// En attendant d'avoir le scoreResume retourne par le back
-				const tempFriendsResponse: User[] = friendsResponse.data.map((friend: User) => ({
+				// En attendant de pouvoir tester avec plusieurs Users
+				const friends: User[] = friendsResponse.data.map((friend: any) => ({
+
 					...friend,
 					//temporaire
 					status: getRandomStatus(),
 					// status: getStatus(friend.status),
 					scoreResume: {
-						wins: 0,
-						draws: 0,
-						looses: 0
+						wins: friend.wins,
+						draws: friend.draws,
+						losses: friend.losses
 					}
 				}))
 
-				return (tempFriendsResponse.slice(0, 10))
+				friends.forEach(deleteScoreFormatFromBack)
+
+				return (friends)
 
 				/* ====================================== */
 			}
 			catch (error) {
+				console.log(error)
 				throw (error)
 			}
 		}
@@ -141,7 +146,7 @@ function Game() {
 					scoreResume: { // a recuperer depuis la reponse
 						wins: 100,
 						draws: 1,
-						looses: 0
+						losses: 0
 					},
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
