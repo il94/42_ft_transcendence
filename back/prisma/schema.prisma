@@ -26,6 +26,11 @@ enum RequestStatus {
   FINISHED
 }
 
+enum RelationStatus {
+  FRIEND
+  BLOCKED
+}
+
 enum Role {
   USER
   ADMIN
@@ -55,6 +60,7 @@ model User {
   avatar      String
   phoneNumber String
   twoFA       Boolean
+  twoFASecret String
   wins        Int
 	draws       Int
 	losses      Int
@@ -63,8 +69,8 @@ model User {
 
   games       UsersOnGames[]
 
-  hasFriends  Friends[] @relation("hasFriends")
-  isFriend    Friends[] @relation("isFriend")
+  hasRelations  Relations[] @relation("hasRelations")
+  isInRelations Relations[] @relation("isInRelations")
 
   channels  UsersOnChannels[]
   messages  Message[]
@@ -73,20 +79,22 @@ model User {
 }
 
 // self relation m-m user-user
-model Friends {
-  hasFriends   User @relation("hasFriends", fields: [hasFriendsId], references: [id])
-  hasFriendsId Int
-  isFriend    User @relation("isFriend", fields: [isFriendId], references: [id])
-  isFriendId  Int
-  request     RequestStatus
+model Relations {
+  hasRelations    User @relation("hasRelations", fields: [hasRelationsId], references: [id])
+  hasRelationsId  Int
+  isInRelations   User @relation("isInRelations", fields: [isInRelationsId], references: [id])
+  isInRelationsId Int
+  RelationType    RelationStatus
+  request         RequestStatus
 
-  @@id([hasFriendsId, isFriendId])
+  @@id([hasRelationsId, isInRelationsId])
 }
 
 model Channel {
   id          Int  @id @default(autoincrement())
   createdAt   DateTime @default(now())
   name        String
+  avatar      String
   type        ChannelStatus
   password    String?
   invitation  Invitation[]

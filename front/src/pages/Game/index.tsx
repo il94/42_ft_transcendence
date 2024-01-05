@@ -166,7 +166,7 @@ function Game() {
 
 	useEffect(() => {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
-	}, [userAuthenticate.channels])
+	}, [userAuthenticate.channels.length])
 
 	//temporaire
 	// a supprimer quand la route qui renvoie les channels sera dispo

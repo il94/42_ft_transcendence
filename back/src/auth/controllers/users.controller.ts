@@ -8,7 +8,7 @@ import { UserEntity } from '../entities/user.entity';
 import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 
-// @UseGuards(JwtGuard)
+//@UseGuards(JwtGuard)
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
@@ -23,26 +23,29 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Get('me')
   async getMe(@getUser() user: User) {
-    console.log(user);
     return user;
   }
 
+  // RQPR touts les channels d'un user 
+  @Get('channels')
+  findOne(@Request() member: User) {
+    return this.usersService.findUserChannel(member);
+  }
+
   @Get(':id')
-  @ApiOkResponse({ type: UserEntity })
   async findById(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.usersService.findById(id));
+    return this.usersService.findById(id);
   }
 
   @Patch(':id')
-  @ApiCreatedResponse({ type: UserEntity })
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return new UserEntity(await this.usersService.updateUser(id, updateUserDto));
+  async update(@Param('id', ParseIntPipe) id: number, 
+  @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.usersService.remove(id));
+    return this.usersService.remove(id);
   }
 
 }

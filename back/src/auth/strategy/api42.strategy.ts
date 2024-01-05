@@ -9,15 +9,17 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
         super({
             clientID: process.env.FORTYTWO_APP_ID,
             clientSecret: process.env.FORTYTWO_APP_SECRET,
-            callbackURL: 'http://localhost:3333/api/auth/api42/redirect',
+            callbackURL: 'http://localhost:3333/auth/api42/callback',
         });
     }
     async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
-        const user = this.authService.validate42User({ email: profile.emails[0].value, username: profile.username }); 
-        console.log ("User valide : ", user);
-        return user;
+        const token = this.authService.validate42User({ email: profile.emails[0].value, username: profile.username });
+        return token;
     }
 }
+
+//validate(accessToken: string, refreshToken: string, profile: FortyTwoUser,): FortyTwoUser {return profile;}
+
 
 // First elements of profile object from api42
 // id: '108965',

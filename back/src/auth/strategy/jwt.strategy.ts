@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		secretOrKey: process.env.JWT_SECRET,
 	});
   }
-
+  
   async validate(payload: {sub: number; username: string; }) {
     const user = await this.prisma.user.findUnique({
         where: {
@@ -20,7 +20,32 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         },
       });
     delete user.hash;
-    console.log("user valide: ", user);
+    delete user.twoFASecret;
     return user;
+  }
+}
+
+@Injectable()
+export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
+  constructor(private readonly prisma: PrismaService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: 'secret',
+    });
+  }
+
+  async validate(payload: any) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    if (!user.twoFA) {
+      return user;
+    }
+    if (payload.isTwoFAuthenticated) {
+      return user;
+    }
   }
 }

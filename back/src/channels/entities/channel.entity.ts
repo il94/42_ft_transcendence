@@ -8,6 +8,7 @@ export class ChannelEntity implements Channel {
 	id:			number;
 	createdAt:	Date;
 	name:       string;
+	avatar:		string;
 	type:       ChannelStatus;
 	password:	string;
 	invitation: Invitation[];

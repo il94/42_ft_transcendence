@@ -33,6 +33,7 @@ export class CreateUserDto implements User {
 	phoneNumber: string;
 
 	twoFA: boolean;
+	twoFASecret: string; 
 
 	@IsString()
 	@IsOptional()

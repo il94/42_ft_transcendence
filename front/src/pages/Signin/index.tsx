@@ -76,10 +76,16 @@ function Signin() {
 
 			const response = await axios.post("http://localhost:3333/auth/signin", user)
 	
-			setToken(response.data.access_token)
-			localStorage.setItem('token', response.data.access_token)
-
-			navigate("/game")
+			//temporaire
+			if (response.data.twoFA)
+				navigate("/twofa")
+			else
+			{
+				setToken(response.data.access_token)
+				localStorage.setItem('token', response.data.access_token)
+				
+				navigate("/game")
+			}
 		}
 		catch (error) {
 			const axiosError = error as AxiosError
@@ -226,7 +232,7 @@ function Signin() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to="http://localhost:3333/auth/api42/login">
+						<LinkButtonImage to="http://localhost:3333/auth/api42">
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

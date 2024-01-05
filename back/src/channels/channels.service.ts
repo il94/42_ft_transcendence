@@ -12,62 +12,49 @@ export class ChannelsService {
   constructor(private prisma: PrismaService) {}
 
   async createChannel(createChannelDto: CreateChannelDto, creator: User) {
-    // creating channel
+    console.log("creator :", creator);
     const newChannel = await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,
+        avatar: createChannelDto.avatar,
         type: createChannelDto.type,
+        members: { 
+          create: [
+            {
+              role: 'OWNER',
+              user: {connect: { id: creator.id }}
+            }
+          ]  
+        },
       }
     })
-
-    // connecting channel-user
-    await this.prisma.channel.update({ where: { id: newChannel.id },
-      data: {
-        members: {
-          connect: [{ userId_channelId: { 
-            userId: creator.id, 
-            channelId: newChannel.id } }],
-          },
-      },
-    });
-
-    // defining user's role in channel
-    await this.prisma.channel.update({ where: { id: newChannel.id },
-      data: { members: {
-        update: { where: { userId_channelId: {
-                          userId: creator.id, 
-                          channelId: newChannel.id },
-                          },
-                  data: { role: 'OWNER' }
-                }
-        }} 
-    })
-
     // setting password
-    if (newChannel.type == ChannelStatus.PRIVATE || newChannel.type == ChannelStatus.PROTECTED ) {
+    if (newChannel.type == ChannelStatus.PRIVATE || newChannel.type == ChannelStatus.PROTECTED )
+    {
       await this.prisma.channel.update({ where: { id: newChannel.id },
         data: { password: await argon.hash(createChannelDto.password) } 
       })
     }
-
+    console.log("new channel ", newChannel);
     return newChannel;
-  }
-
-  // retrieve all user's channels
-  async findUserChannel(member: User) {
-    const userChannels = await this.prisma.user.findUnique({
-      where: { id: member.id },
-      include: { channels: true, }
-    })
-    return userChannels;
   }
 
   //retrieve all public channels
   async findAllChannels() {
     const publicChannels = await this.prisma.channel.findMany({
-      where: { type: 'PUBLIC' }
+      where: { type: 'PUBLIC' || 'PROTECTED' }
     })
     return publicChannels;
+  }
+
+  // 
+  async findChannel(chanId: number) {
+    const channel = await this.prisma.channel.findUnique({ 
+      where: { id: chanId }},
+    )
+    if (!channel)
+      throw new NotFoundException(`User with id ${chanId} is not related to channel id ${chanId}`);
+    return channel;
   }
 
   // decorer avec roleguard : le user doit etre owner ou admin 
@@ -96,12 +83,7 @@ export class ChannelsService {
 	        password:	updateChannelDto.password,
         } 
       })
-
-
-    } catch (error) {
-
-    }
-    
+    } catch (error) { }    
   }
 
   remove(id: number) {

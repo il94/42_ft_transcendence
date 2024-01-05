@@ -1,5 +1,18 @@
-import { PartialType } from '@nestjs/swagger';
+import { Relations, RelationStatus, RequestStatus } from "@prisma/client"
+import { IsNotEmpty } from "class-validator";
 
-export class CreateFriendDto {}
+export class RelationDto implements Relations {
+	
+	id: number;
+	createdAt: Date;
 
-export class UpdateFriendDto extends PartialType(CreateFriendDto) {}
+	@IsNotEmpty()
+	RelationType: RelationStatus;
+
+	request: RequestStatus;
+
+	hasRelationsId: number;
+	isInRelationsId: number;
+
+}
+

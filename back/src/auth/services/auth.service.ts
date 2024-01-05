@@ -6,6 +6,7 @@ import { UsersService } from "./users.service";
 import * as argon from 'argon2';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
+import { authenticator } from "otplib";
 
 @Injectable()
 export class AuthService {
@@ -20,11 +21,11 @@ export class AuthService {
 		return this.signToken(newUser.id, newUser.username);
 	}
 
-	async signin(dto: AuthDto) {
+	async validateUser(dto: AuthDto) {
 		try {
-			const user = await this.prisma.user.findUnique({
-				where: { username: dto.username, },
-			});
+			let user = await this.prisma.user.findUnique({
+					where: { username: dto.username, },
+				});
 			if (!user)
 				throw new BadRequestException('user not found');
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
@@ -33,36 +34,45 @@ export class AuthService {
 			return this.signToken(user.id, user.username)
 		} catch (error) {
             const err = error as Error;
-            console.log("ICI erreur: ", err.message);
-              throw new BadRequestException(err.message)
+            console.log("Validate user error: ", err.message);
+            throw new BadRequestException(err.message)
         }
 	}
 
-	// TODO proteger avec un try catch
-	async validate42User(profile: any) { // profile: any => profile: AuthDTO
-		const user = await this.prisma.user.findUnique({
-			where: { username: profile.username, },
-		});
-		if (!user) {
-			console.log ("jai pas trouve le user");
-			const newUser = await this.prisma.user.create({
-				data: {
-					username: profile.username,
-					hash: "00",
-					email: profile.email,
-					avatar: "string",
-					phoneNumber: profile.phoneNumber,
-					twoFA: false,
-					status: UserStatus.ONLINE,
-					wins: 0,
-					draws: 0,
-					losses: 0,
-				},
+	async validate42User(profile: any) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { username: profile.username, },
 			});
+			if (!user) {
+				console.log ("jai pas trouve le user");
+				profile.hash = "default";
+				const newUser = await this.userService.createUser(profile as CreateUserDto)
+				// const newUser = await this.prisma.user.create({
+				// 	data: {
+				// 		username: profile.username,
+				// 		hash: "00",
+				// 		email: profile.email,
+				// 		avatar: "string",
+				// 		twoFA: false,
+				// 		twoFASecret,
+				// 		status: UserStatus.ONLINE,
+				// 		wins: 0,
+				// 		draws: 0,
+				// 		losses: 0,
+				// 		phoneNumber,
+				// 	},
+				// });
+				if (!newUser)
+					throw new ForbiddenException('Failed to create new 42 user');
+				return this.signToken(newUser.id, newUser.username);
+			}
 			return this.signToken(user.id, user.username);
+		} catch (error) {
+			const err = error as Error;
+            console.log("Validate 42 user error: ", err.message);
+            throw new BadRequestException(err.message)
 		}
-		console.log("user data: ", user);
-		return this.signToken(user.id, user.username);
 	}
 
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
@@ -74,4 +84,32 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
+	async generateTwoFASecret(user: User) {
+		const secret = authenticator.generateSecret();
+
+		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
+		await this.userService.setTwoFASecret(secret, user.id);
+
+		return { secret, otpAuthURL };
+	}
+
+	async isTwoFACodeValid(twoFACode: string, user: User) {
+		return authenticator.verify({
+			token: twoFACode,
+			secret: user.twoFASecret,
+		  });
+	}
+
+	async loginWith2fa(userWithoutPsw: Partial<User>) {
+		const payload = {
+		  email: userWithoutPsw.email,
+		  isTwoFAOn: !!userWithoutPsw.twoFA,
+		  isTwoFAuthenticated: true,
+		};
+	
+		return {
+		  email: payload.email,
+		  access_token: await this.signToken(userWithoutPsw.id, userWithoutPsw.username),
+		};
+	}
 }
