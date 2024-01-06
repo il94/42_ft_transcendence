@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
-import { CreateChannelDto, UpdateChannelDto } from './dto';
+import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
@@ -14,9 +14,14 @@ export class ChannelController {
   constructor(private readonly channelsService: ChannelsService) {}
 
   @Post()
-  create(@Body() createChannelDto: CreateChannelDto, @Request() req) {
+  create(@Body() dto: CreateChannelDto, @Request() req) {
     console.log("req.user :", req.user);
-	  return this.channelsService.createChannel(createChannelDto, req.user);
+	  return this.channelsService.createChannel(dto, req.user);
+  }
+
+  @Post('join')
+  join(@Body() dto: AuthChannelDto, @Request() req) {
+    return this.channelsService.joinChannel(dto, req.user);
   }
 
   @Get()
@@ -28,24 +33,23 @@ export class ChannelController {
 
   // RQPR channel par son id => inutile
   @Get(':id')
-  findUserOne(@Param('id', ParseIntPipe) id: number) {
-    return this.channelsService.findChannel(id);
+  findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.channelsService.findOneChannel(id, req.user);
   }
 
-  @Patch(':id')
+  @Patch()
   update(@Param('id', ParseIntPipe) id: number, 
   @Body() dto: UpdateChannelDto, 
   @Request() member: User) {
     return this.channelsService.updateChannel(dto, member);
   }
 
-  @Patch(':id')
-  addUser(@Param('id', ParseIntPipe) id: number,  
+  @Patch('add/:user/in/:chan')
+  addUser(@Param('user', ParseIntPipe) user: number,
+  @Param('chan', ParseIntPipe) chan: number,
   @Request() member: User) {
-    return this.channelsService.addUserChannel(id, member);
+    return this.channelsService.addUserInChannel(user, member, chan);
   }
-
-
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {

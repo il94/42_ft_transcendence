@@ -31,5 +31,30 @@ export class CreateChannelDto implements Channel {
   }
 
 export class UpdateChannelDto extends PartialType(CreateChannelDto) {
-  id: number;
+
+  @IsString()
+  @MaxLength(8)
+  name:	string;
+
+  @IsString()
+  type:	ChannelStatus;
+
+  @IsOptional()
+  @IsString()
+  password:	string;
+  
+  @IsString()
+  @IsOptional()
+  avatar:	string;
+
+  members:	UsersOnChannels[];
+  
+  content:	Message[];
+}
+
+export class AuthChannelDto extends PartialType(CreateChannelDto) {
+
+	@IsString()
+	password:	string;
+	
 }

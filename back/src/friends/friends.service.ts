@@ -36,7 +36,7 @@ export class FriendsService {
 							hasRelationsId: userId,
 							isInRelationsId: friendId,
 							} }],
-						create : [{ isInRelationsId: friendId, 
+						create: [{ isInRelationsId: friendId, 
 							request: RequestStatus.ACCEPTED,
 							RelationType: RelationStatus.FRIEND }]
 					}}
