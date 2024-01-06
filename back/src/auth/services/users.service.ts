@@ -123,10 +123,17 @@ export class UsersService {
 
 	// retrieve all user's channels
 	async findUserChannel(member: User) {
-		const userChannels = await this.prisma.user.findUnique({
-			where: { id: member.id },
-			include: { channels: true, }
+
+		const channelsId = await this.prisma.usersOnChannels.findMany({
+			where: { userId: member.id }
 		})
+
+		const userChannels = await this.prisma.channel.findMany({
+			where: {
+				id: { in: channelsId.map((channelId) => (channelId.channelId)) }
+			}
+		})
+		
 		return userChannels;
-		}
+	}
 }

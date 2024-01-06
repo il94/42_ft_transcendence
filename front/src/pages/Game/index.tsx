@@ -81,6 +81,7 @@ function Game() {
 
 				/* ============ Temporaire ============== */
 
+				// appeler la route qui recupere les amis du user
 				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
 
 				const friendsResponse = await axios.get("http://localhost:3333/user", {
@@ -116,10 +117,7 @@ function Game() {
 
 		async function fetchChannels() {
 			try {
-
-				/* ============ Temporaire ============== */
-
-				const channelsResponse = await axios.get("http://localhost:3333/channel", {
+				const channelsResponse = await axios.get("http://localhost:3333/user/channels", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -166,7 +164,7 @@ function Game() {
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: false, // a recuperer depuis la reponse
-					friends: friends, // a recuperer depuis la reponse
+					friends: [], // a recuperer depuis la reponse
 					blockedUsers: [], // a recuperer depuis la reponse
 					channels: channels, // a recuperer depuis la reponse
 					socket: socket

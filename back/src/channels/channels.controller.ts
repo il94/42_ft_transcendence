@@ -15,7 +15,6 @@ export class ChannelController {
 
   @Post()
   create(@Body() dto: CreateChannelDto, @Request() req) {
-    console.log("req.user :", req.user);
 	  return this.channelsService.createChannel(dto, req.user);
   }
 
@@ -27,7 +26,6 @@ export class ChannelController {
   @Get()
   async findAll() {
     const channels = await this.channelsService.findAllChannels();
-    console.log("les channels : ", channels);
     return channels;
   }
 

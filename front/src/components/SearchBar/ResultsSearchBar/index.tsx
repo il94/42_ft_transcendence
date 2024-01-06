@@ -155,13 +155,17 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	async function addChannelToChannelList(channel: ChannelData) {
 		try {
-			if (!channel.users.includes(userAuthenticate))
+			// if (!channel.users.includes(userAuthenticate))
 			{
-				/* ============ Temporaire ============== */
-
-				// axios.post("http://localhost:3333/user/me/channels/${channel.id")
-
-				/* ============================================== */
+				const test = await axios.post(`http://localhost:3333/channel/join`, {
+					id: channel.id,
+					password: "salut"
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
 				channel.users.push(userAuthenticate)
 				userAuthenticate.channels.push(channel)
