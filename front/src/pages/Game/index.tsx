@@ -83,7 +83,11 @@ function Game() {
 
 				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
 
-				const friendsResponse = await axios.get("http://localhost:3333/user")
+				const friendsResponse = await axios.get("http://localhost:3333/user", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
 				// En attendant de pouvoir tester avec plusieurs Users
 				const friends: User[] = friendsResponse.data.map((friend: any) => ({

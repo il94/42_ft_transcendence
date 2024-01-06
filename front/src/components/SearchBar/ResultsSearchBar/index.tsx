@@ -178,7 +178,11 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		async function fetchUsersAndChannels() {
 			try {
 
-				const userResponse = await axios.get("http://localhost:3333/user")
+				const userResponse = await axios.get("http://localhost:3333/user", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
 				setUsers(userResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
