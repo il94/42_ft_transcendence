@@ -9,7 +9,7 @@ import DefaultPurpleAvatar from "../assets/default_purple.png"
 import DefaultRedAvatar from "../assets/default_red.png"
 import DefaultYellowAvatar from "../assets/default_yellow.png"
 
-export function getStatus(status: string): userStatus
+export function convertBackStatus(status: string): userStatus
 {
 	if (status === "ONLINE")
 		return (userStatus.ONLINE)

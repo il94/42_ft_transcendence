@@ -46,7 +46,7 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, userSomeone } from '../../temp/temp'
-import { getStatus } from '../../utils/functions'
+import { convertBackStatus } from '../../utils/functions'
 
 function Game() {
 
@@ -98,7 +98,7 @@ function Game() {
 
 					return {
 						...rest,
-						status: getStatus(friend.status),
+						status: convertBackStatus(friend.status),
 						scoreResume: {
 							wins: wins,
 							draws: draws,
