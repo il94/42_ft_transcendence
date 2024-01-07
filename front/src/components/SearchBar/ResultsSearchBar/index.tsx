@@ -26,7 +26,7 @@ import InteractionContext from "../../../contexts/InteractionContext"
 
 import { sortChannelByName, sortUserByName } from "../../../utils/functions"
 
-import { ChannelData, User } from "../../../utils/types"
+import { ChannelData, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
 import { getRandomStatus } from "../../../temp/temp"
@@ -132,7 +132,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 	const [channels, setChannels] = useState<ChannelData[]>([])
 	const [channelsFound, setChannelsFound] = useState<ChannelData[]>([])
 
-	const { userAuthenticate, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	async function addUserToFriendList(user: User) {
@@ -155,11 +155,13 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	async function addChannelToChannelList(channel: ChannelData) {
 		try {
+			// temporaire
+			// Condition OK, a decommenter quand les infos de relation du channel seront retournees par le back
 			// if (!channel.users.includes(userAuthenticate))
 			{
-				const test = await axios.post(`http://localhost:3333/channel/join`, {
+				await axios.post(`http://localhost:3333/channel/join`, {
 					id: channel.id,
-					password: "salut"
+					password: "salut" // temporaire
 				},
 				{
 					headers: {
@@ -167,8 +169,16 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
-				channel.users.push(userAuthenticate)
-				userAuthenticate.channels.push(channel)
+				// temporaire
+				// Crash si l'on tente d'ouvrir le channel car il manque les infos de relation du channel 
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					channels: [ ...prevState.channels, channel]
+				}))
+
+				// temporaire
+				// Code OK, a decommenter quand les infos de relation du channel seront retournees par le back
+				// channel.users.push(userAuthenticate)
 			}
 			setChannelTarget(channel)
 			displayChat(true)
