@@ -31,7 +31,6 @@ export type UserAuthenticate = User & {
 
 export type ChannelData = {
 	id: number,
-	createdAt?: string,
 	name: string,
 	avatar: string,
 	type: channelStatus,
