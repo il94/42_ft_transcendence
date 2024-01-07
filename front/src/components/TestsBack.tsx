@@ -106,7 +106,7 @@ function TestsBack() {
 			{
 				let test = await axios.post("http://localhost:3333/auth/signup",
 					{
-						name: `user_${i}`,
+						username: `user_${i}`,
 						hash: "123456",
 						email: `user_${i}@test.fr`,
 						avatar: getRandomDefaultAvatar(),
