@@ -57,9 +57,3 @@ export function sortUserByStatus(a: User, b: User) {
 
 	return (aValue - bValue)
 }
-
-export function deleteScoreFormatFromBack(friend: any) {
-	delete friend.wins
-	delete friend.draws
-	delete friend.losses
-}

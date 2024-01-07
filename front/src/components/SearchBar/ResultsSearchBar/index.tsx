@@ -181,27 +181,28 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
-
-				const userResponse = await axios.get("http://localhost:3333/user", {
+				const usersResponse = await axios.get("http://localhost:3333/user", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				setUsers(userResponse.data.filter((user: User) => (
+				setUsers(usersResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
-				)).map((user: any) => ({
-					// temporaire
-					// En attendant de pouvoir tester avec plusieurs Users
-					// Wins Draws et Looses en trop !
-					...user ,
-					status: getRandomStatus(),
-					scoreResume: {
-						wins: user.wins,
-						draws: user.draws,
-						losses: user.losses
+				)).map((user: any) => {
+
+					const { wins, draws, losses, ...rest } = user
+
+					return {
+						...rest ,
+						status: getRandomStatus(),
+						scoreResume: {
+							wins: wins,
+							draws: draws,
+							losses: losses
+						}
 					}
-				})).sort(sortUserByName))
+				}).sort(sortUserByName))
 
 				const channelsResponse = await axios.get("http://localhost:3333/channel", {
 					headers: {

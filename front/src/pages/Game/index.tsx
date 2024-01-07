@@ -46,7 +46,7 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, userSomeone } from '../../temp/temp'
-import { deleteScoreFormatFromBack, getStatus } from '../../utils/functions'
+import { getStatus } from '../../utils/functions'
 
 function Game() {
 
@@ -90,25 +90,24 @@ function Game() {
 					}
 				})
 
-				// En attendant de pouvoir tester avec plusieurs Users
-				const friends: User[] = friendsResponse.data.map((friend: any) => ({
+				/* ====================================== */
 
-					...friend,
-					//temporaire
-					// status: getRandomStatus(),
-					status: getStatus(friend.status),
-					scoreResume: {
-						wins: friend.wins,
-						draws: friend.draws,
-						losses: friend.losses
+				const friends: User[] = friendsResponse.data.map((friend: any) => {
+
+					const { wins, draws, losses, ...rest } = friend
+
+					return {
+						...rest,
+						status: getStatus(friend.status),
+						scoreResume: {
+							wins: wins,
+							draws: draws,
+							losses: losses
+						}
 					}
-				}))
-
-				friends.forEach(deleteScoreFormatFromBack)
+				})
 
 				return (friends)
-
-				/* ====================================== */
 			}
 			catch (error) {
 				throw (error)
