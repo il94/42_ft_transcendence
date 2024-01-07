@@ -1,9 +1,9 @@
 export enum userStatus {
 	ONLINE = "Online",
-	OFFLINE = "Offline",
 	PLAYING = "Playing",
 	WAITING = "Looking for a game...",
-	WATCHING = "Spectator"
+	WATCHING = "Spectator",
+	OFFLINE = "Offline"
 }
 
 export enum challengeStatus {
