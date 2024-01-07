@@ -6,18 +6,19 @@ type PropsPaddle = {
 	Hposition: number;
 	Vposition: number;
 }
+
 const Style = styled.div<{ Hposition: number ; Vposition: number }>`
 
 	position: absolute;
 	
-	width: 20px;
-	height: 150px;
+	width: 1%;
+	height: 18%;
 	
 	top: ${(props) => props.Vposition}%;
 	left: ${(props) => props.Hposition}%;
 
 	transform: translate(-50%, -50%);
-	transition: top 0.2s linear, left 0.2s linear;
+	/* transition: top 0.1s linear, left 0.1s linear; */
 
 	background-color: white;
 `

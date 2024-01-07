@@ -307,8 +307,6 @@ function Game() {
 													userAuthenticate={userAuthenticate}
 													displaySettingsMenu={displaySettingsMenu} />
 											}
-											{/* /* <TestsBack /> */}
-											<PongWrapper/>
 											{
 												card &&
 												<Card
@@ -316,6 +314,8 @@ function Game() {
 													displayCard={displayCard}
 													userTarget={userTarget} />
 											}
+											{/* /* <TestsBack /> */}
+											<PongWrapper/>
 											{
 												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
