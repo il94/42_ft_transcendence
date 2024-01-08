@@ -11,11 +11,19 @@ export class UsersService {
 
 	async createUser(createUserDto: CreateUserDto) {
 		try {
-			const userExists = await this.prisma.user.findUnique({
-				where: { email: createUserDto.email },
+			const userExists = await this.prisma.user.findMany({
+				where: { OR: [
+					{
+						email: createUserDto.email
+					}, 
+					{
+						username: createUserDto.username 
+					}
+				],}
 			})
-			if (userExists)
+			if (userExists[0])
 				throw new BadRequestException("User already exists");
+			console.log("HERE")
 			const hash = await argon.hash(createUserDto.hash);
 			const user = await this.prisma.user.create({
 				data: {
