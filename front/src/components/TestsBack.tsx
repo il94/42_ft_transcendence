@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import styled from "styled-components"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
@@ -192,6 +192,32 @@ function TestsBack() {
 		}
 	}
 
+	async function deleteChannels() {
+		try {
+			let i = 0
+
+			const channels: AxiosResponse = await axios.get("http://localhost:3333/channel", {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			while (i < channels.data.length)
+			{
+				console.log("ID = ", channels.data[i].id)
+				let test = await axios.delete(`http://localhost:3333/channel/${channels.data[i].id}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+					}
+				)
+				console.log("CHANNEL", i, " = ", test)
+				i++
+			}
+		}
+		catch (error) {
+			console.log(error)
+		}
+	}
 
 	return (
 		<Style>
@@ -214,6 +240,9 @@ function TestsBack() {
 			</Bout>
 			<Bout onClick={postChannels}>
 				post channels
+			</Bout>
+			<Bout onClick={deleteChannels}>
+				delete channels
 			</Bout>
 
 		</Style>

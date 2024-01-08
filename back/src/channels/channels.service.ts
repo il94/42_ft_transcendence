@@ -23,15 +23,14 @@ export class ChannelsService {
     return publicChannels;
   }
 
-  async findOneChannel(chanId: number, member: User) {
-    const channel = await this.prisma.usersOnChannels.findUnique({ 
-      where: { userId_channelId: {
-        userId: member.id,
-        channelId: chanId }
-      }},
-    )
+  async findOneChannel(chanId: number) {
+    const channel = await this.prisma.channel.findUnique({ 
+      where: { 
+        id: chanId
+      }
+    })
     if (!channel)
-      throw new NotFoundException(`User with id ${member.id} is not related to channel id ${chanId}`);
+      throw new NotFoundException(`Channel with id ${chanId} not found`);
     return channel;
   }
 
@@ -69,11 +68,19 @@ export class ChannelsService {
     return channel;
   }
 
+
   async isInChannel(userId: number, chanId: number) {
-    const inChannel = await this.prisma.usersOnChannels.findUnique({ where: {
-      userId_channelId: { userId: userId, channelId: chanId} }});
-    return inChannel;
-  }
+    
+    const inChannel = await this.prisma.usersOnChannels.findUnique({
+      where: {
+       userId_channelId: {
+        userId: userId,
+        channelId: chanId
+      }
+    }});
+
+  return inChannel;
+}
 
   async joinChannel(dto: AuthChannelDto, user: User) {
     try {
@@ -141,21 +148,18 @@ export class ChannelsService {
     }   
   }
 
-  async updateChannel(dto: UpdateChannelDto, user: User) {
+  async updateChannel(chanId: number, dto: UpdateChannelDto, user: User) {
     try {
-      const chan = await this.findChannel(dto.id);
-      
+      const chan = await this.findChannel(chanId);
       const inChan = await this.isInChannel(user.id, chan.id)
       if (!inChan)
         throw new NotFoundException(`User ${user.id} is not in channel ${chan.id}`);
-
       if (chan.password) {
         const pwdMatch = await argon.verify(chan.password, dto.password);
 			if (!pwdMatch)
 				throw new ForbiddenException('incorrect password');
       }
-
-      if (inChan.role === Role.USER || !inChan.role)
+      if (inChan.role !== Role.OWNER || !inChan.role)
         throw new ForbiddenException(`User ${user.id} has not required role for this action`);
       
         const updateChannel = await this.prisma.channel.update({ where: { id: chan.id}, 
@@ -169,9 +173,22 @@ export class ChannelsService {
     } catch (error) { }    
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} channel`;
-  }
+  async remove(id: number) {
+  
+    const deleteRelations = await this.prisma.usersOnChannels.deleteMany({
+      where: {
+        channelId: id
+      }
+    })
+
+		const deleteChannel = await this.prisma.channel.delete({
+      where: {
+        id: id
+      }
+    });
+		return deleteChannel;
+	}
+
 
   /****************************** CRUD USER ON CHANNEL ***********************/
 

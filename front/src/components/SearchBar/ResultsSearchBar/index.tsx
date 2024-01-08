@@ -161,7 +161,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 			{
 				await axios.post(`http://localhost:3333/channel/join`, {
 					id: channel.id,
-					password: "salut" // temporaire
+					password: "mdp" // temporaire
 				},
 				{
 					headers: {
