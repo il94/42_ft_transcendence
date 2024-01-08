@@ -12,11 +12,11 @@ import UserInvitation from "./UserInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { ChannelData, MessageInvitation, MessageText } from "../../../../utils/types"
+import { Channel, MessageInvitation, MessageText } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
 
 type PropsDiscussion = {
-	channel: ChannelData
+	channel: Channel
 }
 
 function Discussion({ channel } : PropsDiscussion) {

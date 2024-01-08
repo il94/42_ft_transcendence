@@ -7,7 +7,7 @@ import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
-import { ChannelData, User, UserAuthenticate } from "../../../utils/types"
+import { Channel, User, UserAuthenticate } from "../../../utils/types"
 
 type PropsSecondaryContextualMenu = {
 	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
@@ -19,13 +19,13 @@ type PropsSecondaryContextualMenu = {
 		bottom?: number
 	},
 	secondaryContextualMenuHeight: number,
-	channels: ChannelData[] | undefined,
+	channels: Channel[] | undefined,
 	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
 }
 
 function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu }: PropsSecondaryContextualMenu) {
 
-	async function handleInviteClickEvent(channel: ChannelData) {
+	async function handleInviteClickEvent(channel: Channel) {
 		try {
 			if (!channel.users.includes(userTarget)) {
 				/* ============ Temporaire ============== */

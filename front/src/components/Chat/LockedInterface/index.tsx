@@ -5,12 +5,12 @@ import { ErrorMessage, Input, Style, Text } from "./style"
 
 import Button from "../../../componentsLibrary/Button"
 
-import { ChannelData } from "../../../utils/types"
+import { Channel } from "../../../utils/types"
 import InteractionContext from "../../../contexts/InteractionContext"
 import { chatWindowStatus } from "../../../utils/status"
 
 type PropsLockedInterface = {
-	channelTarget: ChannelData,
+	channelTarget: Channel,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
 }
 

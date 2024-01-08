@@ -3,7 +3,7 @@ import styled from "styled-components"
 import TextInput from "./TextInput"
 import Discussion from "./Discussion"
 
-import { ChannelData } from "../../../utils/types"
+import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
 import { Dispatch, SetStateAction } from "react"
@@ -20,8 +20,8 @@ const Style = styled.div`
 `
 
 type PropsChatInterface = {
-	channel: ChannelData,
-	setChannel: Dispatch<SetStateAction<ChannelData>>
+	channel: Channel,
+	setChannel: Dispatch<SetStateAction<Channel>>
 }
 
 function ChatInterface({ channel, setChannel }: PropsChatInterface) {

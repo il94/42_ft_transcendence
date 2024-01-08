@@ -29,14 +29,14 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { ChannelData } from "../../../utils/types"
+import { Channel } from "../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 
 import RemoveIcon from "../../../assets/close.png"
 import DefaultChannelIcon from "../../../assets/default_channel.png"
 
 type PropsChannelInterface = {
-	channel: ChannelData | undefined,
+	channel: Channel | undefined,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	setBannerName: Dispatch<SetStateAction<string>>
@@ -107,7 +107,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					}
 				})
 
-				const newChannel: ChannelData | undefined = {
+				const newChannel: Channel | undefined = {
 					id: postChannelResponse.data.id,
 					name: name.value,
 					avatar: avatar,

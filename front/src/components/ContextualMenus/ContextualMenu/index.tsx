@@ -15,7 +15,7 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 
-import { ChannelData, MessageInvitation, User } from "../../../utils/types"
+import { Channel, MessageInvitation, User } from "../../../utils/types"
 import {
 	challengeStatus,
 	channelStatus,
@@ -104,7 +104,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				setChannelTarget(findResult)
 			else
 			{
-				const newChannel: ChannelData = {
+				const newChannel: Channel = {
 					id: -1, //???
 					name: userTarget.username,
 					avatar: userTarget.avatar,
@@ -174,7 +174,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				}
 				else
 				{
-					const newChannel: ChannelData = {
+					const newChannel: Channel = {
 						id: -1, //???
 						name: userTarget.username,
 						avatar: userTarget.avatar,

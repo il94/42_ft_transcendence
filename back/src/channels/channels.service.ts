@@ -27,10 +27,28 @@ export class ChannelsService {
     const channel = await this.prisma.channel.findUnique({ 
       where: { 
         id: chanId
+      },
+      include: {
+        members: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+                wins: true,
+                draws: true,
+                losses : true     
+              }
+            },
+            role: true
+          }
+        }
       }
     })
     if (!channel)
       throw new NotFoundException(`Channel with id ${chanId} not found`);
+
     return channel;
   }
 

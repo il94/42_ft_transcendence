@@ -26,10 +26,10 @@ export type UserAuthenticate = User & {
 	twoFA: boolean,
 	friends: User[],
 	blockedUsers: User[],
-	channels: ChannelData[]
+	channels: Channel[]
 }
 
-export type ChannelData = {
+export type Channel = {
 	id: number,
 	name: string,
 	avatar: string,
