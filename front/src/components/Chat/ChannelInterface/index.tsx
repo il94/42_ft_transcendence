@@ -70,18 +70,19 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 
 					/* ============ Temporaire ============== */
 
-					const patchChannelResponse = await axios.patch(`http://localhost:3333/channel/${channel.id}`,
-					{
-						name: name.value,
-						type: channelType.toUpperCase(), // pour les status du back
-						password: password,
-						avatar: avatar
-					},
-					{
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
+					// Route a test
+					// const patchChannelResponse = await axios.patch(`http://localhost:3333/channel/${channel.id}`,
+					// {
+					// 	name: name.value,
+					// 	type: channelType.toUpperCase(), // pour les status du back
+					// 	password: password,
+					// 	avatar: avatar
+					// },
+					// {
+					// 	headers: {
+					// 		'Authorization': `Bearer ${token}`
+					// 	}
+					// })
 	
 					/* ====================================== */
 

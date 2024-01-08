@@ -25,8 +25,8 @@ export class ChannelsGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Connected');
+      // console.log(socket.id);
+      // console.log('Connected');
     })
   }
 
@@ -41,7 +41,7 @@ export class ChannelsGateway implements OnModuleInit {
   // }
 
   handleDisconnect(client: Socket) {
-    console.log(`Disconnected: ${client.id}`);
+    // console.log(`Disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('newMessage')
@@ -59,7 +59,7 @@ handlePrivateMessage(client: any, data: any) {
 }
 
   handleConnection(client: Socket, ...args: any[]) {
-    console.log(`Connected ${client.id}`);
+    // console.log(`Connected ${client.id}`);
   }
 
   @SubscribeMessage('createChannel')
