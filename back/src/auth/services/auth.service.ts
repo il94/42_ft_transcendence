@@ -48,21 +48,6 @@ export class AuthService {
 				console.log ("jai pas trouve le user");
 				profile.hash = "default";
 				const newUser = await this.userService.createUser(profile as CreateUserDto)
-				// const newUser = await this.prisma.user.create({
-				// 	data: {
-				// 		username: profile.username,
-				// 		hash: "00",
-				// 		email: profile.email,
-				// 		avatar: "string",
-				// 		twoFA: false,
-				// 		twoFASecret,
-				// 		status: UserStatus.ONLINE,
-				// 		wins: 0,
-				// 		draws: 0,
-				// 		losses: 0,
-				// 		phoneNumber,
-				// 	},
-				// });
 				if (!newUser)
 					throw new ForbiddenException('Failed to create new 42 user');
 				return user;
@@ -80,7 +65,7 @@ export class AuthService {
 			sub: userId,
 			username
 		};
-		const token =  await this.jwt.signAsync(payload, { expiresIn: '50m', secret: process.env.JWT_SECRET })
+		const token =  await this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET })
 		return { access_token: token, }
 	}
 

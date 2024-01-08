@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client"
 import {
 	userStatus,
 	challengeStatus,
@@ -14,9 +15,11 @@ export type User = {
 	scoreResume: {
 		wins: number,
 		draws: number,
-		looses: number
-	}
+		losses: number
+	},
+	socket: Socket | undefined
 }
+
 export type UserAuthenticate = User & {
 	email: string,
 	phoneNumber: string,
@@ -28,7 +31,6 @@ export type UserAuthenticate = User & {
 
 export type ChannelData = {
 	id: number,
-	createdAt?: string,
 	name: string,
 	avatar: string,
 	type: channelStatus,

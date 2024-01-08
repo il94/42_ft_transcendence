@@ -6,7 +6,7 @@ import {
 	useContext,
 	useState
 } from "react"
-// import axios from "axios"
+import axios from "axios"
 
 import {
 	Avatar,
@@ -27,6 +27,7 @@ import IconUploadFile, { HiddenInput } from "../../../componentsLibrary/IconUplo
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
+import AuthContext from "../../../contexts/AuthContext"
 
 import { ChannelData } from "../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
@@ -42,6 +43,8 @@ type PropsChannelInterface = {
 }
 
 function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBannerName }: PropsChannelInterface) {
+
+	const { token } = useContext(AuthContext)!
 
 	const [error, setError] = useState<boolean>(false)
 
@@ -61,47 +64,33 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 		if (name.error)
 			return
 
-		const newChannel: ChannelData | undefined = {
-			id: -1, // ???
-			name: name.value,
-			avatar: avatar,
-			type: channelType,
-			password: password,
-			messages: [],
-			owner: userAuthenticate,
-			administrators: [
-				userAuthenticate
-			],
-			users: [
-				userAuthenticate
-			],
-			validUsers: [
-				userAuthenticate
-			],
-			mutedUsers: [],
-			bannedUsers: [],
-		}
-
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
-					newChannel.messages = channel.messages
-					newChannel.administrators = channel.administrators
-					newChannel.users = channel.users
-					newChannel.validUsers = channel.validUsers
-					newChannel.mutedUsers = channel.mutedUsers
-					newChannel.bannedUsers = channel.bannedUsers
 
 					/* ============ Temporaire ============== */
 
-					// await axios.patch("http://localhost:3333/channel/:id", newChannel)
-
+					const patchChannelResponse = await axios.patch(`http://localhost:3333/channel/${channel.id}`,
+					{
+						name: name.value,
+						type: channelType.toUpperCase(), // pour les status du back
+						password: password,
+						avatar: avatar
+					},
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+	
 					/* ====================================== */
 
 					channel.name = name.value
 					channel.type = channelType
 					channel.password = password
 					channel.avatar = avatar
+
+					setChannelTarget(channel)
 				}
 				else
 					throw new Error
@@ -110,15 +99,43 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 
 			}
 			else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
-				/* ============ Temporaire ============== */
+				const postChannelResponse = await axios.post("http://localhost:3333/channel",
+				{
+					name: name.value,
+					type: channelType.toUpperCase(), // pour les status du back
+					password: password,
+					avatar: avatar
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// await axios.post("http://localhost:3333/channel", newChannel)
-
-				/* ====================================== */
+				const newChannel: ChannelData | undefined = {
+					id: postChannelResponse.data.id,
+					name: name.value,
+					avatar: avatar,
+					type: channelType,
+					password: password,
+					messages: [],
+					owner: userAuthenticate,
+					administrators: [
+						userAuthenticate
+					],
+					users: [
+						userAuthenticate
+					],
+					validUsers: [
+						userAuthenticate
+					],
+					mutedUsers: [],
+					bannedUsers: [],
+				}
 
 				userAuthenticate.channels.push(newChannel)
+				setChannelTarget(newChannel)
 			}
-			setChannelTarget(newChannel)
 		}
 		catch (error) {
 			setError(true)

@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FocusEvent, FormEvent, SetStateAction, useContext, useState } from "react"
+import { ChangeEvent, Dispatch, FocusEvent, FormEvent, SetStateAction, useContext, useEffect, useState } from "react"
 // import axios from "axios"
 
 import { Input, Style } from "./style"
@@ -9,24 +9,36 @@ import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { ChannelData } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
+import { Socket } from "socket.io-client"
 
 type PropsTextInput = {
+	channel: ChannelData,
 	setChannel: Dispatch<SetStateAction<ChannelData>>
 }
 
-function TextInput({ setChannel }: PropsTextInput) {
+
+function TextInput({ channel,  setChannel }: PropsTextInput) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 
 	const { userAuthenticate } = useContext(InteractionContext)!
 
-	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+	const [arraySocket, setArraySocket] = useState<Socket[]>([])
 
+	// useEffect(() => {
+	// 	setArraySocket(channel.users.map((user) => (
+	// 		user.socket
+	// 	)))
+	// }, [channel.users])
+	
+
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		if (message === '')
 			return
 		try {
+			userAuthenticate.socket.emit("sendMsg", message)
 
 			/* ============ Temporaire ============== */
 
@@ -37,6 +49,9 @@ function TextInput({ setChannel }: PropsTextInput) {
 			// })
 
 			// if ()
+
+		
+
 			setChannel((prevState) => ({
 				...prevState,
 				messages: [

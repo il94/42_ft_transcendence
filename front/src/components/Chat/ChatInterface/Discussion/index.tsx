@@ -13,9 +13,7 @@ import ChatContext from "../../../../contexts/ChatContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { ChannelData, MessageInvitation, MessageText } from "../../../../utils/types"
-import { challengeStatus, messageStatus } from "../../../../utils/status"
-
-import { TempContext } from "../../../../temp/temp"
+import { messageStatus } from "../../../../utils/status"
 
 type PropsDiscussion = {
 	channel: ChannelData
@@ -24,34 +22,6 @@ type PropsDiscussion = {
 function Discussion({ channel } : PropsDiscussion) {
 
 	const { userAuthenticate } = useContext(InteractionContext)!
-
-	const { userSomeone } = useContext(TempContext)!
-
-	// temporaire
-	useEffect(() => {
-
-		const randomIndex = Math.floor(Math.random() * 2)
-		
-		if (randomIndex == 0)
-		{
-			channel.messages.push({
-				id: 1,
-				sender: userSomeone,
-				type: messageStatus.TEXT,
-				content: "tg"
-			})
-		}
-		else
-		{
-			channel.messages.push({
-				id: 7,
-				sender: userSomeone,
-				type: messageStatus.INVITATION,
-				target: userAuthenticate,
-				status: challengeStatus.PENDING
-			})
-		}
-	}, [channel.messages])
 
 	const { chatRender, setChatRender } = useContext(ChatContext)!
 
@@ -65,6 +35,7 @@ function Discussion({ channel } : PropsDiscussion) {
 					}}
 					activeState>
 					{
+						channel.messages && // condition temporaire, a supprimer quand les messages du channel seront retournees par le back
 						channel.messages.map((message, index) => (
 							message.sender.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?

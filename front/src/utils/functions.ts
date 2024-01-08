@@ -1,5 +1,5 @@
 import { userStatus } from "./status"
-import { User } from "./types"
+import { ChannelData, User } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -9,18 +9,18 @@ import DefaultPurpleAvatar from "../assets/default_purple.png"
 import DefaultRedAvatar from "../assets/default_red.png"
 import DefaultYellowAvatar from "../assets/default_yellow.png"
 
-export function getStatus(status: string)
+export function getStatus(status: string): userStatus
 {
 	if (status === "ONLINE")
 		return (userStatus.ONLINE)
-	else if (status === "OFFLINE")
-		return (userStatus.OFFLINE)
 	else if (status === "PLAYING")
 		return (userStatus.PLAYING)
 	else if (status === "WAITING")
 		return (userStatus.WAITING)
 	else if (status === "WATCHING")
 		return (userStatus.WATCHING)
+	else
+		return (userStatus.OFFLINE)
 }
 
 export function getRandomDefaultAvatar(): string {
@@ -42,6 +42,10 @@ export function getRandomDefaultAvatar(): string {
 
 export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
+}
+
+export function sortChannelByName(a: ChannelData, b: ChannelData) {
+	return (a.name.localeCompare(b.name))
 }
 
 export function sortUserByStatus(a: User, b: User) {

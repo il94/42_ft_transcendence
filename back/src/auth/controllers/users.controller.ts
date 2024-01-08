@@ -27,8 +27,8 @@ export class UsersController {
 
   // RQPR touts les channels d'un user 
   @Get('channels')
-  findOne(@Request() member: User) {
-    return this.usersService.findUserChannel(member);
+  findOne(@getUser() user: User) {
+    return this.usersService.findUserChannel(user);
   }
 
   @Get(':id')

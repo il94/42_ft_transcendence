@@ -28,7 +28,9 @@ function ChatInterface({ channel, setChannel }: PropsChatInterface) {
 	return (
 		<Style>
 			<Discussion channel={channel} />
-			<TextInput setChannel={setChannel} />
+			<TextInput
+				channel={channel}
+				setChannel={setChannel} />
 		</Style>
 	)
 }

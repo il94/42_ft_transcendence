@@ -24,6 +24,13 @@ Game/ :
 -GET http://localhost:3333/user/me/friends :
 	A implementer, doit permettre de recuperer les amis du user authentifie
 
+TwoFA/ :
+-POST http://localhost:3333/auth/signin/twofa : (Url a definir)
+	A implementer, doit permettre de dire au twoFA d'envoyer un code
+
+-POST http://localhost:3333/auth/signin/twofa : (Url a definir)
+	A implementer, doit permettre de soumettre un code pour le twoFA
+
 MatchHistory/ :
 -GET http://localhost:3333/user/:id/history :
 	A implementer, doit permettre de recuperer l'historique du user

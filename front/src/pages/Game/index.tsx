@@ -5,7 +5,8 @@ import {
 	useState
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
+import io from 'socket.io-client';
 
 import {
 	GamePage,
@@ -17,7 +18,7 @@ import {
 } from './style'
 
 import Logo from '../../components/Logo'
-import SearchBarWrapper from '../../components/SearchBarWrapper'
+import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
@@ -44,7 +45,8 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
+import { TempContext, userSomeone } from '../../temp/temp'
+import { getStatus } from '../../utils/functions'
 
 function Game() {
 
@@ -74,51 +76,67 @@ function Game() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
-		async function fetchFriends() {
+		async function fetchFriends(): Promise<User[]> {
 			try {
 
 				/* ============ Temporaire ============== */
 
+				// appeler la route qui recupere les amis du user
 				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
 
-				const friendsResponse = await axios.get("http://localhost:3333/user", {
+				const friendsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				// En attendant d'avoir le scoreResume retourne par le back
-				const tempFriendsResponse: User[] = friendsResponse.data.map((friend: User) => ({
-					...friend,
-					//temporaire
-					status: getRandomStatus(),
-					// status: getStatus(friend.status),
-					scoreResume: {
-						wins: 0,
-						draws: 0,
-						looses: 0
-					}
-				}))
-
-				return (tempFriendsResponse.slice(0, 10))
-
 				/* ====================================== */
+
+				const friends: User[] = friendsResponse.data.map((friend: any) => {
+
+					const { wins, draws, losses, ...rest } = friend
+
+					return {
+						...rest,
+						status: getStatus(friend.status),
+						scoreResume: {
+							wins: wins,
+							draws: draws,
+							losses: losses
+						}
+					}
+				})
+
+				return (friends)
 			}
 			catch (error) {
 				throw (error)
 			}
 		}
 
-		async function fetchChannels() {
+		async function fetchChannels(): Promise<ChannelData[]> {
 			try {
+				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				/* ============ Temporaire ============== */
+				// temporaire
+				// Ajouter les infos de relation du channel quand elles seront retournees par le back
+				const channels: ChannelData[] = channelsResponse.data.map((channel: ChannelData) => ({
+					...channel,
+					messages: [],
+					owner: userSomeone,
+					administrators: [],
+					users: [],
+					validUsers: [],
+					mutedUsers: [],
+					bannedUsers: []
 
-				// const channelsResponse = await axios.get("http://localhost:3333/user/me/channels")
-				const channelsResponse: ChannelData[] = []
-				return (channelsResponse)
+				}))
 
-				/* ====================================== */
+				return (channels)
 			}
 			catch (error) {
 				throw (error)
@@ -127,45 +145,45 @@ function Game() {
 
 		async function fetchMe() {
 			try {
-				const friends = await fetchFriends()
-				const channels = await fetchChannels()
+				const friends: User[] = await fetchFriends()
+				const channels: ChannelData[] = await fetchChannels()
 
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
+				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				const test = await axios.get("http://localhost:3333/friends", {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
-
-				console.log(test)
+				const socket = io('http://localhost:3333', { transports: ["websocket"]} );
+		
+				socket.on('connect_error', (error) => {
+					console.error('Erreur de connexion à la socket :', error.message);
+					throw new Error;
+				});
 				
 				setUserAuthenticate({
 					id: responseMe.data.id,
 					username: responseMe.data.username,
 					avatar: responseMe.data.avatar,
 					status: userStatus.ONLINE,
-					// temporaire
-					scoreResume: { // a recuperer depuis la reponse
-						wins: 100,
-						draws: 1,
-						looses: 0
+					scoreResume: {
+						wins: responseMe.data.wins,
+						draws: responseMe.data.draws,
+						losses: responseMe.data.losses
 					},
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
-					twoFA: false, // a recuperer depuis la reponse
-					friends: friends, // a recuperer depuis la reponse
+					twoFA: responseMe.data.twoFA,
+					friends: [], // a recuperer depuis la reponse
 					blockedUsers: [], // a recuperer depuis la reponse
-					channels: channels // a recuperer depuis la reponse
+					channels: channels, // a recuperer depuis la reponse
+					socket: socket
 				})
 			}
 			catch (error) {
 
-				console.log(error)
+				// temporaire
+				// Si la socket doit etre close manuellement, il la close ici en cas d'erreur au lancement
 
 				localStorage.removeItem('token')
 				setErrorRequest(true)
@@ -177,12 +195,6 @@ function Game() {
 	useEffect(() => {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
 	}, [userAuthenticate.channels.length])
-
-	//temporaire
-	// a supprimer quand la route qui renvoie les channels sera dispo
-	useEffect(() => {
-		userAuthenticate.channels = getTempChannels(userAuthenticate)
-	}, [userAuthenticate, userTarget])
 
 	/* ========================== COMPONENTS STATES ============================= */
 
@@ -250,7 +262,7 @@ function Game() {
 				onClick={closeContextualMenus}>
 				{
 					!errorRequest ?
-						<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+						<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
 							<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
 								<GameWrapper ref={GameWrapperRef}>
 									{
