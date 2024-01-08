@@ -3,14 +3,19 @@ import { useEffect, useState, KeyboardEvent, useRef } from 'react';
 import styled from 'styled-components';
 
 
-const Style = styled.div<{ X: number ; Y: number }>`
+const Style = styled.div.attrs<{ $X: number ; $Y: number }>((props) => ({
+
+	style: {
+		
+		top: `${props.$Y}px`,
+		left: `${props.$X}px`,
+
+	},
+}))`
 	position: absolute;
 	
 	width: 30px;
 	height: 30px;
-	
-	top: ${(props) => props.Y}px;
-	left: ${(props) => props.X}px;
 	
 	border-radius: 50%;
 	
@@ -74,7 +79,7 @@ type PropsBalls = {
 		}, []);
 
 	return (
-		<Style X={X} Y={Y} ref={BallRef} />
+		<Style $X={X} $Y={Y} ref={BallRef} />
 	);
 }
 

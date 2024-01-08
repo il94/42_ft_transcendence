@@ -1,12 +1,17 @@
 
 import PlayerScore from './PlayerScore';
 
-function Score(){
+type ScoreProps = {
+	LeftScore: number;
+	RightScore: number;
+  };
+
+function Score({LeftScore, RightScore}: ScoreProps){
 
 	return (
 		<>
-		<PlayerScore Hposition = {30}/>
-		<PlayerScore Hposition = {70}/>
+		<PlayerScore Hposition = {30} Score={LeftScore}/>
+		<PlayerScore Hposition = {70} Score={RightScore}/>
 		</>
 	);
 }
