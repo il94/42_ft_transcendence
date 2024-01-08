@@ -5,6 +5,7 @@ import { AuthDto, CreateUserDto } from "../dto/";
 import { Public, getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
 import { Response } from 'express';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -55,25 +56,25 @@ export class AuthController {
 
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
-	async get42User(@Req() req) {
-		return req.user;
+	async get42User(@getUser() user: User) {
+		return user;
 	}
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@Req() req: any, @Res() res: Response) {
-		console.log("user in api42/callback : ", req.user);
-		if (req.user) {
-			const token = await this.authService.signToken(req.user.id, req.user.username);
-			res.cookie('access_token', token.access_token, {
-			  httpOnly: false,
-			});
-			if (req.user.twoFA === false) {
-			  res.cookie('two_factor_auth', true, {
-				httpOnly: false,
-			  });
-			}
-			res.status(302).redirect('http://localhost:5173/game');
+	async handle42Redirect(@getUser() user: User, @Res() res: Response, @Req() req) {
+		//console.log("user in api42/callback : ", res);
+		if (user) {
+			const token = await this.authService.signToken(user.id, user.username);
+			//res.set('Authorization', token.access_token);
+			//res.json(user);
+			//res.status(301).redirect("http://localhost:5173/game");
+			const url = new URL(`${req.protocol}:${req.hostname}`);
+			url.port = '5173';
+			url.pathname = 'game';
+			//url.searchParams.set('code', token.access_token);
+
+			res.status(302).redirect(url.href);
 		}
 		return "OK tu es CO";
 	}

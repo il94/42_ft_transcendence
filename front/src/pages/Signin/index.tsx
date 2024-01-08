@@ -36,6 +36,7 @@ import { emptySetting } from '../../utils/emptyObjects'
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
+import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 function Signin() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
@@ -121,6 +122,23 @@ function Signin() {
 		}
 	}
 
+	// async function connectionBy42() {
+	// 	try {
+
+	// 		const test = await axios.get("http://localhost:3333/auth/api42")
+			
+	// 		console.log(test)
+			
+	// 		setToken(test.data.access_token)
+	// 		localStorage.setItem('token', test.data.access_token)
+			
+	// 		navigate("/game")
+	// 	}
+	// 	catch (error) {
+	// 		console.log(error)
+	// 	}
+	// }
+
 /* ================================ LOGIN =================================== */
 
 	const [login, setLogin] = useState<SettingData>(emptySetting)
@@ -149,10 +167,16 @@ function Signin() {
 
 /* ========================================================================== */
 
-	useEffect(() => {
-		if (token)
-			setErrorRequest(true)
-	}, [])
+	async function test() {
+		
+			const FTtoken = localStorage.getItem('token')
+			if (FTtoken)
+				setToken(FTtoken)
+
+			navigate("/game")
+				// if (token)
+				// setErrorRequest(true)
+		}
 
 	return (
 		<SigninPage>
@@ -232,7 +256,7 @@ function Signin() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to="http://localhost:3333/auth/api42">
+						<LinkButtonImage to="http://localhost:3333/auth/api42" onClick={test}>
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>
