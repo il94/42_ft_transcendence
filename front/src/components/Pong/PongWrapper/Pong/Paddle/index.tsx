@@ -14,7 +14,7 @@ const Style = styled.div<{ $Hposition: number ; $Vposition: number }>`
 	position: absolute;
 	
 	width: 1%;
-	height: 18%;
+	height: 10%;
 	
 	top: ${(props) => props.$Vposition}%;
 	left: ${(props) => props.$Hposition}%;

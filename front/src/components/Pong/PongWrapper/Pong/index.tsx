@@ -34,9 +34,9 @@ function Pong(){
 
 	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({});
 
-
-	// let	BallDirX: number = (Math.random() * 2 - 1) * 5;
-	// let	BallDirY: number = (Math.random() * 2 - 1) * 5;
+	const PaddleSize: number = 10;
+	const BallSize: number = 20;
+	const BallSpeed: number = 5;
 	
 	const handleKeyDown = (event: KeyboardEvent) => {
 		
@@ -57,7 +57,7 @@ function Pong(){
 		const step = 2.5;
 		
 		if (PongBounds && (keysPressed['w'] || keysPressed['W'])) {
-			setVLeftPaddle((prevSetVLeftPaddle) => (prevSetVLeftPaddle >= 11 ? prevSetVLeftPaddle - step : prevSetVLeftPaddle));
+			setVLeftPaddle((prevSetVLeftPaddle) => (prevSetVLeftPaddle >= 9 ? prevSetVLeftPaddle - step : prevSetVLeftPaddle));
 			if (LeftPaddlePos.top - PongBounds.height / 100 * step > 0)
 			{
 				setLeftPaddlePos((prevLeftPaddlePos) => ({
@@ -67,7 +67,7 @@ function Pong(){
 			}
 		}
 		if (PongBounds && (keysPressed['s'] || keysPressed['S'])) {
-			setVLeftPaddle((prevSetVLeftPaddle) => (prevSetVLeftPaddle <= 89 ? prevSetVLeftPaddle + step : prevSetVLeftPaddle));
+			setVLeftPaddle((prevSetVLeftPaddle) => (prevSetVLeftPaddle <= 91 ? prevSetVLeftPaddle + step : prevSetVLeftPaddle));
 			if (LeftPaddlePos.bottom + PongBounds.height / 100 * step < PongBounds.height)
 			{
 				setLeftPaddlePos((prevLeftPaddlePos) => ({
@@ -77,7 +77,7 @@ function Pong(){
 			}
 		}
 		if (PongBounds && keysPressed['ArrowUp']) {
-			setVRightPaddle((prevSetVRightPaddle) => (prevSetVRightPaddle >= 11 ? prevSetVRightPaddle - step : prevSetVRightPaddle));
+			setVRightPaddle((prevSetVRightPaddle) => (prevSetVRightPaddle >= 9 ? prevSetVRightPaddle - step : prevSetVRightPaddle));
 			if (RightPaddlePos.top - PongBounds.height / 100 * step > 0)
 			{
 				setRightPaddlePos((prevRightPaddlePos) => ({
@@ -87,7 +87,7 @@ function Pong(){
 			}
 		}
 		if (PongBounds && keysPressed['ArrowDown']) {
-			setVRightPaddle((prevSetVRightPaddle) => (prevSetVRightPaddle <= 89 ? prevSetVRightPaddle + step : prevSetVRightPaddle));
+			setVRightPaddle((prevSetVRightPaddle) => (prevSetVRightPaddle <= 91 ? prevSetVRightPaddle + step : prevSetVRightPaddle));
 			if (RightPaddlePos.bottom + PongBounds.height / 100 * step < PongBounds.height)
 			{
 				setRightPaddlePos((prevRightPaddlePos) => ({
@@ -101,8 +101,8 @@ function Pong(){
 	const resetGame = () => {
 		if (PongRef.current?.getBoundingClientRect())
 		setBallPos({
-			x: PongRef.current.getBoundingClientRect().width / 2,
-			y: PongRef.current.getBoundingClientRect().height / 2
+			x: PongRef.current.getBoundingClientRect().width / 2 - (BallSize/2),
+			y: PongRef.current.getBoundingClientRect().height / 2 - (BallSize/2)
 		});
 	}
 
@@ -111,7 +111,7 @@ function Pong(){
 		let paddleX: number = 0;
 
 		if (PongBounds)
-			paddleX = (PongBounds.width * 2.5 / 100); 
+			paddleX = (PongBounds.width * 2.5 / 100); // 2.5 == paddle widh/2 + 2
 
 		// console.log("ball pos X ", BallPos.x + BallDir.x);
 		// console.log("right paddleX ", PongBounds.width - paddleX);
@@ -121,17 +121,42 @@ function Pong(){
 		if (PongBounds && BallPos.x + BallDir.x < paddleX)
 		{
 			if (PongBounds && BallPos.y + BallDir.y > LeftPaddlePos.top && BallPos.y + BallDir.y < LeftPaddlePos.bottom)
-				return true;
-			console.log("paddleX collision")
+			{
+				const CollisionOnPaddle: number = (LeftPaddlePos.top + ((PaddleSize/2) * (PongBounds.height / 100))) - (BallPos.y + BallDir.y + (BallSize/2))
+				const tmp: number = (CollisionOnPaddle/ ((PaddleSize * (PongBounds.height /100) / 2 )))
+				const bounceAngle = tmp * (5*Math.PI/12)
+				console.log("----LEFT----")
+				console.log(CollisionOnPaddle)
+				console.log(tmp)
+				console.log(bounceAngle)
+				setBallDir({
+					x: (Math.cos(-bounceAngle) * BallSpeed),
+					y: (Math.sin(-bounceAngle) * BallSpeed)
+				})
+				return true
+			}
 		}
-
-		if (PongBounds && BallPos.x + BallDir.x > PongBounds.width - paddleX - 30)
+		if (PongBounds && BallPos.x + BallDir.x > PongBounds.width - paddleX - BallSize)
 		{
 			if (PongBounds && BallPos.y + BallDir.y > RightPaddlePos.top && BallPos.y + BallDir.y < RightPaddlePos.bottom)
-				return true;
-			console.log("paddleX collision")
-		}
+			{
+				const CollisionOnPaddle: number = (RightPaddlePos.top + ((PaddleSize/2) * (PongBounds.height / 100))) - (BallPos.y + BallDir.y + (BallSize/2))
+				const tmp: number = (CollisionOnPaddle/ ((PaddleSize * (PongBounds.height /100) / 2 )))
+				const bounceAngle = tmp * (5*Math.PI/12)
 
+				console.log("----RIGHT	----")
+				console.log("5% = ", (PaddleSize/2) * (PongBounds.height / 100))
+				console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
+				console.log(CollisionOnPaddle)
+				console.log(tmp)
+				console.log(bounceAngle)
+				setBallDir({
+					x: (Math.cos(bounceAngle) * -BallSpeed),
+					y: (Math.sin(bounceAngle) * -BallSpeed)
+				})
+				return true
+			}
+		}
 		return false;
 	}
 
@@ -142,16 +167,15 @@ function Pong(){
 			y: prevBallPos.y + BallDir.y,
 		}));
 
-		// console.log("WIDTH :",  PongBounds)
-
+		// console.log(BallDir)
 		if (PaddleCollision())
 		{
-			setBallDir((prevBallDir) => ({ x: -prevBallDir.x, y: prevBallDir.y }));
-			console.log("collision");
+			// console.log(BallDir)
+			return;
 		}
 		else
 		{
-			if (PongBounds && (BallPos.x + BallDir.x < 0 || BallPos.x + BallDir.x > PongBounds.width - 30))
+			if (PongBounds && (BallPos.x + BallDir.x < 0 || BallPos.x + BallDir.x > PongBounds.width - BallSize))
 			{
 				console.log('score')
 				if (BallPos.x + BallDir.x < 0)
@@ -160,14 +184,9 @@ function Pong(){
 					setScore((prevScore) => ({left: prevScore.left + 1, right: prevScore.right}))
 				resetGame()
 			}
-	
-			if (PongBounds && (BallPos.y + BallDir.y < 0 || BallPos.y + BallDir.y > PongBounds.height - 30))
-			{
+			if (PongBounds && (BallPos.y + BallDir.y < 0 || BallPos.y + BallDir.y > PongBounds.height - BallSize))
 				setBallDir((prevBallDir) => ({ x: prevBallDir.x, y: -prevBallDir.y }));
-			}
 		}
-		// console.log("ball dir x function ",BallDir.x)
-		// console.log("ball dir y function ",BallDir.y)
 	}
 	
 	useEffect(() => {
@@ -186,39 +205,37 @@ function Pong(){
 			const phi: number = 2*Math.PI*Math.random();
 			setBallDir({
 				x: (Math.cos(phi) * 5),
-				y: (Math.sin(phi) * 5)
+				y: (0 * 5)
 			})
 
 			if (PongRef.current?.getBoundingClientRect())
 			{
-				// console.log('SET PADDLE POS')
-
 				setBallPos({
-					x: PongRef.current.getBoundingClientRect().width / 2,
-					y: PongRef.current.getBoundingClientRect().height / 2
+					x: PongRef.current.getBoundingClientRect().width / 2 - (BallSize/2),
+					y: PongRef.current.getBoundingClientRect().height / 2 - (BallSize/2)
 				});
-
 				setLeftPaddlePos({
-					top: ((VLeftPaddle - 9) * PongRef.current.getBoundingClientRect().height / 100),
-					bottom: ((VLeftPaddle + 9) * PongRef.current.getBoundingClientRect().height / 100)
+					top: ((VLeftPaddle - (PaddleSize/2)) * PongRef.current.getBoundingClientRect().height / 100),
+					bottom: ((VLeftPaddle + (PaddleSize/2)) * PongRef.current.getBoundingClientRect().height / 100)
 				});
 				setRightPaddlePos({
-					top: ((VRightPaddle - 9) * PongRef.current.getBoundingClientRect().height / 100),
-					bottom: ((VRightPaddle + 9) * PongRef.current.getBoundingClientRect().height / 100)
+					top: ((VRightPaddle - (PaddleSize/2)) * PongRef.current.getBoundingClientRect().height / 100),
+					bottom: ((VRightPaddle + (PaddleSize/2)) * PongRef.current.getBoundingClientRect().height / 100)
 				});
 			}
-
-			// console.log("RENDER")
-			// console.log("Pong STATS = ", PongRef.current?.getBoundingClientRect())
 		}, [])
 		
 		useEffect(() => {
-			const phi: number = 2*Math.PI*Math.random();
+			let phi: number; 
+			do {
+				phi = 2*Math.PI*Math.random();
+			} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
 			setBallDir({
-				x: (Math.cos(phi) * 5),
-				y: (Math.sin(phi) * 5)
+				x: (Math.cos(phi) * BallSpeed),
+				y: (0 * BallSpeed)
 			})
 		}, [score])
+
 		useEffect(() => {
 			
 			document.addEventListener('keydown', handleKeyDown, true);
@@ -242,7 +259,7 @@ function Pong(){
 				PongRef.current &&
 				<>
 					<Paddle Hposition={2} Vposition={VLeftPaddle}/>
-					<Ball X={BallPos.x} Y={BallPos.y}/>
+					<Ball X={BallPos.x} Y={BallPos.y} BallSize={BallSize}/>
 					<Score LeftScore={score.left} RightScore={score.right}/>
 					<Paddle Hposition={98} Vposition={VRightPaddle}/>
 				</>

@@ -3,19 +3,18 @@ import { useEffect, useState, KeyboardEvent, useRef } from 'react';
 import styled from 'styled-components';
 
 
-const Style = styled.div.attrs<{ $X: number ; $Y: number }>((props) => ({
+const Style = styled.div.attrs<{ $X: number ; $Y: number ; $BallSize:number }>((props) => ({
 
 	style: {
 		
 		top: `${props.$Y}px`,
 		left: `${props.$X}px`,
-
+		width: `${props.$BallSize}px`,
+		height: `${props.$BallSize}px`,
 	},
 }))`
 	position: absolute;
 	
-	width: 30px;
-	height: 30px;
 	
 	border-radius: 50%;
 	
@@ -30,9 +29,10 @@ const Style = styled.div.attrs<{ $X: number ; $Y: number }>((props) => ({
 type PropsBalls = {
 	X: number;
 	Y: number;
+	BallSize: number;
 }
 
-	function Ball ({X, Y}: PropsBalls) {
+	function Ball ({X, Y, BallSize}: PropsBalls) {
 		
 		/* const [posX, setPosX] = useState(600);
 		const [posY, setPosY] = useState(400); */
@@ -79,7 +79,7 @@ type PropsBalls = {
 		}, []);
 
 	return (
-		<Style $X={X} $Y={Y} ref={BallRef} />
+		<Style $X={X} $Y={Y} $BallSize={BallSize} ref={BallRef} />
 	);
 }
 
