@@ -69,6 +69,14 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
+	async _verifyToken(token: string): Promise<any> {
+		try {
+		  return await this.jwt.verify(token);
+		} catch (error) {
+		  return null;
+		}
+	}
+
 	async generateTwoFASecret(user: User) {
 		const secret = authenticator.generateSecret();
 
