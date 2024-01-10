@@ -7,6 +7,7 @@ import * as argon from 'argon2';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
 import { authenticator } from "otplib";
+import { generate } from "generate-password";
 
 @Injectable()
 export class AuthService {
@@ -44,15 +45,15 @@ export class AuthService {
 			const user = await this.prisma.user.findUnique({
 				where: { username: profile.username, },
 			});
-			if (!user) {
-				console.log ("jai pas trouve le user");
-				profile.hash = "default";
-				const newUser = await this.userService.createUser(profile as CreateUserDto)
-				if (!newUser)
-					throw new ForbiddenException('Failed to create new 42 user');
+			if (user)
 				return user;
-			}
+			console.log ("jai pas trouve le user");
+			profile.hash = generate({ length: 6, numbers: true });
+			const newUser = await this.userService.createUser(profile as CreateUserDto)
+			if (!newUser)
+				throw new ForbiddenException('Failed to create new 42 user');
 			return user;
+
 		} catch (error) {
 			const err = error as Error;
             console.log("Validate 42 user error: ", err.message);
