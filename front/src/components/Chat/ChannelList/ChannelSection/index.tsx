@@ -46,8 +46,8 @@ function ChannelSection({ channel, setChannelTarget, backgroundColor }: PropsCha
 				...channel,
 				messages: [], // a recup depuis le back
 				owner: owner,
-				administrators: admins,
-				users: users,
+				administrators: [owner, ...admins],
+				users: [owner, ...admins, ...users],
 				validUsers: [], // a recup depuis le back
 				bannedUsers: [] // a recup depuis le back
 			}))

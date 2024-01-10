@@ -186,6 +186,7 @@ export class ChannelsService {
           name: dto.name,
 	        type: dto.type,
 	        password:	dto.password,
+          avatar: dto.avatar
         }})
       return updateChannel;
 

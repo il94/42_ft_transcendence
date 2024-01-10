@@ -50,7 +50,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 
 	const [error, setError] = useState<boolean>(false)
 
-	const { userAuthenticate, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 
@@ -96,6 +96,19 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 						else
 							return (undefined)
 					})
+
+					setUserAuthenticate((prevState) => ({
+						...prevState,
+						channels: prevState.channels.map((channelToFind) => {
+							if (channelToFind.id === channel.id)
+							{
+								return {
+									...channelToFind,
+									...newDatas
+								}
+							}
+						})
+					}))
 				}
 				else
 					throw new Error
@@ -134,7 +147,11 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					bannedUsers: [],
 				}
 
-				userAuthenticate.channels.push(newChannel)
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					channels: [...prevState.channels, newChannel]
+				}))
+				
 				setChannelTarget(newChannel)
 			}
 		}
