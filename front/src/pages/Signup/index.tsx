@@ -92,13 +92,14 @@ function Signup() {
 			setToken(response.data.access_token)
 			localStorage.setItem('token', response.data.access_token)
 
-			navigate("/game")
+			navigate("/")
 		}
 		catch (error) {
 			console.log(error)
 			// temporaire
 			// Gestion d'erreurs utilisateur a faire
 
+			console.log(error)
 			setErrorRequest(true)
 			localStorage.removeItem('token')
 		}

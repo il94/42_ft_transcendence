@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res,  UseGuards, UnauthorizedException } from "@nestjs/common";
+import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, LocalAuthGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
 import { Public, getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
 import { Response } from 'express';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -55,29 +56,22 @@ export class AuthController {
 
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
-	async get42User(@Req() req) {
-		return req.user;
+	async get42User(@getUser() user: User) {
+		return user;
 	}
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@Req() req: any, @Res() res: Response) {
-		console.log("user in api42/callback : ", req.user);
-		//const token = this.authService.validateUser(req.user as AuthDto);
+	async handle42Redirect(@getUser() user: User, @Res() res: Response, @Req() req) {
+		if (user) {
+			const token = await this.authService.signToken(user.id, user.username);
+			console.log("token: ", token);
 
-		// const url = new URL(`${req.protocol}:${req.hostname}`);
-		// url.port = process.env.FRONT_PORT;
-		// url.pathname = 'login';
-		// url.searchParams.set('code', req.user.access_token);
-		// res.status(302).redirect(url.href);
-
-		// res.cookie('acces-token', req.user.access_token, {
-		// maxAge: 2592000000,
-		// sameSite: true,
-		// secure: false,
-		// });
-
-		return "OK tu es CO";
+			res.cookie("access_token", token.access_token);
+			res.redirect("http://localhost:5173")
+		}
+		else
+			throw new BadRequestException("Can't find user from 42 intra");
 	}
 
 	@Get('profile')

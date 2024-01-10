@@ -13,27 +13,23 @@ export class UsersService {
 		try {
 			const userExists = await this.prisma.user.findMany({
 				where: { OR: [
-					{
-						email: createUserDto.email
-					}, 
-					{
-						username: createUserDto.username 
-					}
+					{ email: createUserDto.email }, 
+					{ username: createUserDto.username }
 				],}
 			})
 			if (userExists[0])
 				throw new BadRequestException("User already exists");
-			console.log("HERE")
+			console.log("creating user")
 			const hash = await argon.hash(createUserDto.hash);
 			const user = await this.prisma.user.create({
 				data: {
 					username: createUserDto.username,
 					hash,
 					email: createUserDto.email,
-					phoneNumber: createUserDto.phoneNumber,
+					phoneNumber: createUserDto.phoneNumber || '',
+					avatar: createUserDto.avatar || '',
 					twoFA: false,
-					twoFASecret: "string",
-					avatar: createUserDto.avatar,
+					twoFASecret: "",
 					status: UserStatus.ONLINE,
 					wins: 0,
 					draws: 0,
@@ -98,11 +94,24 @@ export class UsersService {
 		return updateUser;
 	}
 
-	remove(id: number) {
-		const deleteUser = this.prisma.user.delete({
-			where: { id: id },
-		});
-		return deleteUser;
+	async remove(id: number) {
+		const deleteFriends =  this.prisma.relations.deleteMany({
+			where: { hasRelationsId: id }});
+		const deleteChannels = this.prisma.usersOnChannels.deleteMany({
+			where: { userId: id }})
+		const deleteGames = this.prisma.usersOnGames.deleteMany({
+			where: { userId: id }})
+		const transaction = await this.prisma.$transaction([deleteFriends, deleteChannels, deleteGames])
+		
+		const userExists = await this.prisma.user.findUnique({
+			where: { id: id },});
+		if (userExists) {
+			const deleteUser = this.prisma.user.delete({
+				where: { id: id },});
+			return deleteUser;
+		} else {
+			throw new Error(`User with ID ${id} not found`);
+		}
 	}
 
 	async turnOnTwoFA(userId: number) {

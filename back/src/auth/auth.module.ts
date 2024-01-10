@@ -11,6 +11,7 @@ import { SessionSerializer } from "./Serializer";
 import { UsersController } from "./controllers/users.controller";
 import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
 import { APP_GUARD } from '@nestjs/core';
+import { HttpModule } from "@nestjs/axios";
 
 @Module ({
 	imports: [
@@ -22,6 +23,7 @@ import { APP_GUARD } from '@nestjs/core';
 			}),
 		}),
 		PassportModule.register({ defaultStrategy: '42' }),
+		HttpModule,
 	],
 	providers: [JwtStrategy, 
 		Api42Strategy,
@@ -29,7 +31,8 @@ import { APP_GUARD } from '@nestjs/core';
 		AuthService, 
 		UsersService, 
 		SessionSerializer, 
-		//Api42AuthGuard,
+		Api42AuthGuard,
+		JwtGuard,
 		//{	provide: APP_GUARD,
 		//	useClass: JwtGuard, },
 	],

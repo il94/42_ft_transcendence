@@ -27,6 +27,11 @@ export class CreateUserDto implements User {
 	@ApiProperty()
 	email: string;
 
+	@IsString()
+	@IsOptional()
+	@ApiProperty()
+	avatar: string;
+
 	@IsMobilePhone()
 	@IsOptional()
 	@ApiProperty()
@@ -34,14 +39,7 @@ export class CreateUserDto implements User {
 
 	twoFA: boolean;
 	twoFASecret: string; 
-
-	@IsString()
-	@IsOptional()
-	@ApiProperty()
-	avatar: string;
-
 	status: UserStatus;
-
 	wins: number;
 	draws: number;
 	losses: number;

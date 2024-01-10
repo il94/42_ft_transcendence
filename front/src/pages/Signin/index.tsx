@@ -36,6 +36,7 @@ import { emptySetting } from '../../utils/emptyObjects'
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
+import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 function Signin() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
@@ -84,7 +85,7 @@ function Signin() {
 				setToken(response.data.access_token)
 				localStorage.setItem('token', response.data.access_token)
 				
-				navigate("/game")
+				navigate("/")
 			}
 		}
 		catch (error) {
@@ -121,6 +122,23 @@ function Signin() {
 		}
 	}
 
+	// async function connectionBy42() {
+	// 	try {
+
+	// 		const test = await axios.get("http://localhost:3333/auth/api42")
+			
+	// 		console.log(test)
+			
+	// 		setToken(test.data.access_token)
+	// 		localStorage.setItem('token', test.data.access_token)
+			
+	// 		navigate("/game")
+	// 	}
+	// 	catch (error) {
+	// 		console.log(error)
+	// 	}
+	// }
+
 /* ================================ LOGIN =================================== */
 
 	const [login, setLogin] = useState<SettingData>(emptySetting)
@@ -148,11 +166,6 @@ function Signin() {
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
 /* ========================================================================== */
-
-	useEffect(() => {
-		if (token)
-			setErrorRequest(true)
-	}, [])
 
 	return (
 		<SigninPage>

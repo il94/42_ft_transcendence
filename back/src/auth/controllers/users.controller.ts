@@ -20,7 +20,6 @@ export class UsersController {
     return this.usersService.findAll();
   }
   
-  @UseGuards(JwtGuard)
   @Get('me')
   async getMe(@getUser() user: User) {
     return user;

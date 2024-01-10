@@ -23,10 +23,10 @@ export class FriendsService {
 					hasRelationsId: userId,
 					isInRelationsId: friendId,}}
 				})
-			if (isFriend && isFriend.RelationType == RelationStatus.FRIEND)
+			if (isFriend && isFriend.relationType == RelationStatus.FRIEND)
 				return { error: `User with id ${friendId} is already your friend.` };
-			if (isFriend && isFriend.RelationType == RelationStatus.BLOCKED) {
-				isFriend.RelationType = RelationStatus.FRIEND;
+			if (isFriend && isFriend.relationType == RelationStatus.BLOCKED) {
+				isFriend.relationType = RelationStatus.FRIEND;
 				return isFriend;
 			}
 			const newFriend = await this.prisma.user.update({where: { id: userId},
@@ -38,7 +38,7 @@ export class FriendsService {
 							} }],
 						create: [{ isInRelationsId: friendId, 
 							request: RequestStatus.ACCEPTED,
-							RelationType: RelationStatus.FRIEND }]
+							relationType: RelationStatus.FRIEND }]
 					}}
 				
 			})
@@ -69,8 +69,29 @@ export class FriendsService {
 		//TODO ?
 	}
 
-	async updateRelation(UserId: number, updateRelationDto) {
-		
+	// OK de passer RelationDTO en parametre ?
+	async updateRelation(userId: number, dto: RelationDto) {
+		if (userId === dto.isInRelationsId)
+			return { error: 'user has same id as friend' };
+		try {
+			const change = await this.prisma.user.update({
+				where: { id: userId },
+				data: { hasRelations: 
+					{ update: [{
+						data: { relationType: dto.relationType },
+						where: { hasRelationsId_isInRelationsId: 
+							{ hasRelationsId: userId,
+							isInRelationsId: dto.isInRelationsId, }
+						}
+					}]
+				}}
+			})
+			return change;
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				return { error: 'An error occurred while removing friend' };
+			throw error;
+		}
 	}
 
 	async removeFriend(userId: number, friendId: number) {
@@ -94,22 +115,6 @@ export class FriendsService {
 			throw error;
 		}
 	}
-
-  create(createFriendDto: RelationDto) {
-    return 'This action adds a new friend';
-  }
-
-  findAll() {
-    return `This action returns all friends`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} friend`;
-  }
-
-  update(id: number, updateFriendDto: RelationDto) {
-    return `This action updates a #${id} friend`;
-  }
 
 	async isSent(sender: User, receiver: User) {
 		const request = await this.prisma.relations.findUnique({
