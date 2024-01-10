@@ -5,7 +5,7 @@ import {
 	useState
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import io from 'socket.io-client';
 
 import {
@@ -39,14 +39,13 @@ import DisplayContext from '../../contexts/DisplayContext'
 import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
-import { ChannelData, User, UserAuthenticate } from '../../utils/types'
+import { Channel, User, UserAuthenticate } from '../../utils/types'
 import { chatWindowStatus, contextualMenuStatus, userStatus } from '../../utils/status'
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, userSomeone } from '../../temp/temp'
-import { deleteScoreFormatFromBack, getStatus } from '../../utils/functions'
 
 function Game() {
 
@@ -70,64 +69,70 @@ function Game() {
 
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
-	const [channelTarget, setChannelTarget] = useState<ChannelData | undefined>(undefined)
+	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
 	const { token } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
-		async function fetchFriends() {
+		async function fetchFriends(): Promise<User[]> {
 			try {
 
 				/* ============ Temporaire ============== */
 
+				// appeler la route qui recupere les amis du user
 				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
 
-				const friendsResponse = await axios.get("http://localhost:3333/user", {
+				const friendsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				// En attendant de pouvoir tester avec plusieurs Users
-				const friends: User[] = friendsResponse.data.map((friend: any) => ({
+				/* ====================================== */
 
-					...friend,
-					//temporaire
-					// status: getRandomStatus(),
-					status: getStatus(friend.status),
-					scoreResume: {
-						wins: friend.wins,
-						draws: friend.draws,
-						losses: friend.losses
+				const friends: User[] = friendsResponse.data.map((friend: any) => {
+
+					const { wins, draws, losses, ...rest } = friend
+
+					return {
+						...rest,
+						scoreResume: {
+							wins: wins,
+							draws: draws,
+							losses: losses
+						}
 					}
-				}))
-
-				friends.forEach(deleteScoreFormatFromBack)
+				})
 
 				return (friends)
-
-				/* ====================================== */
 			}
 			catch (error) {
 				throw (error)
 			}
 		}
 
-		async function fetchChannels() {
+		async function fetchChannels(): Promise<Channel[]> {
 			try {
-
-				/* ============ Temporaire ============== */
-
-				const channelsResponse = await axios.get("http://localhost:3333/channel", {
+				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				return (channelsResponse.data)
+				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => ({
+					...channel,
+					messages: [],
+					owner: emptyUser,
+					administrators: [],
+					users: [],
+					validUsers: [],
+					mutedUsers: [],
+					bannedUsers: []
 
-				/* ====================================== */
+				}))
+
+				return (channels)
 			}
 			catch (error) {
 				throw (error)
@@ -136,10 +141,10 @@ function Game() {
 
 		async function fetchMe() {
 			try {
-				const friends = await fetchFriends()
-				const channels = await fetchChannels()
+				const friends: User[] = await fetchFriends()
+				const channels: Channel[] = await fetchChannels()
 
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
+				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -157,22 +162,25 @@ function Game() {
 					username: responseMe.data.username,
 					avatar: responseMe.data.avatar,
 					status: userStatus.ONLINE,
-					// temporaire
-					scoreResume: { // a recuperer depuis la reponse
-						wins: 100,
-						draws: 1,
-						losses: 0
+					scoreResume: {
+						wins: responseMe.data.wins,
+						draws: responseMe.data.draws,
+						losses: responseMe.data.losses
 					},
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
-					twoFA: false, // a recuperer depuis la reponse
-					friends: friends, // a recuperer depuis la reponse
+					twoFA: responseMe.data.twoFA,
+					friends: [], // a recuperer depuis la reponse
 					blockedUsers: [], // a recuperer depuis la reponse
 					channels: channels, // a recuperer depuis la reponse
 					socket: socket
 				})
 			}
 			catch (error) {
+
+				// temporaire
+				// Si la socket doit etre close manuellement, il la close ici en cas d'erreur au lancement
+
 				localStorage.removeItem('token')
 				setErrorRequest(true)
 			}
@@ -183,7 +191,6 @@ function Game() {
 	useEffect(() => {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
 	}, [userAuthenticate.channels.length])
-
 
 	/* ========================== COMPONENTS STATES ============================= */
 
@@ -251,7 +258,7 @@ function Game() {
 				onClick={closeContextualMenus}>
 				{
 					!errorRequest ?
-						<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+						<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
 							<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
 								<GameWrapper ref={GameWrapperRef}>
 									{

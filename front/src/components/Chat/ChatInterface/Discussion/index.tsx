@@ -12,11 +12,11 @@ import UserInvitation from "./UserInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { ChannelData, MessageInvitation, MessageText } from "../../../../utils/types"
+import { Channel, MessageInvitation, MessageText } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
 
 type PropsDiscussion = {
-	channel: ChannelData
+	channel: Channel
 }
 
 function Discussion({ channel } : PropsDiscussion) {
@@ -35,6 +35,7 @@ function Discussion({ channel } : PropsDiscussion) {
 					}}
 					activeState>
 					{
+						channel.messages && // condition temporaire, a supprimer quand les messages du channel seront retournees par le back
 						channel.messages.map((message, index) => (
 							message.sender.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?

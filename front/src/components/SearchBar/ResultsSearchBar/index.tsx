@@ -26,7 +26,7 @@ import InteractionContext from "../../../contexts/InteractionContext"
 
 import { sortChannelByName, sortUserByName } from "../../../utils/functions"
 
-import { ChannelData, User } from "../../../utils/types"
+import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
 import { getRandomStatus } from "../../../temp/temp"
@@ -40,7 +40,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const { token } = useContext(AuthContext)!
 
-	function generateResults(results: User[] | ChannelData[], type: string, littleResults: boolean) {
+	function generateResults(results: User[] | Channel[], type: string, littleResults: boolean) {
 		return (
 			<Group>
 				<GroupName>
@@ -67,7 +67,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as ChannelData)
+											addChannelToChannelList(result as Channel)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -82,7 +82,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										</>
 										:
 										<>
-											{(result as ChannelData).name}
+											{(result as Channel).name}
 										</>
 									}
 								</Result>
@@ -100,7 +100,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as ChannelData)
+											addChannelToChannelList(result as Channel)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -115,7 +115,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										</>
 										:
 										<>
-											{(result as ChannelData).name}
+											{(result as Channel).name}
 										</>
 									}
 								</Result>
@@ -129,10 +129,10 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const [users, setUsers] = useState<User[]>([])
 	const [usersFound, setUsersFound] = useState<User[]>([])
-	const [channels, setChannels] = useState<ChannelData[]>([])
-	const [channelsFound, setChannelsFound] = useState<ChannelData[]>([])
+	const [channels, setChannels] = useState<Channel[]>([])
+	const [channelsFound, setChannelsFound] = useState<Channel[]>([])
 
-	const { userAuthenticate, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	async function addUserToFriendList(user: User) {
@@ -153,18 +153,32 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		}
 	}
 
-	async function addChannelToChannelList(channel: ChannelData) {
+	async function addChannelToChannelList(channel: Channel) {
 		try {
-			if (!channel.users.includes(userAuthenticate))
+			// temporaire
+			// Condition OK, a decommenter quand les infos de relation du channel seront retournees par le back
+			// if (!channel.users.includes(userAuthenticate))
 			{
-				/* ============ Temporaire ============== */
+				await axios.post(`http://localhost:3333/channel/join`, {
+					id: channel.id,
+					password: "mdp" // temporaire
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// axios.post("http://localhost:3333/user/me/channels/${channel.id")
+				// temporaire
+				// Crash si l'on tente d'ouvrir le channel car il manque les infos de relation du channel 
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					channels: [ ...prevState.channels, channel]
+				}))
 
-				/* ============================================== */
-
-				channel.users.push(userAuthenticate)
-				userAuthenticate.channels.push(channel)
+				// temporaire
+				// Code OK, a decommenter quand les infos de relation du channel seront retournees par le back
+				// channel.users.push(userAuthenticate)
 			}
 			setChannelTarget(channel)
 			displayChat(true)
@@ -177,27 +191,28 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
-
-				const userResponse = await axios.get("http://localhost:3333/user", {
+				const usersResponse = await axios.get("http://localhost:3333/user", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				setUsers(userResponse.data.filter((user: User) => (
+				setUsers(usersResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
-				)).map((user: any) => ({
-					// temporaire
-					// En attendant de pouvoir tester avec plusieurs Users
-					// Wins Draws et Looses en trop !
-					...user ,
-					status: getRandomStatus(),
-					scoreResume: {
-						wins: user.wins,
-						draws: user.draws,
-						losses: user.losses
+				)).map((user: any) => {
+
+					const { wins, draws, losses, ...rest } = user
+
+					return {
+						...rest ,
+						status: getRandomStatus(),
+						scoreResume: {
+							wins: wins,
+							draws: draws,
+							losses: losses
+						}
 					}
-				})).sort(sortUserByName))
+				}).sort(sortUserByName))
 
 				const channelsResponse = await axios.get("http://localhost:3333/channel", {
 					headers: {
@@ -205,7 +220,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
-				setChannels(channelsResponse.data.filter((channel: ChannelData) => (
+				setChannels(channelsResponse.data.filter((channel: Channel) => (
 					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
 				)).sort(sortChannelByName))
 			}
@@ -218,7 +233,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	useEffect(() => {
 		setUsersFound(users.filter((user: User) => user.username.startsWith(value)))
-		setChannelsFound(channels.filter((channel: ChannelData) => channel.name.startsWith(value)))
+		setChannelsFound(channels.filter((channel: Channel) => channel.name.startsWith(value)))
 	}, [value])
 
 	useEffect(() => {

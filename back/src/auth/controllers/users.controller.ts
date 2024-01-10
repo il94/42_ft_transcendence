@@ -8,7 +8,7 @@ import { UserEntity } from '../entities/user.entity';
 import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 
-//@UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('user')
 @ApiTags('user')
 export class UsersController {
@@ -28,8 +28,8 @@ export class UsersController {
 
   // RQPR touts les channels d'un user 
   @Get('channels')
-  findOne(@Request() member: User) {
-    return this.usersService.findUserChannel(member);
+  async getUserChannels(@getUser() user: User) {
+    return this.usersService.findUserChannel(user);
   }
 
   @Get(':id')

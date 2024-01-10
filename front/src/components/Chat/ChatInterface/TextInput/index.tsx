@@ -7,13 +7,12 @@ import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { ChannelData } from "../../../../utils/types"
-import { messageStatus } from "../../../../utils/status"
+import { Channel } from "../../../../utils/types"
 import { Socket } from "socket.io-client"
 
 type PropsTextInput = {
-	channel: ChannelData,
-	setChannel: Dispatch<SetStateAction<ChannelData>>
+	channel: Channel,
+	setChannel: Dispatch<SetStateAction<Channel>>
 }
 
 
@@ -50,20 +49,20 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 
 			// if ()
 
-		
+		console.log(channel.messages)
 
-			setChannel((prevState) => ({
-				...prevState,
-				messages: [
-					...prevState.messages,
-					{
-						id: -1,
-						sender: userAuthenticate,
-						type: messageStatus.TEXT,
-						content: message
-					}
-				]
-			}))
+			// setChannel((prevState) => ({
+			// 	...prevState,
+			// 	messages: [
+			// 		...prevState.messages,
+			// 		{
+			// 			id: -1,
+			// 			sender: userAuthenticate,
+			// 			type: messageStatus.TEXT,
+			// 			content: message
+			// 		}
+			// 	]
+			// }))
 
 			setMessage('')
 

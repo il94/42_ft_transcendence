@@ -25,7 +25,7 @@ import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import DisplayContext from "../../contexts/DisplayContext"
 
-import { ChannelData, UserAuthenticate } from "../../utils/types"
+import { Channel, UserAuthenticate } from "../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
@@ -33,9 +33,9 @@ import ChatIcon from "../../assets/chat.png"
 type PropsChat = {
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
-	channels: ChannelData[],
-	channelTarget: ChannelData | undefined,
-	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
+	channels: Channel[],
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	userAuthenticate: UserAuthenticate
@@ -83,12 +83,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 
 	useEffect(() => {
 		if (channelTarget)
-		{
-			if (channelTarget.type === channelStatus.PROTECTED && !channelTarget.validUsers.includes(userAuthenticate))
-				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
-			else
-				setChatWindowState(chatWindowStatus.CHANNEL)
-		}
+			setChatWindowState(chatWindowStatus.CHANNEL)
 		else
 			setChatWindowState(chatWindowStatus.HOME)
 	}, [channelTarget])
@@ -153,7 +148,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 														:
 														<ChatInterface
 															channel={channelTarget}
-															setChannel={setChannelTarget as Dispatch<SetStateAction<ChannelData>>}/>
+															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}/>
 											}
 										</>
 								}

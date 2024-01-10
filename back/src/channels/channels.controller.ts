@@ -15,7 +15,6 @@ export class ChannelController {
 
   @Post()
   create(@Body() dto: CreateChannelDto, @Request() req) {
-    console.log("req.user :", req.user);
 	  return this.channelsService.createChannel(dto, req.user);
   }
 
@@ -27,21 +26,20 @@ export class ChannelController {
   @Get()
   async findAll() {
     const channels = await this.channelsService.findAllChannels();
-    console.log("les channels : ", channels);
     return channels;
   }
 
   // RQPR channel par son id => inutile
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.channelsService.findOneChannel(id, req.user);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.channelsService.findOneChannel(id);
   }
 
-  @Patch()
+  @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, 
   @Body() dto: UpdateChannelDto, 
-  @Request() member: User) {
-    return this.channelsService.updateChannel(dto, member);
+  @getUser() member: User) {
+    return this.channelsService.updateChannel(id, dto, member);
   }
 
   @Patch('add/:user/in/:chan')

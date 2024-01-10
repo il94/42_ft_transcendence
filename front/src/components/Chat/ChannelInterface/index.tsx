@@ -29,14 +29,16 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { ChannelData } from "../../../utils/types"
+import { capitalize } from "../../../utils/functions"
+
+import { Channel } from "../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 
 import RemoveIcon from "../../../assets/close.png"
 import DefaultChannelIcon from "../../../assets/default_channel.png"
 
 type PropsChannelInterface = {
-	channel: ChannelData | undefined,
+	channel: Channel | undefined,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	setBannerName: Dispatch<SetStateAction<string>>
@@ -68,56 +70,55 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
 
-					/* ============ Temporaire ============== */
+					const newDatas: any = {
+						name: name.value !== channel.name ? name.value : channel.name,
+						type: channelType !== channel.type ? channelType : channel.type,
+						password: password !== channel.password ? password : channel.password,
+						avatar: avatar !== channel.avatar ? avatar : channel.avatar
+					}		
 
-					const patchChannelResponse = await axios.patch(`http://localhost:3333/channel/${channel.id}`,
-					{
-						name: name.value,
-						type: channelType.toUpperCase(), // pour les status du back
-						password: password,
-						avatar: avatar
-					},
+					await axios.patch(`http://localhost:3333/channel/${channel.id}`, newDatas,
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
+					})		
+
+					setChannelTarget((prevState: Channel | undefined) => {
+						if (prevState)
+						{
+							const updateChannel: Channel = {
+								...prevState,
+								...newDatas
+							}
+							return (updateChannel)
+						}
+						else
+							return (undefined)
 					})
-	
-					/* ====================================== */
-
-					channel.name = name.value
-					channel.type = channelType
-					channel.password = password
-					channel.avatar = avatar
-
-					setChannelTarget(channel)
 				}
 				else
 					throw new Error
-
-				/* ====================================== */
-
 			}
 			else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
-				const postChannelResponse = await axios.post("http://localhost:3333/channel",
-				{
+
+				const newDatas: any = {
 					name: name.value,
-					type: channelType.toUpperCase(), // pour les status du back
+					type: channelType,
 					password: password,
 					avatar: avatar
-				},
+				}		
+
+				const postChannelResponse = await axios.post("http://localhost:3333/channel", newDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				const newChannel: ChannelData | undefined = {
+				const newChannel: Channel = {
 					id: postChannelResponse.data.id,
-					name: name.value,
-					avatar: avatar,
-					type: channelType,
-					password: password,
+					...newDatas,
 					messages: [],
 					owner: userAuthenticate,
 					administrators: [
@@ -138,6 +139,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 			}
 		}
 		catch (error) {
+			console.log(error)
 			setError(true)
 		}
 	}
@@ -288,7 +290,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 								type="button"
 								fontSize={13} alt="Type channel icon" title="Change type"
 								style={{ marginLeft: "auto", marginRight: "5px" }}>
-								{channelType}
+								{capitalize(channelType)}
 							</Button>
 						</Setting>
 						{

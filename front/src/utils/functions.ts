@@ -1,5 +1,5 @@
 import { userStatus } from "./status"
-import { ChannelData, User } from "./types"
+import { Channel, User } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -9,18 +9,8 @@ import DefaultPurpleAvatar from "../assets/default_purple.png"
 import DefaultRedAvatar from "../assets/default_red.png"
 import DefaultYellowAvatar from "../assets/default_yellow.png"
 
-export function getStatus(status: string)
-{
-	if (status === "ONLINE")
-		return (userStatus.ONLINE)
-	else if (status === "OFFLINE")
-		return (userStatus.OFFLINE)
-	else if (status === "PLAYING")
-		return (userStatus.PLAYING)
-	else if (status === "WAITING")
-		return (userStatus.WAITING)
-	else if (status === "WATCHING")
-		return (userStatus.WATCHING)
+export function capitalize(str: string): string {
+	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase())
 }
 
 export function getRandomDefaultAvatar(): string {
@@ -44,7 +34,7 @@ export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
 }
 
-export function sortChannelByName(a: ChannelData, b: ChannelData) {
+export function sortChannelByName(a: Channel, b: Channel) {
 	return (a.name.localeCompare(b.name))
 }
 
@@ -56,10 +46,4 @@ export function sortUserByStatus(a: User, b: User) {
 	const bValue = status.indexOf(b.status)
 
 	return (aValue - bValue)
-}
-
-export function deleteScoreFormatFromBack(friend: any) {
-	delete friend.wins
-	delete friend.draws
-	delete friend.losses
 }
