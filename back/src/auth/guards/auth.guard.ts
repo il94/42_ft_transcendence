@@ -8,36 +8,11 @@ import { Observable } from 'rxjs';
 export class LocalAuthGuard extends AuthGuard('local') {}
  
 // v1
-// @Injectable()
-// export class JwtGuard extends AuthGuard('jwt') {
-// 	constructor() {
-// 	  super();
-// 	}
-// }
-
-// v2
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
-	constructor(private readonly jwt: JwtService,) {
+	constructor() {
 	  super();
 	}
-
-	canActivate(context: ExecutionContext): boolean {
-		const request = context.switchToHttp().getRequest<Request>();
-		const token = request.headers.authorization;
-		if (!token) {
-		  return false;
-		}	
-		try {
-		  const decoded = this.jwt.verify(token);
-		  request['user'] = decoded;
-		  console.log("decoded : ", decoded);
-		  return true;
-		} catch (error) {
-			console.log("JwtGuard error: ", error);	
-		  return false;
-		}
-	  }
 }
 
 @Injectable()

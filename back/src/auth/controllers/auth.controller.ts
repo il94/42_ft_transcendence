@@ -63,20 +63,12 @@ export class AuthController {
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@getUser() user: User, @Res() res: Response, @Req() req) {
-		//console.log("user in api42/callback : ", res);
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
-			res.cookie('jwt', token.access_token, { httpOnly: true });
+			console.log("token: ", token);
 
-			//res.set('Authorization', token.access_token);
-			//res.json(user);
-			//res.status(301).redirect("http://localhost:5173/game");
-			const url = new URL(`${req.protocol}:${req.hostname}`);
-			url.port = '5173';
-			url.pathname = 'game';
-			//url.searchParams.set('code', token.access_token);
-
-			res.status(302).redirect(url.href);
+			res.cookie("access_token", token.access_token);
+			res.redirect("http://localhost:5173")
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");

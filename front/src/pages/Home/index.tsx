@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 
 import {
 	HomePage,
@@ -19,6 +19,24 @@ import colors from '../../utils/colors'
 function Home() {
 
 	const { token, setToken } = useContext(AuthContext)!
+
+	useEffect(() => {
+
+			// Extraire la partie après "access_token="
+			// const tokenString: string = document.cookie.indexOf("access_token")
+			const index = document.cookie.indexOf("access_token=")
+
+			const accessTokenString = document.cookie.slice(index + "access_token=".length);
+			
+			console.log("LOL = ", accessTokenString)
+
+			if (!localStorage.getItem('token'))
+			{
+				setToken(accessTokenString)
+				localStorage.setItem('token', accessTokenString)
+			}
+
+	}, [])
 
 	async function handleDeconnexionClickText() {
 		localStorage.removeItem('token')

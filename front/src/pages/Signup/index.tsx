@@ -92,7 +92,7 @@ function Signup() {
 			setToken(response.data.access_token)
 			localStorage.setItem('token', response.data.access_token)
 
-			navigate("/game")
+			navigate("/")
 		}
 		catch (error) {
 			// temporaire

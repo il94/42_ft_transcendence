@@ -23,10 +23,10 @@ export class FriendsService {
 					hasRelationsId: userId,
 					isInRelationsId: friendId,}}
 				})
-			if (isFriend && isFriend.RelationType == RelationStatus.FRIEND)
+			if (isFriend && isFriend.relationType == RelationStatus.FRIEND)
 				return { error: `User with id ${friendId} is already your friend.` };
-			if (isFriend && isFriend.RelationType == RelationStatus.BLOCKED) {
-				isFriend.RelationType = RelationStatus.FRIEND;
+			if (isFriend && isFriend.relationType == RelationStatus.BLOCKED) {
+				isFriend.relationType = RelationStatus.FRIEND;
 				return isFriend;
 			}
 			const newFriend = await this.prisma.user.update({where: { id: userId},
@@ -38,7 +38,7 @@ export class FriendsService {
 							} }],
 						create: [{ isInRelationsId: friendId, 
 							request: RequestStatus.ACCEPTED,
-							RelationType: RelationStatus.FRIEND }]
+							relationType: RelationStatus.FRIEND }]
 					}}
 				
 			})
@@ -78,7 +78,7 @@ export class FriendsService {
 				where: { id: userId },
 				data: { hasRelations: 
 					{ update: [{
-						data: { RelationType: dto.RelationType },
+						data: { relationType: dto.relationType },
 						where: { hasRelationsId_isInRelationsId: 
 							{ hasRelationsId: userId,
 							isInRelationsId: dto.isInRelationsId, }

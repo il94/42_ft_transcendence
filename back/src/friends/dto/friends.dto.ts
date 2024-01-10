@@ -7,7 +7,7 @@ export class RelationDto implements Relations {
 	createdAt: Date;
 
 	@IsNotEmpty()
-	RelationType: RelationStatus;
+	relationType: RelationStatus;
 
 	request: RequestStatus;
 

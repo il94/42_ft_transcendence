@@ -14,6 +14,7 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
     }
     async validate (accessToken: string, refreshToken: string, profile: moduleDefaultExport) {
         const user = await this.authService.validate42User({ email: profile.emails[0].value, username: profile.username });
+        console.log("42 token : ", accessToken);
         return user;
     }
 }

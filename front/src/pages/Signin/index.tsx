@@ -85,7 +85,7 @@ function Signin() {
 				setToken(response.data.access_token)
 				localStorage.setItem('token', response.data.access_token)
 				
-				navigate("/game")
+				navigate("/")
 			}
 		}
 		catch (error) {
@@ -167,17 +167,6 @@ function Signin() {
 
 /* ========================================================================== */
 
-	async function test() {
-		
-			const FTtoken = localStorage.getItem('token')
-			if (FTtoken)
-				setToken(FTtoken)
-
-			navigate("/game")
-				// if (token)
-				// setErrorRequest(true)
-		}
-
 	return (
 		<SigninPage>
 			<MainTitle>
@@ -256,7 +245,7 @@ function Signin() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to="http://localhost:3333/auth/api42" onClick={test}>
+						<LinkButtonImage to="http://localhost:3333/auth/api42">
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>
