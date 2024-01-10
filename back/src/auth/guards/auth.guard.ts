@@ -30,7 +30,8 @@ export class JwtGuard extends AuthGuard('jwt') {
 		}	
 		try {
 		  const decoded = this.jwt.verify(token);
-		  request['user'] = decoded;	
+		  request['user'] = decoded;
+		  console.log("decoded : ", decoded);
 		  return true;
 		} catch (error) {
 			console.log("JwtGuard error: ", error);	

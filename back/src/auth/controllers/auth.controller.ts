@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res,  UseGuards, UnauthorizedException } from "@nestjs/common";
+import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, LocalAuthGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
@@ -66,6 +66,8 @@ export class AuthController {
 		//console.log("user in api42/callback : ", res);
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
+			res.cookie('jwt', token.access_token, { httpOnly: true });
+
 			//res.set('Authorization', token.access_token);
 			//res.json(user);
 			//res.status(301).redirect("http://localhost:5173/game");
@@ -76,7 +78,8 @@ export class AuthController {
 
 			res.status(302).redirect(url.href);
 		}
-		return "OK tu es CO";
+		else
+			throw new BadRequestException("Can't find user from 42 intra");
 	}
 
 	@Get('profile')
