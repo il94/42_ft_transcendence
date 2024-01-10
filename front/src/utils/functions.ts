@@ -9,18 +9,8 @@ import DefaultPurpleAvatar from "../assets/default_purple.png"
 import DefaultRedAvatar from "../assets/default_red.png"
 import DefaultYellowAvatar from "../assets/default_yellow.png"
 
-export function convertBackStatus(status: string): userStatus
-{
-	if (status === "ONLINE")
-		return (userStatus.ONLINE)
-	else if (status === "PLAYING")
-		return (userStatus.PLAYING)
-	else if (status === "WAITING")
-		return (userStatus.WAITING)
-	else if (status === "WATCHING")
-		return (userStatus.WATCHING)
-	else
-		return (userStatus.OFFLINE)
+export function capitalize(str: string): string {
+	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase())
 }
 
 export function getRandomDefaultAvatar(): string {

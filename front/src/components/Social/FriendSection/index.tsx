@@ -17,10 +17,12 @@ import {
 
 import CardContext from "../../../contexts/CardContext"
 import InteractionContext from "../../../contexts/InteractionContext"
+import DisplayContext from "../../../contexts/DisplayContext"
+
+import { capitalize } from "../../../utils/functions"
 
 import { User } from "../../../utils/types"
 import { contextualMenuStatus, userStatus } from "../../../utils/status"
-import DisplayContext from "../../../contexts/DisplayContext"
 
 type PropsFriendSection = {
 	friend: User,
@@ -112,12 +114,12 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 			<Avatar src={friend.avatar} />
 			{
 				!social &&
-				<ProfileInfo $offline={friend.status === "Offline"}>
+				<ProfileInfo $offline={friend.status === userStatus.OFFLINE}>
 					<ProfileName>
 						{friend.username}
 					</ProfileName>
 					<ProfileStatus>
-						{friend.status}
+						{capitalize(friend.status)}
 					</ProfileStatus>
 				</ProfileInfo>
 			}

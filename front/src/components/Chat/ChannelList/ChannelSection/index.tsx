@@ -26,31 +26,21 @@ function ChannelSection({ channel, setChannelTarget, backgroundColor }: PropsCha
 				}
 			})
 
-			console.log(response.data)
-
 			const owner = response.data.members.find((member: any) => {
 				return member.role === "OWNER"
 			}).user
-
-			console.log("OWNER = ", owner)
-
 			
 			const admins = response.data.members.filter((member: any) => {
 				return member.role === "ADMIN"
 			}).map((member: any) => {
 				return member.user
 			})
-
-			console.log("ADMINS = ", admins)
-
 			
 			const users = response.data.members.filter((member: any) => {
 				return member.role === "USER"
 			}).map((member: any) => {
 				return member.user
 			})
-
-			console.log("USERS = ", users)
 			
 			setChannelTarget(() => ({
 				...channel,

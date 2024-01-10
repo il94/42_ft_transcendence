@@ -89,7 +89,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 				phoneNumber.error)
 				return
 
-			const updateUser: any = {
+			const newDatas: any = {
 				username: username.value !== userAuthenticate.username ? username.value : undefined,
 				avatar: avatar ? avatar : undefined,
 				hash: password.value ? password.value : undefined,
@@ -98,7 +98,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 				twoFA: twoFA.value !== userAuthenticate.twoFA ? twoFA.value : undefined,
 			}
 
-			await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, updateUser,
+			await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, newDatas,
 			{
 				headers: {
 					'Authorization': `Bearer ${token}`
@@ -107,11 +107,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 
 			setUserAuthenticate((prevState) => ({
 				...prevState,
-				username: username.value,
-				avatar: avatar,
-				email: email.value,
-				phoneNumber: phoneNumber.value,
-				twoFA: twoFA.value
+				...newDatas,
 			}))
 			displaySettingsMenu(false)
 		}

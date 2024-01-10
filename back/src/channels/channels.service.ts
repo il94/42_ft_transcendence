@@ -36,6 +36,7 @@ export class ChannelsService {
                 id: true,
                 username: true,
                 avatar: true,
+                status: true,
                 wins: true,
                 draws: true,
                 losses : true     

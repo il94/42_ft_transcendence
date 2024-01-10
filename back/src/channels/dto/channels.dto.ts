@@ -8,10 +8,12 @@ export class CreateChannelDto implements Channel {
 	
 	createdAt:  Date;
 
+	@IsOptional()
 	@IsString()
 	@MaxLength(8)
 	name:       string;
 
+	@IsOptional()
 	@IsString()
 	type:       ChannelStatus;
 

@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react"
+
 import styled from "styled-components"
 
 import TextInput from "./TextInput"
@@ -6,7 +8,6 @@ import Discussion from "./Discussion"
 import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
-import { Dispatch, SetStateAction } from "react"
 
 const Style = styled.div`
 

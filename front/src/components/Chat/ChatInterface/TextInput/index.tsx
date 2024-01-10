@@ -8,7 +8,6 @@ import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { Channel } from "../../../../utils/types"
-import { messageStatus } from "../../../../utils/status"
 import { Socket } from "socket.io-client"
 
 type PropsTextInput = {

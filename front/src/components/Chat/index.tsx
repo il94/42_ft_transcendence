@@ -83,12 +83,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 
 	useEffect(() => {
 		if (channelTarget)
-		{
-			if (channelTarget.type === channelStatus.PROTECTED && !channelTarget.validUsers.includes(userAuthenticate))
-				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
-			else
-				setChatWindowState(chatWindowStatus.CHANNEL)
-		}
+			setChatWindowState(chatWindowStatus.CHANNEL)
 		else
 			setChatWindowState(chatWindowStatus.HOME)
 	}, [channelTarget])

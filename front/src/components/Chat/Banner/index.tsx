@@ -79,7 +79,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 					alt="Reduce button" title="Reduce" />
 				{
 					(channelTarget &&
-					channelTarget.owner === userAuthenticate &&
+					channelTarget.owner.id === userAuthenticate.id &&
 					channelTarget.type !== channelStatus.MP &&
 					chatWindowState === chatWindowStatus.CHANNEL) ?
 					<Icon
