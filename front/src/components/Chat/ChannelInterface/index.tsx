@@ -29,14 +29,14 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { ChannelData } from "../../../utils/types"
+import { Channel } from "../../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 
 import RemoveIcon from "../../../assets/close.png"
 import DefaultChannelIcon from "../../../assets/default_channel.png"
 
 type PropsChannelInterface = {
-	channel: ChannelData | undefined,
+	channel: Channel | undefined,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	setBannerName: Dispatch<SetStateAction<string>>
@@ -67,9 +67,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
-
-					/* ============ Temporaire ============== */
-
 					const patchChannelResponse = await axios.patch(`http://localhost:3333/channel/${channel.id}`,
 					{
 						name: name.value,
@@ -82,8 +79,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 							'Authorization': `Bearer ${token}`
 						}
 					})
-	
-					/* ====================================== */
 
 					channel.name = name.value
 					channel.type = channelType
@@ -112,7 +107,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					}
 				})
 
-				const newChannel: ChannelData | undefined = {
+				const newChannel: Channel | undefined = {
 					id: postChannelResponse.data.id,
 					name: name.value,
 					avatar: avatar,
@@ -138,6 +133,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 			}
 		}
 		catch (error) {
+			console.log(error)
 			setError(true)
 		}
 	}

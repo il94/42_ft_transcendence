@@ -1,5 +1,5 @@
 import { userStatus } from "./status"
-import { ChannelData, User } from "./types"
+import { Channel, User } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -9,7 +9,7 @@ import DefaultPurpleAvatar from "../assets/default_purple.png"
 import DefaultRedAvatar from "../assets/default_red.png"
 import DefaultYellowAvatar from "../assets/default_yellow.png"
 
-export function getStatus(status: string): userStatus
+export function convertBackStatus(status: string): userStatus
 {
 	if (status === "ONLINE")
 		return (userStatus.ONLINE)
@@ -44,7 +44,7 @@ export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
 }
 
-export function sortChannelByName(a: ChannelData, b: ChannelData) {
+export function sortChannelByName(a: Channel, b: Channel) {
 	return (a.name.localeCompare(b.name))
 }
 

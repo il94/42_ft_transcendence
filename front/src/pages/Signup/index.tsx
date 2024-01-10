@@ -95,6 +95,7 @@ function Signup() {
 			navigate("/")
 		}
 		catch (error) {
+			console.log(error)
 			// temporaire
 			// Gestion d'erreurs utilisateur a faire
 

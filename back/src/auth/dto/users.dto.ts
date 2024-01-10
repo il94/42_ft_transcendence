@@ -1,7 +1,7 @@
 import { User, UserStatus } from "@prisma/client"
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsEmail, IsString, IsNotEmpty, 
-	IsMobilePhone, IsOptional, MaxLength, MinLength
+	IsMobilePhone, IsOptional, MaxLength, MinLength, IsBoolean
  } from "class-validator";
 
 export class CreateUserDto implements User {
@@ -47,24 +47,34 @@ export class CreateUserDto implements User {
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
+	@IsOptional()
 	@IsString()
 	@ApiProperty()
 	username: string;
 
+	@IsOptional()
 	@IsString()
 	@ApiProperty()
 	hash: string;
 
+	@IsOptional()
 	@IsEmail()
 	@ApiProperty()
 	email: string;
 
+	@IsOptional()
 	@IsMobilePhone()
 	@ApiProperty()
 	phoneNumber: string;
 
+	@IsOptional()
 	@IsString()
 	@ApiProperty()
 	avatar: string;
+
+	@IsOptional()
+	@IsBoolean()
+	@ApiProperty()
+	twoFA: boolean;
 
 }

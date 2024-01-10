@@ -26,7 +26,7 @@ import InteractionContext from "../../../contexts/InteractionContext"
 
 import { sortChannelByName, sortUserByName } from "../../../utils/functions"
 
-import { ChannelData, User, UserAuthenticate } from "../../../utils/types"
+import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
 import { getRandomStatus } from "../../../temp/temp"
@@ -40,7 +40,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const { token } = useContext(AuthContext)!
 
-	function generateResults(results: User[] | ChannelData[], type: string, littleResults: boolean) {
+	function generateResults(results: User[] | Channel[], type: string, littleResults: boolean) {
 		return (
 			<Group>
 				<GroupName>
@@ -67,7 +67,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as ChannelData)
+											addChannelToChannelList(result as Channel)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -82,7 +82,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										</>
 										:
 										<>
-											{(result as ChannelData).name}
+											{(result as Channel).name}
 										</>
 									}
 								</Result>
@@ -100,7 +100,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as ChannelData)
+											addChannelToChannelList(result as Channel)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -115,7 +115,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										</>
 										:
 										<>
-											{(result as ChannelData).name}
+											{(result as Channel).name}
 										</>
 									}
 								</Result>
@@ -129,8 +129,8 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const [users, setUsers] = useState<User[]>([])
 	const [usersFound, setUsersFound] = useState<User[]>([])
-	const [channels, setChannels] = useState<ChannelData[]>([])
-	const [channelsFound, setChannelsFound] = useState<ChannelData[]>([])
+	const [channels, setChannels] = useState<Channel[]>([])
+	const [channelsFound, setChannelsFound] = useState<Channel[]>([])
 
 	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
@@ -153,7 +153,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		}
 	}
 
-	async function addChannelToChannelList(channel: ChannelData) {
+	async function addChannelToChannelList(channel: Channel) {
 		try {
 			// temporaire
 			// Condition OK, a decommenter quand les infos de relation du channel seront retournees par le back
@@ -161,7 +161,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 			{
 				await axios.post(`http://localhost:3333/channel/join`, {
 					id: channel.id,
-					password: "salut" // temporaire
+					password: "mdp" // temporaire
 				},
 				{
 					headers: {
@@ -220,7 +220,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
-				setChannels(channelsResponse.data.filter((channel: ChannelData) => (
+				setChannels(channelsResponse.data.filter((channel: Channel) => (
 					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
 				)).sort(sortChannelByName))
 			}
@@ -233,7 +233,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	useEffect(() => {
 		setUsersFound(users.filter((user: User) => user.username.startsWith(value)))
-		setChannelsFound(channels.filter((channel: ChannelData) => channel.name.startsWith(value)))
+		setChannelsFound(channels.filter((channel: Channel) => channel.name.startsWith(value)))
 	}, [value])
 
 	useEffect(() => {

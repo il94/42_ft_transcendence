@@ -5,7 +5,7 @@ import styled from "styled-components"
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
-import { ChannelData } from "../../../utils/types"
+import { Channel } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
 
@@ -21,8 +21,8 @@ const Style = styled.div`
 `
 
 type PropsChannelList = {
-	channels: ChannelData[],
-	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>
+	channels: Channel[],
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
 }
 
 function ChannelList({ channels, setChannelTarget }: PropsChannelList) {

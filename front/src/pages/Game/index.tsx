@@ -39,14 +39,14 @@ import DisplayContext from '../../contexts/DisplayContext'
 import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
-import { ChannelData, User, UserAuthenticate } from '../../utils/types'
+import { Channel, User, UserAuthenticate } from '../../utils/types'
 import { chatWindowStatus, contextualMenuStatus, userStatus } from '../../utils/status'
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, userSomeone } from '../../temp/temp'
-import { getStatus } from '../../utils/functions'
+import { convertBackStatus } from '../../utils/functions'
 
 function Game() {
 
@@ -70,7 +70,7 @@ function Game() {
 
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
-	const [channelTarget, setChannelTarget] = useState<ChannelData | undefined>(undefined)
+	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
 	const { token } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
@@ -98,7 +98,7 @@ function Game() {
 
 					return {
 						...rest,
-						status: getStatus(friend.status),
+						status: convertBackStatus(friend.status),
 						scoreResume: {
 							wins: wins,
 							draws: draws,
@@ -114,7 +114,7 @@ function Game() {
 			}
 		}
 
-		async function fetchChannels(): Promise<ChannelData[]> {
+		async function fetchChannels(): Promise<Channel[]> {
 			try {
 				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
 					headers: {
@@ -122,12 +122,10 @@ function Game() {
 					}
 				})
 
-				// temporaire
-				// Ajouter les infos de relation du channel quand elles seront retournees par le back
-				const channels: ChannelData[] = channelsResponse.data.map((channel: ChannelData) => ({
+				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => ({
 					...channel,
 					messages: [],
-					owner: userSomeone,
+					owner: emptyUser,
 					administrators: [],
 					users: [],
 					validUsers: [],
@@ -146,7 +144,7 @@ function Game() {
 		async function fetchMe() {
 			try {
 				const friends: User[] = await fetchFriends()
-				const channels: ChannelData[] = await fetchChannels()
+				const channels: Channel[] = await fetchChannels()
 
 				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
 					headers: {
