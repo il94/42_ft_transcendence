@@ -77,6 +77,8 @@ function Signin() {
 
 			const response = await axios.post("http://localhost:3333/auth/signin", user)
 	
+			console.log("response =", response)
+
 			//temporaire
 			if (response.data.twoFA)
 				navigate("/twofa")

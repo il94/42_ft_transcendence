@@ -329,7 +329,9 @@ function Game() {
 											{
 												settings &&
 												<SettingsMenu
+													token={token}
 													userAuthenticate={userAuthenticate}
+													setUserAuthenticate={setUserAuthenticate}
 													displaySettingsMenu={displaySettingsMenu} />
 											}
 											<TestsBack />

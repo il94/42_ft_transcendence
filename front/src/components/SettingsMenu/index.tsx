@@ -38,7 +38,9 @@ type PropsSettingsMenu = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
+
 function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
+	const [testt, setTestt] = useState()
 
 	type PropsSetting = {
 		value: string,
@@ -79,7 +81,6 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 	})
 	const [avatar, setAvatar] = useState<string>(userAuthenticate.avatar)
 
-
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
@@ -88,6 +89,16 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 				email.error ||
 				phoneNumber.error)
 				return
+
+			// const test = await axios.get(`http://localhost:3333/auth/2fa/generate`, {
+			// 	headers: {
+			// 		'Authorization': `Bearer ${token}`
+			// 	}
+			// })
+
+			// setTestt(test.data)
+
+			// console.log("test", test)
 
 			const newDatas: any = {
 				username: username.value !== userAuthenticate.username ? username.value : undefined,
@@ -98,13 +109,13 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 				twoFA: twoFA.value !== userAuthenticate.twoFA ? twoFA.value : undefined,
 			}
 
-			await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, newDatas,
+			const patch = await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, newDatas,
 			{
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
+			console.log("patch", patch)
 			setUserAuthenticate((prevState) => ({
 				...prevState,
 				...newDatas,
@@ -377,6 +388,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 							}
 						</Button>
 					</Setting>
+					<img src={testt} />
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />

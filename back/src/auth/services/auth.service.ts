@@ -8,6 +8,7 @@ import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
 import { authenticator } from "otplib";
 import { generate } from "generate-password";
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +33,8 @@ export class AuthService {
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
 				throw new ForbiddenException('incorrect password');
+			if(user.twoFA)
+				return { twoFA: true };
 			return this.signToken(user.id, user.username)
 		} catch (error) {
             const err = error as Error;
@@ -76,6 +79,10 @@ export class AuthService {
 		} catch (error) {
 		  return null;
 		}
+	}
+
+	async generateQrCodeDataURL(otpAuthUrl: string) {
+		return toDataURL(otpAuthUrl);
 	}
 
 	async generateTwoFASecret(user: User) {

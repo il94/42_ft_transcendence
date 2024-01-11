@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
-import { Api42AuthGuard, JwtGuard, LocalAuthGuard } from '../guards/auth.guard';
+import { Api42AuthGuard, JwtGuard, Jwt2faAuthGuard  } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
 import { Public, getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
@@ -24,34 +24,45 @@ export class AuthController {
 		return this.authService.validateUser(dto);
 	}
 
-	@Post('2fa/turn-on')
+	@Get('2fa/generate')
 	@UseGuards(JwtGuard)
-	async turnOnTwoFA(@Req() request, @Body() body) {
-	  const isCodeValid =
-		this.authService.isTwoFACodeValid(
+	async register(@Res() res, @getUser() user: User) {
+		console.log("in 2fa generate");
+		// if (user.twoFA)
+		// 	throw new BadRequestException('2FA already enabled!');
+	  const { otpAuthURL } =
+		await this.authService.generateTwoFASecret(user);
+	
+	  return res.json(
+		await this.authService.generateQrCodeDataURL(otpAuthURL),
+	  );
+	}
+
+	@Post('2fa/turn-on')
+	@UseGuards(JwtGuard, Jwt2faAuthGuard )
+	async turnOnTwoFA(@getUser() user: User, @Body() body) {
+		// if (user.twoFA)
+		// 	throw new BadRequestException('2FA already enabled!');
+		const isCodeValid = this.authService.isTwoFACodeValid(
 		  body.twoFACode,
-		  request.user,
+		  user,
 		);
-	  if (!isCodeValid) {
+	  if (!isCodeValid)
 		throw new UnauthorizedException('Wrong authentication code');
-	  }
-	  await this.userService.turnOnTwoFA(request.user.id);
+	  await this.userService.turnOnTwoFA(user.id);
 	}
 
 	@Post('2fa/authenticate')
   	@HttpCode(200)
   	@UseGuards(JwtGuard)
-  	async authenticate(@Req() request, @Body() body) {
+  	async authenticate(@getUser() user: User, @Body() body) {
     	const isCodeValid = this.authService.isTwoFACodeValid(
       	body.twoFACode,
-      	request.user,
+      	user,
     	);
-
-    	if (!isCodeValid) {
-      	throw new UnauthorizedException('Wrong authentication code');
-    	}
-
-    	return this.authService.loginWith2fa(request.user);
+    	if (!isCodeValid)
+      		throw new UnauthorizedException('Wrong authentication code');
+    	return this.authService.loginWith2fa(user);
   	}
 
 	@Get('api42')
@@ -75,7 +86,7 @@ export class AuthController {
 	}
 
 	@Get('profile')
-	@UseGuards(Api42AuthGuard)
+	@UseGuards(JwtGuard)
 	getProfile(@Req() req) {
 		console.log("profile: ", req.user);
 		if (req.user) {
@@ -91,6 +102,7 @@ export class AuthController {
 		//delete req.cookies.token.access_token;
 		//console.log("cookie after delete: ", req.cookies);
 		console.log("Res : ", res);
+		res.clearCookie('access_token');
 		return 'Hello cookie';
 	}
 

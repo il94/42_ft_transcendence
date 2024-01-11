@@ -29,6 +29,7 @@ import { SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
+import axios from 'axios'
 
 function TwoFA() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
@@ -50,7 +51,7 @@ function TwoFA() {
 
 			/* ============ Temporaire ============== */
 			
-			// const response = await axios.post("http://localhost:3333/auth/signin/twofa", code)
+			const response = await axios.post("http://localhost:3333/auth/2fa/authenticate", code)
 	
 			// setToken(response.data.access_token)
 			// localStorage.setItem('token', response.data.access_token)

@@ -5,7 +5,7 @@ import { UsersService } from './services/users.service';
 import { PrismaModule } from "src/prisma/prisma.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy, LocalStrategy } from './strategy';
+import { Jwt2faStrategy, JwtStrategy, LocalStrategy } from './strategy';
 import { Api42Strategy } from "./strategy/api42.strategy";
 import { SessionSerializer } from "./Serializer";
 import { UsersController } from "./controllers/users.controller";
@@ -27,14 +27,12 @@ import { HttpModule } from "@nestjs/axios";
 	],
 	providers: [JwtStrategy, 
 		Api42Strategy,
-		//LocalStrategy,
+		Jwt2faStrategy,
 		AuthService, 
 		UsersService, 
 		SessionSerializer, 
 		Api42AuthGuard,
 		JwtGuard,
-		//{	provide: APP_GUARD,
-		//	useClass: JwtGuard, },
 	],
 		
 	controllers: [AuthController, UsersController],

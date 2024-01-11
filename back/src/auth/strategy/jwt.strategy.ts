@@ -6,22 +6,24 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private prisma: PrismaService,) {
-    const extractJwtFromCookie = (req) => {
-      let token = null;
-      if (req && req.cookies) {
-        token = req.cookies['access_token'];
-      }
-      return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    };
+
+    // const extractJwtFromCookie = (req) => {
+    //   let token = null;
+    //   if (req && req.cookies) {
+    //     token = req.cookies['access_token'];
+    //   }
+    //   return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+    // };
 
     super({
-		jwtFromRequest: extractJwtFromCookie,
+		jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     ignoreExpiration: false,
 		secretOrKey: process.env.JWT_SECRET,
 	});
   }
   
   async validate(payload: {sub: number; username: string; }) {
+    console.log("payload: ", payload)
     const user = await this.prisma.user.findUnique({
         where: { id: payload.sub, },
       });
@@ -29,6 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new NotFoundException(`User with ${payload.sub} does not exist.`);
     delete user.hash;
     delete user.twoFASecret;
+    console.log("user :", user)
     return user;
   }
 }
@@ -44,9 +47,7 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
 
   async validate(payload: any) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        email: payload.email,
-      },
+      where: { email: payload.email, },
     });
 
     if (!user.twoFA) {

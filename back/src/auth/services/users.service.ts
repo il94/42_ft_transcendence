@@ -115,27 +115,26 @@ export class UsersService {
 	}
 
 	async turnOnTwoFA(userId: number) {
-		const user = this.prisma.user.update({
-			where: {
-			  id: userId,
-			},
-			data: {
-			  twoFA: true,
-			},
-		});
-		return user;
+		try { 
+			const user = this.prisma.user.update({
+				where: { id: userId, },
+				data: { twoFA: true, },
+			});
+			return user;
+		} catch (error) { throw error; }
 	}
 
 	async setTwoFASecret(secret: string, userId: number) {
+		try {
 		const user = this.prisma.user.update({
-			where: {
-			  id: userId,
-			},
-			data: {
-			  twoFASecret: secret,
-			},
+			where: { id: userId, },
+			data: { twoFASecret: secret,
+					twoFA: true },
 		});
+		if (!user)
+			throw new NotFoundException(`User with ${userId} does not exist.`);
 		return user;
+		} catch (error) { throw error; }
 	}
 
 	// retrieve all user's channels
