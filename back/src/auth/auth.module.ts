@@ -19,7 +19,7 @@ import { HttpModule } from "@nestjs/axios";
 		JwtModule.registerAsync({
 			useFactory: async () => ({
 			  secret: process.env.JWT_SECRET,
-			  signOptions: { expiresIn: '1d' },
+			  signOptions: { expiresIn: '1h' },
 			}),
 		}),
 		PassportModule.register({ defaultStrategy: '42' }),

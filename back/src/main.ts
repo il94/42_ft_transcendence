@@ -6,6 +6,7 @@ import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-cl
 import session from 'express-session';
 import passport from 'passport'
 import { json } from 'express';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -39,6 +40,7 @@ async function bootstrap() {
 
 	app.use(passport.initialize());
 	app.use(passport.session());
+	app.use(cookieParser());
 	
 	await app.listen(3333);
 }

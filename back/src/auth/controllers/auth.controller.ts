@@ -85,4 +85,13 @@ export class AuthController {
 		}
 	}
 
+	@Get()
+	getHello(@Req() req, @Res() res): string {
+		console.log(req.cookies);
+		//delete req.cookies.token.access_token;
+		//console.log("cookie after delete: ", req.cookies);
+		console.log("Res : ", res);
+		return 'Hello cookie';
+	}
+
 }
