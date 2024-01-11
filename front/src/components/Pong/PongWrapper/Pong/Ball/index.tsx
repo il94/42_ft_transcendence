@@ -16,7 +16,7 @@ const Style = styled.div.attrs<{ $X: number ; $Y: number ; $BallSize:number }>((
 	position: absolute;
 	
 	
-	border-radius: 50%;
+	/* border-radius: 50%; */
 	
 	background-color: white
 	
