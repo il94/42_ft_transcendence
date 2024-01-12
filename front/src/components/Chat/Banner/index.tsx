@@ -18,6 +18,8 @@ import ChatContext from "../../../contexts/ChatContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
+import { channelIsEmpty } from "../../../utils/functions"
+
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 import { Channel, User } from "../../../utils/types"
 
@@ -34,43 +36,47 @@ type PropsBanner = {
 
 function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorRequest }: PropsBanner) {
 
+	function getNewOwner(channel: Channel): User | undefined {
+		const adminFind: User | undefined = channel.administrators.find((administrator) => administrator.id !== channel.owner?.id)
+		if (adminFind)
+			return (adminFind)
+		const memberFind: User | undefined = channel.users.find((user) => user.id !== channel.owner?.id)
+		if (memberFind)
+			return (memberFind)
+		return (undefined)
+	}
+
 	const { token } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function leaveChannel() {
 
-		function getNewOwner(channel: Channel): User | undefined {
-
-			const adminFind: User | undefined = channel.administrators.find((administrator) => administrator.id !== channel.owner.id)
-			if (adminFind)
-				return (adminFind)
-			const memberFind: User | undefined = channel.users.find((user) => user.id !== channel.owner.id)
-			if (memberFind)
-				return (memberFind)
-			return (undefined)
-		}
-
-		try {
-			if (!channelTarget)
-				throw (new Error)
-
-			if (channelTarget.users.length === 1)
-			{
-				await axios.delete(`http://localhost:3333/channel/${channelTarget.id}`, {
+		async function deleteChannel(channelId: number) {
+			try {
+				await axios.delete(`http://localhost:3333/channel/${channelId}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 				setChannelTarget(undefined)
 			}
-			else
-			{
-				/* ============ Temporaire ============== */
+			catch (error) {
+				throw error
+			}
+		}
 
-				// appeler la route qui supprime un user d'un channel
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/members/${userAuthenticate.id}`)
-
-				/* ====================================== */
+		async function memberLeaveChannel(channelId: number) {
+			try {
+				await axios.delete(`http://localhost:3333/channel/leave/${channelId}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+					
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					channels: prevState.channels.filter((channel) => channel.id !== channelId)
+				}))
 
 				setChannelTarget((prevState: Channel | undefined) => {
 					if (prevState)
@@ -79,20 +85,30 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 							...prevState,
 							users: prevState.users.filter((user) => user.id !== userAuthenticate.id),
 							administrators: prevState.administrators.filter((administrator) => administrator.id !== userAuthenticate.id),
-							owner: prevState.owner.id === userAuthenticate.id ? getNewOwner(channelTarget)! : prevState.owner
+							owner: prevState.owner?.id === userAuthenticate.id ? getNewOwner(prevState) : prevState.owner
 						}
 					}
 					else
 						return (undefined)
 				})
+
+				setChannelTarget(undefined)
 			}
+			catch (error) {
+				console.log(error)
+				throw error
+			}
+		}
 
-			setUserAuthenticate((prevState) => ({
-				...prevState,
-				channels: prevState.channels.filter((channel) => channel.id !== channelTarget.id)
-			}))
-
-			setChannelTarget(undefined)
+		try {
+			if (channelTarget)
+			{
+				await memberLeaveChannel(channelTarget.id)
+				if (channelIsEmpty(channelTarget))
+					await deleteChannel(channelTarget.id)
+			}
+			else
+				throw new Error
 		}
 		catch (error) {
 			setErrorRequest(true)
@@ -125,7 +141,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 					alt="Reduce button" title="Reduce" />
 				{
 					(channelTarget &&
-					channelTarget.owner.id === userAuthenticate.id &&
+					channelTarget.owner?.id === userAuthenticate.id &&
 					channelTarget.type !== channelStatus.MP &&
 					chatWindowState === chatWindowStatus.CHANNEL) ?
 					<Icon

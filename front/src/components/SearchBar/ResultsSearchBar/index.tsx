@@ -6,7 +6,7 @@ import {
 	useRef,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
 	AvatarResult,
@@ -24,7 +24,7 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
-import { sortChannelByName, sortUserByName } from "../../../utils/functions"
+import { channelIncludeUser, sortChannelByName, sortUserByName } from "../../../utils/functions"
 
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
@@ -67,7 +67,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as Channel)
+											addChannelToChannelList(result.id)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -100,7 +100,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as Channel)
+											addChannelToChannelList(result.id)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -153,11 +153,16 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		}
 	}
 
-	async function addChannelToChannelList(channel: Channel) {
+	async function addChannelToChannelList(channelId: number) {
 		try {
-			// temporaire
-			// Condition OK, a decommenter quand les infos de relation du channel seront retournees par le back
-			// if (!channel.users.includes(userAuthenticate))
+			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			const channel: Channel = channelResponse.data
+			if (!channelIncludeUser(channel, userAuthenticate))
 			{
 				await axios.post(`http://localhost:3333/channel/join`, {
 					id: channel.id,
@@ -169,21 +174,18 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
-				// temporaire
-				// Crash si l'on tente d'ouvrir le channel car il manque les infos de relation du channel 
+				channel.users.push(userAuthenticate)
+
 				setUserAuthenticate((prevState: UserAuthenticate) => ({
 					...prevState,
 					channels: [ ...prevState.channels, channel]
 				}))
-
-				// temporaire
-				// Code OK, a decommenter quand les infos de relation du channel seront retournees par le back
-				// channel.users.push(userAuthenticate)
 			}
 			setChannelTarget(channel)
 			displayChat(true)
 		}
 		catch (error) {
+			console.log(error)
 			setErrorRequest(true)
 		}
 	}

@@ -136,7 +136,8 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget} />
+												setChannelTarget={setChannelTarget}
+												setErrorRequest={setErrorRequest} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?

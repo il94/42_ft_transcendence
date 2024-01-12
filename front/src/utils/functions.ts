@@ -1,5 +1,5 @@
 import { userStatus } from "./status"
-import { Channel, User } from "./types"
+import { Channel, User, UserAuthenticate } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -46,4 +46,20 @@ export function sortUserByStatus(a: User, b: User) {
 	const bValue = status.indexOf(b.status)
 
 	return (aValue - bValue)
+}
+
+export function channelIncludeUser(channel: Channel, user: User | UserAuthenticate): boolean {
+	return (
+		channel.users.some((member) => member?.id === user.id) ||
+		channel.administrators.some((administrator) => administrator?.id === user.id) ||
+		channel.owner?.id === user.id
+	)
+}
+
+export function channelIsEmpty(channel: Channel): boolean {
+	return (
+		channel.users.length === 0 &&
+		channel.administrators.length === 0 &&
+		channel.owner === undefined
+	)
 }

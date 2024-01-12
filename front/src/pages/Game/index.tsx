@@ -123,13 +123,12 @@ function Game() {
 				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => ({
 					...channel,
 					messages: [],
-					owner: emptyUser,
+					owner: undefined,
 					administrators: [],
 					users: [],
 					validUsers: [],
 					mutedUsers: [],
 					bannedUsers: []
-
 				}))
 
 				return (channels)
@@ -170,7 +169,7 @@ function Game() {
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: responseMe.data.twoFA,
-					friends: [], // a recuperer depuis la reponse
+					friends: friends, // a recuperer depuis la reponse
 					blockedUsers: [], // a recuperer depuis la reponse
 					channels: channels, // a recuperer depuis la reponse
 					socket: socket

@@ -107,6 +107,8 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 									...newDatas
 								}
 							}
+							else
+								return channelToFind
 						})
 					}))
 				}
@@ -239,7 +241,9 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 
 	const [password, setPassword] = useState<string | undefined>(
 		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
-			channel.password
+			channel.password ?
+			channel.password :
+			''
 			:
 			''
 	)
