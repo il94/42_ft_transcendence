@@ -18,11 +18,11 @@ const Style = styled.div`
 	flex-direction: column;
 
 	position: absolute;
-	top: 30%;
+	top: 8%;
 	left: 50%;
 
 	width: 180px;
-	height: 380px;
+	height: 680px;
 
 	background-color: #a84152;
 	
@@ -219,6 +219,100 @@ function TestsBack() {
 		}
 	}
 
+/* =============================== FRIENDS ================================== */
+
+async function getFriends() {
+	try {
+		const test = await axios.get("http://localhost:3333/friends", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		console.log("FRIENDS = ", test)
+
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+async function postFriend() {
+	// try {
+	// 	const test = await axios.post("http://localhost:3333/channel",
+	// 		{
+	// 			name: "channl_1",
+	// 			type: "PUBLIC",
+	// 			avatar: DefaultChannel
+	// 		},
+	// 		{
+	// 			headers: {
+	// 				'Authorization': `Bearer ${token}`
+	// 			}
+	// 		}
+	// 	)
+	// 	console.log("CHANNEL = ", test)
+	// }
+	// catch (error) {
+	// 	console.log(error)
+	// }
+}
+
+async function postFriends() {
+	// try {
+	// 	let i = 0
+
+	// 	while (i < 5)
+	// 	{
+	// 		let test = await axios.post("http://localhost:3333/channel",
+	// 			{
+	// 				name: `channl_${i}`,
+	// 				type: "PUBLIC",
+	// 				avatar: DefaultChannel
+	// 			},
+	// 			{
+	// 				headers: {
+	// 					'Authorization': `Bearer ${token}`
+	// 				}
+	// 			}
+	// 		)
+	// 		console.log("CHANNEL", i, " = ", test)
+	// 		i++
+	// 	}
+	// }
+	// catch (error) {
+	// 	console.log(error)
+	// }
+}
+
+async function deleteFriends() {
+	// try {
+	// 	let i = 0
+
+	// 	const channels: AxiosResponse = await axios.get("http://localhost:3333/channel", {
+	// 		headers: {
+	// 			'Authorization': `Bearer ${token}`
+	// 		}
+	// 	})
+	// 	while (i < channels.data.length)
+	// 	{
+	// 		console.log("ID = ", channels.data[i].id)
+	// 		let test = await axios.delete(`http://localhost:3333/channel/${channels.data[i].id}`, {
+	// 			headers: {
+	// 				'Authorization': `Bearer ${token}`
+	// 			}
+	// 			}
+	// 		)
+	// 		console.log("CHANNEL", i, " = ", test)
+	// 		i++
+	// 	}
+	// }
+	// catch (error) {
+	// 	console.log(error)
+	// }
+}
+
+
+	
 	return (
 		<Style>
 
@@ -244,6 +338,21 @@ function TestsBack() {
 			<Bout onClick={deleteChannels}>
 				delete channels
 			</Bout>
+
+			<Bout onClick={getFriends}>
+				get friends
+			</Bout>
+			<Bout onClick={postFriend}>
+				post friend
+			</Bout>
+			<Bout onClick={postFriends}>
+				post friends
+			</Bout>
+			<Bout onClick={deleteFriends}>
+				delete friends
+			</Bout>
+
+
 
 		</Style>
 	)
