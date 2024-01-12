@@ -6,7 +6,7 @@ import {
 	useRef,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
 	AvatarResult,
@@ -24,7 +24,7 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
-import { sortChannelByName, sortUserByName } from "../../../utils/functions"
+import { channelIncludeUser, sortChannelByName, sortUserByName } from "../../../utils/functions"
 
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
@@ -40,7 +40,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const { token } = useContext(AuthContext)!
 
-	function generateResults(results: User[] | Channel[], type: string, littleResults: boolean) {
+	function generateResults(results: User[] | Channel[], type: string) {
 		return (
 			<Group>
 				<GroupName>
@@ -67,7 +67,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as Channel)
+											addChannelToChannelList(result.id)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -100,7 +100,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 										type === "user" ?
 											addUserToFriendList(result as User)
 											:
-											addChannelToChannelList(result as Channel)
+											addChannelToChannelList(result.id)
 										}
 									}
 									$noAvatar={littleResults}>
@@ -153,37 +153,48 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		}
 	}
 
-	async function addChannelToChannelList(channel: Channel) {
+	async function addChannelToChannelList(channelId: number) {
 		try {
-			// temporaire
-			// Condition OK, a decommenter quand les infos de relation du channel seront retournees par le back
-			// if (!channel.users.includes(userAuthenticate))
+			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			const channel: Channel = channelResponse.data
+			if (!channelIncludeUser(channel, userAuthenticate))
 			{
-				await axios.post(`http://localhost:3333/channel/join`, {
-					id: channel.id,
-					password: "mdp" // temporaire
-				},
+				if (channel.type === channelStatus.PROTECTED)
+					setChannelTarget(channel)
+				else
 				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+					await axios.post(`http://localhost:3333/channel/join`, {
+						id: channel.id
+					},
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 
-				// temporaire
-				// Crash si l'on tente d'ouvrir le channel car il manque les infos de relation du channel 
-				setUserAuthenticate((prevState: UserAuthenticate) => ({
-					...prevState,
-					channels: [ ...prevState.channels, channel]
-				}))
+					setUserAuthenticate((prevState: UserAuthenticate) => ({
+						...prevState,
+						channels: [ ...prevState.channels, channel]
+					}))
 
-				// temporaire
-				// Code OK, a decommenter quand les infos de relation du channel seront retournees par le back
-				// channel.users.push(userAuthenticate)
+					setChannelTarget(() => ({
+						...channel,
+						users: [...channel.users, userAuthenticate]
+					}))
+				}
+
 			}
-			setChannelTarget(channel)
+			else
+				setChannelTarget(channel)
 			displayChat(true)
 		}
 		catch (error) {
+			console.log(error)
 			setErrorRequest(true)
 		}
 	}
@@ -220,9 +231,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
-				setChannels(channelsResponse.data.filter((channel: Channel) => (
-					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
-				)).sort(sortChannelByName))
+				setChannels(channelsResponse.data.sort(sortChannelByName))
 			}
 			catch (error) {
 				setErrorRequest(true)
@@ -264,7 +273,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					usersFound.length > 0 &&
 					<>
 					{
-						generateResults(usersFound, "user", littleResults)
+						generateResults(usersFound, "user")
 					}
 					</>
 				}
@@ -272,7 +281,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					channelsFound.length > 0 &&
 					<>
 					{
-						generateResults(channelsFound, "channel", littleResults)
+						generateResults(channelsFound, "channel")
 					}
 					</>
 				}

@@ -31,15 +31,15 @@ export type UserAuthenticate = User & {
 
 export type Channel = {
 	id: number,
+	createdAt?: string,
 	name: string,
 	avatar: string,
 	type: channelStatus,
 	password?: string,
 	messages: (MessageText | MessageInvitation)[],
-	owner: User | UserAuthenticate,
-	administrators: (User | UserAuthenticate)[],
 	users: (User | UserAuthenticate)[],
-	validUsers: (User | UserAuthenticate)[],
+	administrators: (User | UserAuthenticate)[],
+	owner: User | UserAuthenticate | undefined,
 	mutedUsers: (User | UserAuthenticate)[],
 	bannedUsers: (User | UserAuthenticate)[]
 }

@@ -83,7 +83,14 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 
 	useEffect(() => {
 		if (channelTarget)
-			setChatWindowState(chatWindowStatus.CHANNEL)
+		{
+			if (channelTarget.type === channelStatus.PROTECTED &&
+				!channelTarget.users.some((member) => member.id === userAuthenticate.id) &&
+				channelTarget.owner?.id !== userAuthenticate.id)
+				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
 		else
 			setChatWindowState(chatWindowStatus.HOME)
 	}, [channelTarget])
@@ -136,15 +143,18 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget} />
+												setChannelTarget={setChannelTarget}
+												setErrorRequest={setErrorRequest} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?
 													<HomeInterface />
 													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
 														<LockedInterface
-															channelTarget={channelTarget}
-															setChatWindowState={setChatWindowState} />
+															channel={channelTarget}
+															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
+															setChatWindowState={setChatWindowState}
+															setErrorRequest={setErrorRequest} />
 														:
 														<ChatInterface
 															channel={channelTarget}

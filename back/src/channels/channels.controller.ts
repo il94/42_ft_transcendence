@@ -53,4 +53,11 @@ export class ChannelController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.channelsService.remove(id);
 	}
+
+  @Delete('leave/:id')
+  leave(@Param('id', ParseIntPipe) channId: number,
+  @getUser() member: User) {
+    return this.channelsService.leaveChannel(member, channId);
+	}
+
 }

@@ -107,9 +107,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				userAuthenticate
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -140,9 +137,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			users: [
 				userAuthenticate,
 				userSomeone
-			],
-			validUsers: [
-				userAuthenticate
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -175,9 +169,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				userAuthenticate
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -207,9 +198,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			users: [
 				userAuthenticate,
 				userSomeone
-			],
-			validUsers: [
-				osef
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -242,9 +230,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -274,9 +259,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			],
 			users: [
 				userAuthenticate,
-				userSomeone
-			],
-			validUsers: [
 				userSomeone
 			],
 			mutedUsers: [],
@@ -311,9 +293,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -343,9 +322,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			],
 			users: [
 				userAuthenticate,
-				userSomeone
-			],
-			validUsers: [
 				userSomeone
 			],
 			mutedUsers: [],
@@ -379,9 +355,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -413,9 +386,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -441,9 +411,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				userAuthenticate
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -466,9 +433,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			users: [
 				userSomeone,
 				userAuthenticate
-			],
-			validUsers: [
-				userSomeone
 			],
 			mutedUsers: [],
 			bannedUsers: []
