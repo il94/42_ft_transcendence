@@ -1,16 +1,18 @@
-import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException } from "@nestjs/common";
+import { Body, Controller, Get, Post, Patch, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, Jwt2faAuthGuard  } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
 import { Public, getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
 import { Response } from 'express';
-import { User } from '@prisma/client';
+import { User, UserStatus } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
 	constructor(private authService: AuthService, 
 		private userService: UsersService) {}
+
+	/*********************** Auth form routes *******************************/
 
 	@Post('signup')
 	@HttpCode(HttpStatus.OK)
@@ -24,46 +26,28 @@ export class AuthController {
 		return this.authService.validateUser(dto);
 	}
 
-	@Get('2fa/generate')
+	@Get('profile')
 	@UseGuards(JwtGuard)
-	async register(@Res() res, @getUser() user: User) {
-		console.log("in 2fa generate");
-		// if (user.twoFA)
-		// 	throw new BadRequestException('2FA already enabled!');
-	  const { otpAuthURL } =
-		await this.authService.generateTwoFASecret(user);
-	
-	  return res.json(
-		await this.authService.generateQrCodeDataURL(otpAuthURL),
-	  );
+	getProfile(@Req() req) {
+		console.log("profile: ", req.user);
+		if (req.user) {
+			return { msg: 'Authenticated' };
+		} else { 
+			return { msg: 'NOT Authenticated' };
+		}
 	}
 
-	@Post('2fa/turn-on')
-	@UseGuards(JwtGuard, Jwt2faAuthGuard )
-	async turnOnTwoFA(@getUser() user: User, @Body() body) {
-		// if (user.twoFA)
-		// 	throw new BadRequestException('2FA already enabled!');
-		const isCodeValid = this.authService.isTwoFACodeValid(
-		  body.twoFACode,
-		  user,
-		);
-	  if (!isCodeValid)
-		throw new UnauthorizedException('Wrong authentication code');
-	  await this.userService.turnOnTwoFA(user.id);
+	@Get('logout')
+	async logout(@getUser() user: User, @Res() res) {
+		//console.log(req.cookies);
+		//delete req.cookies.token.access_token;
+		//console.log("cookie after delete: ", req.cookies);
+		//console.log("Res : ", res);
+		//res.clearCookie('access_token');
+		return this.authService.logout(user.id);
 	}
 
-	@Post('2fa/authenticate')
-  	@HttpCode(200)
-  	@UseGuards(JwtGuard)
-  	async authenticate(@getUser() user: User, @Body() body) {
-    	const isCodeValid = this.authService.isTwoFACodeValid(
-      	body.twoFACode,
-      	user,
-    	);
-    	if (!isCodeValid)
-      		throw new UnauthorizedException('Wrong authentication code');
-    	return this.authService.loginWith2fa(user);
-  	}
+	/*********************** Api42 routes ****************** ****************/
 
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
@@ -78,32 +62,53 @@ export class AuthController {
 			const token = await this.authService.signToken(user.id, user.username);
 			console.log("token: ", token);
 
-			res.cookie("access_token", token.access_token);
+			//res.cookie("access_token", token.access_token);
 			res.redirect("http://localhost:5173")
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");
 	}
 
-	@Get('profile')
-	@UseGuards(JwtGuard)
-	getProfile(@Req() req) {
-		console.log("profile: ", req.user);
-		if (req.user) {
-			return { msg: 'Authenticated' };
-		} else { 
-			return { msg: 'NOT Authenticated' };
+	/*********************** 2FA routes *************************************/
+
+	@Get('2fa/generate')  // cree le service de 2FA en creeant le twoFASecret du user et en generant un QRcode 
+	@UseGuards(JwtGuard, Jwt2faAuthGuard )
+	async register(@Res() res, @getUser() user: User) {
+		const { otpAuthURL } =
+		await this.authService.generateTwoFASecret(user);
+	  return res.json(
+		await this.authService.generateQrCodeDataURL(otpAuthURL),
+	  );
+	}
+
+	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
+	@UseGuards(JwtGuard, Jwt2faAuthGuard )
+	async turnOnTwoFA(@getUser() user: User, @Body() body) {
+		try {
+			if (!body.twoFACode)
+				throw new BadRequestException('Empty 2FA code');
+			await this.userService.turnOnTwoFA(user, body.twoFACode);
+		} catch (error) {
+			throw new BadRequestException(error.message);
 		}
 	}
 
-	@Get()
-	getHello(@Req() req, @Res() res): string {
-		console.log(req.cookies);
-		//delete req.cookies.token.access_token;
-		//console.log("cookie after delete: ", req.cookies);
-		console.log("Res : ", res);
-		res.clearCookie('access_token');
-		return 'Hello cookie';
+	@Post('2fa/authenticate')
+  	@HttpCode(200)
+  	@UseGuards(JwtGuard)
+  	async authenticate(@getUser() user: User, @Body() body) {
+    	if (user.status === UserStatus.ONLINE)
+			throw new BadRequestException('User is already authenticated');
+		if (!body.twoFACode)
+			throw new BadRequestException('Empty 2FA code');
+    	return this.authService.loginWith2fa(user, body.twoFACode);
+  	}
+
+	@Post('2fa/disable')
+	@HttpCode(200)
+	@UseGuards(JwtGuard)
+	async disable(@getUser() user: User, @Body() body, @Req() req) {
+		return this.userService.disableTwoFA(user, body.twoFACode) //il faut envoyer un code dans le body pour disable la 2FA
 	}
 
 }

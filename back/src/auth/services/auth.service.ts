@@ -17,6 +17,9 @@ export class AuthService {
 		private jwt: JwtService, 
 		private userService: UsersService) {}
 
+	
+	//*********************** General Authentication ******************************************/
+
 	async signup(dto: CreateUserDto) {
 		const newUser = await this.userService.createUser(dto);
 		delete newUser.hash;
@@ -25,43 +28,27 @@ export class AuthService {
 
 	async validateUser(dto: AuthDto) {
 		try {
-			let user = await this.prisma.user.findUnique({
+			const user = await this.prisma.user.findUnique({
 					where: { username: dto.username, },
 				});
 			if (!user)
 				throw new BadRequestException('user not found');
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
-				throw new ForbiddenException('incorrect password');
-			if(user.twoFA)
-				return { twoFA: true };
-			return this.signToken(user.id, user.username)
+				throw new ForbiddenException('incorrect password');			
+			if(user.twoFA === false) {
+				await this.prisma.user.update({ 
+					where: { username: dto.username },
+					data: { status: UserStatus.ONLINE }})
+				return this.signToken(user.id, user.username)
+			}
+			// else : return nulll to login with 2FA
+			return `User ${user.username} must login with 2FA`
 		} catch (error) {
             const err = error as Error;
             console.log("Validate user error: ", err.message);
             throw new BadRequestException(err.message)
         }
-	}
-
-	async validate42User(profile: any) {
-		try {
-			const user = await this.prisma.user.findUnique({
-				where: { username: profile.username, },
-			});
-			if (user)
-				return user;
-			console.log ("jai pas trouve le user");
-			profile.hash = generate({ length: 6, numbers: true });
-			const newUser = await this.userService.createUser(profile as CreateUserDto)
-			if (!newUser)
-				throw new ForbiddenException('Failed to create new 42 user');
-			return user;
-
-		} catch (error) {
-			const err = error as Error;
-            console.log("Validate 42 user error: ", err.message);
-            throw new BadRequestException(err.message)
-		}
 	}
 
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
@@ -73,13 +60,54 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
-	async _verifyToken(token: string): Promise<any> {
+	async verifyToken(token: string): Promise<any> {
 		try {
 		  return await this.jwt.verify(token);
 		} catch (error) {
 		  return null;
 		}
 	}
+
+	async logout(userId: number) {
+		const user = this.prisma.user.update({
+			where: { id: userId, status: UserStatus.ONLINE },
+			data: { status: UserStatus.OFFLINE }
+		})
+		if (!user)
+			throw new BadRequestException(`User with od ${userId}, not found or offline`)
+		return user;
+	}
+
+	/*********************** api42 Authentication ******************************************/
+
+	async validate42User(profile: any) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { username: profile.username, },
+			});
+			if (user) {
+				if (!user.twoFA) {
+					await this.prisma.user.update({ 
+						where: { username: profile.username },
+						data: { status: UserStatus.ONLINE }})
+					return this.signToken(user.id, user.username);
+				}
+				return `42 User must login with 2FA`;
+			}
+			console.log ("jai pas trouve le user");
+			profile.hash = generate({ length: 6, numbers: true });
+			const newUser = await this.userService.createUser(profile as CreateUserDto)
+			if (!newUser)
+				throw new ForbiddenException('Failed to create new 42 user');
+			return this.signToken(user.id, user.username);
+		} catch (error) {
+			const err = error as Error;
+            console.log("Validate 42 user error: ", err.message);
+            throw new BadRequestException(err.message)
+		}
+	}
+
+	/*********************** TwoFA Authentication ******************************************/
 
 	async generateQrCodeDataURL(otpAuthUrl: string) {
 		return toDataURL(otpAuthUrl);
@@ -90,27 +118,20 @@ export class AuthService {
 
 		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
 		await this.userService.setTwoFASecret(secret, user.id);
-
 		return { secret, otpAuthURL };
 	}
 
-	async isTwoFACodeValid(twoFACode: string, user: User) {
+	async verifyCode(user: User, twoFACode: string) {
 		return authenticator.verify({
 			token: twoFACode,
 			secret: user.twoFASecret,
 		  });
 	}
 
-	async loginWith2fa(userWithoutPsw: Partial<User>) {
-		const payload = {
-		  email: userWithoutPsw.email,
-		  isTwoFAOn: !!userWithoutPsw.twoFA,
-		  isTwoFAuthenticated: true,
-		};
-	
-		return {
-		  email: payload.email,
-		  access_token: await this.signToken(userWithoutPsw.id, userWithoutPsw.username),
-		};
+	async loginWith2fa(user: User, twoFACode: string) {
+		if (!await this.verifyCode(user, twoFACode))
+			throw new ForbiddenException('Wrong secret code')	
+		return this.signToken(user.id, user.username)
 	}
+
 }

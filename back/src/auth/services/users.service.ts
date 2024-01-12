@@ -1,13 +1,16 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
+import { authenticator } from "otplib";
 
 @Injectable()
 export class UsersService {
 	constructor(private prisma: PrismaService) {}
+
+	/*********************** General CRUD ******************************************/
 
 	async createUser(createUserDto: CreateUserDto) {
 		try {
@@ -75,10 +78,6 @@ export class UsersService {
 		return user;
 	}
 
-	async updateStatus(id: number, updateUserDto: UpdateUserDto) {
-
-	}
-
 	async updateUser(id: number, updateUserDto: UpdateUserDto) {
 		const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
 		const updateUser = await this.prisma.user.update({
@@ -114,20 +113,33 @@ export class UsersService {
 		}
 	}
 
-	async turnOnTwoFA(userId: number) {
-		try { 
-			const user = this.prisma.user.update({
-				where: { id: userId, },
-				data: { twoFA: true, },
-			});
-			return user;
-		} catch (error) { throw error; }
+	/*********************** TwoFA settings ******************************************/
+
+	async turnOnTwoFA(user: User, twoFACode: string) {
+		const setUser = await this.prisma.user.findUnique({ where: {id: user.id}});
+		if (!setUser)
+			throw new NotFoundException('User not found');
+		if (setUser.twoFA)
+			throw new BadRequestException('2FA already enabled');
+
+		const isCodeValid = authenticator.verify({
+			token: twoFACode,
+			secret: setUser.twoFASecret,
+		});
+		if (!isCodeValid)
+			throw new UnauthorizedException('Wrong authentication code');
+		await this.prisma.user.update({
+			where: { id: user.id, },
+			data: { twoFA: true, },
+		});
+		return user;
+
 	}
 
 	async setTwoFASecret(secret: string, userId: number) {
 		try {
 		const user = this.prisma.user.update({
-			where: { id: userId, },
+			where: { id: userId, twoFA: true },
 			data: { twoFASecret: secret,
 					twoFA: true },
 		});
@@ -137,19 +149,28 @@ export class UsersService {
 		} catch (error) { throw error; }
 	}
 
-	// retrieve all user's channels
+	async disableTwoFA(user: User, code: string) {
+		  const otpCode = await this.prisma.user.findUnique({
+			where: { id: user.id, twoFASecret:  code }
+		  })
+		  await this.prisma.user.update({
+			where: { id: user.id },
+			data: { twoFA: false },
+		  });
+	}
+
+	/*********************** Channels ******************************************/
+
 	async findUserChannel(member: User) {
 
 		const channelsId = await this.prisma.usersOnChannels.findMany({
-			where: { userId: member.id }
-		})
+			where: { userId: member.id }})
 
 		const userChannels = await this.prisma.channel.findMany({
 			where: {
 				id: { in: channelsId.map((channelId) => (channelId.channelId)) }
 			}
 		})
-		
 		return userChannels;
 	}
 }
