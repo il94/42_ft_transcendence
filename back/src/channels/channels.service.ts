@@ -62,7 +62,6 @@ export class ChannelsService {
           return (member.user)
       }).filter(Boolean),
       owner: channelDatas.members.find((member) => member.role === "OWNER").user,
-      validUsers: [], // a supprimer
       mutedUsers: [], // en attendant de pouvoir recup les users mutes
       bannedUsers: [] // en attendant de pouvoir recup les users bans
     }

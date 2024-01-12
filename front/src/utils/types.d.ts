@@ -40,7 +40,6 @@ export type Channel = {
 	users: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
-	validUsers: (User | UserAuthenticate)[],
 	mutedUsers: (User | UserAuthenticate)[],
 	bannedUsers: (User | UserAuthenticate)[]
 }

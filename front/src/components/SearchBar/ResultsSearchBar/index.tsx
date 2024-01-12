@@ -40,7 +40,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const { token } = useContext(AuthContext)!
 
-	function generateResults(results: User[] | Channel[], type: string, littleResults: boolean) {
+	function generateResults(results: User[] | Channel[], type: string) {
 		return (
 			<Group>
 				<GroupName>
@@ -164,24 +164,33 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 			const channel: Channel = channelResponse.data
 			if (!channelIncludeUser(channel, userAuthenticate))
 			{
-				await axios.post(`http://localhost:3333/channel/join`, {
-					id: channel.id,
-					password: "mdp" // temporaire
-				},
+				if (channel.type === channelStatus.PROTECTED)
+					setChannelTarget(channel)
+				else
 				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+					await axios.post(`http://localhost:3333/channel/join`, {
+						id: channel.id
+					},
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 
-				channel.users.push(userAuthenticate)
+					setUserAuthenticate((prevState: UserAuthenticate) => ({
+						...prevState,
+						channels: [ ...prevState.channels, channel]
+					}))
 
-				setUserAuthenticate((prevState: UserAuthenticate) => ({
-					...prevState,
-					channels: [ ...prevState.channels, channel]
-				}))
+					setChannelTarget(() => ({
+						...channel,
+						users: [...channel.users, userAuthenticate]
+					}))
+				}
+
 			}
-			setChannelTarget(channel)
+			else
+				setChannelTarget(channel)
 			displayChat(true)
 		}
 		catch (error) {
@@ -222,9 +231,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
-				setChannels(channelsResponse.data.filter((channel: Channel) => (
-					channel.type !== channelStatus.PRIVATE && channel.type !== channelStatus.MP
-				)).sort(sortChannelByName))
+				setChannels(channelsResponse.data.sort(sortChannelByName))
 			}
 			catch (error) {
 				setErrorRequest(true)
@@ -266,7 +273,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					usersFound.length > 0 &&
 					<>
 					{
-						generateResults(usersFound, "user", littleResults)
+						generateResults(usersFound, "user")
 					}
 					</>
 				}
@@ -274,7 +281,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					channelsFound.length > 0 &&
 					<>
 					{
-						generateResults(channelsFound, "channel", littleResults)
+						generateResults(channelsFound, "channel")
 					}
 					</>
 				}

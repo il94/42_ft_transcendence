@@ -116,7 +116,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						userAuthenticate,
 						userTarget
 					],
-					validUsers: [],
 					mutedUsers: [],
 					bannedUsers: []
 				}
@@ -186,7 +185,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							userAuthenticate,
 							userTarget
 						],
-						validUsers: [],
 						mutedUsers: [],
 						bannedUsers: []
 					}

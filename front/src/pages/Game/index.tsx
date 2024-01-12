@@ -126,7 +126,6 @@ function Game() {
 					owner: undefined,
 					administrators: [],
 					users: [],
-					validUsers: [],
 					mutedUsers: [],
 					bannedUsers: []
 				}))
