@@ -150,7 +150,12 @@ function Game() {
 					}
 				})
 
-				const socket = io('http://localhost:3333', { transports: ["websocket"]} );
+				const socket = io('http://localhost:3333', {
+					transports: ["websocket"],
+					query: {
+						id: responseMe.data.id,
+					}
+					});
 		
 				socket.on('connect_error', (error) => {
 					console.error('Erreur de connexion à la socket :', error.message);

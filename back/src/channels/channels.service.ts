@@ -208,6 +208,64 @@ export class ChannelsService {
 		return deleteChannel;
 	}
 
+    /****************************** gestion message ***********************/
+
+    async addContent(id: number, msg:string, user :User) {
+
+
+      const newMessage = await this.prisma.message.create({
+        data: {
+          author: { connect: { id: user.id } },  // Connectez le message à l'utilisateur existant
+          channel: { connect: { id: id } }, 
+          content: msg,
+          isInvit: true
+        },
+      });
+      //console.log(newMessage.content);
+    }
+  
+    async getAllMessage(id: number) {
+      try {
+        const channel = await this.prisma.channel.findUnique({
+          where: { id: id },
+          include: { content: true },
+        });
+    
+        if (!channel) {
+          console.error("Le canal n'existe pas.");
+          return;
+        }
+    
+        const messages = channel.content;
+    
+        if (!messages) {
+          console.error("Aucun message trouvé dans le canal.");
+          return;
+        }
+        for (const message of messages) {
+          console.log(message.authorId, " = ",message.content);
+          //retourner les messages 
+        }
+      } catch (error) {
+        console.error("Une erreur s'est produite lors de la récupération des messages.", error);
+      }
+    }
+
+
+    async getAllUserId(id: number)
+    {
+      const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+        where: {
+          channelId: id,
+        },
+        select: {
+          userId: true,
+        },
+      });
+      const userIds = usersOnChannels.map((userOnChannel) => userOnChannel.userId);
+      return userIds;
+    }
+
 
   /****************************** CRUD USER ON CHANNEL ***********************/
 

@@ -24,7 +24,6 @@ function Discussion({ channel } : PropsDiscussion) {
 	const { userAuthenticate } = useContext(InteractionContext)!
 
 	const { chatRender, setChatRender } = useContext(ChatContext)!
-
 	return (
 		<Style>
 			{
@@ -37,7 +36,7 @@ function Discussion({ channel } : PropsDiscussion) {
 					{
 						channel.messages && // condition temporaire, a supprimer quand les messages du channel seront retournees par le back
 						channel.messages.map((message, index) => (
-							message.sender.id === userAuthenticate.id ?
+							message.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?
 									<UserText
 										key={"message" + index} // a definir
