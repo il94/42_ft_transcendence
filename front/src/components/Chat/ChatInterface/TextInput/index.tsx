@@ -7,7 +7,9 @@ import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { Channel } from "../../../../utils/types"
+
+
+import { Channel, User } from "../../../../utils/types"
 import { Socket } from "socket.io-client"
 import { messageStatus } from "../../../../utils/status"
 import AuthContext from "../../../../contexts/AuthContext"
@@ -23,9 +25,18 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate } = useContext(InteractionContext)!
 
+	function findUserInChannels(channel: any, userId: number): User | undefined {
+		// Combinez les tableaux d'utilisateurs en un seul tableau
+		const allUsers = channel.users.concat(channel.owner, channel.administrators);
+	  
+		// Recherchez l'utilisateur par son ID
+		const foundUser = allUsers.find((user: User) => user.id === userId);
+	  
+		return foundUser;
+	  }
 
 	function printMsg(msg: string, idSend: number, idChannel:number){
-		
+		const userSend = findUserInChannels(channel, idSend);
 		if (idChannel == channel.id)
 			{
 			setChannel((prevState: { messages: any }) => ({
@@ -34,7 +45,7 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 				...prevState.messages,
 				{
 					id: idSend,
-					sender: userAuthenticate,
+					sender: userSend,
 					type: messageStatus.TEXT,
 					content: msg
 				}
