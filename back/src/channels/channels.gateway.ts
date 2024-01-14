@@ -6,7 +6,7 @@ import { Server, Socket } from 'socket.io';
 import { User, Channel } from "@prisma/client";
 
 // create a channel
-// CRUD channel
+// CRUD channel 
 // create
 // read
 // update
@@ -23,18 +23,40 @@ export class ChannelsGateway implements OnModuleInit {
 
   @WebSocketServer() server: Server;
 
+  private connectedUsers: Map<string, Socket> = new Map();
+
   onModuleInit() {
-    this.server.on('connection', (socket) => {
-      // console.log(socket.id);
-      // console.log('Connected');
-    })
+    this.server.on('connection', (socket: Socket) => {
+      const userid = socket.handshake.query.id;
+      //console.log("Connected id =", userid);
+
+      // Vérifier le type de userid
+      if (typeof userid === 'string') {
+        this.connectedUsers.set(userid, socket);
+
+        // Écouter le débranchement du socket
+        socket.on('disconnect', () => {
+          this.connectedUsers.delete(userid);
+        });
+      } else {
+        console.log('Invalid userid type:', typeof userid);
+      }
+    });
+  } 
+    getSocketByUserId(userid: string): Socket | undefined {
+    return  this.connectedUsers.get(userid);
   }
 
-//   @SubscribeMessage('sendMessage')
-//   async handleSendMessage(client: Socket, payload: Channel) {
-//     //await this.channelsService.createMessage(payload);
-//     this.server.emit('recMessage', payload);
-//   }
+  /* args[0] = message recu en string // args[1] = Channel en channel  */
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(client: Socket, args: string) {
+    for (const userId of args[0]) {
+      let socket = await this.getSocketByUserId(userId.toString());
+      if (socket) 
+        socket.emit("printMessage", args[1].toString(), args[2], args[3]);
+    }
+  }
 
 //   // afterInit(server: Server) {
 //   //   console.log("server after init" );
