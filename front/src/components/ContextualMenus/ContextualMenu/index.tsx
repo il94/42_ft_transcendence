@@ -113,13 +113,24 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				setChannelTarget(findResult)
 			else
 			{
-				const newChannel: Channel = {
-					id: -1, //???
+				const MPDatas: any = {
 					name: userTarget.username,
-					avatar: userTarget.avatar,
 					type: channelStatus.MP,
+					avatar: userTarget.avatar
+				}		
+
+				const postChannelResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const newChannel: Channel = {
+					id: postChannelResponse.data.id,
+					...MPDatas,
 					messages: [],
-					owner: userAuthenticate,
+					owner: undefined,
 					administrators: [],
 					users: [
 						userAuthenticate,
@@ -129,18 +140,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					bannedUsers: []
 				}
 
-				/* ============ Temporaire ============== */
-
-				// Verifier si le channel mp n'existe pas deja
-				// await axios.post(`http://localhost:3333/channel`, {
-				// 	name: userTarget.id,
-				// 	avatar: userTarget.avatar,
-				// 	type: channelStatus.MP
-				// })
-
-				/* ====================================== */
-
-				userAuthenticate.channels.push(newChannel)
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					channels: [...prevState.channels, newChannel]
+				}))
+				
 				setChannelTarget(newChannel)
 			}
 			displayChat(true)
@@ -231,7 +235,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleManageFriendClickEvent() {
 		try {
 			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
-				await axios.post(`http://localhost:3333/friends/${user.id}`, {}, {
+				await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -428,7 +432,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleManageFriendClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.friends.includes(userTarget) ?
+										!userAuthenticate.friends.some((friend) => friend.id === userTarget.id) ?
 											"Add"
 											:
 											"Delete"

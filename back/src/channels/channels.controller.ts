@@ -18,6 +18,13 @@ export class ChannelController {
 	  return this.channelsService.createChannel(dto, req.user);
   }
 
+  @Post('mp/:id')
+  createMP(@Param('id', ParseIntPipe) idRecipient: number,
+    @Body() dto: CreateChannelDto,
+    @Request() req) {
+	  return this.channelsService.createChannelMP(idRecipient, dto, req.user);
+  }
+
   @Post('join')
   join(@Body() dto: AuthChannelDto, @Request() req) {
     return this.channelsService.joinChannel(dto, req.user);

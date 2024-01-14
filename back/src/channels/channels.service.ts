@@ -98,6 +98,21 @@ export class ChannelsService {
     return newChannel;
   }
 
+  async createChannelMP(idRecipient: number, createChannelDto: CreateChannelDto, creator: User) {
+
+    const newChannel = await this.createChannel(createChannelDto, creator)
+
+    const recipient = await this.prisma.user.findUnique({
+      where: {
+        id: idRecipient
+      }
+    })
+
+    const newChannelWithRecipient = this.joinChannel(newChannel, recipient)
+
+    return newChannelWithRecipient;
+  }
+
   async findChannel(chanId: number) {
     const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
     if (!channel)
