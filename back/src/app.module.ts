@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { ChatsModule } from './channels/channels.module';
 import { FriendsModule } from './friends/friends.module';
+import { BlockedsModule } from './blockeds/blockeds.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { FriendsModule } from './friends/friends.module';
     PassportModule.register({ session: true }),
     ChatsModule,
     FriendsModule,
+    BlockedsModule,
   ],
 })
 export class AppModule {}

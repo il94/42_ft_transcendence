@@ -237,21 +237,6 @@ async function getFriends() {
 	}
 }
 
-async function postFriend() {
-	try {
-		const test = await axios.post(`http://localhost:3333/friends/${3}`, {}, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			}
-		)
-		console.log("FRIEND = ", test)
-	}
-	catch (error) {
-		console.log(error)
-	}
-}
-
 async function deleteFriends() {
 	try {
 		let i = 0
@@ -271,6 +256,50 @@ async function deleteFriends() {
 				}
 			)
 			console.log("FRIEND", i, " = ", test)
+			i++
+		}
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+/* =============================== BLOCKEDS ================================= */
+
+async function getBlockeds() {
+	try {
+		const test: AxiosResponse<User> = await axios.get("http://localhost:3333/blockeds", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		console.log("BLOCKEDS = ", test)
+
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+async function deleteBlockeds() {
+	try {
+		let i = 0
+
+		const blockeds: AxiosResponse = await axios.get("http://localhost:3333/blockeds", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		while (i < blockeds.data.length)
+		{
+			console.log("ID = ", blockeds.data[i].id)
+			let test = await axios.delete(`http://localhost:3333/blockeds/${blockeds.data[i].id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+				}
+			)
+			console.log("BLOCKEDS", i, " = ", test)
 			i++
 		}
 	}
@@ -310,13 +339,16 @@ async function deleteFriends() {
 			<Bout onClick={getFriends}>
 				get friends
 			</Bout>
-			<Bout onClick={postFriend}>
-				post friend
-			</Bout>
 			<Bout onClick={deleteFriends}>
 				delete friends
 			</Bout>
 
+			<Bout onClick={getBlockeds}>
+				get blockeds
+			</Bout>
+			<Bout onClick={deleteBlockeds}>
+				delete blockeds
+			</Bout>
 
 
 		</Style>

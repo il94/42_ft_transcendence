@@ -75,6 +75,7 @@ function Game() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
+
 		async function fetchFriends(): Promise<User[]> {
 			try {
 				const friends: AxiosResponse<User[]> = await axios.get("http://localhost:3333/friends", {
@@ -84,6 +85,23 @@ function Game() {
 				})
 
 				return (friends.data)
+			}
+			catch (error) {
+				throw (error)
+			}
+		}
+
+		async function fetchBlockedUsers(): Promise<User[]> {
+			try {
+				const blockedUsers: AxiosResponse<User[]> = await axios.get("http://localhost:3333/blockeds", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				console.log("BLOAUED ===", blockedUsers)
+
+				return (blockedUsers.data)
 			}
 			catch (error) {
 				throw (error)
@@ -118,6 +136,7 @@ function Game() {
 		async function fetchMe() {
 			try {
 				const friends: User[] = await fetchFriends()
+				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
 
 				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
@@ -147,7 +166,7 @@ function Game() {
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: responseMe.data.twoFA,
 					friends: friends, // a recuperer depuis la reponse
-					blockedUsers: [], // a recuperer depuis la reponse
+					blockedUsers: blockedUsers, // a recuperer depuis la reponse
 					channels: channels, // a recuperer depuis la reponse
 					socket: socket
 				})

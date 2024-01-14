@@ -2,7 +2,7 @@ import { RefObject } from "react"
 import styled from "styled-components"
 import colors from "../../../utils/colors"
 
-export const Style = styled.div<{ $backgroundColor: string, ref: RefObject<HTMLElement> }>`
+export const Style = styled.div<{ $backgroundColor: string, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
 
 	display: flex;
 	justify-content: center;
@@ -14,6 +14,8 @@ export const Style = styled.div<{ $backgroundColor: string, ref: RefObject<HTMLE
 	min-width: 100%;
 	height: 53px;
 	min-height: 53px;
+
+	opacity: ${(props) => props.$isBlocked && 0.5};
 
 	background-color: ${(props) => props.$backgroundColor};
 
