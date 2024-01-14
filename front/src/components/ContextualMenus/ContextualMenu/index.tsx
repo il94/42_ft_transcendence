@@ -14,8 +14,15 @@ import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
+import AuthContext from "../../../contexts/AuthContext"
 
-import { Channel, MessageInvitation, User } from "../../../utils/types"
+import {
+	Channel,
+	MessageInvitation,
+	User,
+	UserAuthenticate
+} from "../../../utils/types"
+
 import {
 	challengeStatus,
 	channelStatus,
@@ -23,7 +30,6 @@ import {
 	messageStatus,
 	userStatus
 } from "../../../utils/status"
-import AuthContext from "../../../contexts/AuthContext"
 
 type PropsContextualMenu = {
 	type: contextualMenuStatus | undefined,
@@ -96,7 +102,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayAdminSections(false)
 	}, [])
 
-	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleContactClickEvent() {
 		try {
@@ -247,37 +253,21 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				userAuthenticate.friends.push(userTarget)
 			}
 			else {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/user/me/friends/${userTarget.id}`)
-
-				/* ====================================== */
-
-				// const test = await axios.post(`http://localhost:3333/friends/request/${userTarget.id}/`, {
-				// 	headers: {
-				// 		'Authorization': `Bearer ${token}`
-				// 	}
-				// })
-
-				const test = await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {
+				await axios.delete(`http://localhost:3333/friends/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				console.log("post", test)
+				setUserAuthenticate((prevState: UserAuthenticate) => {
 
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
-					headers: {
-						'Authorization': `Bearer ${token}`
+					const { friends, ...rest } = prevState
+
+					return {
+						...rest,
+						friends: friends.splice(userAuthenticate.friends.indexOf(userTarget), 1)
 					}
 				})
-
-				console.log("get", responseMe)
-
-
-
-				userAuthenticate.friends.splice(userAuthenticate.friends.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {

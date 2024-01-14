@@ -15,19 +15,13 @@ import { CreateUserDto } from 'src/auth/dto';
 export class FriendsController {
   constructor(private readonly friendsService: FriendsService) {}
 
-  // @Post(':id')
-  // async addNewFriend(@Param() isFriendId) {
-  //   console.log("taget id: ", isFriendId);
-  //     return "LOL";
-  // }
-
   @Post(':id')
-  addNewFriend(@getUser() user: User, 
+  addNewFriend(@getUser() user: User,
   @Param('id', ParseIntPipe) id: number) {
       console.log("taget id: ", id);
       return this.friendsService.addFriend(user.id, id);
   }
-
+  
   @Post('request/:isFriendId')
   sendFriendRequest(
     @Param('isFriendId', ParseIntPipe) isFriendId: number,
@@ -54,11 +48,10 @@ export class FriendsController {
         return this.friendsService.updateRelation(id, dto);
     }
 
-  @Delete('remove/:id')
-  async removeFriend(
-    @Param('id', ParseIntPipe) id: number, 
-    @Body('friendId', ParseIntPipe) friendId: number) {
-        return this.friendsService.removeFriend(id, friendId);
+  @Delete(':id')
+  async removeFriend(@getUser() user: User,
+  @Param('id', ParseIntPipe) friendId: number) {
+        return this.friendsService.removeFriend(user.id, friendId);
     }
 
 }

@@ -77,35 +77,13 @@ function Game() {
 	useEffect(() => {
 		async function fetchFriends(): Promise<User[]> {
 			try {
-
-				/* ============ Temporaire ============== */
-
-				// appeler la route qui recupere les amis du user
-				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
-
-				const friendsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user", {
+				const friends: AxiosResponse<User[]> = await axios.get("http://localhost:3333/friends", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				/* ====================================== */
-
-				const friends: User[] = friendsResponse.data.map((friend: any) => {
-
-					const { wins, draws, losses, ...rest } = friend
-
-					return {
-						...rest,
-						scoreResume: {
-							wins: wins,
-							draws: draws,
-							losses: losses
-						}
-					}
-				})
-
-				return (friends)
+				return (friends.data)
 			}
 			catch (error) {
 				throw (error)

@@ -29,19 +29,24 @@ export class FriendsService {
 				isFriend.relationType = RelationStatus.FRIEND;
 				return isFriend;
 			}
-			const newFriend = await this.prisma.user.update({where: { id: userId},
-				data: { 
-					hasRelations: {
-						connect: [{ hasRelationsId_isInRelationsId: {
-							hasRelationsId: userId,
-							isInRelationsId: friendId,
-							} }],
-						create: [{ isInRelationsId: friendId, 
-							request: RequestStatus.ACCEPTED,
-							relationType: RelationStatus.FRIEND }]
-					}}
-				
-			})
+
+			const newFriend = await this.prisma.user.update(
+				{
+					where: {
+						id: userId
+					},
+					data: {
+						hasRelations: {
+							create: [{
+								relationType: "FRIEND",
+								request: "ACCEPTED",
+								isInRelationsId: friendId
+							}]
+						}
+					}
+				}
+			)
+
 			return newFriend;
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
@@ -59,10 +64,56 @@ export class FriendsService {
 	}
 
 	async getUserFriends(userId: number) {
-		const friends = await this.prisma.relations.findMany({
-			where: { hasRelationsId: userId }
+		const relations = await this.prisma.user.findUnique({
+			where: {
+				id: userId
+			},
+			select: {
+				hasRelations: {
+					where: {
+						relationType: "FRIEND"
+					},
+					select: {
+						isInRelationsId: true
+					}
+				}
+			}
 		})
-		return friends;
+
+		const friendsIds = relations.hasRelations.map((relation) => relation.isInRelationsId)
+
+		const friends = await this.prisma.user.findMany({
+			where: {
+				id: {
+					in: friendsIds
+				}
+			},
+			select: {
+				id: true,
+				username: true,
+				avatar: true,
+				status: true,
+				wins: true,
+				draws: true,
+				losses: true
+			}
+		})
+
+		const friendsMapped = friends.map((friend) => {
+
+			const { wins, draws, losses, ...rest } = friend
+
+			return {
+				...rest,
+				scoreResume: {
+					wins,
+					draws,
+					losses
+				}
+			}
+		})
+
+		return friendsMapped;
 	}
 
 	async getNonFriends(UserId: number) {
@@ -98,17 +149,18 @@ export class FriendsService {
 		if (userId === friendId)
 			return { error: 'user has same id as friend' };
 		try {
-			const result = await this.prisma.user.update({ 
-				where: { id: userId, },
-				data: {
-					hasRelations: {
-						disconnect: [{ hasRelationsId_isInRelationsId: {
-							hasRelationsId: userId,
-							isInRelationsId: friendId,
-							} }],
+
+			const deleteFriend = await this.prisma.relations.delete({
+				where: {
+					hasRelationsId_isInRelationsId: {
+						hasRelationsId: userId,
+						isInRelationsId: friendId
 					}
-				}})
-			return result;
+				}
+			})
+
+			return deleteFriend;
+
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
 				return { error: 'An error occurred while removing friend' };

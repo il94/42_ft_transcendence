@@ -11,6 +11,7 @@ import DefaultYellowAvatar from "../assets/default_yellow.png"
 import DefaultChannel from "../assets/default_channel.png"
 import { useContext } from "react"
 import AuthContext from "../contexts/AuthContext"
+import { User } from "../utils/types"
 
 const Style = styled.div`
 
@@ -223,7 +224,7 @@ function TestsBack() {
 
 async function getFriends() {
 	try {
-		const test = await axios.get("http://localhost:3333/friends", {
+		const test: AxiosResponse<User> = await axios.get("http://localhost:3333/friends", {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
@@ -237,78 +238,45 @@ async function getFriends() {
 }
 
 async function postFriend() {
-	// try {
-	// 	const test = await axios.post("http://localhost:3333/channel",
-	// 		{
-	// 			name: "channl_1",
-	// 			type: "PUBLIC",
-	// 			avatar: DefaultChannel
-	// 		},
-	// 		{
-	// 			headers: {
-	// 				'Authorization': `Bearer ${token}`
-	// 			}
-	// 		}
-	// 	)
-	// 	console.log("CHANNEL = ", test)
-	// }
-	// catch (error) {
-	// 	console.log(error)
-	// }
-}
-
-async function postFriends() {
-	// try {
-	// 	let i = 0
-
-	// 	while (i < 5)
-	// 	{
-	// 		let test = await axios.post("http://localhost:3333/channel",
-	// 			{
-	// 				name: `channl_${i}`,
-	// 				type: "PUBLIC",
-	// 				avatar: DefaultChannel
-	// 			},
-	// 			{
-	// 				headers: {
-	// 					'Authorization': `Bearer ${token}`
-	// 				}
-	// 			}
-	// 		)
-	// 		console.log("CHANNEL", i, " = ", test)
-	// 		i++
-	// 	}
-	// }
-	// catch (error) {
-	// 	console.log(error)
-	// }
+	try {
+		const test = await axios.post(`http://localhost:3333/friends/${3}`, {}, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}
+		)
+		console.log("FRIEND = ", test)
+	}
+	catch (error) {
+		console.log(error)
+	}
 }
 
 async function deleteFriends() {
-	// try {
-	// 	let i = 0
+	try {
+		let i = 0
 
-	// 	const channels: AxiosResponse = await axios.get("http://localhost:3333/channel", {
-	// 		headers: {
-	// 			'Authorization': `Bearer ${token}`
-	// 		}
-	// 	})
-	// 	while (i < channels.data.length)
-	// 	{
-	// 		console.log("ID = ", channels.data[i].id)
-	// 		let test = await axios.delete(`http://localhost:3333/channel/${channels.data[i].id}`, {
-	// 			headers: {
-	// 				'Authorization': `Bearer ${token}`
-	// 			}
-	// 			}
-	// 		)
-	// 		console.log("CHANNEL", i, " = ", test)
-	// 		i++
-	// 	}
-	// }
-	// catch (error) {
-	// 	console.log(error)
-	// }
+		const friends: AxiosResponse = await axios.get("http://localhost:3333/friends", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		while (i < friends.data.length)
+		{
+			console.log("ID = ", friends.data[i].id)
+			let test = await axios.delete(`http://localhost:3333/friends/${friends.data[i].id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+				}
+			)
+			console.log("FRIEND", i, " = ", test)
+			i++
+		}
+	}
+	catch (error) {
+		console.log(error)
+	}
 }
 
 
@@ -344,9 +312,6 @@ async function deleteFriends() {
 			</Bout>
 			<Bout onClick={postFriend}>
 				post friend
-			</Bout>
-			<Bout onClick={postFriends}>
-				post friends
 			</Bout>
 			<Bout onClick={deleteFriends}>
 				delete friends

@@ -28,7 +28,7 @@ function Home() {
 
 			const accessTokenString = document.cookie.slice(index + "access_token=".length);
 			
-			console.log("LOL = ", accessTokenString)
+			// console.log("LOL = ", accessTokenString)
 
 			if (!localStorage.getItem('token'))
 			{

@@ -137,15 +137,18 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	async function addUserToFriendList(user: User) {
 		try {
-			if (!userAuthenticate.friends.includes(user))
+			if (!userAuthenticate.friends.some((friend) => friend.id === user.id))
 			{
-				/* ============ Temporaire ============== */
+				await axios.post(`http://localhost:3333/friends/${user.id}`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// axios.post("http://localhost:3333/user/me/friends/${user.id}") 
-
-				/* ============================================== */
-
-				userAuthenticate.friends.push(user)
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					friends: [ ...prevState.friends, user]
+				}))
 			}
 		}
 		catch (error) {
