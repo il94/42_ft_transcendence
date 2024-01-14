@@ -95,8 +95,8 @@ export class UsersService {
 	}
 
 	async remove(id: number) {
-		const deleteFriends =  this.prisma.relations.deleteMany({
-			where: { hasRelationsId: id }});
+		const deleteFriends =  this.prisma.friend.deleteMany({
+			where: { userId: id }});
 		const deleteChannels = this.prisma.usersOnChannels.deleteMany({
 			where: { userId: id }})
 		const deleteGames = this.prisma.usersOnGames.deleteMany({
