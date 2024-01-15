@@ -38,12 +38,13 @@ export class AuthController {
 	}
 
 	@Get('logout')
-	async logout(@getUser() user: User, @Res() res) {
+	@UseGuards(JwtGuard)
+	async logout(@getUser() user: User, @Res({ passthrough: true }) res: Response) {
 		//console.log(req.cookies);
 		//delete req.cookies.token.access_token;
 		//console.log("cookie after delete: ", req.cookies);
 		//console.log("Res : ", res);
-		//res.clearCookie('access_token');
+		//res.clearCookie('access_token', { httpOnly: true });
 		return this.authService.logout(user.id);
 	}
 
@@ -57,13 +58,14 @@ export class AuthController {
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@getUser() user: User, @Res() res: Response, @Req() req) {
+	async handle42Redirect(@getUser() user: User, 
+	@Res({ passthrough: true }) res: Response,
+	) {
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
-			console.log("token: ", token);
 
-			//res.cookie("access_token", token.access_token);
-			res.redirect("http://localhost:5173")
+			//res.cookie("access_token", token.access_token, { httpOnly: true });
+			return { user };
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");

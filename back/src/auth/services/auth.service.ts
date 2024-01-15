@@ -90,7 +90,7 @@ export class AuthService {
 					await this.prisma.user.update({ 
 						where: { username: profile.username },
 						data: { status: UserStatus.ONLINE }})
-					return this.signToken(user.id, user.username);
+					return user;
 				}
 				return `42 User must login with 2FA`;
 			}
@@ -99,7 +99,7 @@ export class AuthService {
 			const newUser = await this.userService.createUser(profile as CreateUserDto)
 			if (!newUser)
 				throw new ForbiddenException('Failed to create new 42 user');
-			return this.signToken(user.id, user.username);
+			return newUser;
 		} catch (error) {
 			const err = error as Error;
             console.log("Validate 42 user error: ", err.message);
