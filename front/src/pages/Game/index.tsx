@@ -315,7 +315,7 @@ function Game() {
 													userTarget={userTarget} />
 											}
 											{/* /* <TestsBack /> */}
-											<PongWrapper/>
+											<PongWrapper social={social}/>
 											{
 												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>

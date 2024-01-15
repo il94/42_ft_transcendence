@@ -1,4 +1,4 @@
-// import { useEffect, useState } from "react"
+import { useRef } from "react"
 import styled from "styled-components"
 
 
@@ -19,28 +19,18 @@ const Style = styled.div`
 	background-color: yellow;
 `
 
-function PongWrapper() {
-	
-	// Code temporaire pour tests
-	// const [counter, setCounter] = useState(0);
-	
-	// useEffect(() => {
-	// 	const interval = setInterval(() => {
-	// 	  setCounter((counter) => counter + 1);
-	// 	}, 100);
+function PongWrapper({social}) {
 
-	// 	console.log("LOL")
-	
-	// 	return () => {
-	// 	  clearInterval(interval);
-	// 	};
-	//   }, []);
+	const wrapperRef = useRef<HTMLDivElement | null>(null)
+
+	if (wrapperRef.current)
+		console.log(wrapperRef.current.getBoundingClientRect())
 
 	return (
 		<>
 		{/* {counter} */}
-		<Style>
-			<Pong />	
+		<Style ref={wrapperRef}>
+			<Pong social={social} />	
 		</Style>
 		</>
 	)

@@ -38,15 +38,12 @@ type PropsBalls = {
 		const [posY, setPosY] = useState(400); */
 /* 
 		const getRandom = () => { return (Math.random() * 2 - 1) } */
-		const BallRef = useRef(null)
+		const BallRef = useRef<HTMLDivElement | null>(null)
 		
 		const keyHandler = (e: KeyboardEvent) => {
 			if (e.key === 'Enter')
 				console.log("Enter");
 		}
-
-		let speedX: number = 5;
-		let speedY: number = 2;
 
 		/* console.log(posX)
 		console.log(PongData.right) */
@@ -59,7 +56,7 @@ type PropsBalls = {
 		} */
 
 
-		useEffect(() => {
+		/* useEffect(() => {
 			const BallContainer: HTMLDivElement = BallRef.current
 
 			if (BallContainer)
@@ -69,7 +66,7 @@ type PropsBalls = {
 
 				console.log("BALL STATS = ", BallContainer.getBoundingClientRect())
 			}
-		}, [])
+		}, [X, Y]) */
 
 		useEffect(() => {
 			document.addEventListener('keydown', keyHandler, true);

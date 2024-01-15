@@ -97,7 +97,6 @@ function Signup() {
 		catch (error) {
 			// temporaire
 			// Gestion d'erreurs utilisateur a faire
-
 			setErrorRequest(true)
 			localStorage.removeItem('token')
 		}
