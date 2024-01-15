@@ -21,6 +21,7 @@ import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
+import PongWrapper from '../../components/Pong/PongWrapper'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
@@ -45,9 +46,7 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
-import { deleteScoreFormatFromBack } from '../../utils/functions'
-import PongWrapper from '../../components/Pong/PongWrapper'
+import { TempContext, userSomeone } from '../../temp/temp'
 
 function Game() {
 
@@ -320,12 +319,8 @@ function Game() {
 												displaySettingsMenu={displaySettingsMenu} />
 										</TopGameWrapper>
 										<BottomGameWrapper>
-											{
-												settings &&
-												<SettingsMenu
-													userAuthenticate={userAuthenticate}
-													displaySettingsMenu={displaySettingsMenu} />
-											}
+											{/* <PongWrapper social={social}/> */}
+											<Pong/>
 											{
 												card &&
 												<Card
@@ -333,8 +328,13 @@ function Game() {
 													displayCard={displayCard}
 													userTarget={userTarget} />
 											}
-											{/* /* <TestsBack /> */}
-											<PongWrapper social={social}/>
+											{
+												settings &&
+												<SettingsMenu
+													userAuthenticate={userAuthenticate}
+													displaySettingsMenu={displaySettingsMenu} />
+											}
+											<TestsBack />
 											{
 												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
