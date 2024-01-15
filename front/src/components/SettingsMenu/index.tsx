@@ -7,7 +7,7 @@ import {
 	useEffect,
 	useState
 } from "react"
-// import axios from "axios"
+import axios from "axios"
 
 import {
 	Setting,
@@ -32,11 +32,13 @@ import { UserAuthenticate } from "../../utils/types"
 import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
-	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
+	token: string,
 	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMenu) {
+function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
 
 	type PropsSetting = {
 		value: string,
@@ -87,31 +89,33 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 				phoneNumber.error)
 				return
 
-			// const newUser: UserAuthenticate = {
-			// 	...userAuthenticate,
+			const newDatas: any = {
+				username: username.value !== userAuthenticate.username ? username.value : undefined,
+				avatar: avatar !== userAuthenticate.avatar ? avatar : undefined,
+				hash: password.value ? password.value : undefined,
+				email: email.value !== userAuthenticate.email ? email.value : undefined,
+				phoneNumber: phoneNumber.value !== userAuthenticate.phoneNumber ? phoneNumber.value : undefined,
+				twoFA: twoFA.value !== userAuthenticate.twoFA ? twoFA.value : undefined,
+			}
 
-			// 	username: username.value,
-			// 	avatar: avatar,
-			// 	hash: password.value,
-			// 	email: email.value,
-			// 	phoneNumber: phoneNumber.value,
-			// }
+			await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, newDatas,
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 
-			/* ============ Temporaire ============== */
-
-			// await axios.patch("http://localhost:3333/user/me", newUser)
-
-			/* ====================================== */
-
-			userAuthenticate.username = username.value,
-				userAuthenticate.avatar = avatar,
-				userAuthenticate.email = email.value,
-				userAuthenticate.phoneNumber = phoneNumber.value
-
+			setUserAuthenticate((prevState) => ({
+				...prevState,
+				...newDatas,
+			}))
 			displaySettingsMenu(false)
 		}
 		catch (error) {
 
+			// afficher correctement la gestion d'erreur
+
+			console.log(error)
 		}
 	}
 
@@ -264,7 +268,7 @@ function SettingsMenu({ displaySettingsMenu, userAuthenticate }: PropsSettingsMe
 		<Style
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
-			<ScrollBar>
+			<ScrollBar visible>
 				<CloseButtonWrapper>
 					<Icon src={CloseIcon} size={24}
 						onClick={() => displaySettingsMenu(false)}

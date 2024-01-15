@@ -5,7 +5,8 @@ import {
 	useState
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
+import io from 'socket.io-client';
 
 import {
 	GamePage,
@@ -17,7 +18,7 @@ import {
 } from './style'
 
 import Logo from '../../components/Logo'
-import SearchBarWrapper from '../../components/SearchBarWrapper'
+import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
 import Profile from '../../components/Profile'
@@ -38,7 +39,7 @@ import DisplayContext from '../../contexts/DisplayContext'
 import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
-import { ChannelData, User, UserAuthenticate } from '../../utils/types'
+import { Channel, User, UserAuthenticate } from '../../utils/types'
 import { chatWindowStatus, contextualMenuStatus, userStatus } from '../../utils/status'
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
@@ -70,57 +71,64 @@ function Game() {
 
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
-	const [channelTarget, setChannelTarget] = useState<ChannelData | undefined>(undefined)
+	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
 	const { token } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
-		async function fetchFriends() {
+
+		async function fetchFriends(): Promise<User[]> {
 			try {
-
-				/* ============ Temporaire ============== */
-
-				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
-
-				const friendsResponse = await axios.get("http://localhost:3333/user")
-
-				// En attendant de pouvoir tester avec plusieurs Users
-				const friends: User[] = friendsResponse.data.map((friend: any) => ({
-
-					...friend,
-					//temporaire
-					status: getRandomStatus(),
-					// status: getStatus(friend.status),
-					scoreResume: {
-						wins: friend.wins,
-						draws: friend.draws,
-						losses: friend.losses
+				const friends: AxiosResponse<User[]> = await axios.get("http://localhost:3333/friends", {
+					headers: {
+						'Authorization': `Bearer ${token}`
 					}
-				}))
+				})
 
-				friends.forEach(deleteScoreFormatFromBack)
-
-				return (friends)
-
-				/* ====================================== */
+				return (friends.data)
 			}
 			catch (error) {
-				console.log(error)
 				throw (error)
 			}
 		}
 
-		async function fetchChannels() {
+		async function fetchBlockedUsers(): Promise<User[]> {
 			try {
+				const blockedUsers: AxiosResponse<User[]> = await axios.get("http://localhost:3333/blockeds", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				/* ============ Temporaire ============== */
+				console.log("BLOAUED ===", blockedUsers)
 
-				// const channelsResponse = await axios.get("http://localhost:3333/user/me/channels")
-				const channelsResponse: ChannelData[] = []
-				return (channelsResponse)
+				return (blockedUsers.data)
+			}
+			catch (error) {
+				throw (error)
+			}
+		}
 
-				/* ====================================== */
+		async function fetchChannels(): Promise<Channel[]> {
+			try {
+				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => ({
+					...channel,
+					messages: [],
+					owner: undefined,
+					administrators: [],
+					users: [],
+					mutedUsers: [],
+					bannedUsers: []
+				}))
+
+				return (channels)
 			}
 			catch (error) {
 				throw (error)
@@ -129,35 +137,52 @@ function Game() {
 
 		async function fetchMe() {
 			try {
-				const friends = await fetchFriends()
-				const channels = await fetchChannels()
+				const friends: User[] = await fetchFriends()
+				const blockedUsers: User[] = await fetchBlockedUsers()
+				const channels: Channel[] = await fetchChannels()
 
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
+				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
+				const socket = io('http://localhost:3333', {
+					transports: ["websocket"],
+					query: {
+						id: responseMe.data.id,
+					}
+					});
+		
+				socket.on('connect_error', (error) => {
+					console.error('Erreur de connexion à la socket :', error.message);
+					throw new Error;
+				});
+				
 				setUserAuthenticate({
 					id: responseMe.data.id,
 					username: responseMe.data.username,
 					avatar: responseMe.data.avatar,
 					status: userStatus.ONLINE,
-					// temporaire
-					scoreResume: { // a recuperer depuis la reponse
-						wins: 100,
-						draws: 1,
-						losses: 0
+					scoreResume: {
+						wins: responseMe.data.wins,
+						draws: responseMe.data.draws,
+						losses: responseMe.data.losses
 					},
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
-					twoFA: false, // a recuperer depuis la reponse
+					twoFA: responseMe.data.twoFA,
 					friends: friends, // a recuperer depuis la reponse
-					blockedUsers: [], // a recuperer depuis la reponse
-					channels: channels // a recuperer depuis la reponse
+					blockedUsers: blockedUsers, // a recuperer depuis la reponse
+					channels: channels, // a recuperer depuis la reponse
+					socket: socket
 				})
 			}
 			catch (error) {
+
+				// temporaire
+				// Si la socket doit etre close manuellement, il la close ici en cas d'erreur au lancement
+
 				localStorage.removeItem('token')
 				setErrorRequest(true)
 			}
@@ -168,12 +193,6 @@ function Game() {
 	useEffect(() => {
 		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
 	}, [userAuthenticate.channels.length])
-
-	//temporaire
-	// a supprimer quand la route qui renvoie les channels sera dispo
-	useEffect(() => {
-		userAuthenticate.channels = getTempChannels(userAuthenticate)
-	}, [userAuthenticate, userTarget])
 
 	/* ========================== COMPONENTS STATES ============================= */
 
@@ -241,7 +260,7 @@ function Game() {
 				onClick={closeContextualMenus}>
 				{
 					!errorRequest ?
-						<InteractionContext.Provider value={{ userAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+						<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
 							<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
 								<GameWrapper ref={GameWrapperRef}>
 									{

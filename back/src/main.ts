@@ -1,14 +1,16 @@
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory, Reflector,  } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import session from 'express-session';
 import passport from 'passport'
+import { json } from 'express';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
-
+	app.use(json({ limit: '5mb' }))
 	const config = new DocumentBuilder()
     .setTitle('Median')
     .setDescription('The Median API description')
@@ -38,6 +40,7 @@ async function bootstrap() {
 
 	app.use(passport.initialize());
 	app.use(passport.session());
+	app.use(cookieParser());
 	
 	await app.listen(3333);
 }

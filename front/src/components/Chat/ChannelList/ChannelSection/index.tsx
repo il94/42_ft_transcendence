@@ -1,20 +1,49 @@
-import { Dispatch, SetStateAction } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext
+} from "react"
+import axios, { AxiosResponse } from "axios"
 
-import { Style, Avatar, ChannelName } from "./style"
+import {
+	Style,
+	Avatar,
+	ChannelName
+} from "./style"
 
-import { ChannelData } from "../../../../utils/types"
+import AuthContext from "../../../../contexts/AuthContext"
+
+import { Channel } from "../../../../utils/types"
 
 type PropsChannel = {
-	channel: ChannelData,
-	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
+	channel: Channel,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	setErrorRequest: Dispatch<SetStateAction<boolean>>,
 	backgroundColor: string
 }
 
-function ChannelSection({ channel, setChannelTarget, backgroundColor }: PropsChannel) {
+function ChannelSection({ channel, setChannelTarget, setErrorRequest, backgroundColor }: PropsChannel) {
+
+	const { token } = useContext(AuthContext)!
+
+	async function handleClickEvent() {
+		try {
+			const response: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			setChannelTarget(response.data)
+		}
+		catch (error) {
+			setErrorRequest(true)
+		}
+	}
 
 	return (
 		<Style
-			onClick={() => setChannelTarget(channel)}
+			onClick={handleClickEvent}
 			$backgroundColor={backgroundColor}>
 			<Avatar src={channel.avatar} />
 			<ChannelName>

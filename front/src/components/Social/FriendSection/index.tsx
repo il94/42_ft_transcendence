@@ -17,10 +17,12 @@ import {
 
 import CardContext from "../../../contexts/CardContext"
 import InteractionContext from "../../../contexts/InteractionContext"
+import DisplayContext from "../../../contexts/DisplayContext"
+
+import { capitalize } from "../../../utils/functions"
 
 import { User } from "../../../utils/types"
 import { contextualMenuStatus, userStatus } from "../../../utils/status"
-import DisplayContext from "../../../contexts/DisplayContext"
 
 type PropsFriendSection = {
 	friend: User,
@@ -40,7 +42,7 @@ type PropsFriendSection = {
 function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { card, displayCard, setCardPosition } = useContext(CardContext)!
-	const { userTarget, setUserTarget } = useContext(InteractionContext)!
+	const { userTarget, setUserTarget, userAuthenticate } = useContext(InteractionContext)!
 	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
@@ -102,22 +104,25 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 		event.preventDefault();
 	}
 
+	const isBlocked = userAuthenticate.blockedUsers.some((blockedUsers) => blockedUsers.id === friend.id)
+
 	return (
 		<Style
 			onClick={showCard}
 			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
 			$backgroundColor={backgroundColor}
+			$isBlocked={isBlocked}
 			ref={friendContainerRef}>
 			<Avatar src={friend.avatar} />
 			{
 				!social &&
-				<ProfileInfo $offline={friend.status === "Offline"}>
+				<ProfileInfo $offline={friend.status === userStatus.OFFLINE}>
 					<ProfileName>
 						{friend.username}
 					</ProfileName>
 					<ProfileStatus>
-						{friend.status}
+						{capitalize(friend.status)}
 					</ProfileStatus>
 				</ProfileInfo>
 			}

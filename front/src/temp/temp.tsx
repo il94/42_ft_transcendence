@@ -1,11 +1,11 @@
 import { challengeStatus, channelStatus, messageStatus, userStatus } from "../utils/status";
-import { ChannelData, User, UserAuthenticate } from "../utils/types";
+import { Channel, User, UserAuthenticate } from "../utils/types";
 import DefaultChannelPicture from "../assets/default_channel.png"
 import DefaultBluePicture from "../assets/default_blue.png"
 import TontonPicture from "../assets/xavier_niel.webp"
 import { createContext } from "react";
 
-export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelData[] {
+export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] {
 
 	const osef = {
 		id: -1,
@@ -16,10 +16,11 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			wins: 0,
 			draws: 0,
 			losses: 0
-		}
+		},
+		socket: undefined
 	}
 
-	const result: ChannelData[] = [
+	const result: Channel[] = [
 		{
 			id: -1,
 			name: "BAGARRE",
@@ -106,9 +107,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				userAuthenticate
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -139,9 +137,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			users: [
 				userAuthenticate,
 				userSomeone
-			],
-			validUsers: [
-				userAuthenticate
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -174,9 +169,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				userAuthenticate
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -206,9 +198,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			users: [
 				userAuthenticate,
 				userSomeone
-			],
-			validUsers: [
-				osef
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -241,9 +230,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -273,9 +259,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			],
 			users: [
 				userAuthenticate,
-				userSomeone
-			],
-			validUsers: [
 				userSomeone
 			],
 			mutedUsers: [],
@@ -310,9 +293,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -342,9 +322,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			],
 			users: [
 				userAuthenticate,
-				userSomeone
-			],
-			validUsers: [
 				userSomeone
 			],
 			mutedUsers: [],
@@ -378,9 +355,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -412,9 +386,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				osef
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -440,9 +411,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 				userAuthenticate,
 				userSomeone
 			],
-			validUsers: [
-				userAuthenticate
-			],
 			mutedUsers: [],
 			bannedUsers: []
 		},
@@ -465,9 +433,6 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : ChannelDat
 			users: [
 				userSomeone,
 				userAuthenticate
-			],
-			validUsers: [
-				userSomeone
 			],
 			mutedUsers: [],
 			bannedUsers: []
@@ -503,7 +468,8 @@ export const userSomeone: User = {
 		wins: 0,
 		draws: 0,
 		losses: 0
-	}
+	},
+	socket: undefined
 }
 
 export const TempContext = createContext<{

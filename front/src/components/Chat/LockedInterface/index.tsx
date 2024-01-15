@@ -1,20 +1,36 @@
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useContext, useState } from "react"
-// import axios from "axios"
+import {
+	ChangeEvent,
+	Dispatch,
+	FormEvent,
+	SetStateAction,
+	useContext,
+	useState
+} from "react"
+import axios, { AxiosError } from "axios"
 
-import { ErrorMessage, Input, Style, Text } from "./style"
+import {
+	ErrorMessage,
+	Input,
+	Style,
+	Text
+} from "./style"
 
 import Button from "../../../componentsLibrary/Button"
 
-import { ChannelData } from "../../../utils/types"
 import InteractionContext from "../../../contexts/InteractionContext"
-import { chatWindowStatus } from "../../../utils/status"
+import AuthContext from "../../../contexts/AuthContext"
+
+import { Channel, UserAuthenticate } from "../../../utils/types"
 
 type PropsLockedInterface = {
-	channelTarget: ChannelData,
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
+	channel: Channel,
+	setChannel: Dispatch<SetStateAction<Channel>>,
+	setErrorRequest: Dispatch<SetStateAction<boolean>>
 }
 
-function LockedInterface({ channelTarget, setChatWindowState }: PropsLockedInterface) {
+function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedInterface) {
+
+	const { token } = useContext(AuthContext)!
 
 	type PropsSetting = {
 		value: string,
@@ -36,7 +52,7 @@ function LockedInterface({ channelTarget, setChatWindowState }: PropsLockedInter
 		})
 	}
 
-	const { userAuthenticate } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -50,17 +66,31 @@ function LockedInterface({ channelTarget, setChatWindowState }: PropsLockedInter
 				return
 			}
 
-			if (password.value === channelTarget.password) {
-				/* ============ Temporaire ============== */
+			await axios.post(`http://localhost:3333/channel/join`, {
+				id: channel.id,
+				password: password.value
+			},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 
-				// await axios.post("http://localhost:3333/channel/:id/validusers/:id", userAuthenticate)
+			setUserAuthenticate((prevState: UserAuthenticate) => ({
+				...prevState,
+				channels: [ ...prevState.channels, channel]
+			}))
 
-				/* ====================================== */
+			setChannel(() => ({
+				...channel,
+				users: [...channel.users, userAuthenticate],
+			}))
+		}
+		catch (error) {
+			const axiosError = error as AxiosError
 
-				channelTarget.validUsers.push(userAuthenticate)
-				setChatWindowState(chatWindowStatus.CHANNEL)
-			}
-			else {
+			if (axiosError.response?.status === 403)
+			{
 				setPassword((prevState) => ({
 					...prevState,
 
@@ -68,9 +98,8 @@ function LockedInterface({ channelTarget, setChatWindowState }: PropsLockedInter
 					errorMessage: "Invalid password",
 				}))
 			}
-		}
-		catch (error) {
-
+			else
+				setErrorRequest(true)
 		}
 	}
 
@@ -94,7 +123,6 @@ function LockedInterface({ channelTarget, setChatWindowState }: PropsLockedInter
 				alt="Submit button" title="Submit">
 				Submit
 			</Button>
-
 		</Style>
 	)
 }

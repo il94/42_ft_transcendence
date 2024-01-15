@@ -1,15 +1,75 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto, UpdateChannelDto } from './dto/';
-import { Channel, User, ChannelStatus } from '@prisma/client';
+import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto/';
+import { Channel, User, ChannelStatus, Role, Prisma } from '@prisma/client';
 import * as argon from 'argon2';
+import { JwtGuard } from 'src/auth/guards/auth.guard';
 
-// Authenticated user
-// Role guard : creator is owner
-
+@UseGuards(JwtGuard)
 @Injectable()
 export class ChannelsService {
   constructor(private prisma: PrismaService) {}
+
+  //retrieve all public channels
+  async findAllChannels() {
+    const publicChannels = await this.prisma.channel.findMany({
+      where: { type: {
+        in: ['PUBLIC', 'PROTECTED']
+      }
+    },
+    })
+    if (publicChannels)
+      console.log("YES");
+    return publicChannels;
+  }
+
+  async findOneChannel(chanId: number) {
+    const channelDatas = await this.prisma.channel.findUnique({ 
+      where: { 
+        id: chanId
+      },
+      include: {
+        members: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+                status: true,
+                wins: true,
+                draws: true,
+                losses : true     
+              }
+            },
+            role: true
+          }
+        }
+      }
+    })
+    if (!channelDatas)
+      throw new NotFoundException(`Channel with id ${chanId} not found`);
+
+    const channel = {
+      ...channelDatas,
+      messages: [], // en attendant de pouvoir recup les messages
+      users: channelDatas.members.map((member) => {
+        if (member.role === "USER")
+          return (member.user)
+      }).filter(Boolean),
+      administrators: channelDatas.members.map((member) => {
+        if (member.role === "ADMIN")
+          return (member.user)
+      }).filter(Boolean),
+      owner: channelDatas.members.find((member) => member.role === "OWNER").user,
+      mutedUsers: [], // en attendant de pouvoir recup les users mutes
+      bannedUsers: [] // en attendant de pouvoir recup les users bans
+    }
+
+    delete channel.members
+
+    return channel;
+  }
 
   async createChannel(createChannelDto: CreateChannelDto, creator: User) {
     console.log("creator :", creator);
@@ -29,66 +89,284 @@ export class ChannelsService {
       }
     })
     // setting password
-    if (newChannel.type == ChannelStatus.PRIVATE || newChannel.type == ChannelStatus.PROTECTED )
+    if (newChannel.type === ChannelStatus.PRIVATE || newChannel.type === ChannelStatus.PROTECTED )
     {
       await this.prisma.channel.update({ where: { id: newChannel.id },
         data: { password: await argon.hash(createChannelDto.password) } 
       })
     }
-    console.log("new channel ", newChannel);
     return newChannel;
   }
 
-  //retrieve all public channels
-  async findAllChannels() {
-    const publicChannels = await this.prisma.channel.findMany({
-      where: { type: 'PUBLIC' || 'PROTECTED' }
-    })
-    return publicChannels;
-  }
-
-  // 
   async findChannel(chanId: number) {
-    const channel = await this.prisma.channel.findUnique({ 
-      where: { id: chanId }},
-    )
+    const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
     if (!channel)
-      throw new NotFoundException(`User with id ${chanId} is not related to channel id ${chanId}`);
+      throw new NotFoundException(`Channel id ${chanId} not found`);
     return channel;
   }
 
-  // decorer avec roleguard : le user doit etre owner ou admin 
-  // get one channel by id
-  async findOneChannel(chanId: number, member: User) {
-    const channel = await this.prisma.usersOnChannels.findUnique({ 
-      where: { userId_channelId: {
-        userId: member.id,
-        channelId: chanId }
-      }},
-    )
-    if (!channel)
-      throw new NotFoundException(`User with id ${member.id} is not related to channel id ${chanId}`);
-    return channel;
-  }
 
-  // update a channel, by a user who has edit role
-  async updateChannel(updateChannelDto: UpdateChannelDto, member: User) {
-    //const chan = this.prisma.channel.findUnique
+  async isInChannel(userId: number, chanId: number) {
+    
+    const inChannel = await this.prisma.usersOnChannels.findUnique({
+      where: {
+       userId_channelId: {
+        userId: userId,
+        channelId: chanId
+      }
+    }});
+
+  return inChannel;
+}
+
+  async joinChannel(dto: AuthChannelDto, user: User) {
     try {
-      const channel = this.findOneChannel(updateChannelDto.id, member);
-      await this.prisma.channel.update({ where: { id: updateChannelDto.id },
-        data: { 
-          name: updateChannelDto.name,
-	        type:       updateChannelDto.type,
-	        password:	updateChannelDto.password,
-        } 
-      })
+      const chan = await this.findChannel(dto.id);
+      
+      const inChan = await this.isInChannel(user.id, chan.id);
+      if (inChan)
+        throw new BadRequestException(`User ${user.id} is already in channel ${chan.id}`);
+
+      if (chan.password) {
+        const pwdMatch = await argon.verify(chan.password, dto.password);
+			if (!pwdMatch)
+				throw new ForbiddenException('incorrect password');
+      }
+
+      const joinChannel = await this.prisma.channel.update({ where: { id: chan.id}, 
+        data: {
+          members: { 
+            create: [
+              {
+                role: 'USER',
+                user: {connect: { id: user.id }}
+              }
+            ]  
+          }
+        }})
+      return joinChannel;
+
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError)
+        return { error: 'An error occurred while addind other user in channel' };
+      throw error;
+    }
+  }
+
+  async addUserInChannel(friendId: number, member: User, chanId: number) {
+    if (friendId === member.id)
+      return { error: 'Cannot add your self in channel'}
+
+    try {
+      this.findChannel(chanId);
+      
+      if (await this.isInChannel(friendId, chanId))
+        throw new NotFoundException(`User ${friendId} is already in channel ${chanId}`);
+
+      const userInchannel = await this.isInChannel(member.id, chanId);
+      if (!userInchannel)
+        throw new NotFoundException(`User id ${member.id} is not in channel id ${chanId}`);
+      
+        if (userInchannel.role ===  Role.USER || !userInchannel.role)
+          throw new ForbiddenException(`User ${member.id} has not required role for this action`);
+      
+        const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
+        data: {
+          members: {
+            connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
+            create: [{ userId: friendId, role: Role.USER }]
+          }
+        }})
+        return addInChannel;
+    } catch (error) { 
+      if (error instanceof Prisma.PrismaClientKnownRequestError)
+				return { error: 'An error occurred while addind other user in channel' };
+			throw error;
+    }   
+  }
+
+  async updateChannel(chanId: number, dto: UpdateChannelDto, user: User) {
+    try {
+      const chan = await this.findChannel(chanId);
+      const inChan = await this.isInChannel(user.id, chan.id)
+      if (!inChan)
+        throw new NotFoundException(`User ${user.id} is not in channel ${chan.id}`);
+      if (chan.password) {
+        const pwdMatch = await argon.verify(chan.password, dto.password);
+			if (!pwdMatch)
+				throw new ForbiddenException('incorrect password');
+      }
+      if (inChan.role !== Role.OWNER || !inChan.role)
+        throw new ForbiddenException(`User ${user.id} has not required role for this action`);
+      
+        const updateChannel = await this.prisma.channel.update({ where: { id: chan.id}, 
+        data: {
+          name: dto.name,
+	        type: dto.type,
+	        password:	dto.password,
+          avatar: dto.avatar
+        }})
+      return updateChannel;
+
     } catch (error) { }    
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  async countMembersInChannel(chanId: number): Promise<number> {
+
+    const result = (await this.prisma.channel.findUnique({
+      where: {
+        id: chanId
+      },
+      include: {
+        members: true
+      }
+    })).members.length
+
+    return (result)
   }
+
+  async setNewOwner(chanId: number) {
+    
+    const administratorFound = await this.prisma.usersOnChannels.findFirst({
+      where: {
+        channelId: chanId,
+        role: "ADMIN"
+      },
+      select: {
+        userId: true,
+        role: true
+      }
+    })
+    const memberFound = await this.prisma.usersOnChannels.findFirst({
+      where: {
+        channelId: chanId,
+        role: "USER"
+      },
+      select: {
+        userId: true,
+        role: true
+      }
+    })
+
+    const newOwner = administratorFound ? administratorFound : memberFound
+
+    await this.prisma.usersOnChannels.update({
+      where: {
+        userId_channelId: {
+          userId: newOwner.userId,
+          channelId: chanId
+        }
+      },
+      data: {
+        role: "OWNER"
+      },
+      select: {
+        userId: true,
+        role: true
+      }
+    })
+  }
+
+  async leaveChannel(user: User, chanId: number) {
+
+    const userLeave = await this.prisma.usersOnChannels.delete({
+      where: {
+        userId_channelId: {
+          userId: user.id,
+          channelId: chanId
+        }
+      }
+    })
+
+    const numberOfMembers: number = await this.countMembersInChannel(chanId)
+
+    if (numberOfMembers === 0)
+    {
+      const removeChannel = await this.remove(chanId)
+      return ([ userLeave, removeChannel ])
+    }
+    else if (userLeave.role === "OWNER")
+    {
+      const newOwner = await this.setNewOwner(chanId)
+      return ([ userLeave, newOwner ])
+    }
+    return (userLeave)
+  }
+
+  async remove(id: number) {
+  
+    await this.prisma.usersOnChannels.deleteMany({
+      where: {
+        channelId: id
+      }
+    })
+
+		const deleteChannel = await this.prisma.channel.delete({
+      where: {
+        id: id
+      }
+    });
+		return deleteChannel;
+	}
+
+    /****************************** gestion message ***********************/
+
+    async addContent(id: number, msg:string, user :User) {
+
+
+      const newMessage = await this.prisma.message.create({
+        data: {
+          author: { connect: { id: user.id } },  // Connectez le message à l'utilisateur existant
+          channel: { connect: { id: id } }, 
+          content: msg,
+          isInvit: true
+        },
+      });
+      //console.log(newMessage.content);
+    }
+  
+    async getAllMessage(id: number) {
+      try {
+        const channel = await this.prisma.channel.findUnique({
+          where: { id: id },
+          include: { content: true },
+        });
+    
+        if (!channel) {
+          console.error("Le canal n'existe pas.");
+          return;
+        }
+    
+        const messages = channel.content;
+    
+        if (!messages) {
+          console.error("Aucun message trouvé dans le canal.");
+          return;
+        }
+        for (const message of messages) {
+          console.log(message.authorId, " = ",message.content);
+          //retourner les messages 
+        }
+      } catch (error) {
+        console.error("Une erreur s'est produite lors de la récupération des messages.", error);
+      }
+    }
+
+
+    async getAllUserId(id: number)
+    {
+      const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+        where: {
+          channelId: id,
+        },
+        select: {
+          userId: true,
+        },
+      });
+      const userIds = usersOnChannels.map((userOnChannel) => userOnChannel.userId);
+      return userIds;
+    }
+
 
   /****************************** CRUD USER ON CHANNEL ***********************/
 

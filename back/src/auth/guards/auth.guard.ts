@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {}
-  
+ 
+// v1
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
 	constructor() {

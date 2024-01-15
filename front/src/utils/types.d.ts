@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client"
 import {
 	userStatus,
 	challengeStatus,
@@ -15,18 +16,20 @@ export type User = {
 		wins: number,
 		draws: number,
 		losses: number
-	}
+	},
+	socket: Socket | undefined
 }
+
 export type UserAuthenticate = User & {
 	email: string,
 	phoneNumber: string,
 	twoFA: boolean,
 	friends: User[],
 	blockedUsers: User[],
-	channels: ChannelData[]
+	channels: Channel[]
 }
 
-export type ChannelData = {
+export type Channel = {
 	id: number,
 	createdAt?: string,
 	name: string,
@@ -34,10 +37,9 @@ export type ChannelData = {
 	type: channelStatus,
 	password?: string,
 	messages: (MessageText | MessageInvitation)[],
-	owner: User | UserAuthenticate,
-	administrators: (User | UserAuthenticate)[],
 	users: (User | UserAuthenticate)[],
-	validUsers: (User | UserAuthenticate)[],
+	administrators: (User | UserAuthenticate)[],
+	owner: User | UserAuthenticate | undefined,
 	mutedUsers: (User | UserAuthenticate)[],
 	bannedUsers: (User | UserAuthenticate)[]
 }

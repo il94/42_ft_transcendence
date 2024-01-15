@@ -25,7 +25,7 @@ import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import DisplayContext from "../../contexts/DisplayContext"
 
-import { ChannelData, UserAuthenticate } from "../../utils/types"
+import { Channel, UserAuthenticate } from "../../utils/types"
 import { channelStatus, chatWindowStatus } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
@@ -33,9 +33,9 @@ import ChatIcon from "../../assets/chat.png"
 type PropsChat = {
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
-	channels: ChannelData[],
-	channelTarget: ChannelData | undefined,
-	setChannelTarget: Dispatch<SetStateAction<ChannelData | undefined>>,
+	channels: Channel[],
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 	userAuthenticate: UserAuthenticate
@@ -84,7 +84,9 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 	useEffect(() => {
 		if (channelTarget)
 		{
-			if (channelTarget.type === channelStatus.PROTECTED && !channelTarget.validUsers.includes(userAuthenticate))
+			if (channelTarget.type === channelStatus.PROTECTED &&
+				!channelTarget.users.some((member) => member.id === userAuthenticate.id) &&
+				channelTarget.owner?.id !== userAuthenticate.id)
 				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
 			else
 				setChatWindowState(chatWindowStatus.CHANNEL)
@@ -141,19 +143,22 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget} />
+												setChannelTarget={setChannelTarget}
+												setErrorRequest={setErrorRequest} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?
 													<HomeInterface />
 													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
 														<LockedInterface
-															channelTarget={channelTarget}
-															setChatWindowState={setChatWindowState} />
+															channel={channelTarget}
+															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
+															setChatWindowState={setChatWindowState}
+															setErrorRequest={setErrorRequest} />
 														:
 														<ChatInterface
 															channel={channelTarget}
-															setChannel={setChannelTarget as Dispatch<SetStateAction<ChannelData>>}/>
+															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}/>
 											}
 										</>
 								}

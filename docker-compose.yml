@@ -38,7 +38,8 @@ services:
     depends_on:
       - back
     volumes:
-      - ./front/package*.json:/app/package*.json
+      - ./front/package.json:/app/package.json
+      - ./front/package-lock.json:/app/package-lock.json
       - ./front/src:/app/src
       - ./front/index.html:/app/index.html
       - ./front/style.css:/app/style.css

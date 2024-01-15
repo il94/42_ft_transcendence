@@ -1,24 +1,24 @@
 export enum userStatus {
-	ONLINE = "Online",
-	OFFLINE = "Offline",
-	PLAYING = "Playing",
-	WAITING = "Looking for a game...",
-	WATCHING = "Spectator"
+	ONLINE = "ONLINE",
+	PLAYING = "PLAYING",
+	WAITING = "LOOKING FOR A GAME...",
+	WATCHING = "SPECTATOR",
+	OFFLINE = "OFFLINE"
 }
 
 export enum challengeStatus {
-	PENDING = "pending",
-	ACCEPTED = "accepted",
-	CANCELLED = "cancelled",
-	IN_PROGRESS = "in progress",
-	FINISHED = "finished"
+	PENDING = "PENDING",
+	ACCEPTED = "ACCEPTED",
+	CANCELLED = "CANCELLED",
+	IN_PROGRESS = "IN_PROGRESS",
+	FINISHED = "FINISHED"
 }
 
 export enum channelStatus {
-	PUBLIC = "Public",
-	PROTECTED = "Protected",
-	PRIVATE = "Private",
-	MP = "Direct messages"
+	PUBLIC = "PUBLIC",
+	PROTECTED = "PROTECTED",
+	PRIVATE = "PRIVATE",
+	MP = "MP"
 }
 
 export enum chatWindowStatus {
