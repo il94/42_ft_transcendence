@@ -45,7 +45,9 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import { TempContext, userSomeone } from '../../temp/temp'
+import { TempContext, getRandomStatus, getTempChannels, userSomeone } from '../../temp/temp'
+import { deleteScoreFormatFromBack } from '../../utils/functions'
+import PongWrapper from '../../components/Pong/PongWrapper'
 
 function Game() {
 
@@ -318,7 +320,12 @@ function Game() {
 												displaySettingsMenu={displaySettingsMenu} />
 										</TopGameWrapper>
 										<BottomGameWrapper>
-											<Pong />
+											{
+												settings &&
+												<SettingsMenu
+													userAuthenticate={userAuthenticate}
+													displaySettingsMenu={displaySettingsMenu} />
+											}
 											{
 												card &&
 												<Card
@@ -326,13 +333,8 @@ function Game() {
 													displayCard={displayCard}
 													userTarget={userTarget} />
 											}
-											{
-												settings &&
-												<SettingsMenu
-													userAuthenticate={userAuthenticate}
-													displaySettingsMenu={displaySettingsMenu} />
-											}
-											<TestsBack />
+											{/* /* <TestsBack /> */}
+											<PongWrapper social={social}/>
 											{
 												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
