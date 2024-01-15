@@ -102,7 +102,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 
 			const newDatas: any = {
 				username: username.value !== userAuthenticate.username ? username.value : undefined,
-				avatar: avatar ? avatar : undefined,
+				avatar: avatar !== userAuthenticate.avatar ? avatar : undefined,
 				hash: password.value ? password.value : undefined,
 				email: email.value !== userAuthenticate.email ? email.value : undefined,
 				phoneNumber: phoneNumber.value !== userAuthenticate.phoneNumber ? phoneNumber.value : undefined,

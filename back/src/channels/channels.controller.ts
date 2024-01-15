@@ -23,11 +23,43 @@ export class ChannelController {
     return this.channelsService.joinChannel(dto, req.user);
   }
 
+  /* soso  ajout de message avec l'id du channel  */
+
+  @Post(':id/message') //a acorder
+  async addMessage(
+    @getUser() user: User,
+    @Param('id', ParseIntPipe) id: number,
+    @Body('msg') msg: string
+    ) {
+    return await this.channelsService.addContent(id, msg, user);
+  }
+  
+
+  /* soso obtenir tout les messages  edit : format de renvoie pas encore confirmer */
+
+  @Get(':id/message') // a acorder
+  getMessages(
+    @Param('id', ParseIntPipe) id: number) {
+    return this.channelsService.getAllMessage(id);
+  }
+  
+
+
   @Get()
   async findAll() {
     const channels = await this.channelsService.findAllChannels();
     return channels;
   }
+
+  /* soso obtenir tout les id des users d'un channel avec son id*/
+
+  @Get(':id/userId')
+  async getAllUserId(
+    @Param('id', ParseIntPipe) id: number,
+  ){
+    return await this.channelsService.getAllUserId(id);;
+  }
+
 
   // RQPR channel par son id => inutile
   @Get(':id')
@@ -53,4 +85,11 @@ export class ChannelController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.channelsService.remove(id);
 	}
+
+  @Delete('leave/:id')
+  leave(@Param('id', ParseIntPipe) channId: number,
+  @getUser() member: User) {
+    return this.channelsService.leaveChannel(member, channId);
+	}
+
 }

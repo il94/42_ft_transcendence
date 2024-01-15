@@ -11,6 +11,7 @@ import DefaultYellowAvatar from "../assets/default_yellow.png"
 import DefaultChannel from "../assets/default_channel.png"
 import { useContext } from "react"
 import AuthContext from "../contexts/AuthContext"
+import { User } from "../utils/types"
 
 const Style = styled.div`
 
@@ -18,11 +19,11 @@ const Style = styled.div`
 	flex-direction: column;
 
 	position: absolute;
-	top: 30%;
+	top: 8%;
 	left: 50%;
 
 	width: 180px;
-	height: 380px;
+	height: 680px;
 
 	background-color: #a84152;
 	
@@ -219,6 +220,96 @@ function TestsBack() {
 		}
 	}
 
+/* =============================== FRIENDS ================================== */
+
+async function getFriends() {
+	try {
+		const test: AxiosResponse<User> = await axios.get("http://localhost:3333/friends", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		console.log("FRIENDS = ", test)
+
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+async function deleteFriends() {
+	try {
+		let i = 0
+
+		const friends: AxiosResponse = await axios.get("http://localhost:3333/friends", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		while (i < friends.data.length)
+		{
+			console.log("ID = ", friends.data[i].id)
+			let test = await axios.delete(`http://localhost:3333/friends/${friends.data[i].id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+				}
+			)
+			console.log("FRIEND", i, " = ", test)
+			i++
+		}
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+/* =============================== BLOCKEDS ================================= */
+
+async function getBlockeds() {
+	try {
+		const test: AxiosResponse<User> = await axios.get("http://localhost:3333/blockeds", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		console.log("BLOCKEDS = ", test)
+
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+async function deleteBlockeds() {
+	try {
+		let i = 0
+
+		const blockeds: AxiosResponse = await axios.get("http://localhost:3333/blockeds", {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		while (i < blockeds.data.length)
+		{
+			console.log("ID = ", blockeds.data[i].id)
+			let test = await axios.delete(`http://localhost:3333/blockeds/${blockeds.data[i].id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+				}
+			)
+			console.log("BLOCKEDS", i, " = ", test)
+			i++
+		}
+	}
+	catch (error) {
+		console.log(error)
+	}
+}
+
+
+	
 	return (
 		<Style>
 
@@ -244,6 +335,21 @@ function TestsBack() {
 			<Bout onClick={deleteChannels}>
 				delete channels
 			</Bout>
+
+			<Bout onClick={getFriends}>
+				get friends
+			</Bout>
+			<Bout onClick={deleteFriends}>
+				delete friends
+			</Bout>
+
+			<Bout onClick={getBlockeds}>
+				get blockeds
+			</Bout>
+			<Bout onClick={deleteBlockeds}>
+				delete blockeds
+			</Bout>
+
 
 		</Style>
 	)

@@ -14,8 +14,15 @@ import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
+import AuthContext from "../../../contexts/AuthContext"
 
-import { Channel, MessageInvitation, User } from "../../../utils/types"
+import {
+	Channel,
+	MessageInvitation,
+	User,
+	UserAuthenticate
+} from "../../../utils/types"
+
 import {
 	challengeStatus,
 	channelStatus,
@@ -23,7 +30,6 @@ import {
 	messageStatus,
 	userStatus
 } from "../../../utils/status"
-import AuthContext from "../../../contexts/AuthContext"
 
 type PropsContextualMenu = {
 	type: contextualMenuStatus | undefined,
@@ -96,7 +102,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayAdminSections(false)
 	}, [])
 
-	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleContactClickEvent() {
 		try {
@@ -119,7 +125,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						userAuthenticate,
 						userTarget
 					],
-					validUsers: [],
 					mutedUsers: [],
 					bannedUsers: []
 				}
@@ -189,7 +194,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							userAuthenticate,
 							userTarget
 						],
-						validUsers: [],
 						mutedUsers: [],
 						bannedUsers: []
 					}
@@ -226,60 +230,34 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleManageFriendClickEvent() {
 		try {
-			if (!userAuthenticate.friends.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.post(`http://localhost:3333/user/me/friends/${userTarget.id}`)
-
-				const test = await axios.post("http://localhost:3333/friends/add", {
-					id: userTarget.id
-				})
-
-				console.log("post", test)
-
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
+			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
+				await axios.post(`http://localhost:3333/friends/${user.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				console.log("get", responseMe)
-
-				/* ====================================== */
-				userAuthenticate.friends.push(userTarget)
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					friends: [ ...prevState.friends, userTarget]
+				}))
 			}
 			else {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/user/me/friends/${userTarget.id}`)
-
-				/* ====================================== */
-
-				// const test = await axios.post(`http://localhost:3333/friends/request/${userTarget.id}/`, {
-				// 	headers: {
-				// 		'Authorization': `Bearer ${token}`
-				// 	}
-				// })
-
-				const test = await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {
+				await axios.delete(`http://localhost:3333/friends/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				console.log("post", test)
+				setUserAuthenticate((prevState: UserAuthenticate) => {
 
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
-					headers: {
-						'Authorization': `Bearer ${token}`
+					const { friends, ...rest } = prevState
+
+					return {
+						...rest,
+						friends: friends.filter((friend) => friend.id !== userTarget.id)
 					}
 				})
-
-				console.log("get", responseMe)
-
-
-
-				userAuthenticate.friends.splice(userAuthenticate.friends.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {
@@ -292,23 +270,40 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleBlockClickEvent() {
 		try {
-			if (!userAuthenticate.blockedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id)) {
+				await axios.post(`http://localhost:3333/blockeds/${userTarget.id}`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// await axios.post(`http://localhost:3333/user/me/blockedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				userAuthenticate.blockedUsers.push(userTarget)
+				setUserAuthenticate((prevState: UserAuthenticate) => {
+					return {
+						...prevState,
+						blockedUsers: [ ...prevState.blockedUsers, userTarget ]
+					}
+				})
 			}
 			else {
-				/* ============ Temporaire ============== */
 
-				// await axios.delete(`http://localhost:3333/user/me/blockedusers/${userTarget.id}`)
+				console.log("DELETE")
+				await axios.delete(`http://localhost:3333/blockeds/${userTarget.id}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				/* ====================================== */
+				setUserAuthenticate((prevState: UserAuthenticate) => {
 
-				userAuthenticate.blockedUsers.splice(userAuthenticate.blockedUsers.indexOf(userTarget), 1)
+					const { blockedUsers, ...rest } = prevState
+
+					console.log("REST", rest)
+
+					return {
+						...rest,
+						blockedUsers: blockedUsers.filter((blockedUser) => blockedUser.id !== userTarget.id)
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -443,7 +438,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleBlockClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.blockedUsers.includes(userTarget) ?
+										!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id) ?
 											"Block"
 											:
 											"Unblock"
