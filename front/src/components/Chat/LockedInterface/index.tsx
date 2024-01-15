@@ -83,7 +83,7 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 
 			setChannel(() => ({
 				...channel,
-				users: [...channel.users, userAuthenticate],
+				members: [...channel.members, userAuthenticate],
 			}))
 		}
 		catch (error) {

@@ -103,7 +103,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -134,7 +134,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -165,7 +165,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -195,7 +195,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -226,7 +226,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				osef
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -257,7 +257,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -289,7 +289,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -320,7 +320,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -351,7 +351,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -382,7 +382,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				osef
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -407,7 +407,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -430,7 +430,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 
 			owner: userSomeone,
 			administrators: [],
-			users: [
+			members: [
 				userSomeone,
 				userAuthenticate
 			],

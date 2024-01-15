@@ -114,25 +114,27 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			else
 			{
 				const MPDatas: any = {
-					name: userTarget.username,
-					type: channelStatus.MP,
-					avatar: userTarget.avatar
+					name: '',
+					avatar: '',
+					type: channelStatus.MP
 				}		
 
-				const postChannelResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				const postChannelMPResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				const newChannel: Channel = {
-					id: postChannelResponse.data.id,
-					...MPDatas,
+				const newChannelMP: Channel = {
+					id: postChannelMPResponse.data.id,
+					name: userTarget.username,
+					avatar: userTarget.avatar,
+					type: channelStatus.MP,
 					messages: [],
 					owner: undefined,
 					administrators: [],
-					users: [
+					members: [
 						userAuthenticate,
 						userTarget
 					],
@@ -142,10 +144,10 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 				setUserAuthenticate((prevState) => ({
 					...prevState,
-					channels: [...prevState.channels, newChannel]
+					channels: [...prevState.channels, newChannelMP]
 				}))
 				
-				setChannelTarget(newChannel)
+				setChannelTarget(newChannelMP)
 			}
 			displayChat(true)
 		}
@@ -194,7 +196,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						messages: [],
 						owner: userAuthenticate,
 						administrators: [],
-						users: [
+						members: [
 							userAuthenticate,
 							userTarget
 						],
@@ -289,8 +291,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				})
 			}
 			else {
-
-				console.log("DELETE")
 				await axios.delete(`http://localhost:3333/blockeds/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -300,8 +300,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				setUserAuthenticate((prevState: UserAuthenticate) => {
 
 					const { blockedUsers, ...rest } = prevState
-
-					console.log("REST", rest)
 
 					return {
 						...rest,
@@ -366,14 +364,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.users.includes(userTarget)) {
+			if (!channelTarget.members.includes(userTarget)) {
 				/* ============ Temporaire ============== */
 
 				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/users/${userTarget.id}`)
 
 				/* ====================================== */
 
-				channelTarget.users.splice(channelTarget.users.indexOf(userTarget), 1)
+				channelTarget.members.splice(channelTarget.members.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {

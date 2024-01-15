@@ -147,10 +147,58 @@ export class UsersService {
 
 		const userChannels = await this.prisma.channel.findMany({
 			where: {
-				id: { in: channelsId.map((channelId) => (channelId.channelId)) }
+				id: {
+					in: channelsId.map((channelId) => (channelId.channelId))
+				},
+				AND: {
+					type: {
+						in: ["PUBLIC", "PROTECTED", "PRIVATE"]
+					}
+				}
 			}
 		})
 		
-		return userChannels;
+		const userChannelsMP = await this.prisma.channel.findMany({
+			where: {
+				id: {
+					in: channelsId.map((channelId) => (channelId.channelId))
+				},
+				AND: {
+					type: "MP"
+				}
+			},
+			include: {
+				members: {
+					select: {
+						user: {
+							select: {
+								id: true,
+								username: true,
+								avatar: true
+							}
+						},
+					}
+				}
+			}
+		})
+
+		const userAllChannels = [
+
+			...userChannels,
+			...userChannelsMP.map((channelMP) => {
+				const { members, ...rest } = channelMP
+
+				return {
+					...rest,
+					members: members.map((member) => {
+						return (member.user)
+					}).sort((recipient) => {
+						return (member.id - recipient.id)
+					})
+				}
+			})
+		]
+
+		return userAllChannels;
 	}
 }

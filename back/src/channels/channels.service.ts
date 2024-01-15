@@ -54,7 +54,7 @@ export class ChannelsService {
       ...channelDatas,
       messages: [], // en attendant de pouvoir recup les messages
       users: channelDatas.members.map((member) => {
-        if (member.role === "USER")
+        if (member.role === "MEMBER")
           return (member.user)
       }).filter(Boolean),
       administrators: channelDatas.members.map((member) => {
@@ -153,7 +153,7 @@ export class ChannelsService {
           members: { 
             create: [
               {
-                role: 'USER',
+                role: 'MEMBER',
                 user: {connect: { id: user.id }}
               }
             ]  
@@ -182,14 +182,14 @@ export class ChannelsService {
       if (!userInchannel)
         throw new NotFoundException(`User id ${member.id} is not in channel id ${chanId}`);
       
-        if (userInchannel.role ===  Role.USER || !userInchannel.role)
+        if (userInchannel.role ===  Role.MEMBER || !userInchannel.role)
           throw new ForbiddenException(`User ${member.id} has not required role for this action`);
       
         const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
         data: {
           members: {
             connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
-            create: [{ userId: friendId, role: Role.USER }]
+            create: [{ userId: friendId, role: Role.MEMBER }]
           }
         }})
         return addInChannel;
@@ -255,7 +255,7 @@ export class ChannelsService {
     const memberFound = await this.prisma.usersOnChannels.findFirst({
       where: {
         channelId: chanId,
-        role: "USER"
+        role: "MEMBER"
       },
       select: {
         userId: true,

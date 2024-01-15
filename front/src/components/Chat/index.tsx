@@ -85,7 +85,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 		if (channelTarget)
 		{
 			if (channelTarget.type === channelStatus.PROTECTED &&
-				!channelTarget.users.some((member) => member.id === userAuthenticate.id) &&
+				!channelTarget.members.some((member) => member.id === userAuthenticate.id) &&
 				channelTarget.owner?.id !== userAuthenticate.id)
 				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
 			else
@@ -153,7 +153,6 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 														<LockedInterface
 															channel={channelTarget}
 															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
-															setChatWindowState={setChatWindowState}
 															setErrorRequest={setErrorRequest} />
 														:
 														<ChatInterface

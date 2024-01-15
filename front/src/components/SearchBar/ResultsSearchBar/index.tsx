@@ -187,7 +187,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 					setChannelTarget(() => ({
 						...channel,
-						users: [...channel.users, userAuthenticate]
+						members: [...channel.members, userAuthenticate]
 					}))
 				}
 
