@@ -21,6 +21,7 @@ import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
+import PongWrapper from '../../components/Pong/PongWrapper'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
@@ -318,7 +319,8 @@ function Game() {
 												displaySettingsMenu={displaySettingsMenu} />
 										</TopGameWrapper>
 										<BottomGameWrapper>
-											<Pong />
+											{/* <PongWrapper social={social}/> */}
+											<Pong/>
 											{
 												card &&
 												<Card
