@@ -64,11 +64,11 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 			setValueChannelCreateButton("Create")
 			setBannerName("Welcome")
 		}
-		else if (channelTarget && (chatWindowState === chatWindowStatus.CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
+		else if (channelTarget && chatWindowState === chatWindowStatus.CHANNEL) {
 			setValueChannelCreateButton("Create")
 			setBannerName(channelTarget.name)
 		}
-		else if (channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
+		else if (channelTarget && (chatWindowState === chatWindowStatus.UPDATE_CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
 			setValueChannelCreateButton("<<")
 			setBannerName(channelTarget.name)
 		}
@@ -83,7 +83,14 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 
 	useEffect(() => {
 		if (channelTarget)
-			setChatWindowState(chatWindowStatus.CHANNEL)
+		{
+			if (channelTarget.type === channelStatus.PROTECTED &&
+				!channelTarget.members.some((member) => member.id === userAuthenticate.id) &&
+				channelTarget.owner?.id !== userAuthenticate.id)
+				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
 		else
 			setChatWindowState(chatWindowStatus.HOME)
 	}, [channelTarget])
@@ -94,6 +101,8 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
 		else if (chatWindowState === chatWindowStatus.CHANNEL)
 			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
+		else if (chatWindowState === chatWindowStatus.LOCKED_CHANNEL)
+			setChatWindowState(chatWindowStatus.HOME)
 		else if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
 			setChatWindowState(chatWindowStatus.CHANNEL)
 		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
@@ -136,15 +145,17 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget} />
+												setChannelTarget={setChannelTarget}
+												setErrorRequest={setErrorRequest} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?
 													<HomeInterface />
 													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
 														<LockedInterface
-															channelTarget={channelTarget}
-															setChatWindowState={setChatWindowState} />
+															channel={channelTarget}
+															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
+															setErrorRequest={setErrorRequest} />
 														:
 														<ChatInterface
 															channel={channelTarget}

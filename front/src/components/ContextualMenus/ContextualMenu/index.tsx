@@ -14,8 +14,15 @@ import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../contexts/InteractionContext"
+import AuthContext from "../../../contexts/AuthContext"
 
-import { Channel, MessageInvitation, User } from "../../../utils/types"
+import {
+	Channel,
+	MessageInvitation,
+	User,
+	UserAuthenticate
+} from "../../../utils/types"
+
 import {
 	challengeStatus,
 	channelStatus,
@@ -23,7 +30,6 @@ import {
 	messageStatus,
 	userStatus
 } from "../../../utils/status"
-import AuthContext from "../../../contexts/AuthContext"
 
 type PropsContextualMenu = {
 	type: contextualMenuStatus | undefined,
@@ -96,7 +102,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayAdminSections(false)
 	}, [])
 
-	const { userAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleContactClickEvent() {
 		try {
@@ -107,36 +113,41 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				setChannelTarget(findResult)
 			else
 			{
-				const newChannel: Channel = {
-					id: -1, //???
+				const MPDatas: any = {
+					name: '',
+					avatar: '',
+					type: channelStatus.MP
+				}		
+
+				const postChannelMPResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const newChannelMP: Channel = {
+					id: postChannelMPResponse.data.id,
 					name: userTarget.username,
 					avatar: userTarget.avatar,
 					type: channelStatus.MP,
 					messages: [],
-					owner: userAuthenticate,
+					owner: undefined,
 					administrators: [],
-					users: [
+					members: [
 						userAuthenticate,
 						userTarget
 					],
-					validUsers: [],
 					mutedUsers: [],
 					bannedUsers: []
 				}
 
-				/* ============ Temporaire ============== */
-
-				// Verifier si le channel mp n'existe pas deja
-				// await axios.post(`http://localhost:3333/channel`, {
-				// 	name: userTarget.id,
-				// 	avatar: userTarget.avatar,
-				// 	type: channelStatus.MP
-				// })
-
-				/* ====================================== */
-
-				userAuthenticate.channels.push(newChannel)
-				setChannelTarget(newChannel)
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					channels: [...prevState.channels, newChannelMP]
+				}))
+				
+				setChannelTarget(newChannelMP)
 			}
 			displayChat(true)
 		}
@@ -185,11 +196,10 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						messages: [],
 						owner: userAuthenticate,
 						administrators: [],
-						users: [
+						members: [
 							userAuthenticate,
 							userTarget
 						],
-						validUsers: [],
 						mutedUsers: [],
 						bannedUsers: []
 					}
@@ -226,60 +236,34 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleManageFriendClickEvent() {
 		try {
-			if (!userAuthenticate.friends.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.post(`http://localhost:3333/user/me/friends/${userTarget.id}`)
-
-				const test = await axios.post("http://localhost:3333/friends/add", {
-					id: userTarget.id
-				})
-
-				console.log("post", test)
-
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
+			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
+				await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				console.log("get", responseMe)
-
-				/* ====================================== */
-				userAuthenticate.friends.push(userTarget)
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					friends: [ ...prevState.friends, userTarget]
+				}))
 			}
 			else {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/user/me/friends/${userTarget.id}`)
-
-				/* ====================================== */
-
-				// const test = await axios.post(`http://localhost:3333/friends/request/${userTarget.id}/`, {
-				// 	headers: {
-				// 		'Authorization': `Bearer ${token}`
-				// 	}
-				// })
-
-				const test = await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {
+				await axios.delete(`http://localhost:3333/friends/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				console.log("post", test)
+				setUserAuthenticate((prevState: UserAuthenticate) => {
 
-				const responseMe = await axios.get("http://localhost:3333/user/me", {
-					headers: {
-						'Authorization': `Bearer ${token}`
+					const { friends, ...rest } = prevState
+
+					return {
+						...rest,
+						friends: friends.filter((friend) => friend.id !== userTarget.id)
 					}
 				})
-
-				console.log("get", responseMe)
-
-
-
-				userAuthenticate.friends.splice(userAuthenticate.friends.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {
@@ -292,23 +276,36 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleBlockClickEvent() {
 		try {
-			if (!userAuthenticate.blockedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id)) {
+				await axios.post(`http://localhost:3333/blockeds/${userTarget.id}`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// await axios.post(`http://localhost:3333/user/me/blockedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				userAuthenticate.blockedUsers.push(userTarget)
+				setUserAuthenticate((prevState: UserAuthenticate) => {
+					return {
+						...prevState,
+						blockedUsers: [ ...prevState.blockedUsers, userTarget ]
+					}
+				})
 			}
 			else {
-				/* ============ Temporaire ============== */
+				await axios.delete(`http://localhost:3333/blockeds/${userTarget.id}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// await axios.delete(`http://localhost:3333/user/me/blockedusers/${userTarget.id}`)
+				setUserAuthenticate((prevState: UserAuthenticate) => {
 
-				/* ====================================== */
+					const { blockedUsers, ...rest } = prevState
 
-				userAuthenticate.blockedUsers.splice(userAuthenticate.blockedUsers.indexOf(userTarget), 1)
+					return {
+						...rest,
+						blockedUsers: blockedUsers.filter((blockedUser) => blockedUser.id !== userTarget.id)
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -367,14 +364,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.users.includes(userTarget)) {
+			if (!channelTarget.members.includes(userTarget)) {
 				/* ============ Temporaire ============== */
 
 				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/users/${userTarget.id}`)
 
 				/* ====================================== */
 
-				channelTarget.users.splice(channelTarget.users.indexOf(userTarget), 1)
+				channelTarget.members.splice(channelTarget.members.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {
@@ -433,7 +430,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleManageFriendClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.friends.includes(userTarget) ?
+										!userAuthenticate.friends.some((friend) => friend.id === userTarget.id) ?
 											"Add"
 											:
 											"Delete"
@@ -443,7 +440,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleBlockClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.blockedUsers.includes(userTarget) ?
+										!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id) ?
 											"Block"
 											:
 											"Unblock"

@@ -26,13 +26,8 @@ enum RequestStatus {
   FINISHED
 }
 
-enum RelationStatus {
-  FRIEND
-  BLOCKED
-}
-
 enum Role {
-  USER
+  MEMBER
   ADMIN
   OWNER
   BANNED
@@ -84,8 +79,8 @@ model User {
 
   games       UsersOnGames[]
 
-  hasRelations  Relations[] @relation("hasRelations")
-  isInRelations Relations[] @relation("isInRelations")
+  friends  Friend[] @relation("friends")
+  blockeds  Blocked[] @relation("blockeds")
 
   channels  UsersOnChannels[]
   messages  Message[]
@@ -93,16 +88,20 @@ model User {
   @@map("users")
 }
 
-// self relation m-m user-user
-model Relations {
-  hasRelations    User @relation("hasRelations", fields: [hasRelationsId], references: [id])
-  hasRelationsId  Int
-  isInRelations   User @relation("isInRelations", fields: [isInRelationsId], references: [id])
-  isInRelationsId Int
-  relationType    RelationStatus
-  request         RequestStatus
+model Friend {
+  friend    User @relation("friends", fields: [userId], references: [id])
+  userId  Int
+  friendId Int
 
-  @@id([hasRelationsId, isInRelationsId])
+  @@id([userId, friendId])
+}
+
+model Blocked {
+  blocked    User @relation("blockeds", fields: [userId], references: [id])
+  userId  Int
+  blockedId Int
+
+  @@id([userId, blockedId])
 }
 
 model Channel {
@@ -114,7 +113,7 @@ model Channel {
   password    String?
   invitation  Invitation[]
 
-  members     UsersOnChannels[]
+  users       UsersOnChannels[]
   content     Message[]
 }
 

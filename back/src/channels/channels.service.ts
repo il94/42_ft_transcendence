@@ -26,12 +26,12 @@ export class ChannelsService {
   }
 
   async findOneChannel(chanId: number) {
-    const channel = await this.prisma.channel.findUnique({ 
+    const channelDatas = await this.prisma.channel.findUnique({ 
       where: { 
         id: chanId
       },
       include: {
-        members: {
+        users: {
           select: {
             user: {
               select: {
@@ -49,8 +49,25 @@ export class ChannelsService {
         }
       }
     })
-    if (!channel)
+    if (!channelDatas)
       throw new NotFoundException(`Channel with id ${chanId} not found`);
+
+    const { users, ...rest } = channelDatas
+    const channel = {
+      ...rest,
+      messages: [], // en attendant de pouvoir recup les messages
+      members: channelDatas.users.map((member) => {
+        if (member.role === "MEMBER")
+          return (member.user)
+      }).filter(Boolean),
+      administrators: channelDatas.users.map((member) => {
+        if (member.role === "ADMIN")
+          return (member.user)
+      }).filter(Boolean),
+      owner: channelDatas.users.find((member) => member.role === "OWNER").user,
+      mutedUsers: [], // en attendant de pouvoir recup les users mutes
+      bannedUsers: [] // en attendant de pouvoir recup les users bans
+    }
 
     return channel;
   }
@@ -62,7 +79,7 @@ export class ChannelsService {
         name: createChannelDto.name,
         avatar: createChannelDto.avatar,
         type: createChannelDto.type,
-        members: { 
+        users: { 
           create: [
             {
               role: 'OWNER',
@@ -80,6 +97,21 @@ export class ChannelsService {
       })
     }
     return newChannel;
+  }
+
+  async createChannelMP(idRecipient: number, createChannelDto: CreateChannelDto, creator: User) {
+
+    const newChannel = await this.createChannel(createChannelDto, creator)
+
+    const recipient = await this.prisma.user.findUnique({
+      where: {
+        id: idRecipient
+      }
+    })
+
+    const newChannelWithRecipient = this.joinChannel(newChannel, recipient)
+
+    return newChannelWithRecipient;
   }
 
   async findChannel(chanId: number) {
@@ -119,10 +151,10 @@ export class ChannelsService {
 
       const joinChannel = await this.prisma.channel.update({ where: { id: chan.id}, 
         data: {
-          members: { 
+          users: { 
             create: [
               {
-                role: 'USER',
+                role: 'MEMBER',
                 user: {connect: { id: user.id }}
               }
             ]  
@@ -151,14 +183,14 @@ export class ChannelsService {
       if (!userInchannel)
         throw new NotFoundException(`User id ${member.id} is not in channel id ${chanId}`);
       
-        if (userInchannel.role ===  Role.USER || !userInchannel.role)
+        if (userInchannel.role ===  Role.MEMBER || !userInchannel.role)
           throw new ForbiddenException(`User ${member.id} has not required role for this action`);
       
         const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
         data: {
-          members: {
+          users: {
             connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
-            create: [{ userId: friendId, role: Role.USER }]
+            create: [{ userId: friendId, role: Role.MEMBER }]
           }
         }})
         return addInChannel;
@@ -188,20 +220,112 @@ export class ChannelsService {
           name: dto.name,
 	        type: dto.type,
 	        password:	dto.password,
+          avatar: dto.avatar
         }})
       return updateChannel;
 
     } catch (error) { }    
   }
 
+  async countMembersInChannel(chanId: number): Promise<number> {
+
+    const result = (await this.prisma.channel.findUnique({
+      where: {
+        id: chanId
+      },
+      include: {
+        users: true
+      }
+    })).users.length
+
+    return (result)
+  }
+
+  async setNewOwner(chanId: number) {
+    
+    const administratorFound = await this.prisma.usersOnChannels.findFirst({
+      where: {
+        channelId: chanId,
+        role: "ADMIN"
+      },
+      select: {
+        userId: true,
+        role: true
+      }
+    })
+    const memberFound = await this.prisma.usersOnChannels.findFirst({
+      where: {
+        channelId: chanId,
+        role: "MEMBER"
+      },
+      select: {
+        userId: true,
+        role: true
+      }
+    })
+
+    const newOwner = administratorFound ? administratorFound : memberFound
+
+    await this.prisma.usersOnChannels.update({
+      where: {
+        userId_channelId: {
+          userId: newOwner.userId,
+          channelId: chanId
+        }
+      },
+      data: {
+        role: "OWNER"
+      },
+      select: {
+        userId: true,
+        role: true
+      }
+    })
+  }
+
+  async leaveChannel(user: User, chanId: number) {
+
+    const userLeave = await this.prisma.usersOnChannels.delete({
+      where: {
+        userId_channelId: {
+          userId: user.id,
+          channelId: chanId
+        }
+      }
+    })
+
+    const numberOfMembers: number = await this.countMembersInChannel(chanId)
+
+    if (numberOfMembers === 0)
+    {
+      const removeChannel = await this.remove(chanId)
+      return ([ userLeave, removeChannel ])
+    }
+    else if (userLeave.role === "OWNER")
+    {
+      const newOwner = await this.setNewOwner(chanId)
+      return ([ userLeave, newOwner ])
+    }
+    return (userLeave)
+  }
+
   async remove(id: number) {
   
-    const deleteRelations = await this.prisma.usersOnChannels.deleteMany({
+    // supprime les relations user - channel
+    await this.prisma.usersOnChannels.deleteMany({
       where: {
         channelId: id
       }
     })
 
+    // supprime les relations message - channel
+    await this.prisma.message.deleteMany({
+      where: {
+        channelId: id
+      }
+    })
+
+    // supprime le channel
 		const deleteChannel = await this.prisma.channel.delete({
       where: {
         id: id

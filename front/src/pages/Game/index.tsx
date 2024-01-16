@@ -21,6 +21,7 @@ import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
 import Pong from '../../components/Pong'
+import PongWrapper from '../../components/Pong/PongWrapper'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
@@ -75,37 +76,31 @@ function Game() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
+
 		async function fetchFriends(): Promise<User[]> {
 			try {
-
-				/* ============ Temporaire ============== */
-
-				// appeler la route qui recupere les amis du user
-				// const friendsResponse = await axios.get("http://localhost:3333/user/me/friends")
-
-				const friendsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user", {
+				const friends: AxiosResponse<User[]> = await axios.get("http://localhost:3333/friends", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				/* ====================================== */
+				return (friends.data)
+			}
+			catch (error) {
+				throw (error)
+			}
+		}
 
-				const friends: User[] = friendsResponse.data.map((friend: any) => {
-
-					const { wins, draws, losses, ...rest } = friend
-
-					return {
-						...rest,
-						scoreResume: {
-							wins: wins,
-							draws: draws,
-							losses: losses
-						}
+		async function fetchBlockedUsers(): Promise<User[]> {
+			try {
+				const blockedUsers: AxiosResponse<User[]> = await axios.get("http://localhost:3333/blockeds", {
+					headers: {
+						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				return (friends)
+				return (blockedUsers.data)
 			}
 			catch (error) {
 				throw (error)
@@ -123,13 +118,11 @@ function Game() {
 				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => ({
 					...channel,
 					messages: [],
-					owner: emptyUser,
+					owner: undefined,
 					administrators: [],
 					users: [],
-					validUsers: [],
 					mutedUsers: [],
 					bannedUsers: []
-
 				}))
 
 				return (channels)
@@ -142,6 +135,7 @@ function Game() {
 		async function fetchMe() {
 			try {
 				const friends: User[] = await fetchFriends()
+				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
 
 				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
@@ -175,8 +169,8 @@ function Game() {
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: responseMe.data.twoFA,
-					friends: [], // a recuperer depuis la reponse
-					blockedUsers: [], // a recuperer depuis la reponse
+					friends: friends, // a recuperer depuis la reponse
+					blockedUsers: blockedUsers, // a recuperer depuis la reponse
 					channels: channels, // a recuperer depuis la reponse
 					socket: socket
 				})
@@ -323,7 +317,8 @@ function Game() {
 												displaySettingsMenu={displaySettingsMenu} />
 										</TopGameWrapper>
 										<BottomGameWrapper>
-											<Pong />
+											{/* <PongWrapper social={social}/> */}
+											<Pong/>
 											{
 												card &&
 												<Card

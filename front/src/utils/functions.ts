@@ -1,5 +1,5 @@
 import { userStatus } from "./status"
-import { Channel, User } from "./types"
+import { Channel, User, UserAuthenticate } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -46,4 +46,45 @@ export function sortUserByStatus(a: User, b: User) {
 	const bValue = status.indexOf(b.status)
 
 	return (aValue - bValue)
+}
+
+export function getAllMembersInChannel(channel: Channel): User[] {
+	const members = [
+		...(channel.members || []),
+		...(channel.administrators || []),
+		(channel.owner ? channel.owner : [])
+	].filter(member => member !== undefined) as User[]
+
+	return (members)
+}
+
+
+export function findUserInChannel(channel: Channel, user: User | UserAuthenticate): User | UserAuthenticate | undefined {
+	const inMembers = channel.members.find((member) => member.id === user.id)
+	if (inMembers)
+		return (inMembers)
+	const inAdministrators = channel.administrators.find((administrator) => administrator.id === user.id)
+	if (inAdministrators)
+		return (inAdministrators)
+	const isOwner = channel.owner?.id === user.id && channel.owner
+	if (isOwner)
+		return (isOwner)
+	else
+		return (undefined)
+}
+
+export function channelIncludeUser(channel: Channel, user: User | UserAuthenticate): boolean {
+	return (
+		channel.members.some((member) => member?.id === user.id) ||
+		channel.administrators.some((administrator) => administrator?.id === user.id) ||
+		channel.owner?.id === user.id
+	)
+}
+
+export function channelIsEmpty(channel: Channel): boolean {
+	return (
+		channel.members.length === 0 &&
+		channel.administrators.length === 0 &&
+		channel.owner === undefined
+	)
 }

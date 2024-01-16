@@ -33,7 +33,7 @@ export class UsersService {
 					status: UserStatus.ONLINE,
 					wins: 0,
 					draws: 0,
-					losses: 0,
+					losses: 0
 				},
 			});
             console.log(`User ${user.username} with id ${user.id} created successfully`);
@@ -95,8 +95,8 @@ export class UsersService {
 	}
 
 	async remove(id: number) {
-		const deleteFriends =  this.prisma.relations.deleteMany({
-			where: { hasRelationsId: id }});
+		const deleteFriends =  this.prisma.friend.deleteMany({
+			where: { userId: id }});
 		const deleteChannels = this.prisma.usersOnChannels.deleteMany({
 			where: { userId: id }})
 		const deleteGames = this.prisma.usersOnGames.deleteMany({
@@ -147,10 +147,56 @@ export class UsersService {
 
 		const userChannels = await this.prisma.channel.findMany({
 			where: {
-				id: { in: channelsId.map((channelId) => (channelId.channelId)) }
+				id: {
+					in: channelsId.map((channelId) => (channelId.channelId))
+				},
+				AND: {
+					type: {
+						in: ["PUBLIC", "PROTECTED", "PRIVATE"]
+					}
+				}
 			}
 		})
 		
-		return userChannels;
+		const userChannelsMP = await this.prisma.channel.findMany({
+			where: {
+				id: {
+					in: channelsId.map((channelId) => (channelId.channelId))
+				},
+				AND: {
+					type: "MP"
+				}
+			},
+			include: {
+				users: {
+					select: {
+						user: {
+							select: {
+								id: true,
+								username: true,
+								avatar: true
+							}
+						},
+					}
+				}
+			}
+		})
+
+		const userAllChannels = [
+
+			...userChannels,
+			...userChannelsMP.map((channelMP) => {
+				const { users, ...rest } = channelMP
+
+				return {
+					...rest,
+					members: users.map((member) => {
+						return (member.user)
+					})
+				}
+			})
+		]
+
+		return userAllChannels;
 	}
 }

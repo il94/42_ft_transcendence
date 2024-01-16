@@ -1,19 +1,27 @@
-import { Dispatch, SetStateAction, useContext } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext
+} from "react"
 import axios, { AxiosResponse } from "axios"
 
-import { Style, Avatar, ChannelName } from "./style"
+import {
+	Style,
+	Avatar,
+	ChannelName
+} from "./style"
 
 import AuthContext from "../../../../contexts/AuthContext"
 
 import { Channel, User } from "../../../../utils/types"
-import { messageStatus } from "../../../../utils/status"
+import { messageStatus, channelStatus } from "../../../../utils/status"
 
 type PropsChannel = {
 	channel: Channel,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	setErrorRequest: Dispatch<SetStateAction<boolean>>,
 	backgroundColor: string
 }
-
 
 /* 
 	soso renvoie le user a partir du userid
@@ -51,47 +59,45 @@ async function transformMessagesText(channelId: number, token: string, members: 
   }
 
 
-function ChannelSection({ channel, setChannelTarget, backgroundColor }: PropsChannel) {
+function ChannelSection({ channel, setChannelTarget, setErrorRequest, backgroundColor }: PropsChannel) {
 
 	const { token } = useContext(AuthContext)!
 	
 	async function handleClickEvent() {
 		try {
-			const response: AxiosResponse = await axios.get(`http://localhost:3333/channel/${channel.id}`, {
+
+			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-			const owner = response.data.members.find((member: any) => {
-				return member.role === "OWNER"
-			}).user
-			const admins = response.data.members.filter((member: any) => {
-				return member.role === "ADMIN"
-			}).map((member: any) => {
-				return member.user
-			})
-
-			const users = response.data.members.filter((member: any) => {
-				return member.role === "USER"
-			}).map((member: any) => {
-				return member.user
-			})
 
 			const msgFront = await transformMessagesText(channel.id , token, response.data.members);
-	
-			setChannelTarget(() => ({
-				...channel,
-				messages: msgFront, 
-				owner: owner,
-				administrators: admins,
-				users: users,
-				validUsers: [], // a recup depuis le back
-				bannedUsers: [] // a recup depuis le back
-			}))
-		
+
+			if (channelResponse.data.type === channelStatus.MP)
+			{
+				const { name, avatar, ...rest } = channelResponse.data
+
+				setChannelTarget({
+					...rest,
+					name: channel.name,
+					avatar: channel.avatar,
+          messages: msgFront
+				})
+			}
+			else
+      {
+        setChannelTarget({
+					...rest,
+					name: name,
+					avatar: avatar,
+          messages: msgFront
+				})
+				// setChannelTarget(channelResponse.data)
+      }
 		}
 		catch (error) {
-			console.log(error)
+			setErrorRequest(true)
 		}
 	}
 

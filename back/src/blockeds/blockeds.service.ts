@@ -1,84 +1,84 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-// import { RelationDto } from './dto/friends.dto';
+// import { RelationDto } from './dto/blockeds.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 @Injectable()
-export class FriendsService {
+export class BlockedsService {
   constructor(private prisma: PrismaService) {}
 
-	async addFriend(userId: number, friendId: number) 
+	async addBlocked(userId: number, blockedId: number) 
 	{
-		if (userId === friendId) 
-			return { error: 'It is not possible to add yourself!' };
+		if (userId === blockedId) 
+			return { error: 'It is not possible to block yourself!' };
 		
 		try {
-			const friend: User = await this.prisma.user.findUnique({where: { id: friendId }});
-			if (!friend)
-				throw new NotFoundException(`User with id ${friendId} does not exist.`);
+			const blocked: User = await this.prisma.user.findUnique({where: { id: blockedId }});
+			if (!blocked)
+				throw new NotFoundException(`User with id ${blockedId} does not exist.`);
 		
-			const isFriend  =  await this.prisma.friend.findUnique({
+			const isBlocked  =  await this.prisma.blocked.findUnique({
 				where: {
-					userId_friendId:
+					userId_blockedId:
 					{
 						userId: userId,
-						friendId: friendId
+						blockedId: blockedId
 					}
 				}
 			})
 
-			const newFriend = await this.prisma.user.update(
+			const newBlocked = await this.prisma.user.update(
 				{
 					where: {
 						id: userId
 					},
 					data: {
-						friends: {
+						blockeds: {
 							create: [{
-								friendId: friendId
+								blockedId: blockedId
 							}]
 						}
 					}
 				}
 			)
-			return newFriend;
+			return newBlocked;
 
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				return { error: 'An error occurred while addind friend' };
+				return { error: 'An error occurred while addind blocked' };
 			throw error;
 		}
 	}
 
-	async getFriends(userId: number) {
+	async getBlockeds(userId: number) {
 		const user = await this.prisma.user.findFirst({ 
 			where: { id: userId },
-			include: { friends: true, },
+			include: { blockeds: true, },
 		})
 		return user;
 	}
 
-	async getUserFriends(userId: number) {
+	async getUserBlockeds(userId: number) {
 		const relations = await this.prisma.user.findUnique({
 			where: {
 				id: userId
 			},
 			select: {
-				friends: {
+				blockeds: {
 					select: {
-						friendId: true
+						blockedId: true
 					}
 				}
 			}
 		})
 
-		const friendsIds = relations.friends.map((relation) => relation.friendId)
+		const blockedsIds = relations.blockeds.map((relation) => relation.blockedId)
 
-		const friends = await this.prisma.user.findMany({
+		const blockeds = await this.prisma.user.findMany({
 			where: {
 				id: {
-					in: friendsIds
+					in: blockedsIds
 				}
 			},
 			select: {
@@ -92,9 +92,9 @@ export class FriendsService {
 			}
 		})
 
-		const friendsMapped = friends.map((friend) => {
+		const blockedsMapped = blockeds.map((blocked) => {
 
-			const { wins, draws, losses, ...rest } = friend
+			const { wins, draws, losses, ...rest } = blocked
 
 			return {
 				...rest,
@@ -106,17 +106,17 @@ export class FriendsService {
 			}
 		})
 
-		return friendsMapped;
+		return blockedsMapped;
 	}
 
-	async getNonFriends(UserId: number) {
+	async getNonBlockeds(UserId: number) {
 		//TODO ?
 	}
 
 	// OK de passer RelationDTO en parametre ?
 	// async updateRelation(userId: number, dto: RelationDto) {
 	// 	if (userId === dto.isInRelationsId)
-	// 		return { error: 'user has same id as friend' };
+	// 		return { error: 'user has same id as blocked' };
 	// 	try {
 	// 		const change = await this.prisma.user.update({
 	// 			where: { id: userId },
@@ -133,30 +133,30 @@ export class FriendsService {
 	// 		return change;
 	// 	} catch (error) {
 	// 		if (error instanceof Prisma.PrismaClientKnownRequestError)
-	// 			return { error: 'An error occurred while removing friend' };
+	// 			return { error: 'An error occurred while removing blocked' };
 	// 		throw error;
 	// 	}
 	// }
 
-	async removeFriend(userId: number, friendId: number) {
-		if (userId === friendId)
-			return { error: 'user has same id as friend' };
+	async removeBlocked(userId: number, blockedId: number) {
+		if (userId === blockedId)
+			return { error: 'user has same id as blocked' };
 		try {
 
-			const deleteFriend = await this.prisma.friend.delete({
+			const deleteBlocked = await this.prisma.blocked.delete({
 				where: {
-					userId_friendId: {
+					userId_blockedId: {
 						userId: userId,
-						friendId: friendId
+						blockedId: blockedId
 					}
 				}
 			})
 
-			return deleteFriend;
+			return deleteBlocked;
 
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				return { error: 'An error occurred while removing friend' };
+				return { error: 'An error occurred while removing blocked' };
 			throw error;
 		}
 	}
@@ -172,7 +172,7 @@ export class FriendsService {
 	// 	return true;
 	// } 
 
-	// async sendFriendRequest(receiverId: number, sender: User): Promise<Relations | { error: string }> {
+	// async sendBlockedRequest(receiverId: number, sender: User): Promise<Relations | { error: string }> {
 	// 	if (receiverId === sender.id)
 	// 		return { error: 'It is not possible to add yourself!' };
 
@@ -183,34 +183,34 @@ export class FriendsService {
 			
 	// 		const isSent: boolean = await this.isSent(sender, receiver);
 	// 		if (isSent === true)
-	// 			return { error: 'A friend request has already been sent or received to your account!' };
+	// 			return { error: 'A blocked request has already been sent or received to your account!' };
 
-	// 		// const friendRequest = await this.prisma.user.create({
+	// 		// const blockedRequest = await this.prisma.user.create({
 	// 		// 	data: { hasRelationsId: sender.id,
 	// 		// 	isInRelationsId: receiver.id,
 	// 		// 	request: 'PENDING', }
 	// 		// 	});
-	// 		// return friendRequest;
+	// 		// return blockedRequest;
 	// 	} catch (error) {
 	// 		if (error instanceof Prisma.PrismaClientKnownRequestError)
-	// 			return { error: 'An error occurred while processing the friend request.' };
+	// 			return { error: 'An error occurred while processing the blocked request.' };
 	// 		throw error;
 	// 	}
 	// }
 
-	// async getFriendRequestStatus(isFriendId: number, currentUser: User): Promise<RequestStatus | { error: string }> {
+	// async getBlockedRequestStatus(isBlockedId: number, currentUser: User): Promise<RequestStatus | { error: string }> {
 	// 	const receiver = await this.prisma.user.findUnique({
-	// 		where: { id: isFriendId },
+	// 		where: { id: isBlockedId },
 	// 	})
-	// 	const friendRequest = await this.prisma.relations.findUnique({
+	// 	const blockedRequest = await this.prisma.relations.findUnique({
 	// 		where : { hasRelationsId_isInRelationsId: {
 	// 			hasRelationsId: currentUser.id,
 	// 			isInRelationsId: receiver.id,
 	// 			}}
 	// 	})
-	// 	if (friendRequest)
-	// 		return friendRequest.request; 
-	// 	return { error : 'friend request not sent'};
+	// 	if (blockedRequest)
+	// 		return blockedRequest.request; 
+	// 	return { error : 'blocked request not sent'};
 	// }
 
 }
