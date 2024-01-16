@@ -48,14 +48,14 @@ export function sortUserByStatus(a: User, b: User) {
 	return (aValue - bValue)
 }
 
-export function getAllMembersInChannel(channel: Channel): User[] {
-	const members = [
+export function getAllUsersInChannel(channel: Channel): User[] {
+	const users = [
 		...(channel.members || []),
 		...(channel.administrators || []),
 		(channel.owner ? channel.owner : [])
-	].filter(member => member !== undefined) as User[]
+	].filter(user => user !== undefined) as User[]
 
-	return (members)
+	return (users)
 }
 
 

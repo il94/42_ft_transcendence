@@ -70,8 +70,42 @@ export class ChannelsService {
     return channel;
   }
 
-  async createChannel(createChannelDto: CreateChannelDto, creator: User) {
-    console.log("creator :", creator);
+  async findChannel(chanId: number) {
+    const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
+    if (!channel)
+      throw new NotFoundException(`Channel id ${chanId} not found`);
+    return channel;
+  }
+
+  async findChannelMP(idRecipient: number, idCreator: number) {
+
+    // cherche un channel de type MP qui contient les 2 users
+    const channel = await this.prisma.channel.findFirst({
+      where: {
+        type: ChannelStatus.MP,
+        users: {
+          every: {
+            OR: [
+              {
+                user: {
+                  id: idRecipient
+               }
+              },
+              {
+                user: {
+                  id: idCreator
+                }
+              }
+            ]
+          }
+        }
+      }
+    })
+    return channel;
+  }
+
+  async createChannel(createChannelDto: CreateChannelDto, idCreator: number) {
+    // console.log("creator :", creator);
     const newChannel = await this.prisma.channel.create({
       data: {
         name: createChannelDto.name,
@@ -81,7 +115,7 @@ export class ChannelsService {
           create: [
             {
               role: 'OWNER',
-              user: {connect: { id: creator.id }}
+              user: {connect: { id: idCreator }}
             }
           ]  
         },
@@ -97,9 +131,13 @@ export class ChannelsService {
     return newChannel;
   }
 
-  async createChannelMP(idRecipient: number, createChannelDto: CreateChannelDto, creator: User) {
+  async createChannelMP(idRecipient: number, idCreator: number, channelDatas: CreateChannelDto) {
 
-    const newChannel = await this.createChannel(createChannelDto, creator)
+    const channelMPAlreadyExist = await this.findChannelMP(idRecipient, idCreator)
+    if (channelMPAlreadyExist)
+     throw new BadRequestException('MP canal already exist')
+
+    const newChannel = await this.createChannel(channelDatas, idCreator)
 
     const recipient = await this.prisma.user.findUnique({
       where: {
@@ -111,14 +149,6 @@ export class ChannelsService {
 
     return newChannelWithRecipient;
   }
-
-  async findChannel(chanId: number) {
-    const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
-    if (!channel)
-      throw new NotFoundException(`Channel id ${chanId} not found`);
-    return channel;
-  }
-
 
   async isInChannel(userId: number, chanId: number) {
     

@@ -106,11 +106,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleContactClickEvent() {
 		try {
-			const findResult = userAuthenticate.channels.find((channel) => (
+			const findChannelMP = userAuthenticate.channels.find((channel) => (
 				channel.name === userTarget.username && channel.type === channelStatus.MP
 			))
-			if (findResult)
-				setChannelTarget(findResult)
+			if (findChannelMP)
+				setChannelTarget(findChannelMP)
 			else
 			{
 				const MPDatas: any = {
