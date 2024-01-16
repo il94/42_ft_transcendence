@@ -56,10 +56,6 @@ export class UpdateChannelDto extends PartialType(CreateChannelDto) {
 
 export class AuthChannelDto extends PartialType(CreateChannelDto) {
 
-	@IsInt()
-	@IsOptional()
-	id: number;
-
 	@IsString()
 	@IsOptional()
 	password:	string;

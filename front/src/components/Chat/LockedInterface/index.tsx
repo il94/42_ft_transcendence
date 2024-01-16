@@ -67,7 +67,6 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 			}
 
 			await axios.post(`http://localhost:3333/channel/join`, {
-				id: channel.id,
 				password: password.value
 			},
 			{

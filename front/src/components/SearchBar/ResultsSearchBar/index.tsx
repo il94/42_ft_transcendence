@@ -171,9 +171,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 				else
 				{
 
-					await axios.post(`http://localhost:3333/channel/join`, {
-						id: channelResponse.data.id
-					},
+					await axios.post(`http://localhost:3333/channel/join/${channelId}`, {},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`

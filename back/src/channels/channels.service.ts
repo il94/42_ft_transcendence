@@ -48,15 +48,15 @@ export class ChannelsService {
 
     const newChannelMP = await this.createChannel(channelDatas, creatorId)
 
-    await this.joinChannel(newChannelMP, recipientId)
+    await this.joinChannel(newChannelMP, newChannelMP.id, recipientId)
 
     return newChannelMP;
   }
 
   // Ajoute un user dans un channel
-  async joinChannel(joinChannelDatas: AuthChannelDto, userId: number) {
+  async joinChannel(joinChannelDatas: AuthChannelDto, channelId: number, userId: number) {
     try {
-      const channelToJoin = await this.findChannel(joinChannelDatas.id);
+      const channelToJoin = await this.findChannel(channelId);
       
       const inChan = await this.isInChannel(userId, channelToJoin.id);
       if (inChan)
@@ -80,7 +80,7 @@ export class ChannelsService {
           }
         }})
 
-      console.log(`User ${userId} joined channel ${joinChannelDatas.id}`)
+      console.log(`User ${userId} joined channel ${channelId}`)
 
       return joinChannel;
 

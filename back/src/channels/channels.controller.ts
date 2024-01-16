@@ -28,9 +28,11 @@ export class ChannelController {
   }
 
   // Ajoute un user dans un channel
-  @Post('join')
-  join(@Body() joinChannelDatas: AuthChannelDto, @getUser('id') userId: number) {
-    return this.channelsService.joinChannel(joinChannelDatas, userId);
+  @Post('join/:id')
+  join(@Param('id', ParseIntPipe) channelId: number,
+    @Body() joinChannelDatas: AuthChannelDto,
+    @getUser('id') userId: number) {
+    return this.channelsService.joinChannel(joinChannelDatas, channelId, userId);
   }
   
   // Retourne tout les channels
