@@ -23,6 +23,7 @@ export class ChannelsGateway implements OnModuleInit {
 
   @WebSocketServer() server: Server;
 
+  /* Map qui stock l'id sous forme */
   private connectedUsers: Map<string, Socket> = new Map();
 
   onModuleInit() {
@@ -47,7 +48,12 @@ export class ChannelsGateway implements OnModuleInit {
     return  this.connectedUsers.get(userid);
   }
 
-  /* args[0] = message recu en string // args[1] = Channel en channel  */
+  /*
+    args[0] tableau des id des users channel
+    args[1] message recu
+    args[2] id du user qui envoie (sender)
+    args[3] channel id
+   */
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(client: Socket, args: string) {

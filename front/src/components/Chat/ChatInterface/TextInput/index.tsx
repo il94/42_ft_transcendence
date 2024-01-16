@@ -25,6 +25,10 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate } = useContext(InteractionContext)!
 
+	/* 
+		renvoie le user contenue dans le channel correspondant a l'id du user envoyer 
+	*/
+
 	function findUserInChannels(channel: any, userId: number): User | undefined {
 		// Combinez les tableaux d'utilisateurs en un seul tableau
 		const allUsers = channel.users.concat(channel.owner, channel.administrators);
@@ -44,7 +48,7 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 				messages: [
 				...prevState.messages,
 				{
-					id: idSend,
+					//id: idSend,
 					sender: userSend,
 					type: messageStatus.TEXT,
 					content: msg
@@ -52,20 +56,13 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 				]
 			}));
 			};
-			
 		};
 
-		async function messagelog(){
-			const response = await axios.get(`http://localhost:3333/channel/${channel.id}/message`, {
-			headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-			//console.log(response);
-		}
 
+		/* 
+			active l'ecouteur d'evenement pour l'envoie du channel 
+		*/
 		useEffect(() => {
-		messagelog();
 		userAuthenticate.socket.on("printMessage", printMsg);
 
 		return () => {
@@ -74,18 +71,29 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 		 }, [channel]);
 
 
+
+	/*
+
+		response = tableau des socket des users connecter sur le channel
+
+	*/
+
+
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		if (message === '')
 			return
 			try {
+
 				const response = await axios.get(`http://localhost:3333/channel/${channel.id}/userId`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
+
+				/* post le meesage dans le back */
 				await axios.post(`http://localhost:3333/channel/${channel.id}/message`, 
-				{ msg: message },
+				{ msg: message , msgStatus : messageStatus.TEXT},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`

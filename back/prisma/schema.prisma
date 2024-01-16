@@ -45,6 +45,20 @@ enum ChannelStatus {
   MP
 }
 
+enum messageStatus {
+	TEXT
+	INVITATION
+}
+
+
+enum challengeStatus {
+	PENDING
+	ACCEPTED
+	CANCELLED
+	IN_PROGRESS
+	FINISHED
+}
+
 enum MatchResult {
   WINNER
   DRAW
@@ -127,12 +141,15 @@ model Invitation {
 
 // Relation 1-m user-message et channel-message 
 model Message {
-  id        Int  @id @default(autoincrement())
+  id        Int  @id @default(autoincrement()) 
   author    User @relation(fields: [authorId], references: [id])
   authorId  Int
   channel   Channel @relation(fields: [channelId], references: [id])
   channelId Int
-  content   String?
+  //targetId  Int? // add
+  content   String? 
+  type      messageStatus // add
+  status    challengeStatus? // add
   isInvit   Boolean @default(false)
 }
 

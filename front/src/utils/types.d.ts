@@ -45,7 +45,7 @@ export type Channel = {
 }
 
 export type Message = {
-	id: number,
+	//id?: number,
 	createdAt?: string,
 	sender: User | UserAuthenticate,
 	type: messageStatus
