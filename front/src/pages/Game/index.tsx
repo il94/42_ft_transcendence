@@ -195,11 +195,9 @@ function Game() {
 					username: responseMe.data.username,
 					avatar: responseMe.data.avatar,
 					status: userStatus.ONLINE,
-					scoreResume: {
-						wins: responseMe.data.wins,
-						draws: responseMe.data.draws,
-						losses: responseMe.data.losses
-					},
+					wins: responseMe.data.wins,
+					draws: responseMe.data.draws,
+					losses: responseMe.data.losses,
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: responseMe.data.twoFA,

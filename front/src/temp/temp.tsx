@@ -12,11 +12,9 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 		username: "Osef",
 		avatar: '',
 		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			losses: 0
-		},
+		wins: 0,
+		draws: 0,
+		losses: 0,
 		socket: undefined
 	}
 
@@ -464,11 +462,9 @@ export const userSomeone: User = {
 	username: "Someone",
 	avatar: DefaultBluePicture,
 	status: userStatus.ONLINE,
-	scoreResume: {
-		wins: 0,
-		draws: 0,
-		losses: 0
-	},
+	wins: 0,
+	draws: 0,
+	losses: 0,
 	socket: undefined
 }
 

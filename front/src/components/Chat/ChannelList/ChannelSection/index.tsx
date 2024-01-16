@@ -13,8 +13,8 @@ import {
 
 import AuthContext from "../../../../contexts/AuthContext"
 
-import { Channel, User } from "../../../../utils/types"
-import { messageStatus, channelStatus } from "../../../../utils/status"
+import { Channel } from "../../../../utils/types"
+import { channelStatus } from "../../../../utils/status"
 
 type PropsChannel = {
 	channel: Channel,
@@ -22,42 +22,6 @@ type PropsChannel = {
 	setErrorRequest: Dispatch<SetStateAction<boolean>>,
 	backgroundColor: string
 }
-
-/* 
-	soso renvoie le user a partir du userid
-	parmis les membre du channel
-*/
-
-function findUserInChannels(users: any, userId: number): User | undefined {
-	const foundUser = users.find(member => member.user.id === userId);
-	return foundUser?.user;
-  }
-
-/*
-
-  soso renvoie les messages d'un channel recu du back dans le front pour l'affichage
-  gestion des messagesStatus.Text
-
-*/
-
-async function transformMessagesText(channelId: number, token: string, members: any): Promise<any[]> {
-	
-	const msg = await axios.get(`http://localhost:3333/channel/${channelId}/message`, {
-	  headers: {
-		'Authorization': `Bearer ${token}`
-	  }
-	});
-
-	const cleanedMessages = msg.data.map(({ channelId, isInvit, status, ...rest }) => rest);
-  
-	const msgRes = cleanedMessages.map(({ authorId, ...rest }) => {
-	  const sender = findUserInChannels(members, authorId);
-	  return { sender, ...rest };
-	});
-
-	return msgRes;
-  }
-
 
 function ChannelSection({ channel, setChannelTarget, setErrorRequest, backgroundColor }: PropsChannel) {
 
@@ -71,8 +35,6 @@ function ChannelSection({ channel, setChannelTarget, setErrorRequest, background
 				}
 			})
 
-			const msgFront = await transformMessagesText(channel.id , token, response.data.members);
-
 			if (channelWithRelationsResponse.data.type === channelStatus.MP)
 			{
 				const { name, avatar, ...rest } = channelWithRelationsResponse.data
@@ -80,20 +42,11 @@ function ChannelSection({ channel, setChannelTarget, setErrorRequest, background
 				setChannelTarget({
 					...rest,
 					name: channel.name,
-					avatar: channel.avatar,
-          messages: msgFront
+					avatar: channel.avatar
 				})
 			}
 			else
-      {
-        setChannelTarget({
-					...rest,
-					name: name,
-					avatar: avatar,
-          messages: msgFront
-				})
-				// setChannelTarget(channelWithRelationsResponse.data)
-      }
+				setChannelTarget(channelWithRelationsResponse.data)
 		}
 		catch (error) {
 			setErrorRequest(true)

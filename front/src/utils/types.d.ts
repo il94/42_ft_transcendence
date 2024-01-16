@@ -12,11 +12,9 @@ export type User = {
 	username: string,
 	avatar: string,
 	status: userStatus,
-	scoreResume: {
-		wins: number,
-		draws: number,
-		losses: number
-	},
+	wins: number,
+	draws: number,
+	losses: number,
 	socket: Socket | undefined
 }
 

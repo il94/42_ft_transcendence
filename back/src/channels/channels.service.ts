@@ -146,16 +146,55 @@ export class ChannelsService {
             },
             role: true
           }
+        },
+        content: {
+          select: {
+            id: true,
+            author: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+                status: true,
+                wins: true,
+                draws: true,
+                losses : true 
+              }
+            },
+            type: true,
+            content: true,
+            status: true
+          }
         }
       }
     })
     if (!channelDatas)
       throw new NotFoundException(`Channel ${chanId} not found`);
 
-    const { users, ...rest } = channelDatas
+    const { users, content, ...rest } = channelDatas
+    const cleanedMessages = content.map((message) => {
+      if (message.type === "TEXT")
+      {
+        const { status, author, ...rest } = message
+        return {
+          ...rest,
+          sender: author
+        }
+      }
+      else
+      {
+        // penser a ajouter targetID
+        const { content, author, ...rest } = message
+        return {
+          ...rest,
+          sender: author
+        }
+      }
+    })
+
     const channelWithRelations = {
       ...rest,
-      messages: [], // en attendant de pouvoir recup les messages
+      messages: cleanedMessages,
       members: channelDatas.users.map((member) => {
         if (member.role === "MEMBER")
           return (member.user)

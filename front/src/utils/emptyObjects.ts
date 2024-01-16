@@ -5,11 +5,9 @@ export const emptyUser = {
 	username: '',
 	avatar: '',
 	status: userStatus.ONLINE,
-	scoreResume: {
-		wins: 0,
-		draws: 0,
-		losses: 0
-	},
+	wins: 0,
+	draws: 0,
+	losses: 0,
 	socket: undefined
 }
 
@@ -18,11 +16,9 @@ export const emptyUserAuthenticate = {
 	username: "",
 	avatar: "",
 	status: userStatus.ONLINE,
-	scoreResume: {
-		wins: 0,
-		draws: 0,
-		losses: 0
-	},
+	wins: 0,
+	draws: 0,
+	losses: 0,
 	socket: undefined,
 	email: "",
 	phoneNumber: "",

@@ -210,20 +210,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 				setUsers(usersResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
-				)).map((user: any) => {
-
-					const { wins, draws, losses, ...rest } = user
-
-					return {
-						...rest ,
-						status: getRandomStatus(),
-						scoreResume: {
-							wins: wins,
-							draws: draws,
-							losses: losses
-						}
-					}
-				}).sort(sortUserByName))
+				)).sort(sortUserByName))
 
 				const accessiblesChannelsResponse = await axios.get("http://localhost:3333/channel/accessibles", {
 					headers: {
