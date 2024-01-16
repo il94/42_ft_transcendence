@@ -29,15 +29,15 @@ function ChannelSection({ channel, setChannelTarget, setErrorRequest, background
 
 	async function handleClickEvent() {
 		try {
-			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}`, {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
 
-			if (channelResponse.data.type === channelStatus.MP)
+			if (channelWithRelationsResponse.data.type === channelStatus.MP)
 			{
-				const { name, avatar, ...rest } = channelResponse.data
+				const { name, avatar, ...rest } = channelWithRelationsResponse.data
 
 				setChannelTarget({
 					...rest,
@@ -46,7 +46,7 @@ function ChannelSection({ channel, setChannelTarget, setErrorRequest, background
 				})
 			}
 			else
-				setChannelTarget(channelResponse.data)
+				setChannelTarget(channelWithRelationsResponse.data)
 		}
 		catch (error) {
 			setErrorRequest(true)

@@ -158,7 +158,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	async function addChannelToChannelList(channelId: number) {
 		try {
-			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}`, {
+			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -227,13 +227,13 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				}).sort(sortUserByName))
 
-				const channelsResponse = await axios.get("http://localhost:3333/channel", {
+				const accessiblesChannelsResponse = await axios.get("http://localhost:3333/channel/accessibles", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				setChannels(channelsResponse.data.sort(sortChannelByName))
+				setChannels(accessiblesChannelsResponse.data.sort(sortChannelByName))
 			}
 			catch (error) {
 				setErrorRequest(true)
