@@ -168,7 +168,7 @@ export class UsersService {
 				}
 			},
 			include: {
-				members: {
+				users: {
 					select: {
 						user: {
 							select: {
@@ -186,14 +186,12 @@ export class UsersService {
 
 			...userChannels,
 			...userChannelsMP.map((channelMP) => {
-				const { members, ...rest } = channelMP
+				const { users, ...rest } = channelMP
 
 				return {
 					...rest,
-					members: members.map((member) => {
+					members: users.map((member) => {
 						return (member.user)
-					}).sort((recipient) => {
-						return (member.id - recipient.id)
 					})
 				}
 			})

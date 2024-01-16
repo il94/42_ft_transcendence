@@ -29,7 +29,7 @@ export class ChannelsService {
         id: chanId
       },
       include: {
-        members: {
+        users: {
           select: {
             user: {
               select: {
@@ -50,23 +50,22 @@ export class ChannelsService {
     if (!channelDatas)
       throw new NotFoundException(`Channel with id ${chanId} not found`);
 
+    const { users, ...rest } = channelDatas
     const channel = {
-      ...channelDatas,
+      ...rest,
       messages: [], // en attendant de pouvoir recup les messages
-      users: channelDatas.members.map((member) => {
+      members: channelDatas.users.map((member) => {
         if (member.role === "MEMBER")
           return (member.user)
       }).filter(Boolean),
-      administrators: channelDatas.members.map((member) => {
+      administrators: channelDatas.users.map((member) => {
         if (member.role === "ADMIN")
           return (member.user)
       }).filter(Boolean),
-      owner: channelDatas.members.find((member) => member.role === "OWNER").user,
+      owner: channelDatas.users.find((member) => member.role === "OWNER").user,
       mutedUsers: [], // en attendant de pouvoir recup les users mutes
       bannedUsers: [] // en attendant de pouvoir recup les users bans
     }
-
-    delete channel.members
 
     return channel;
   }
@@ -78,7 +77,7 @@ export class ChannelsService {
         name: createChannelDto.name,
         avatar: createChannelDto.avatar,
         type: createChannelDto.type,
-        members: { 
+        users: { 
           create: [
             {
               role: 'OWNER',
@@ -150,7 +149,7 @@ export class ChannelsService {
 
       const joinChannel = await this.prisma.channel.update({ where: { id: chan.id}, 
         data: {
-          members: { 
+          users: { 
             create: [
               {
                 role: 'MEMBER',
@@ -187,7 +186,7 @@ export class ChannelsService {
       
         const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
         data: {
-          members: {
+          users: {
             connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
             create: [{ userId: friendId, role: Role.MEMBER }]
           }
@@ -233,9 +232,9 @@ export class ChannelsService {
         id: chanId
       },
       include: {
-        members: true
+        users: true
       }
-    })).members.length
+    })).users.length
 
     return (result)
   }
@@ -310,12 +309,21 @@ export class ChannelsService {
 
   async remove(id: number) {
   
+    // supprime les relations user - channel
     await this.prisma.usersOnChannels.deleteMany({
       where: {
         channelId: id
       }
     })
 
+    // supprime les relations message - channel
+    await this.prisma.message.deleteMany({
+      where: {
+        channelId: id
+      }
+    })
+
+    // supprime le channel
 		const deleteChannel = await this.prisma.channel.delete({
       where: {
         id: id

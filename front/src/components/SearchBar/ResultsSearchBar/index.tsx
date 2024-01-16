@@ -164,15 +164,15 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 				}
 			})
 
-			const channel: Channel = channelResponse.data
-			if (!channelIncludeUser(channel, userAuthenticate))
+			if (!channelIncludeUser(channelResponse.data, userAuthenticate))
 			{
-				if (channel.type === channelStatus.PROTECTED)
-					setChannelTarget(channel)
+				if (channelResponse.data.type === channelStatus.PROTECTED)
+					setChannelTarget(channelResponse.data)
 				else
 				{
+
 					await axios.post(`http://localhost:3333/channel/join`, {
-						id: channel.id
+						id: channelResponse.data.id
 					},
 					{
 						headers: {
@@ -182,18 +182,17 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 					setUserAuthenticate((prevState: UserAuthenticate) => ({
 						...prevState,
-						channels: [ ...prevState.channels, channel]
+						channels: [ ...prevState.channels, channelResponse.data]
 					}))
 
 					setChannelTarget(() => ({
-						...channel,
-						members: [...channel.members, userAuthenticate]
+						...channelResponse.data,
+						members: [...channelResponse.data.members, userAuthenticate]
 					}))
 				}
-
 			}
 			else
-				setChannelTarget(channel)
+				setChannelTarget(channelResponse.data)
 			displayChat(true)
 		}
 		catch (error) {

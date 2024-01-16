@@ -105,7 +105,6 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 				setChannelTarget((prevState: Channel | undefined) => {
 					if (prevState)
 					{
-						console.log("PREVSTATE", prevState)
 						const { members, administrators, owner , ...rest } = prevState
 						
 						return {
@@ -148,8 +147,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		<Style>
 			<LeaveButtonWrapper>
 				{
-					(chatWindowState === chatWindowStatus.CHANNEL ||
-					chatWindowState === chatWindowStatus.LOCKED_CHANNEL) ?
+					chatWindowState === chatWindowStatus.CHANNEL ?
 					channelTarget?.type === channelStatus.MP ?
 					<Icon
 						onClick={deleteChannelMP}

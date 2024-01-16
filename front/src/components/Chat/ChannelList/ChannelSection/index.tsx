@@ -29,7 +29,6 @@ function ChannelSection({ channel, setChannelTarget, setErrorRequest, background
 
 	async function handleClickEvent() {
 		try {
-			console.log("HERE")
 			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`

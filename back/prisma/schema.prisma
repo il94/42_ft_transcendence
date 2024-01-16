@@ -99,7 +99,7 @@ model Channel {
   password    String?
   invitation  Invitation[]
 
-  members     UsersOnChannels[]
+  users       UsersOnChannels[]
   content     Message[]
 }
 
