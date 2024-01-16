@@ -1,9 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto/';
-import { Channel, User, ChannelStatus, Role, Prisma } from '@prisma/client';
+import { Channel, User, ChannelStatus, Role, Prisma, messageStatus } from '@prisma/client';
 import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
+
+
 
 @UseGuards(JwtGuard)
 @Injectable()
@@ -264,7 +266,7 @@ export class ChannelsService {
 
     /****************************** gestion message ***********************/
 
-    async addContent(id: number, msg:string, user :User) {
+    async addContent(id: number, msg:string, user :User, msgStatus : messageStatus) {
 
 
       const newMessage = await this.prisma.message.create({
@@ -272,7 +274,8 @@ export class ChannelsService {
           author: { connect: { id: user.id } },  // Connectez le message à l'utilisateur existant
           channel: { connect: { id: id } }, 
           content: msg,
-          isInvit: true
+          isInvit: true,
+          type: msgStatus,
         },
       });
       //console.log(newMessage.content);
@@ -287,21 +290,22 @@ export class ChannelsService {
     
         if (!channel) {
           console.error("Le canal n'existe pas.");
-          return;
+          return null; // Retournez une valeur ou utilisez une exception appropriée
         }
     
         const messages = channel.content;
     
         if (!messages) {
           console.error("Aucun message trouvé dans le canal.");
-          return;
+          return null; // Retournez une valeur ou utilisez une exception appropriée
         }
-        for (const message of messages) {
-          console.log(message.authorId, " = ",message.content);
-          //retourner les messages 
-        }
+    
+        //console.log(messages);
+    
+        return messages;
       } catch (error) {
         console.error("Une erreur s'est produite lors de la récupération des messages.", error);
+        return null; // Retournez une valeur ou utilisez une exception appropriée
       }
     }
 

@@ -4,7 +4,7 @@ import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import { getUser } from '../auth/decorators/users.decorator';
-import { User } from '@prisma/client';
+import { User, messageStatus } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
 
@@ -81,18 +81,17 @@ export class ChannelController {
   @getUser('id') userId: number) {
     return this.channelsService.leaveChannel(userId, channelId);
 	}
+  /* soso  ajout de message  avec l'id du channel  */
 
-
-  /* soso  ajout de message avec l'id du channel  */
-
-  @Post(':id/message') //a acorder
-  async addMessage(
-    @getUser() user: User,
-    @Param('id', ParseIntPipe) id: number,
-    @Body('msg') msg: string
-    ) {
-    return await this.channelsService.addContent(id, msg, user);
-  }
+  @Post(':id/message') // à accorder
+async addMessage( 
+  @getUser() user: User,
+  @Param('id', ParseIntPipe) id: number,
+  @Body('msg') msg: string, 
+  @Body('msgStatus') msgStatus: messageStatus, // Ajout du paramètre msgStatus
+) {
+  return await this.channelsService.addContent(id, msg, user, msgStatus);
+}
 
   /* soso obtenir tout les messages  edit : format de renvoie pas encore confirmer */
 
