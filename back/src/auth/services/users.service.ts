@@ -33,7 +33,7 @@ export class UsersService {
 					status: UserStatus.ONLINE,
 					wins: 0,
 					draws: 0,
-					losses: 0,
+					losses: 0
 				},
 			});
             console.log(`User ${user.username} with id ${user.id} created successfully`);
