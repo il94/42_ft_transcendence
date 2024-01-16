@@ -100,8 +100,6 @@ function Game() {
 					}
 				})
 
-				console.log("BLOAUED ===", blockedUsers)
-
 				return (blockedUsers.data)
 			}
 			catch (error) {

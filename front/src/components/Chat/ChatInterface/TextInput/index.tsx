@@ -27,7 +27,7 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 
 	function findUserInChannels(channel: any, userId: number): User | undefined {
 		// Combinez les tableaux d'utilisateurs en un seul tableau
-		const allUsers = channel.users.concat(channel.owner, channel.administrators);
+		const allUsers = channel.members.concat(channel.owner, channel.administrators);
 	  
 		// Recherchez l'utilisateur par son ID
 		const foundUser = allUsers.find((user: User) => user.id === userId);

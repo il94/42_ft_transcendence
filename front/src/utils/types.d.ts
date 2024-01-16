@@ -37,7 +37,7 @@ export type Channel = {
 	type: channelStatus,
 	password?: string,
 	messages: (MessageText | MessageInvitation)[],
-	users: (User | UserAuthenticate)[],
+	members: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
 	mutedUsers: (User | UserAuthenticate)[],

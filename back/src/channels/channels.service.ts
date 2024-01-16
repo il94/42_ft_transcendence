@@ -29,7 +29,7 @@ export class ChannelsService {
         id: chanId
       },
       include: {
-        members: {
+        users: {
           select: {
             user: {
               select: {
@@ -50,23 +50,22 @@ export class ChannelsService {
     if (!channelDatas)
       throw new NotFoundException(`Channel with id ${chanId} not found`);
 
+    const { users, ...rest } = channelDatas
     const channel = {
-      ...channelDatas,
+      ...rest,
       messages: [], // en attendant de pouvoir recup les messages
-      users: channelDatas.members.map((member) => {
-        if (member.role === "USER")
+      members: channelDatas.users.map((member) => {
+        if (member.role === "MEMBER")
           return (member.user)
       }).filter(Boolean),
-      administrators: channelDatas.members.map((member) => {
+      administrators: channelDatas.users.map((member) => {
         if (member.role === "ADMIN")
           return (member.user)
       }).filter(Boolean),
-      owner: channelDatas.members.find((member) => member.role === "OWNER").user,
+      owner: channelDatas.users.find((member) => member.role === "OWNER").user,
       mutedUsers: [], // en attendant de pouvoir recup les users mutes
       bannedUsers: [] // en attendant de pouvoir recup les users bans
     }
-
-    delete channel.members
 
     return channel;
   }
@@ -78,7 +77,7 @@ export class ChannelsService {
         name: createChannelDto.name,
         avatar: createChannelDto.avatar,
         type: createChannelDto.type,
-        members: { 
+        users: { 
           create: [
             {
               role: 'OWNER',
@@ -96,6 +95,21 @@ export class ChannelsService {
       })
     }
     return newChannel;
+  }
+
+  async createChannelMP(idRecipient: number, createChannelDto: CreateChannelDto, creator: User) {
+
+    const newChannel = await this.createChannel(createChannelDto, creator)
+
+    const recipient = await this.prisma.user.findUnique({
+      where: {
+        id: idRecipient
+      }
+    })
+
+    const newChannelWithRecipient = this.joinChannel(newChannel, recipient)
+
+    return newChannelWithRecipient;
   }
 
   async findChannel(chanId: number) {
@@ -135,10 +149,10 @@ export class ChannelsService {
 
       const joinChannel = await this.prisma.channel.update({ where: { id: chan.id}, 
         data: {
-          members: { 
+          users: { 
             create: [
               {
-                role: 'USER',
+                role: 'MEMBER',
                 user: {connect: { id: user.id }}
               }
             ]  
@@ -167,14 +181,14 @@ export class ChannelsService {
       if (!userInchannel)
         throw new NotFoundException(`User id ${member.id} is not in channel id ${chanId}`);
       
-        if (userInchannel.role ===  Role.USER || !userInchannel.role)
+        if (userInchannel.role ===  Role.MEMBER || !userInchannel.role)
           throw new ForbiddenException(`User ${member.id} has not required role for this action`);
       
         const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
         data: {
-          members: {
+          users: {
             connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
-            create: [{ userId: friendId, role: Role.USER }]
+            create: [{ userId: friendId, role: Role.MEMBER }]
           }
         }})
         return addInChannel;
@@ -218,9 +232,9 @@ export class ChannelsService {
         id: chanId
       },
       include: {
-        members: true
+        users: true
       }
-    })).members.length
+    })).users.length
 
     return (result)
   }
@@ -240,7 +254,7 @@ export class ChannelsService {
     const memberFound = await this.prisma.usersOnChannels.findFirst({
       where: {
         channelId: chanId,
-        role: "USER"
+        role: "MEMBER"
       },
       select: {
         userId: true,
@@ -295,12 +309,21 @@ export class ChannelsService {
 
   async remove(id: number) {
   
+    // supprime les relations user - channel
     await this.prisma.usersOnChannels.deleteMany({
       where: {
         channelId: id
       }
     })
 
+    // supprime les relations message - channel
+    await this.prisma.message.deleteMany({
+      where: {
+        channelId: id
+      }
+    })
+
+    // supprime le channel
 		const deleteChannel = await this.prisma.channel.delete({
       where: {
         id: id

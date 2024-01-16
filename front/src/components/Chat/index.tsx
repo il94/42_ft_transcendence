@@ -64,11 +64,11 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 			setValueChannelCreateButton("Create")
 			setBannerName("Welcome")
 		}
-		else if (channelTarget && (chatWindowState === chatWindowStatus.CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
+		else if (channelTarget && chatWindowState === chatWindowStatus.CHANNEL) {
 			setValueChannelCreateButton("Create")
 			setBannerName(channelTarget.name)
 		}
-		else if (channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
+		else if (channelTarget && (chatWindowState === chatWindowStatus.UPDATE_CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
 			setValueChannelCreateButton("<<")
 			setBannerName(channelTarget.name)
 		}
@@ -85,7 +85,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 		if (channelTarget)
 		{
 			if (channelTarget.type === channelStatus.PROTECTED &&
-				!channelTarget.users.some((member) => member.id === userAuthenticate.id) &&
+				!channelTarget.members.some((member) => member.id === userAuthenticate.id) &&
 				channelTarget.owner?.id !== userAuthenticate.id)
 				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
 			else
@@ -101,6 +101,8 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
 		else if (chatWindowState === chatWindowStatus.CHANNEL)
 			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
+		else if (chatWindowState === chatWindowStatus.LOCKED_CHANNEL)
+			setChatWindowState(chatWindowStatus.HOME)
 		else if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
 			setChatWindowState(chatWindowStatus.CHANNEL)
 		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
@@ -153,7 +155,6 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 														<LockedInterface
 															channel={channelTarget}
 															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
-															setChatWindowState={setChatWindowState}
 															setErrorRequest={setErrorRequest} />
 														:
 														<ChatInterface

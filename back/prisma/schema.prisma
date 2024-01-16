@@ -27,7 +27,7 @@ enum RequestStatus {
 }
 
 enum Role {
-  USER
+  MEMBER
   ADMIN
   OWNER
   BANNED
@@ -99,7 +99,7 @@ model Channel {
   password    String?
   invitation  Invitation[]
 
-  members     UsersOnChannels[]
+  users       UsersOnChannels[]
   content     Message[]
 }
 

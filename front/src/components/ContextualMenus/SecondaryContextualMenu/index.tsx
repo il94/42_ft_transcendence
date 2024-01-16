@@ -27,13 +27,13 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
-			if (!channel.users.includes(userTarget)) {
+			if (!channel.members.includes(userTarget)) {
 				/* ============ Temporaire ============== */
 
 				// await axios.post(`http://localhost:3333/channel/${channel.id}/users/${userTarget.id}`, userTarget)
 
 				/* ====================================== */
-				channel.users.push(userTarget)
+				channel.members.push(userTarget)
 			}
 		}
 		catch (error) {

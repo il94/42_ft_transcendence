@@ -139,7 +139,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					administrators: [
 						userAuthenticate
 					],
-					users: [
+					members: [
 						userAuthenticate
 					],
 					mutedUsers: [],
