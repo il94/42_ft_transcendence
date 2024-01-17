@@ -60,13 +60,6 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
-			setUserAuthenticate((prevState) => ({
-				...prevState,
-				channels: prevState.channels.filter((channel) => channel.id !== channelTarget.id)
-			}))
-
-			setChannelTarget(undefined)
 		}
 		catch (error) {
 			throw error

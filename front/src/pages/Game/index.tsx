@@ -208,10 +208,6 @@ function Game() {
 				})
 			}
 			catch (error) {
-
-				// temporaire
-				// Si la socket doit etre close manuellement, il la close ici en cas d'erreur au lancement
-
 				localStorage.removeItem('token')
 				setErrorRequest(true)
 			}
@@ -281,7 +277,62 @@ function Game() {
 	}, [])
 	
 
-	/* ========================================================================== */
+/* ========================================================================== */
+
+	async function refreshUpdateChannel(channelId: number, newDatas: any) {
+		setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+			{
+				return {
+					...prevState,
+					...newDatas
+				}
+			}
+			else
+				return (undefined)
+
+		});
+
+		setUserAuthenticate((prevState) => ({
+			...prevState,
+			channels: prevState.channels.map((channel) => {
+				if (channel.id === channelId)
+				{
+					return {
+						...channel,
+						...newDatas
+					}
+				}
+				else
+					return channel
+			})
+		}))
+	}
+
+	async function refreshDeleteChannel(channelId: number) {
+
+		console.log("HERE")
+		setUserAuthenticate((prevState) => ({
+			...prevState,
+			channels: prevState.channels.filter((channel) => channel.id !== channelId)
+		}))
+		
+		setChannelTarget(undefined)
+	}
+
+	useEffect(() => {
+		
+		userAuthenticate.socket?.on("updateChannel", refreshUpdateChannel);
+		userAuthenticate.socket?.on("deleteChannel", refreshDeleteChannel);
+
+		return () => {
+			userAuthenticate.socket?.off("updateChannel", refreshUpdateChannel);
+			userAuthenticate.socket?.off("deleteChannel", refreshDeleteChannel);
+		};
+
+	}, [userAuthenticate.socket])
+
+/* ========================================================================== */
 
 	return (
 		<TempContext.Provider value={{ userSomeone }}>
@@ -373,6 +424,7 @@ function Game() {
 																chat={chat}
 																displayChat={displayChat}
 																channels={userAuthenticate.channels}
+																setUserAuthenticate={setUserAuthenticate}
 																channelTarget={channelTarget}
 																setChannelTarget={setChannelTarget}
 																chatWindowState={chatWindowState}

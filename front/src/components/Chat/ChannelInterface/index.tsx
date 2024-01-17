@@ -6,7 +6,7 @@ import {
 	useContext,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
 	Avatar,
@@ -82,35 +82,15 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
-					})		
-
-					setChannelTarget((prevState: Channel | undefined) => {
-						if (prevState)
-						{
-							const updateChannel: Channel = {
-								...prevState,
-								...newDatas
-							}
-							return (updateChannel)
-						}
-						else
-							return (undefined)
 					})
 
-					setUserAuthenticate((prevState) => ({
-						...prevState,
-						channels: prevState.channels.map((channelToFind) => {
-							if (channelToFind.id === channel.id)
-							{
-								return {
-									...channelToFind,
-									...newDatas
-								}
-							}
-							else
-								return channelToFind
-						})
-					}))
+					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channel.id}/sockets`, {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+
+					userAuthenticate.socket?.emit("updateChannel", socketsResponse.data, channel.id, newDatas)
 				}
 				else
 					throw new Error

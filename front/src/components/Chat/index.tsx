@@ -46,6 +46,7 @@ type PropsChat = {
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
 	channels: Channel[],
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 	chatWindowState: chatWindowStatus,
@@ -53,7 +54,7 @@ type PropsChat = {
 	userAuthenticate: UserAuthenticate
 }
 
-function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
+function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
 
 	const { token } = useContext(AuthContext)!
 
@@ -128,12 +129,12 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 	}
 
 	function handleListenSockets() {
-		userAuthenticate.socket?.on("userJoinedChannel", refreshJoinChannel);
-		userAuthenticate.socket?.on("printMessage", updateDiscussion);
+		userAuthenticate.socket?.on("newMessage", updateDiscussion);
+		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
 
 		return () => {
-			userAuthenticate.socket?.off("userJoinedChannel", refreshJoinChannel);
-			userAuthenticate.socket?.off("printMessage", updateDiscussion);
+			userAuthenticate.socket?.off("newMessage", updateDiscussion);
+			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
 		};
 	}
 

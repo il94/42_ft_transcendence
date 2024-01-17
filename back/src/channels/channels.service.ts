@@ -262,6 +262,15 @@ export class ChannelsService {
   // Supprime un channel
   async remove(channelId: number) {
   
+    const sockets = await this.getAllSockets(channelId)
+
+    connectedUsers.forEach((socket) => {
+      const socketToEmit = sockets.includes(socket.id)
+
+      if (socketToEmit)
+        socket.emit("deleteChannel", channelId);
+    })
+
     // Supprime les relations user - channel
     await this.prisma.usersOnChannels.deleteMany({
       where: {
