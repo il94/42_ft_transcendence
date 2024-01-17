@@ -4,7 +4,7 @@ import { Api42AuthGuard, JwtGuard, Jwt2faAuthGuard  } from '../guards/auth.guard
 import { AuthDto, CreateUserDto } from "../dto/";
 import { Public, getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { User, UserStatus } from '@prisma/client';
 
 @Controller('auth')
@@ -44,7 +44,7 @@ export class AuthController {
 		//delete req.cookies.token.access_token;
 		//console.log("cookie after delete: ", req.cookies);
 		//console.log("Res : ", res);
-		//res.clearCookie('access_token', { httpOnly: true });
+		res.clearCookie('access_token', { httpOnly: true });
 		return this.authService.logout(user.id);
 	}
 
@@ -60,12 +60,16 @@ export class AuthController {
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@getUser() user: User, 
 	@Res({ passthrough: true }) res: Response,
+	@Req() req: Request,
 	) {
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
 
-			//res.cookie("access_token", token.access_token, { httpOnly: true });
-			return { user };
+			req.headers.authorization = "Bearer" + token.access_token;
+			res.set('Authorization', `Bearer ${token.access_token}`)
+			//res.send()
+			res.redirect("http://localhost:5173/game")
+			//return { user };
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");
