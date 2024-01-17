@@ -1,5 +1,5 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer } from '@nestjs/websockets';
-import { ChannelsService } from './channels.service';
+import { ChannelsService, connectedUsers } from './channels.service';
 import { CreateChannelDto, UpdateChannelDto, MessageDto } from './dto';
 import { OnModuleInit, Request } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -23,9 +23,7 @@ export class ChannelsGateway implements OnModuleInit {
 
   @WebSocketServer() server: Server;
 
-  /* Map qui stock l'id sous forme */
-  private connectedUsers: Map<string, Socket> = new Map();
-
+  // Gestion de la map userConnected (ajoute/supprime des sockets)
   onModuleInit() {
     this.server.on('connection', (socket: Socket) => {
       const userid = socket.handshake.query.id;
@@ -33,11 +31,11 @@ export class ChannelsGateway implements OnModuleInit {
 
       // Vérifier le type de userid
       if (typeof userid === 'string') {
-        this.connectedUsers.set(userid, socket);
+        connectedUsers.set(userid, socket);
 
         // Écouter le débranchement du socket
         socket.on('disconnect', () => {
-          this.connectedUsers.delete(userid);
+          connectedUsers.delete(userid);
         });
       } else {
         console.log('Invalid userid type:', typeof userid);
@@ -45,25 +43,35 @@ export class ChannelsGateway implements OnModuleInit {
     });
   } 
     getSocketByUserId(userid: string): Socket | undefined {
-    return  this.connectedUsers.get(userid);
+    return connectedUsers.get(userid);
   }
 
   /*
-    args[0] tableau des id des users channel
-    args[1] message recu
-    args[2] id du user qui envoie (sender)
-    args[3] channel id
+    args[0] tableau de sockets des users channel
+    args[1] id du user qui envoie (sender)
+    args[2] channel id
+    args[3] message recu
    */
 
   @SubscribeMessage('sendMessage')
-  async handleSendMessage(client: Socket, args: string) {
-    for (const userId of args[0]) {
-      let socket = await this.getSocketByUserId(userId.toString());
-      if (socket) 
-        socket.emit("printMessage", args[1].toString(), args[2], args[3]);
+  async handleSendMessage(client: Socket, args: string[]) {
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("printMessage", args[1], args[2], args[3].toString());
     }
   }
 
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] user qui a join
+    args[2] id du channel rejoint
+   */
+
+  @SubscribeMessage('joinChannel')
+  async handleJoinChannel(client: Socket, args: string[]) {
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("userJoinedChannel", parseInt(args[1]), parseInt(args[2]));
+    }
+  }
 //   // afterInit(server: Server) {
 //   //   console.log("server after init" );
 //   // }

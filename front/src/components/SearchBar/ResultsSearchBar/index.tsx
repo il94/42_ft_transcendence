@@ -29,8 +29,6 @@ import { channelIncludeUser, sortChannelByName, sortUserByName } from "../../../
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
-import { getRandomStatus } from "../../../temp/temp"
-
 type PropsSearchBar = {
 	value: string,
 	displayChat: Dispatch<SetStateAction<boolean>>
@@ -170,7 +168,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					setChannelTarget(channelResponse.data)
 				else
 				{
-
 					await axios.post(`http://localhost:3333/channel/join/${channelId}`, {},
 					{
 						headers: {
@@ -187,6 +184,14 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 						...channelResponse.data,
 						members: [...channelResponse.data.members, userAuthenticate]
 					}))
+
+					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channelId}/sockets`, {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+
+					userAuthenticate.socket?.emit("joinChannel", socketsResponse.data, userAuthenticate.id, channelId)
 				}
 			}
 			else

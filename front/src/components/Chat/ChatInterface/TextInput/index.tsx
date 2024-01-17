@@ -1,4 +1,10 @@
-import { ChangeEvent, Dispatch, FocusEvent, FormEvent, SetStateAction, useContext, useEffect, useState } from "react"
+import {
+	ChangeEvent,
+	FocusEvent,
+	FormEvent,
+	useContext,
+	useState
+} from "react"
 import axios from "axios"
 
 import { Input, Style } from "./style"
@@ -6,71 +12,21 @@ import { Input, Style } from "./style"
 import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
 import InteractionContext from "../../../../contexts/InteractionContext"
-
-
-
-import { Channel, MessageText, User } from "../../../../utils/types"
-import { messageStatus } from "../../../../utils/status"
 import AuthContext from "../../../../contexts/AuthContext"
+
+import { Channel } from "../../../../utils/types"
+import { messageStatus } from "../../../../utils/status"
+
 type PropsTextInput = {
 	channel: Channel,
-	setChannel: Dispatch<SetStateAction<Channel>>
 }
  
 
-function TextInput({ channel,  setChannel }: PropsTextInput) {
+function TextInput({ channel }: PropsTextInput) {
 	const { token } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate } = useContext(InteractionContext)!
-
-	/* 
-		renvoie le user contenue dans le channel correspondant a l'id du user envoyer 
-	*/
-
-	function findUserInChannels(channel: any, userId: number): User | undefined {
-		// Combinez les tableaux d'utilisateurs en un seul tableau
-		const allUsers = channel.members.concat(channel.owner, channel.administrators);
-	  
-		// Recherchez l'utilisateur par son ID
-		const foundUser = allUsers.find((user: User) => user.id === userId);
-	  
-		return foundUser;
-	  }
-
-	function printMsg(msg: string, idSend: number, idChannel:number) {
-		const userSend = findUserInChannels(channel, idSend);
-		if (idChannel == channel.id)
-			{
-			setChannel((prevState: Channel) => {
-				return {
-					...prevState,
-					messages: [
-						...prevState.messages,
-						{
-							sender: userSend,
-							type: messageStatus.TEXT,
-							content: msg
-						} as MessageText
-					]
-				}
-			});
-			};
-		};
-
-
-		/* 
-			active l'ecouteur d'evenement pour l'envoie du channel 
-		*/
-		useEffect(() => {
-		userAuthenticate.socket?.on("printMessage", printMsg);
-
-		return () => {
-			userAuthenticate.socket?.off("printMessage", printMsg);
-				};
-		 }, [channel]);
-
-
 
 	/*
 
@@ -85,7 +41,7 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 			return
 			try {
 
-				const response = await axios.get(`http://localhost:3333/channel/${channel.id}/userId`, {
+				const sockets = await axios.get(`http://localhost:3333/channel/${channel.id}/sockets`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -100,7 +56,7 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 						}
 					}
 				);
-				userAuthenticate.socket?.emit("sendMessage", response.data, message, userAuthenticate.id, channel.id);
+				userAuthenticate.socket?.emit("sendMessage", sockets.data, userAuthenticate.id, channel.id, message);
 				
 				setMessage("");
 			  } catch (error) {

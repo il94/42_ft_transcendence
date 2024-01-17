@@ -4,8 +4,9 @@ import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto/';
 import { Channel, User, ChannelStatus, Role, Prisma, messageStatus } from '@prisma/client';
 import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { Socket } from 'socket.io';
 
-
+export const connectedUsers: Map<string, Socket> = new Map();
 
 @UseGuards(JwtGuard)
 @Injectable()
@@ -212,6 +213,23 @@ export class ChannelsService {
     return channelWithRelations;
   }
 
+  // Retourne les sockets (string) des users
+  async getAllSockets(id: number)
+  {
+    const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+      where: {
+        channelId: id,
+      },
+      select: {
+        userId: true,
+      },
+    });
+    const sockets = usersOnChannels.map((userOnChannel) => connectedUsers.get(userOnChannel.userId.toString()).id)
+
+    // console.log(`Sockets channel ${chanId} :`, sockets)
+    return sockets;
+  }
+
   // Modifie un channel
   async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
     try {
@@ -347,21 +365,6 @@ export class ChannelsService {
         return null; // Retournez une valeur ou utilisez une exception appropriée
       }
     }
-
-    async getAllUserId(id: number)
-    {
-      const usersOnChannels = await this.prisma.usersOnChannels.findMany({
-        where: {
-          channelId: id,
-        },
-        select: {
-          userId: true,
-        },
-      });
-      const userIds = usersOnChannels.map((userOnChannel) => userOnChannel.userId);
-      return userIds;
-    }
-
 
 /* =============================== UTILS ==================================== */
 
