@@ -12,11 +12,9 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 		username: "Osef",
 		avatar: '',
 		status: userStatus.ONLINE,
-		scoreResume: {
-			wins: 0,
-			draws: 0,
-			losses: 0
-		},
+		wins: 0,
+		draws: 0,
+		losses: 0,
 		socket: undefined
 	}
 
@@ -103,7 +101,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -134,7 +132,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -165,7 +163,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -195,7 +193,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -226,7 +224,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				osef
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -257,7 +255,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -289,7 +287,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -320,7 +318,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -351,7 +349,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userSomeone
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -382,7 +380,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				osef
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -407,7 +405,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 			administrators: [
 				userAuthenticate
 			],
-			users: [
+			members: [
 				userAuthenticate,
 				userSomeone
 			],
@@ -430,7 +428,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 
 			owner: userSomeone,
 			administrators: [],
-			users: [
+			members: [
 				userSomeone,
 				userAuthenticate
 			],
@@ -464,11 +462,9 @@ export const userSomeone: User = {
 	username: "Someone",
 	avatar: DefaultBluePicture,
 	status: userStatus.ONLINE,
-	scoreResume: {
-		wins: 0,
-		draws: 0,
-		losses: 0
-	},
+	wins: 0,
+	draws: 0,
+	losses: 0,
 	socket: undefined
 }
 

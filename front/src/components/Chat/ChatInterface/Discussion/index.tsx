@@ -34,9 +34,8 @@ function Discussion({ channel } : PropsDiscussion) {
 					}}
 					activeState>
 					{
-						channel.messages && // condition temporaire, a supprimer quand les messages du channel seront retournees par le back
 						channel.messages.map((message, index) => (
-							message.id === userAuthenticate.id ?
+							message.sender.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?
 									<UserText
 										key={"message" + index} // a definir

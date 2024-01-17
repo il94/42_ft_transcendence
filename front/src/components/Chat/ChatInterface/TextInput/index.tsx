@@ -9,8 +9,7 @@ import InteractionContext from "../../../../contexts/InteractionContext"
 
 
 
-import { Channel, User } from "../../../../utils/types"
-import { Socket } from "socket.io-client"
+import { Channel, MessageText, User } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
 import AuthContext from "../../../../contexts/AuthContext"
 type PropsTextInput = {
@@ -25,9 +24,13 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate } = useContext(InteractionContext)!
 
+	/* 
+		renvoie le user contenue dans le channel correspondant a l'id du user envoyer 
+	*/
+
 	function findUserInChannels(channel: any, userId: number): User | undefined {
 		// Combinez les tableaux d'utilisateurs en un seul tableau
-		const allUsers = channel.users.concat(channel.owner, channel.administrators);
+		const allUsers = channel.members.concat(channel.owner, channel.administrators);
 	  
 		// Recherchez l'utilisateur par son ID
 		const foundUser = allUsers.find((user: User) => user.id === userId);
@@ -35,43 +38,45 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 		return foundUser;
 	  }
 
-	function printMsg(msg: string, idSend: number, idChannel:number){
+	function printMsg(msg: string, idSend: number, idChannel:number) {
 		const userSend = findUserInChannels(channel, idSend);
 		if (idChannel == channel.id)
 			{
-			setChannel((prevState: { messages: any }) => ({
-				...prevState,
-				messages: [
-				...prevState.messages,
-				{
-					id: idSend,
-					sender: userSend,
-					type: messageStatus.TEXT,
-					content: msg
+			setChannel((prevState: Channel) => {
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						{
+							sender: userSend,
+							type: messageStatus.TEXT,
+							content: msg
+						} as MessageText
+					]
 				}
-				]
-			}));
+			});
 			};
-			
 		};
 
-		async function messagelog(){
-			const response = await axios.get(`http://localhost:3333/channel/${channel.id}/message`, {
-			headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-			//console.log(response);
-		}
 
+		/* 
+			active l'ecouteur d'evenement pour l'envoie du channel 
+		*/
 		useEffect(() => {
-		messagelog();
-		userAuthenticate.socket.on("printMessage", printMsg);
+		userAuthenticate.socket?.on("printMessage", printMsg);
 
 		return () => {
-			userAuthenticate.socket.off("printMessage", printMsg);
+			userAuthenticate.socket?.off("printMessage", printMsg);
 				};
 		 }, [channel]);
+
+
+
+	/*
+
+		response = tableau des socket des users connecter sur le channel
+
+	*/
 
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -79,20 +84,23 @@ function TextInput({ channel,  setChannel }: PropsTextInput) {
 		if (message === '')
 			return
 			try {
+
 				const response = await axios.get(`http://localhost:3333/channel/${channel.id}/userId`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
+
+				/* post le meesage dans le back */
 				await axios.post(`http://localhost:3333/channel/${channel.id}/message`, 
-				{ msg: message },
+				{ msg: message , msgStatus : messageStatus.TEXT},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
 					}
 				);
-				userAuthenticate.socket.emit("sendMessage", response.data, message, userAuthenticate.id, channel.id);
+				userAuthenticate.socket?.emit("sendMessage", response.data, message, userAuthenticate.id, channel.id);
 				
 				setMessage("");
 			  } catch (error) {

@@ -6,7 +6,7 @@ services:
     image: postgres:16.0
     restart: always
     env_file: ./back/.env
-    expose :
+    expose:
       - '5432'
     networks:
       - transcendence
@@ -25,6 +25,10 @@ services:
       - db
     volumes:
       - ./back/src:/app/src
+      - ./back/prisma:/app/prisma
+      - ./back/package.json:/app/package.json
+      - ./back/package-lock.json:/app/package-lock.json
+
     networks:
       - transcendence
 
@@ -38,11 +42,11 @@ services:
     depends_on:
       - back
     volumes:
-      - ./front/package.json:/app/package.json
-      - ./front/package-lock.json:/app/package-lock.json
       - ./front/src:/app/src
       - ./front/index.html:/app/index.html
       - ./front/style.css:/app/style.css
+      - ./front/package.json:/app/package.json
+      - ./front/package-lock.json:/app/package-lock.json
     networks:
       - transcendence
 

@@ -40,8 +40,15 @@ import DisplayContext from '../../contexts/DisplayContext'
 import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
+import { getAllUsersInChannel } from '../../utils/functions';
+
 import { Channel, User, UserAuthenticate } from '../../utils/types'
-import { chatWindowStatus, contextualMenuStatus, userStatus } from '../../utils/status'
+import {
+	channelStatus,
+	chatWindowStatus,
+	contextualMenuStatus,
+	userStatus
+} from '../../utils/status'
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
@@ -100,8 +107,6 @@ function Game() {
 					}
 				})
 
-				console.log("BLOAUED ===", blockedUsers)
-
 				return (blockedUsers.data)
 			}
 			catch (error) {
@@ -109,7 +114,7 @@ function Game() {
 			}
 		}
 
-		async function fetchChannels(): Promise<Channel[]> {
+		async function fetchChannels(userAuthId: number): Promise<Channel[]> {
 			try {
 				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
 					headers: {
@@ -117,15 +122,42 @@ function Game() {
 					}
 				})
 
-				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => ({
-					...channel,
-					messages: [],
-					owner: undefined,
-					administrators: [],
-					users: [],
-					mutedUsers: [],
-					bannedUsers: []
-				}))
+				function setDataChannelMP(channel: Channel): Channel {
+					const users = getAllUsersInChannel(channel)
+					const recipient = users.find((user) => user.id !== userAuthId)
+		
+					if (!recipient)
+					{
+						setErrorRequest(true)
+						return (channel)
+					}
+					else
+					{
+						const { name, avatar, ...rest } = channel
+		
+						const channelMP: Channel = {
+							name: recipient.username,
+							avatar: recipient.avatar,
+							...rest
+						}
+		
+						return (channelMP)
+					}
+				}
+
+				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => {
+
+					const channelMapped = channel.type === channelStatus.MP ? setDataChannelMP(channel) : channel
+					return {
+						...channelMapped,
+						messages: [],
+						owner: undefined,
+						administrators: [],
+						users: [],
+						mutedUsers: [],
+						bannedUsers: []
+					}
+				})
 
 				return (channels)
 			}
@@ -136,15 +168,15 @@ function Game() {
 
 		async function fetchMe() {
 			try {
-				const friends: User[] = await fetchFriends()
-				const blockedUsers: User[] = await fetchBlockedUsers()
-				const channels: Channel[] = await fetchChannels()
-
 				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
+
+				const friends: User[] = await fetchFriends()
+				const blockedUsers: User[] = await fetchBlockedUsers()
+				const channels: Channel[] = await fetchChannels(responseMe.data.id)
 
 				const socket = io('http://localhost:3333', {
 					transports: ["websocket"],
@@ -163,11 +195,9 @@ function Game() {
 					username: responseMe.data.username,
 					avatar: responseMe.data.avatar,
 					status: userStatus.ONLINE,
-					scoreResume: {
-						wins: responseMe.data.wins,
-						draws: responseMe.data.draws,
-						losses: responseMe.data.losses
-					},
+					wins: responseMe.data.wins,
+					draws: responseMe.data.draws,
+					losses: responseMe.data.losses,
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: responseMe.data.twoFA,

@@ -48,9 +48,34 @@ export function sortUserByStatus(a: User, b: User) {
 	return (aValue - bValue)
 }
 
+export function getAllUsersInChannel(channel: Channel): User[] {
+	const users = [
+		...(channel.members || []),
+		...(channel.administrators || []),
+		(channel.owner ? channel.owner : [])
+	].filter(user => user !== undefined) as User[]
+
+	return (users)
+}
+
+
+export function findUserInChannel(channel: Channel, user: User | UserAuthenticate): User | UserAuthenticate | undefined {
+	const inMembers = channel.members.find((member) => member.id === user.id)
+	if (inMembers)
+		return (inMembers)
+	const inAdministrators = channel.administrators.find((administrator) => administrator.id === user.id)
+	if (inAdministrators)
+		return (inAdministrators)
+	const isOwner = channel.owner?.id === user.id && channel.owner
+	if (isOwner)
+		return (isOwner)
+	else
+		return (undefined)
+}
+
 export function channelIncludeUser(channel: Channel, user: User | UserAuthenticate): boolean {
 	return (
-		channel.users.some((member) => member?.id === user.id) ||
+		channel.members.some((member) => member?.id === user.id) ||
 		channel.administrators.some((administrator) => administrator?.id === user.id) ||
 		channel.owner?.id === user.id
 	)
@@ -58,7 +83,7 @@ export function channelIncludeUser(channel: Channel, user: User | UserAuthentica
 
 export function channelIsEmpty(channel: Channel): boolean {
 	return (
-		channel.users.length === 0 &&
+		channel.members.length === 0 &&
 		channel.administrators.length === 0 &&
 		channel.owner === undefined
 	)

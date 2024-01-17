@@ -5,13 +5,16 @@ CREATE TYPE "UserStatus" AS ENUM ('ONLINE', 'OFFLINE', 'PLAYING', 'WAITING', 'WA
 CREATE TYPE "RequestStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'PROGRESSING', 'FINISHED');
 
 -- CreateEnum
-CREATE TYPE "RelationStatus" AS ENUM ('FRIEND', 'BLOCKED');
-
--- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN', 'OWNER');
+CREATE TYPE "Role" AS ENUM ('MEMBER', 'ADMIN', 'OWNER', 'BANNED');
 
 -- CreateEnum
 CREATE TYPE "ChannelStatus" AS ENUM ('PRIVATE', 'PUBLIC', 'PROTECTED', 'MP');
+
+-- CreateEnum
+CREATE TYPE "messageStatus" AS ENUM ('TEXT', 'INVITATION');
+
+-- CreateEnum
+CREATE TYPE "challengeStatus" AS ENUM ('PENDING', 'ACCEPTED', 'CANCELLED', 'IN_PROGRESS', 'FINISHED');
 
 -- CreateEnum
 CREATE TYPE "MatchResult" AS ENUM ('WINNER', 'DRAW', 'LOOSER');
@@ -36,12 +39,19 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "Relations" (
-    "hasRelationsId" INTEGER NOT NULL,
-    "isInRelationsId" INTEGER NOT NULL,
-    "RelationType" "RelationStatus" NOT NULL,
+CREATE TABLE "Friend" (
+    "userId" INTEGER NOT NULL,
+    "friendId" INTEGER NOT NULL,
 
-    CONSTRAINT "Relations_pkey" PRIMARY KEY ("hasRelationsId","isInRelationsId")
+    CONSTRAINT "Friend_pkey" PRIMARY KEY ("userId","friendId")
+);
+
+-- CreateTable
+CREATE TABLE "Blocked" (
+    "userId" INTEGER NOT NULL,
+    "blockedId" INTEGER NOT NULL,
+
+    CONSTRAINT "Blocked_pkey" PRIMARY KEY ("userId","blockedId")
 );
 
 -- CreateTable
@@ -83,6 +93,8 @@ CREATE TABLE "Message" (
     "authorId" INTEGER NOT NULL,
     "channelId" INTEGER NOT NULL,
     "content" TEXT,
+    "type" "messageStatus" NOT NULL,
+    "status" "challengeStatus",
     "isInvit" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
@@ -113,10 +125,10 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- AddForeignKey
-ALTER TABLE "Relations" ADD CONSTRAINT "Relations_hasRelationsId_fkey" FOREIGN KEY ("hasRelationsId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Friend" ADD CONSTRAINT "Friend_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Relations" ADD CONSTRAINT "Relations_isInRelationsId_fkey" FOREIGN KEY ("isInRelationsId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Blocked" ADD CONSTRAINT "Blocked_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
