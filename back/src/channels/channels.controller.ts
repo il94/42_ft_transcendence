@@ -7,7 +7,6 @@ import { getUser } from '../auth/decorators/users.decorator';
 import { User, messageStatus } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
-
 @UseGuards(JwtGuard)
 @Controller('channel')
 export class ChannelController {
@@ -61,6 +60,13 @@ export class ChannelController {
     return this.channelsService.findChannelWithRelations(channelId);
   }
 
+  // Retourne les sockets (string) des users
+  @Get(':id/sockets')
+  async findSockets(
+    @Param('id', ParseIntPipe) id: number) {
+    return await this.channelsService.getAllSockets(id);
+  }
+
   // Modifie un channel
   @Patch(':id')
   update(@Param('id', ParseIntPipe) channelId: number, 
@@ -101,14 +107,6 @@ async addMessage(
     return this.channelsService.getAllMessage(id);
   }
 
-  /* soso obtenir tout les id des users d'un channel avec son id*/
-
-  @Get(':id/userId')
-  async getAllUserId(
-    @Param('id', ParseIntPipe) id: number,
-  ){
-    return await this.channelsService.getAllUserId(id);;
-  }
 
 /* =========================== PAS UTILISEES ================================ */
 

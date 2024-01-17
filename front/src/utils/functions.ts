@@ -59,14 +59,14 @@ export function getAllUsersInChannel(channel: Channel): User[] {
 }
 
 
-export function findUserInChannel(channel: Channel, user: User | UserAuthenticate): User | UserAuthenticate | undefined {
-	const inMembers = channel.members.find((member) => member.id === user.id)
+export function findUserInChannel(channel: Channel, userId: number): User | UserAuthenticate | undefined {
+	const inMembers = channel.members.find((member) => member.id === userId)
 	if (inMembers)
 		return (inMembers)
-	const inAdministrators = channel.administrators.find((administrator) => administrator.id === user.id)
+	const inAdministrators = channel.administrators.find((administrator) => administrator.id === userId)
 	if (inAdministrators)
 		return (inAdministrators)
-	const isOwner = channel.owner?.id === user.id && channel.owner
+	const isOwner = channel.owner?.id === userId && channel.owner
 	if (isOwner)
 		return (isOwner)
 	else
