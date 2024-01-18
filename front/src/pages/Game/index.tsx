@@ -310,8 +310,6 @@ function Game() {
 	}
 
 	async function refreshDeleteChannel(channelId: number) {
-
-		console.log("HERE")
 		setUserAuthenticate((prevState) => ({
 			...prevState,
 			channels: prevState.channels.filter((channel) => channel.id !== channelId)
@@ -328,7 +326,7 @@ function Game() {
 		return () => {
 			userAuthenticate.socket?.off("updateChannel", refreshUpdateChannel);
 			userAuthenticate.socket?.off("deleteChannel", refreshDeleteChannel);
-		};
+		}
 
 	}, [userAuthenticate.socket])
 

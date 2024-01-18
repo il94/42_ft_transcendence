@@ -109,7 +109,26 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 				else
 					return (undefined)
 
-			});
+			})
+		}
+	}
+
+	async function refreshLeaveChannel(channelId: number, userId: number) {
+		if (channelTarget?.id === channelId)
+		{
+			setChannelTarget((prevState: Channel | undefined) => {
+				if (prevState)
+				{
+					return {
+						...prevState,
+						members: prevState.members.filter((member) => member.id !== userId),
+						administrators: prevState.administrators.filter((administrator) => administrator.id !== userId),
+						owner: prevState.owner?.id === userId ? undefined : prevState.owner
+					}
+				}
+				else
+					return (undefined)
+			})
 		}
 	}
 
@@ -131,11 +150,13 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	function handleListenSockets() {
 		userAuthenticate.socket?.on("newMessage", updateDiscussion);
 		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
+		userAuthenticate.socket?.on("leaveChannel", refreshLeaveChannel);
 
 		return () => {
 			userAuthenticate.socket?.off("newMessage", updateDiscussion);
 			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
-		};
+			userAuthenticate.socket?.off("leaveChannel", refreshLeaveChannel);
+		}
 	}
 
 	function handleClickCreateButton() {

@@ -101,6 +101,20 @@ export class ChannelsGateway implements OnModuleInit {
     }
   }
 
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel quitte
+    args[2] user qui a leave
+   */
+
+    @SubscribeMessage('leaveChannel')
+    async handleLeaveChannel(client: Socket, args: any[]) {
+      const argsToSend = args.slice(1)
+      for (const socket of args[0]) {
+        this.server.to(socket).emit("leaveChannel", ...argsToSend);
+      }
+    }
+  
 
 
 //   // afterInit(server: Server) {

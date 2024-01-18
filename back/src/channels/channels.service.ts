@@ -310,9 +310,11 @@ export class ChannelsService {
       }
     })
 
-    const numberOfMembers: number = await this.countMembersInChannel(channelId)
+    await this.emitToChannel("leaveChannel", channelId, userId)
 
     console.log(`User ${userId} left channel ${channelId}`)
+
+    const numberOfMembers: number = await this.countMembersInChannel(channelId)
   
     // Supprime le channel
     if (numberOfMembers === 0)
@@ -379,9 +381,6 @@ export class ChannelsService {
 
     // Emit a tout les users d'un channel
     async emitToChannel(route: string, ...args: any[]) {
-
-      console.log("args = ", args)
-
       const channelId = args[0]
       const sockets = await this.getAllSockets(channelId)
       connectedUsers.forEach((socket) => {
