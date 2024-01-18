@@ -106,22 +106,35 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleContactClickEvent() {
 		try {
-			const findResult = userAuthenticate.channels.find((channel) => (
+			const findChannelMP = userAuthenticate.channels.find((channel) => (
 				channel.name === userTarget.username && channel.type === channelStatus.MP
 			))
-			if (findResult)
-				setChannelTarget(findResult)
+			if (findChannelMP)
+				setChannelTarget(findChannelMP)
 			else
 			{
-				const newChannel: Channel = {
-					id: -1, //???
+				const MPDatas: any = {
+					name: '',
+					avatar: '',
+					type: channelStatus.MP
+				}		
+
+				const postChannelMPResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const newChannelMP: Channel = {
+					id: postChannelMPResponse.data.id,
 					name: userTarget.username,
 					avatar: userTarget.avatar,
 					type: channelStatus.MP,
 					messages: [],
-					owner: userAuthenticate,
+					owner: undefined,
 					administrators: [],
-					users: [
+					members: [
 						userAuthenticate,
 						userTarget
 					],
@@ -129,19 +142,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					bannedUsers: []
 				}
 
-				/* ============ Temporaire ============== */
-
-				// Verifier si le channel mp n'existe pas deja
-				// await axios.post(`http://localhost:3333/channel`, {
-				// 	name: userTarget.id,
-				// 	avatar: userTarget.avatar,
-				// 	type: channelStatus.MP
-				// })
-
-				/* ====================================== */
-
-				userAuthenticate.channels.push(newChannel)
-				setChannelTarget(newChannel)
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					channels: [...prevState.channels, newChannelMP]
+				}))
+				
+				setChannelTarget(newChannelMP)
 			}
 			displayChat(true)
 		}
@@ -190,7 +196,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						messages: [],
 						owner: userAuthenticate,
 						administrators: [],
-						users: [
+						members: [
 							userAuthenticate,
 							userTarget
 						],
@@ -231,7 +237,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleManageFriendClickEvent() {
 		try {
 			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
-				await axios.post(`http://localhost:3333/friends/${user.id}`, {}, {
+				await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -285,8 +291,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				})
 			}
 			else {
-
-				console.log("DELETE")
 				await axios.delete(`http://localhost:3333/blockeds/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -296,8 +300,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				setUserAuthenticate((prevState: UserAuthenticate) => {
 
 					const { blockedUsers, ...rest } = prevState
-
-					console.log("REST", rest)
 
 					return {
 						...rest,
@@ -362,14 +364,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.users.includes(userTarget)) {
+			if (!channelTarget.members.includes(userTarget)) {
 				/* ============ Temporaire ============== */
 
 				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/users/${userTarget.id}`)
 
 				/* ====================================== */
 
-				channelTarget.users.splice(channelTarget.users.indexOf(userTarget), 1)
+				channelTarget.members.splice(channelTarget.members.indexOf(userTarget), 1)
 			}
 		}
 		catch (error) {
@@ -436,7 +438,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleManageFriendClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.friends.includes(userTarget) ?
+										!userAuthenticate.friends.some((friend) => friend.id === userTarget.id) ?
 											"Add"
 											:
 											"Delete"

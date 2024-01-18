@@ -14,6 +14,7 @@ import {
 import AuthContext from "../../../../contexts/AuthContext"
 
 import { Channel } from "../../../../utils/types"
+import { channelStatus } from "../../../../utils/status"
 
 type PropsChannel = {
 	channel: Channel,
@@ -25,16 +26,27 @@ type PropsChannel = {
 function ChannelSection({ channel, setChannelTarget, setErrorRequest, backgroundColor }: PropsChannel) {
 
 	const { token } = useContext(AuthContext)!
-
+	
 	async function handleClickEvent() {
 		try {
-			const response: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}`, {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channel.id}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
 
-			setChannelTarget(response.data)
+			if (channelWithRelationsResponse.data.type === channelStatus.MP)
+			{
+				const { name, avatar, ...rest } = channelWithRelationsResponse.data
+
+				setChannelTarget({
+					...rest,
+					name: channel.name,
+					avatar: channel.avatar
+				})
+			}
+			else
+				setChannelTarget(channelWithRelationsResponse.data)
 		}
 		catch (error) {
 			setErrorRequest(true)

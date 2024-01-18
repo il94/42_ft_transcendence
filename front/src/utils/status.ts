@@ -30,8 +30,8 @@ export enum chatWindowStatus {
 }
 
 export enum messageStatus {
-	TEXT,
-	INVITATION
+	TEXT = "TEXT",
+	INVITATION = "INVITATION"
 }
 
 export enum matchResultStatus {

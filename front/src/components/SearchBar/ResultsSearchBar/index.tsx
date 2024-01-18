@@ -29,8 +29,6 @@ import { channelIncludeUser, sortChannelByName, sortUserByName } from "../../../
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
-import { getRandomStatus } from "../../../temp/temp"
-
 type PropsSearchBar = {
 	value: string,
 	displayChat: Dispatch<SetStateAction<boolean>>
@@ -158,22 +156,19 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	async function addChannelToChannelList(channelId: number) {
 		try {
-			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}`, {
+			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
 
-			const channel: Channel = channelResponse.data
-			if (!channelIncludeUser(channel, userAuthenticate))
+			if (!channelIncludeUser(channelResponse.data, userAuthenticate))
 			{
-				if (channel.type === channelStatus.PROTECTED)
-					setChannelTarget(channel)
+				if (channelResponse.data.type === channelStatus.PROTECTED)
+					setChannelTarget(channelResponse.data)
 				else
 				{
-					await axios.post(`http://localhost:3333/channel/join`, {
-						id: channel.id
-					},
+					await axios.post(`http://localhost:3333/channel/join/${channelId}`, {},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
@@ -182,18 +177,25 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 					setUserAuthenticate((prevState: UserAuthenticate) => ({
 						...prevState,
-						channels: [ ...prevState.channels, channel]
+						channels: [ ...prevState.channels, channelResponse.data]
 					}))
 
 					setChannelTarget(() => ({
-						...channel,
-						users: [...channel.users, userAuthenticate]
+						...channelResponse.data,
+						members: [...channelResponse.data.members, userAuthenticate]
 					}))
-				}
 
+					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channelId}/sockets`, {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+
+					userAuthenticate.socket?.emit("joinChannel", socketsResponse.data, userAuthenticate.id, channelId)
+				}
 			}
 			else
-				setChannelTarget(channel)
+				setChannelTarget(channelResponse.data)
 			displayChat(true)
 		}
 		catch (error) {
@@ -213,28 +215,15 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 				setUsers(usersResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
-				)).map((user: any) => {
+				)).sort(sortUserByName))
 
-					const { wins, draws, losses, ...rest } = user
-
-					return {
-						...rest ,
-						status: getRandomStatus(),
-						scoreResume: {
-							wins: wins,
-							draws: draws,
-							losses: losses
-						}
-					}
-				}).sort(sortUserByName))
-
-				const channelsResponse = await axios.get("http://localhost:3333/channel", {
+				const accessiblesChannelsResponse = await axios.get("http://localhost:3333/channel/accessibles", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				setChannels(channelsResponse.data.sort(sortChannelByName))
+				setChannels(accessiblesChannelsResponse.data.sort(sortChannelByName))
 			}
 			catch (error) {
 				setErrorRequest(true)

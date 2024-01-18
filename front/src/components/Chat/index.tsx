@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useState
 } from "react"
+import axios from "axios"
 
 import {
 	Style,
@@ -24,9 +25,20 @@ import LockedInterface from "./LockedInterface"
 import ErrorRequest from "../../componentsLibrary/ErrorRequest"
 
 import DisplayContext from "../../contexts/DisplayContext"
+import AuthContext from "../../contexts/AuthContext"
 
-import { Channel, UserAuthenticate } from "../../utils/types"
-import { channelStatus, chatWindowStatus } from "../../utils/status"
+import { findUserInChannel } from "../../utils/functions"
+
+import {
+	Channel,
+	MessageText,
+	UserAuthenticate
+} from "../../utils/types"
+import {
+	channelStatus,
+	chatWindowStatus,
+	messageStatus
+} from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
 
@@ -42,6 +54,106 @@ type PropsChat = {
 }
 
 function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
+
+	const { token } = useContext(AuthContext)!
+
+	function updateDiscussion(idSend: number, idChannel: number, msg: string) {
+		if (channelTarget)
+		{
+			const userSend = findUserInChannel(channelTarget, idSend);
+			if (idChannel === channelTarget.id)
+			{
+				setChannelTarget((prevState: Channel | undefined) => {
+				if (prevState)
+				{
+					return {
+						...prevState,
+						messages: [
+							...prevState.messages,
+							{
+								sender: userSend,
+								type: messageStatus.TEXT,
+								content: msg
+							} as MessageText
+						]
+					}
+				}
+				else
+					return (undefined)
+				});
+			};
+		}
+	};
+
+	async function refreshJoinChannel(userId: number, channelId: number) {
+		if (channelTarget?.id === channelId)
+		{
+			const userResponse = await axios.get(`http://localhost:3333/user/${userId}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			setChannelTarget((prevState: Channel | undefined) => {
+				if (prevState)
+				{
+					return {
+						...prevState,
+						members: [
+							...prevState.members,
+							userResponse.data
+						]
+					}
+				}
+				else
+					return (undefined)
+
+			});
+		}
+	}
+
+	function handleChangeChatWindowState() {
+		if (channelTarget)
+		{
+			if (channelTarget.type === channelStatus.PROTECTED &&
+				!channelTarget.members.some((member) => member.id === userAuthenticate.id) &&
+				channelTarget.owner?.id !== userAuthenticate.id)
+				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+		else
+			setChatWindowState(chatWindowStatus.HOME)
+
+	}
+
+	function handleListenSockets() {
+		userAuthenticate.socket?.on("userJoinedChannel", refreshJoinChannel);
+		userAuthenticate.socket?.on("printMessage", updateDiscussion);
+
+		return () => {
+			userAuthenticate.socket?.off("userJoinedChannel", refreshJoinChannel);
+			userAuthenticate.socket?.off("printMessage", updateDiscussion);
+		};
+	}
+
+	function handleClickCreateButton() {
+
+		if (chatWindowState === chatWindowStatus.HOME)
+			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
+		else if (chatWindowState === chatWindowStatus.CHANNEL)
+			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
+		else if (chatWindowState === chatWindowStatus.LOCKED_CHANNEL)
+			setChatWindowState(chatWindowStatus.HOME)
+		else if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
+			setChatWindowState(chatWindowStatus.CHANNEL)
+		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
+			if (!channelTarget)
+				setChatWindowState(chatWindowStatus.HOME)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+	}
 
 	function handleCickChatButton() {
 		displayChat(true)
@@ -64,11 +176,11 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 			setValueChannelCreateButton("Create")
 			setBannerName("Welcome")
 		}
-		else if (channelTarget && (chatWindowState === chatWindowStatus.CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
+		else if (channelTarget && chatWindowState === chatWindowStatus.CHANNEL) {
 			setValueChannelCreateButton("Create")
 			setBannerName(channelTarget.name)
 		}
-		else if (channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
+		else if (channelTarget && (chatWindowState === chatWindowStatus.UPDATE_CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
 			setValueChannelCreateButton("<<")
 			setBannerName(channelTarget.name)
 		}
@@ -82,34 +194,9 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 	}, [chatWindowState, channelTarget])
 
 	useEffect(() => {
-		if (channelTarget)
-		{
-			if (channelTarget.type === channelStatus.PROTECTED &&
-				!channelTarget.users.some((member) => member.id === userAuthenticate.id) &&
-				channelTarget.owner?.id !== userAuthenticate.id)
-				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
-			else
-				setChatWindowState(chatWindowStatus.CHANNEL)
-		}
-		else
-			setChatWindowState(chatWindowStatus.HOME)
+		handleChangeChatWindowState()
+		return (handleListenSockets())
 	}, [channelTarget])
-
-	function handleClickCreateButton() {
-
-		if (chatWindowState === chatWindowStatus.HOME)
-			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
-		else if (chatWindowState === chatWindowStatus.CHANNEL)
-			setChatWindowState(chatWindowStatus.CREATE_CHANNEL)
-		else if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL)
-			setChatWindowState(chatWindowStatus.CHANNEL)
-		else if (chatWindowState === chatWindowStatus.CREATE_CHANNEL) {
-			if (!channelTarget)
-				setChatWindowState(chatWindowStatus.HOME)
-			else
-				setChatWindowState(chatWindowStatus.CHANNEL)
-		}
-	}
 
 	return (
 		chat ?
@@ -153,7 +240,6 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 														<LockedInterface
 															channel={channelTarget}
 															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
-															setChatWindowState={setChatWindowState}
 															setErrorRequest={setErrorRequest} />
 														:
 														<ChatInterface

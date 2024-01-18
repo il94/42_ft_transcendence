@@ -23,6 +23,7 @@ import { channelIsEmpty } from "../../../utils/functions"
 import { channelStatus, chatWindowStatus } from "../../../utils/status"
 import { Channel, User } from "../../../utils/types"
 
+import DeleteIcon from "../../../assets/close.png"
 import LeaveIcon from "../../../assets/deconnexion.png"
 import ReduceIcon from "../../../assets/reduce.png"
 import SettingsIcon from "../../../assets/settings.png"
@@ -40,7 +41,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		const adminFind: User | undefined = channel.administrators.find((administrator) => administrator.id !== channel.owner?.id)
 		if (adminFind)
 			return (adminFind)
-		const memberFind: User | undefined = channel.users.find((user) => user.id !== channel.owner?.id)
+		const memberFind: User | undefined = channel.members.find((member) => member.id !== channel.owner?.id)
 		if (memberFind)
 			return (memberFind)
 		return (undefined)
@@ -48,6 +49,29 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 
 	const { token } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+
+	async function deleteChannelMP() {
+		try {
+			if (!channelTarget)
+				throw new Error
+		
+			await axios.delete(`http://localhost:3333/channel/${channelTarget.id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			setUserAuthenticate((prevState) => ({
+				...prevState,
+				channels: prevState.channels.filter((channel) => channel.id !== channelTarget.id)
+			}))
+
+			setChannelTarget(undefined)
+		}
+		catch (error) {
+			throw error
+		}
+	}
 
 	async function leaveChannel() {
 
@@ -81,9 +105,11 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 				setChannelTarget((prevState: Channel | undefined) => {
 					if (prevState)
 					{
+						const { members, administrators, owner , ...rest } = prevState
+						
 						return {
-							...prevState,
-							users: prevState.users.filter((user) => user.id !== userAuthenticate.id),
+							...rest,
+							members: prevState.members.filter((member) => member.id !== userAuthenticate.id),
 							administrators: prevState.administrators.filter((administrator) => administrator.id !== userAuthenticate.id),
 							owner: prevState.owner?.id === userAuthenticate.id ? getNewOwner(prevState) : prevState.owner
 						}
@@ -121,8 +147,13 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		<Style>
 			<LeaveButtonWrapper>
 				{
-					(chatWindowState === chatWindowStatus.CHANNEL ||
-					chatWindowState === chatWindowStatus.LOCKED_CHANNEL) ?
+					chatWindowState === chatWindowStatus.CHANNEL ?
+					channelTarget?.type === channelStatus.MP ?
+					<Icon
+						onClick={deleteChannelMP}
+						src={DeleteIcon} size={24}
+						alt="Leave button" title="Leave channel" />
+					:
 					<Icon
 						onClick={leaveChannel}
 						src={LeaveIcon} size={24}

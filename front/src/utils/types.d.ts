@@ -12,11 +12,9 @@ export type User = {
 	username: string,
 	avatar: string,
 	status: userStatus,
-	scoreResume: {
-		wins: number,
-		draws: number,
-		losses: number
-	},
+	wins: number,
+	draws: number,
+	losses: number,
 	socket: Socket | undefined
 }
 
@@ -37,7 +35,7 @@ export type Channel = {
 	type: channelStatus,
 	password?: string,
 	messages: (MessageText | MessageInvitation)[],
-	users: (User | UserAuthenticate)[],
+	members: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
 	mutedUsers: (User | UserAuthenticate)[],
