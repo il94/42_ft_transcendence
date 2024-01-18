@@ -272,8 +272,8 @@ export class ChannelsService {
 
     const channelWithRelations = {
       ...rest,
-      name: rest.type === ChannelStatus.MP && getMPData().name,
-      avatar: rest.type === ChannelStatus.MP && getMPData().avatar,
+      name: rest.type === ChannelStatus.MP ? getMPData().name : rest.name,
+      avatar: rest.type === ChannelStatus.MP ? getMPData().avatar : rest.avatar,
       messages: cleanedMessages,
       members: channelDatas.users.map((user) => {
         if (user.role === "MEMBER")
