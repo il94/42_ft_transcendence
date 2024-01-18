@@ -349,7 +349,7 @@ function Game() {
 												displaySettingsMenu={displaySettingsMenu} />
 										</TopGameWrapper>
 										<BottomGameWrapper>
-											{/* <PongWrapper social={social}/> */}
+											{/* <PongWrapper social={social}/>  */}
 											<Pong/>
 											{
 												card &&
