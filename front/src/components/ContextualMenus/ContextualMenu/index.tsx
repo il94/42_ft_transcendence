@@ -158,7 +158,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				sender: userAuthenticate,
 				type: messageStatus.INVITATION,
 				target: userTarget,
-				status: challengeStatus.PENDING
+				status: challengeStatus.PENDING	
 			}
 
 			/* ============ Temporaire ============== */
@@ -425,6 +425,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 									</SectionName>
 								</Section>
 							}
+
+							<Section onClick={handleContactClickEvent}>
+								<SectionName>
+									Spectate
+								</SectionName>
+							</Section>
+
+
 							<Section onClick={handleManageFriendClickEvent}>
 								<SectionName>
 									{

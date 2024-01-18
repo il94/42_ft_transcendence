@@ -5,8 +5,7 @@ import { Input, Style } from "./style"
 
 import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
 
-import InteractionContext from "../../../../contexts/InteractionContext"
-
+	
 
 
 import { Channel, User } from "../../../../utils/types"
