@@ -108,7 +108,6 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 				}
 				else
 					return (undefined)
-
 			})
 		}
 	}
@@ -144,7 +143,6 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		}
 		else
 			setChatWindowState(chatWindowStatus.HOME)
-
 	}
 
 	function handleListenSockets() {

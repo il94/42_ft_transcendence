@@ -157,7 +157,7 @@ export class UsersService {
 				}
 			}
 		})
-		
+
 		const userChannelsMP = await this.prisma.channel.findMany({
 			where: {
 				id: {
@@ -183,16 +183,14 @@ export class UsersService {
 		})
 
 		const userAllChannels = [
-
 			...userChannels,
 			...userChannelsMP.map((channelMP) => {
 				const { users, ...rest } = channelMP
 
 				return {
 					...rest,
-					members: users.map((member) => {
-						return (member.user)
-					})
+					name: users.find((user) => user.user.id !== member.id).user.username,
+					avatar: users.find((user) => user.user.id !== member.id).user.avatar
 				}
 			})
 		]

@@ -119,35 +119,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					type: channelStatus.MP
 				}		
 
-				const postChannelMPResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				const newChannelMP: Channel = {
-					id: postChannelMPResponse.data.id,
-					name: userTarget.username,
-					avatar: userTarget.avatar,
-					type: channelStatus.MP,
-					messages: [],
-					owner: undefined,
-					administrators: [],
-					members: [
-						userAuthenticate,
-						userTarget
-					],
-					mutedUsers: [],
-					bannedUsers: []
-				}
-
-				setUserAuthenticate((prevState) => ({
-					...prevState,
-					channels: [...prevState.channels, newChannelMP]
-				}))
-				
-				setChannelTarget(newChannelMP)
 			}
 			displayChat(true)
 		}

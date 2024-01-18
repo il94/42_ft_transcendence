@@ -49,17 +49,53 @@ export class ChannelsService {
     if (channelMPAlreadyExist)
      throw new BadRequestException('MP canal already exist')
 
-    const newChannelMP = await this.createChannel(channelDatas, creatorId)
+    const newChannelMP = await this.prisma.channel.create({
+      data: {
+        name: '',
+        avatar: '',
+        type: ChannelStatus.MP,
+        users: { 
+          create: [
+            {
+              role: 'MEMBER',
+              user: {connect: { id: creatorId }}
+            },
+            {
+              role: 'MEMBER',
+              user: {connect: { id: recipientId }}
+            },
+          ]  
+        },
+      }
+    })
 
-    await this.joinChannel(newChannelMP, newChannelMP.id, recipientId)
+    const recipientDatas = await this.prisma.user.findUnique({
+      where: {
+        id: recipientId
+      },
+      select: {
+        username: true,
+        avatar: true
+      }
+    })
 
-    return newChannelMP;
+    const channelMP = {
+      ...newChannelMP,
+      name: recipientDatas.username,
+      avatar: recipientDatas.avatar
+    }
+
+    await this.emitToChannel("createChannelMP", channelMP.id)
+
+    console.log(`Channel MP ${channelMP.id} was created`)
+
+    return channelMP;
   }
 
   // Ajoute un user dans un channel
   async joinChannel(joinChannelDatas: AuthChannelDto, channelId: number, userId: number) {
     try {
-      const channelToJoin = await this.findChannel(channelId);
+      const channelToJoin = await this.findChannel(channelId, userId);
       
       const inChan = await this.isInChannel(userId, channelToJoin.id);
       if (inChan)
@@ -118,17 +154,49 @@ export class ChannelsService {
   }
 
   // Retourne un channel
-  async findChannel(chanId: number) {
+  async findChannel(chanId: number, userId: number) {
     const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
     if (!channel)
       throw new NotFoundException(`Channel id ${chanId} not found`);
 
-    // console.log(`Channel ${chanId} :`, channel)
-    return channel;
+    if (channel.type === ChannelStatus.MP)
+    {
+      const recipientId = await this.prisma.usersOnChannels.findUnique({
+        where: {
+          userId_channelId: {
+            userId: userId,
+            channelId: chanId
+          }
+        },
+        select: {
+          userId: true
+        }
+      })
+
+      const recipient = await this.prisma.user.findUnique({
+        where: {
+          id: recipientId.userId
+        },
+        select: {
+          username: true,
+          avatar: true
+        }
+      })
+
+      const channelMP = {
+        ...channel,
+        name: recipient.username,
+        avatar: recipient.avatar
+      }
+
+      return channelMP
+    }
+    else
+      return channel;
   }
 
   // Retourne un channel avec ses relations
-  async findChannelWithRelations(chanId: number) {
+  async findChannelWithRelations(chanId: number, userId: number) {
     const channelDatas = await this.prisma.channel.findUnique({ 
       where: { 
         id: chanId
@@ -195,21 +263,32 @@ export class ChannelsService {
       }
     })
 
+    function getMPData() {
+      return {
+        name: channelDatas.users.find((user) => user.user.id !== userId).user.username,
+        avatar: channelDatas.users.find((user) => user.user.id !== userId).user.avatar,
+      }
+    }
+
     const channelWithRelations = {
       ...rest,
+      name: rest.type === ChannelStatus.MP && getMPData().name,
+      avatar: rest.type === ChannelStatus.MP && getMPData().avatar,
       messages: cleanedMessages,
-      members: channelDatas.users.map((member) => {
-        if (member.role === "MEMBER")
-          return (member.user)
+      members: channelDatas.users.map((user) => {
+        if (user.role === "MEMBER")
+          return (user.user)
       }).filter(Boolean),
-      administrators: channelDatas.users.map((member) => {
-        if (member.role === "ADMIN")
-          return (member.user)
+      administrators: channelDatas.users.map((user) => {
+        if (user.role === "ADMIN")
+          return (user.user)
       }).filter(Boolean),
-      owner: channelDatas.users.find((member) => member.role === "OWNER").user,
+      owner: channelDatas.users.find((user) => user.role === "OWNER")?.user,
       mutedUsers: [], // en attendant de pouvoir recup les users mutes
       bannedUsers: [] // en attendant de pouvoir recup les users bans
     }
+
+
 
     // console.log(`Channel ${chanId} with relations :`, channelWithRelations)
     return channelWithRelations;
@@ -235,7 +314,7 @@ export class ChannelsService {
   // Modifie un channel
   async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
     try {
-      const channelToUpdate = await this.findChannel(channelId);
+      const channelToUpdate = await this.findChannel(channelId, userId);
       const inChan = await this.isInChannel(userId, channelToUpdate.id)
       if (!inChan)
         throw new NotFoundException(`User ${userId} is not in channel ${channelToUpdate.id}`);
@@ -496,7 +575,7 @@ async addUserInChannel(friendId: number, member: User, chanId: number) {
     return { error: 'Cannot add your self in channel'}
 
   try {
-    this.findChannel(chanId);
+    this.findChannel(chanId, member.id);
     
     if (await this.isInChannel(friendId, chanId))
       throw new NotFoundException(`User ${friendId} is already in channel ${chanId}`);

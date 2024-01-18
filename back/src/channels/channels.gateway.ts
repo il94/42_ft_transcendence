@@ -62,6 +62,19 @@ export class ChannelsGateway implements OnModuleInit {
 
   /*
     args[0] tableau de sockets des users channel
+    args[1] id du channel MP cree
+   */
+
+    @SubscribeMessage('createChannelMP')
+    async handleCreateChannelMP(client: Socket, args: any[]) {
+      const argsToSend = args.slice(1)
+      for (const socket of args[0]) {
+        this.server.to(socket).emit("createChannelMP", ...argsToSend);
+      }
+    }  
+
+  /*
+    args[0] tableau de sockets des users channel
     args[1] id du channel rejoint
     args[2] user qui a join
    */

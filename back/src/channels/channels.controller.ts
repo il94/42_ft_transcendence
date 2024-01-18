@@ -50,14 +50,16 @@ export class ChannelController {
 
   // Retourne un channel
   @Get(':id')
-  find(@Param('id', ParseIntPipe) channelId: number) {
-    return this.channelsService.findChannel(channelId);
+  find(@Param('id', ParseIntPipe) channelId: number,
+    @getUser('id') userId: number) {
+    return this.channelsService.findChannel(channelId, userId);
   }
 
   // Retourne un channel avec ses relations
   @Get(':id/relations')
-  findWithRelations(@Param('id', ParseIntPipe) channelId: number) {
-    return this.channelsService.findChannelWithRelations(channelId);
+  findWithRelations(@Param('id', ParseIntPipe) channelId: number,
+    @getUser('id') userId: number) {
+    return this.channelsService.findChannelWithRelations(channelId, userId);
   }
 
   // Retourne les sockets (string) des users
