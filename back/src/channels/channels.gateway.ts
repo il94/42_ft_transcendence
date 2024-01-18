@@ -56,10 +56,24 @@ export class ChannelsGateway implements OnModuleInit {
   @SubscribeMessage('sendMessage')
   async handleSendMessage(client: Socket, args: string[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("printMessage", args[1], args[2], args[3].toString());
+      this.server.to(socket).emit("printMessage", args[1], args[2], args[3]);
     }
   }
 
+
+   /*
+    args[0] tableau de sockets des users channel
+    args[1] id du user qui envoie (sender)
+    args[2] channel id
+    args[3] target id 
+   */
+
+  @SubscribeMessage('sendInvitation')
+  async handleSendInvitation(client: Socket, args: string[]) {
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("sendInvitation", args[1], args[2], args[3]);
+    }
+  }
   /*
     args[0] tableau de sockets des users channel
     args[1] user qui a join

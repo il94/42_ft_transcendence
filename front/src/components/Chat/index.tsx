@@ -31,10 +31,12 @@ import { findUserInChannel } from "../../utils/functions"
 
 import {
 	Channel,
+	MessageInvitation,
 	MessageText,
 	UserAuthenticate
 } from "../../utils/types"
 import {
+	challengeStatus,
 	channelStatus,
 	chatWindowStatus,
 	messageStatus
@@ -75,6 +77,36 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 								type: messageStatus.TEXT,
 								content: msg
 							} as MessageText
+						]
+					}
+				}
+				else
+					return (undefined)
+				});
+			};
+		}
+	};
+
+	function updateInvitation(idSend: number, idChannel: number, idTarget: number) {
+		if (channelTarget)
+		{
+			const userSend = findUserInChannel(channelTarget, idSend);
+			const userTarget = findUserInChannel(channelTarget, idTarget);
+			if (idChannel === channelTarget.id)
+			{
+				setChannelTarget((prevState: Channel | undefined) => {
+				if (prevState)
+				{
+					return {
+						...prevState,
+						messages: [
+							...prevState.messages,
+							{
+								sender: userSend,
+								type: messageStatus.INVITATION,
+								target: userTarget,
+								status: challengeStatus.PENDING
+							} as MessageInvitation
 						]
 					}
 				}
@@ -130,10 +162,12 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 	function handleListenSockets() {
 		userAuthenticate.socket?.on("userJoinedChannel", refreshJoinChannel);
 		userAuthenticate.socket?.on("printMessage", updateDiscussion);
+		userAuthenticate.socket?.on("sendInvitation", updateInvitation);
 
 		return () => {
 			userAuthenticate.socket?.off("userJoinedChannel", refreshJoinChannel);
 			userAuthenticate.socket?.off("printMessage", updateDiscussion);
+			userAuthenticate.socket?.off("sendInvitation", updateInvitation);
 		};
 	}
 

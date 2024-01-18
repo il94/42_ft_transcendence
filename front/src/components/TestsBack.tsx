@@ -130,15 +130,14 @@ function TestsBack() {
 
 /* ============================== CHANNELS ================================== */
 
-	async function getChannel() {
+	async function getChannel() { 
 		try {
 			const test = await axios.get("http://localhost:3333/channel", {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
-			})
+			}) 
 			console.log("CHANNELS = ", test)
-
 		}
 		catch (error) {
 			console.log(error)

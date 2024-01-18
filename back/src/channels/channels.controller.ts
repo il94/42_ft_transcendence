@@ -91,21 +91,33 @@ export class ChannelController {
 
   @Post(':id/message') // à accorder
 async addMessage( 
-  @getUser() user: User,
+  @getUser('id') userId: number,
   @Param('id', ParseIntPipe) id: number,
   @Body('msg') msg: string, 
-  @Body('msgStatus') msgStatus: messageStatus, // Ajout du paramètre msgStatus
+  @Body('msgStatus') msgStatus: messageStatus,
 ) {
-  return await this.channelsService.addContent(id, msg, user, msgStatus);
+  return await this.channelsService.addContent(id, msg, userId, msgStatus);
+} 
+
+@Post(':id/invitation') // à accorder
+async addInvitation( 
+  @getUser() user: User,
+  @Param('id', ParseIntPipe) id: number,
+  @Body('msgStatus') msgStatus: messageStatus,
+  @Body('targetId') targetId: number, 
+) {
+  return await this.channelsService.addContentInvitation(id, user.id, targetId, msgStatus);
 }
+
+
 
   /* soso obtenir tout les messages  edit : format de renvoie pas encore confirmer */
 
-  @Get(':id/message') // a acorder
-  getMessages(
-    @Param('id', ParseIntPipe) id: number) {
-    return this.channelsService.getAllMessage(id);
-  }
+  // @Get(':id/message') // a acorder
+  // getMessages(
+  //   @Param('id', ParseIntPipe) id: number) {
+  //   return this.channelsService.getAllMessage(id);
+  // }
 
 
 /* =========================== PAS UTILISEES ================================ */

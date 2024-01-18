@@ -82,7 +82,7 @@ function TextInput({ channel }: PropsTextInput) {
 		<Style
 			onSubmit={handleSubmit}
 			autoComplete="off"
-			spellCheck="false">
+			spellCheck="false"> 
 			{
 				!errorRequest ?
 					<Input
