@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message } from "@prisma/client"
+import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message, Role } from "@prisma/client"
 import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateChannelDto implements Channel {
@@ -53,6 +53,13 @@ export class UpdateChannelDto extends PartialType(CreateChannelDto) {
   
   content:	Message[];
 }
+
+export class UpdateRoleDto extends PartialType(CreateChannelDto) {
+
+	@IsString()
+	role:	Role;
+  
+  }
 
 export class AuthChannelDto extends PartialType(CreateChannelDto) {
 

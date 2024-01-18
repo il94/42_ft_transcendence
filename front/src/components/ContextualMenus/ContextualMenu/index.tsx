@@ -25,6 +25,7 @@ import {
 
 import {
 	challengeStatus,
+	channelRole,
 	channelStatus,
 	contextualMenuStatus,
 	messageStatus,
@@ -294,23 +295,49 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.administrators.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) {
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/administrators/${userTarget.id}`)
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.ADMIN
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				/* ====================================== */
-
-				channelTarget.administrators.push(userTarget)
+				setChannelTarget((prevState) => {
+					if (prevState)
+					{
+						return {
+							...prevState,
+							administrators: [
+								...prevState.administrators,
+								userTarget
+							]
+						}
+					}
+				})
 			}
 			else {
-				/* ============ Temporaire ============== */
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.MEMBER
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/administrators/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.administrators.splice(channelTarget.administrators.indexOf(userTarget), 1)
+				setChannelTarget((prevState) => {
+					if (prevState)
+					{
+						return {
+							...prevState,
+							administrators: prevState.administrators.filter((administrator) => administrator.id !== userTarget.id)
+						}
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -438,7 +465,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 															<Section onClick={handleGradeClickEvent}>
 																<SectionName>
 																	{
-																		!channelTarget.administrators.includes(userTarget) ?
+																		!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
 																			"Upgrade"
 																			:
 																			"Downgrade"

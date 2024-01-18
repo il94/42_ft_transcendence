@@ -100,6 +100,21 @@ export class ChannelsGateway implements OnModuleInit {
       this.server.to(socket).emit("updateChannel", ...argsToSend);
     }
   }
+
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel
+    args[2] id du user modifie
+    args[3] nouveau role du user modifie
+   */
+
+  @SubscribeMessage('updateUserRole')
+  async handleUpdateUserRole(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("updateUserRole", ...argsToSend);
+    }
+  }
   
   /*
     args[0] tableau de sockets des users channel

@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto/';
+import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto/';
 import { Channel, User, ChannelStatus, Role, Prisma, messageStatus } from '@prisma/client';
 import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
@@ -276,14 +276,14 @@ export class ChannelsService {
       avatar: rest.type === ChannelStatus.MP ? getMPData().avatar : rest.avatar,
       messages: cleanedMessages,
       members: channelDatas.users.map((user) => {
-        if (user.role === "MEMBER")
+        if (user.role === Role.MEMBER)
           return (user.user)
       }).filter(Boolean),
       administrators: channelDatas.users.map((user) => {
-        if (user.role === "ADMIN")
+        if (user.role === Role.ADMIN)
           return (user.user)
       }).filter(Boolean),
-      owner: channelDatas.users.find((user) => user.role === "OWNER")?.user,
+      owner: channelDatas.users.find((user) => user.role === Role.OWNER)?.user,
       mutedUsers: [], // en attendant de pouvoir recup les users mutes
       bannedUsers: [] // en attendant de pouvoir recup les users bans
     }
@@ -339,6 +339,44 @@ export class ChannelsService {
       
       console.log(`Channel ${channelId} has been updated`)
       return updateChannel;
+
+    } catch (error) { }    
+  }
+
+  // Change le role d'un user du channel
+  async updateUserRole(channelId: number, userTargetId: number, userAuthId: number, newRole: UpdateRoleDto) {
+    try {
+      const userAuthIsOwner = await this.prisma.usersOnChannels.findUnique({
+        where: {
+          userId_channelId: {
+            userId: userAuthId,
+            channelId: channelId
+          },
+          AND: {
+            role: Role.OWNER
+          }
+        }
+      })
+
+      if (!userAuthIsOwner)
+        throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+
+      const updateRole = await this.prisma.usersOnChannels.update({
+        where: {
+          userId_channelId: {
+            userId: userTargetId,
+            channelId: channelId
+          }
+        },
+        data: {
+          role: newRole.role
+        }
+      })
+      
+      await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole.role)
+
+      console.log(`User ${userTargetId} is now ${newRole.role} on channel ${channelId}`)
+      return (updateRole)
 
     } catch (error) { }    
   }

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
-import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto';
+import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
@@ -33,7 +33,7 @@ export class ChannelController {
     @getUser('id') userId: number) {
     return this.channelsService.joinChannel(joinChannelDatas, channelId, userId);
   }
-  
+
   // Retourne tout les channels
   @Get()
   async findAll() {
@@ -75,6 +75,15 @@ export class ChannelController {
   @Body() newChannelDatas: UpdateChannelDto, 
   @getUser('id') userId: number) {
     return this.channelsService.updateChannel(channelId, newChannelDatas, userId);
+  }
+
+  // Change le role d'un user du channel
+  @Patch(':idChannel/role/:idUser')
+  updateRole(@Param('idChannel', ParseIntPipe) channelId: number,
+    @Param('idUser', ParseIntPipe) userTargetId: number,
+    @getUser('id') userAuthId: number,
+    @Body() newRole: UpdateRoleDto) {
+    return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
   }
 
   // Supprime un channel

@@ -5,7 +5,7 @@ import {
 	useEffect,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
 	Style,
@@ -32,9 +32,11 @@ import { findUserInChannel } from "../../utils/functions"
 import {
 	Channel,
 	MessageText,
+	User,
 	UserAuthenticate
 } from "../../utils/types"
 import {
+	channelRole,
 	channelStatus,
 	chatWindowStatus,
 	messageStatus
@@ -89,7 +91,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	async function refreshJoinChannel(channelId: number, userId: number) {
 		if (channelTarget?.id === channelId)
 		{
-			const userResponse = await axios.get(`http://localhost:3333/user/${userId}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -131,6 +133,49 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		}
 	}
 
+	async function refreshUserRole(channelId: number, userId: number, newRole: any) {
+		if (channelTarget?.id === channelId)
+		{
+			const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			setChannelTarget((prevState: Channel | undefined) => {
+				if (prevState)
+				{
+					if (newRole === channelRole.MEMBER)
+					{
+						const isAlreadyMember = prevState.members.find((member) => member.id === userId)
+						const members = isAlreadyMember ? prevState.members : [ ...prevState.members, userResponse.data ]
+
+						return {
+							...prevState,
+							members: members,
+							administrators: prevState.administrators.filter((administrator) => administrator.id !== userId)
+						}
+					}
+					else if (newRole === channelRole.ADMIN)
+					{
+						const isAlreadyAdministrator = prevState.administrators.find((administrator) => administrator.id === userId)
+						const administrators = isAlreadyAdministrator ? prevState.administrators : [ ...prevState.administrators, userResponse.data ]
+
+						return {
+							...prevState,
+							members: prevState.members.filter((member) => member.id !== userId),
+							administrators: administrators
+						}
+					}
+					else
+						return (undefined)
+				}
+				else
+					return (undefined)
+			})
+		}
+	}
+
 	function handleChangeChatWindowState() {
 		if (channelTarget)
 		{
@@ -149,11 +194,13 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		userAuthenticate.socket?.on("newMessage", updateDiscussion);
 		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
 		userAuthenticate.socket?.on("leaveChannel", refreshLeaveChannel);
+		userAuthenticate.socket?.on("updateUserRole", refreshUserRole);
 
 		return () => {
 			userAuthenticate.socket?.off("newMessage", updateDiscussion);
 			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
 			userAuthenticate.socket?.off("leaveChannel", refreshLeaveChannel);
+			userAuthenticate.socket?.off("updateUserRole", refreshUserRole);
 		}
 	}
 
