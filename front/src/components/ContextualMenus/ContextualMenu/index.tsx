@@ -89,13 +89,13 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	const [adminSections, displayAdminSections] = useState<boolean>(false)
 
 	useEffect(() => {
-	
-		if (channelTarget && type === contextualMenuStatus.CHAT &&
-			(channelTarget.owner === userAuthenticate ||
-				(channelTarget.administrators.includes(userAuthenticate) &&
-				!channelTarget.administrators.includes(userTarget)) &&
-				(channelTarget.owner !== userTarget &&
-					!channelTarget.administrators.includes(userTarget)))) {
+		if (channelTarget &&
+			type === contextualMenuStatus.CHAT &&
+			(channelTarget.owner?.id === userAuthenticate.id ||
+			(channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
+				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) &&
+			(channelTarget.owner?.id !== userTarget.id &&
+				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))) {
 			displayAdminSections(true)
 		}
 		else
@@ -434,7 +434,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 													adminSections &&
 													<>
 														{
-															channelTarget.owner === userAuthenticate &&
+															channelTarget.owner?.id === userAuthenticate.id &&
 															<Section onClick={handleGradeClickEvent}>
 																<SectionName>
 																	{

@@ -58,15 +58,15 @@ function ContactText({ sender, content }: PropsContactText) {
 		if (gameWrapperContainer) {
 			function getContextualMenuHeight() { // determine la taille du menu par rapport aux status du user authentifie et de la cible
 				if (channelTarget) {
-					if (channelTarget.owner === userAuthenticate) {
+					if (channelTarget.owner?.id === userAuthenticate.id) {
 						if (userTarget.status === userStatus.OFFLINE)
 							return (280)
 						else
 							return (315)
 					}
-					else if (channelTarget.administrators.includes(userAuthenticate) &&
-						(channelTarget.owner !== userTarget &&
-							!channelTarget.administrators.includes(userTarget)))
+					else if (channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
+						(channelTarget.owner?.id !== userTarget.id &&
+						!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))
 						return (280)
 					else
 						return (175)
