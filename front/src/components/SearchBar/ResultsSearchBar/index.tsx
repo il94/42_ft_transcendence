@@ -184,14 +184,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 						...channelResponse.data,
 						members: [...channelResponse.data.members, userAuthenticate]
 					}))
-
-					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channelId}/sockets`, {
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
-
-					userAuthenticate.socket?.emit("joinChannel", socketsResponse.data, userAuthenticate.id, channelId)
 				}
 			}
 			else

@@ -86,7 +86,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		}
 	};
 
-	async function refreshJoinChannel(userId: number, channelId: number) {
+	async function refreshJoinChannel(channelId: number, userId: number) {
 		if (channelTarget?.id === channelId)
 		{
 			const userResponse = await axios.get(`http://localhost:3333/user/${userId}`, {

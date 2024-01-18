@@ -69,7 +69,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
-
 					const newDatas: any = {
 						name: name.value !== channel.name ? name.value : channel.name,
 						type: channelType !== channel.type ? channelType : channel.type,
@@ -83,14 +82,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 							'Authorization': `Bearer ${token}`
 						}
 					})
-
-					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channel.id}/sockets`, {
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
-
-					userAuthenticate.socket?.emit("updateChannel", socketsResponse.data, channel.id, newDatas)
 				}
 				else
 					throw new Error

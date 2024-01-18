@@ -56,20 +56,21 @@ export class ChannelsGateway implements OnModuleInit {
   @SubscribeMessage('newMessage')
   async handleSendMessage(client: Socket, args: any[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("newMessage", args[1], args[2], args[3].toString());
+      this.server.to(socket).emit("newMessage", args[1], args[2], args[3]);
     }
   }
 
   /*
     args[0] tableau de sockets des users channel
-    args[1] user qui a join
-    args[2] id du channel rejoint
+    args[1] id du channel rejoint
+    args[2] user qui a join
    */
 
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
     for (const socket of args[0]) {
-      this.server.to(socket).emit("joinChannel", parseInt(args[1]), parseInt(args[2]));
+      this.server.to(socket).emit("joinChannel", ...argsToSend);
     }
   }
 
@@ -81,8 +82,9 @@ export class ChannelsGateway implements OnModuleInit {
 
   @SubscribeMessage('updateChannel')
   async handleUpdateChannel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
     for (const socket of args[0]) {
-      this.server.to(socket).emit("updateChannel", parseInt(args[1]), args[2]);
+      this.server.to(socket).emit("updateChannel", ...argsToSend);
     }
   }
   
@@ -93,8 +95,9 @@ export class ChannelsGateway implements OnModuleInit {
 
   @SubscribeMessage('deleteChannel')
   async handleDeleteChannel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
     for (const socket of args[0]) {
-      this.server.to(socket).emit("deleteChannel", parseInt(args[1]));
+      this.server.to(socket).emit("deleteChannel", ...argsToSend);
     }
   }
 

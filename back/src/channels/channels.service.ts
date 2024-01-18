@@ -83,6 +83,8 @@ export class ChannelsService {
           }
         }})
 
+      await this.emitToChannel("joinChannel", channelId, userId)
+
       console.log(`User ${userId} joined channel ${channelId}`)
 
       return joinChannel;
@@ -245,14 +247,17 @@ export class ChannelsService {
       if (inChan.role !== Role.OWNER || !inChan.role)
         throw new ForbiddenException(`User ${userId} has not required role for this action`);
       
-        const updateChannel = await this.prisma.channel.update({ where: { id: channelToUpdate.id}, 
+      await this.emitToChannel("updateChannel", channelId, newChannelDatas)
+
+      const updateChannel = await this.prisma.channel.update({ where: { id: channelToUpdate.id}, 
         data: {
           name: newChannelDatas.name,
-	        type: newChannelDatas.type,
-	        password:	newChannelDatas.password,
+          type: newChannelDatas.type,
+          password:	newChannelDatas.password,
           avatar: newChannelDatas.avatar
-        }})
-
+        }
+      })
+      
       console.log(`Channel ${channelId} has been updated`)
       return updateChannel;
 
@@ -262,14 +267,8 @@ export class ChannelsService {
   // Supprime un channel
   async remove(channelId: number) {
   
-    const sockets = await this.getAllSockets(channelId)
-
-    connectedUsers.forEach((socket) => {
-      const socketToEmit = sockets.includes(socket.id)
-
-      if (socketToEmit)
-        socket.emit("deleteChannel", channelId);
-    })
+    // Informe les autres users de la suppression du channel
+    await this.emitToChannel("deleteChannel", channelId)
 
     // Supprime les relations user - channel
     await this.prisma.usersOnChannels.deleteMany({
@@ -291,6 +290,7 @@ export class ChannelsService {
         id: channelId
       }
     });
+
 
     console.log(`Channel ${channelId} has been deleted`)
 		return deleteChannel;
@@ -376,6 +376,21 @@ export class ChannelsService {
     }
 
 /* =============================== UTILS ==================================== */
+
+    // Emit a tout les users d'un channel
+    async emitToChannel(route: string, ...args: any[]) {
+
+      console.log("args = ", args)
+
+      const channelId = args[0]
+      const sockets = await this.getAllSockets(channelId)
+      connectedUsers.forEach((socket) => {
+        const socketToEmit = sockets.includes(socket.id)
+
+        if (socketToEmit)
+          socket.emit(route, ...args);
+      })
+    }
 
     // cherche un channel de type MP qui contient les 2 users
     async findChannelMP(recipientId: number, creatorId: number) {
