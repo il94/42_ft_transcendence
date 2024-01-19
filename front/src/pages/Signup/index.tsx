@@ -35,7 +35,7 @@ import FTButton from "../../assets/42.png"
 
 function Signup() {
 
-	const { token, setToken } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const navigate = useNavigate()
 
@@ -87,7 +87,7 @@ function Signup() {
 				avatar: getRandomDefaultAvatar()
 			}
 
-			const response = await axios.post("http://localhost:3333/auth/signup", newUser)
+			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
 			setToken(response.data.access_token)
 			localStorage.setItem('token', response.data.access_token)
@@ -305,7 +305,7 @@ function Signup() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to="http://localhost:3333/auth/api42/login">
+						<LinkButtonImage to={`http://${url}:3333/auth/api42/login`}>
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

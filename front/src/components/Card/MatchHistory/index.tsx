@@ -24,7 +24,7 @@ function MatchHistory({ userTarget }: PropsMatchHistory) {
 
 				/* ============ Temporaire ============== */
 
-				// const response = await axios.get("http://localhost:3333/user/:id/history") //(id etant userIdTarget)
+				// const response = await axios.get(`http://${url}:3333/user/:id/history`) //(id etant userIdTarget)
 				// setMatchs(response.data)		
 
 				setMatchs([

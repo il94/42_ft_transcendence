@@ -40,7 +40,7 @@ import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 function Signin() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { token, setToken } = useContext(AuthContext)!
+	const { setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -74,8 +74,8 @@ function Signin() {
 				username: login.value,
 				hash: password.value
 			}
-
-			const response = await axios.post("http://localhost:3333/auth/signin", user)
+			
+			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
 	
 			//temporaire
 			if (response.data.twoFA)
@@ -125,7 +125,7 @@ function Signin() {
 	// async function connectionBy42() {
 	// 	try {
 
-	// 		const test = await axios.get("http://localhost:3333/auth/api42")
+	// 		const test = await axios.get(`http://${url}:3333/auth/api42`)
 			
 	// 		console.log(test)
 			
@@ -245,7 +245,7 @@ function Signin() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to="http://localhost:3333/auth/api42">
+						<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

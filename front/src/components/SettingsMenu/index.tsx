@@ -33,12 +33,13 @@ import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
 	token: string,
+	url: string,
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
+function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
 
 	type PropsSetting = {
 		value: string,
@@ -98,7 +99,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 				twoFA: twoFA.value !== userAuthenticate.twoFA ? twoFA.value : undefined,
 			}
 
-			await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, newDatas,
+			await axios.patch(`http://${url}:3333/user/${userAuthenticate.id}`, newDatas,
 			{
 				headers: {
 					'Authorization': `Bearer ${token}`
