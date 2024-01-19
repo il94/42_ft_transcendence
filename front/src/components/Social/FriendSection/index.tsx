@@ -19,7 +19,7 @@ import CardContext from "../../../contexts/CardContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import DisplayContext from "../../../contexts/DisplayContext"
 
-import { capitalize } from "../../../utils/functions"
+import { capitalize, getContextualMenuHeight } from "../../../utils/functions"
 
 import { User } from "../../../utils/types"
 import { contextualMenuStatus, userStatus } from "../../../utils/status"
@@ -77,16 +77,9 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 
 	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
-		function getContextualMenuHeight() { // determine la taille du menu par rapport au statut du user cible
-			if (userTarget.status === userStatus.OFFLINE)
-				return (140)
-			else
-				return (175)
-		}
-
 		setUserTarget(friend)
 
-		const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel de la liste d'amis
+		const heightContextualMenu = getContextualMenuHeight(contextualMenuStatus.SOCIAL, userTarget) // height du menu contextuel de la liste d'amis
 		const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
 		const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 

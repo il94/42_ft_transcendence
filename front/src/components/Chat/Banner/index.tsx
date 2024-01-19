@@ -70,7 +70,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 
 		async function memberLeaveChannel(channelId: number) {
 			try {
-				await axios.delete(`http://localhost:3333/channel/leave/${channelId}`, {
+				await axios.delete(`http://localhost:3333/channel/${channelId}/leave/${userAuthenticate.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}

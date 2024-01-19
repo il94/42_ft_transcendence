@@ -115,7 +115,18 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	}
 
 	async function refreshLeaveChannel(channelId: number, userId: number) {
-		if (channelTarget?.id === channelId)
+		if (userId === userAuthenticate.id)
+		{
+			setUserAuthenticate((prevState: UserAuthenticate) => {
+				return {
+					...prevState,
+					channels: prevState.channels.filter((channel) => channel.id !== channelId)
+				}
+			})
+			if (channelTarget?.id === channelId)
+				setChannelTarget(undefined)
+		}
+		else if (channelTarget?.id === channelId)
 		{
 			setChannelTarget((prevState: Channel | undefined) => {
 				if (prevState)
@@ -123,18 +134,20 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 					return {
 						...prevState,
 						members: prevState.members.filter((member) => member.id !== userId),
-						administrators: prevState.administrators.filter((administrator) => administrator.id !== userId),
+						administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId),
 						owner: prevState.owner?.id === userId ? undefined : prevState.owner
 					}
 				}
 				else
 					return (undefined)
-			})
+			})	
 		}
 	}
 
 	async function refreshUserRole(channelId: number, userId: number, newRole: any) {
-		if (channelTarget?.id === channelId)
+		if (newRole === channelRole.BANNED)
+			await refreshLeaveChannel(channelId, userId)
+		else if (channelTarget?.id === channelId)
 		{
 			const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
 				headers: {
@@ -177,34 +190,6 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 					else
 						return (undefined)
 				})
-			}
-			else if (newRole === channelRole.BANNED)
-			{
-				if (userId === userAuthenticate.id)
-				{
-					setUserAuthenticate((prevState: UserAuthenticate) => {
-						return {
-							...prevState,
-							channels: prevState.channels.filter((channel) => channel.id !== channelId)
-						}
-					})
-					setChannelTarget(undefined)
-				}
-				else
-				{
-					setChannelTarget((prevState: Channel | undefined) => {
-						if (prevState)
-						{
-							return {
-								...prevState,
-								members: prevState.members.filter((member) => member.id !== userId),
-								administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId)
-							}
-						}
-						else
-							return (undefined)
-					})	
-				}
 			}
 		}
 	}

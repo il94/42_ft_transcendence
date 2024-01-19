@@ -438,20 +438,38 @@ export class ChannelsService {
   // Retire un user d'un channel
   // Si le user etait owner, set un nouvel owner
   // Si le user etait le dernier, supprime le channel
-  async leaveChannel(userId: number, channelId: number) {
+  async leaveChannel(channelId: number, userTargetId: number, userAuthId: number) {
+
+    if (userTargetId !== userAuthId)
+    {
+      const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+        where: {
+          userId_channelId: {
+            userId: userAuthId,
+            channelId: channelId
+          }
+        },
+        select: {
+          role: true
+        }
+      })
+
+      if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
+       throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+    }
+
+    await this.emitToChannel("leaveChannel", channelId, userTargetId)
 
     const userLeave = await this.prisma.usersOnChannels.delete({
       where: {
         userId_channelId: {
-          userId: userId,
+          userId: userTargetId,
           channelId: channelId
         }
       }
     })
 
-    await this.emitToChannel("leaveChannel", channelId, userId)
-
-    console.log(`User ${userId} left channel ${channelId}`)
+    console.log(`User ${userTargetId} left channel ${channelId}`)
 
     const numberOfMembers: number = await this.countMembersInChannel(channelId)
   

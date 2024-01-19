@@ -78,9 +78,9 @@ export class ChannelController {
   }
 
   // Change le role d'un user du channel
-  @Patch(':idChannel/role/:idUser')
-  updateRole(@Param('idChannel', ParseIntPipe) channelId: number,
-    @Param('idUser', ParseIntPipe) userTargetId: number,
+  @Patch(':channelId/role/:userTargetId')
+  updateRole(@Param('channelId', ParseIntPipe) channelId: number,
+    @Param('userTargetId', ParseIntPipe) userTargetId: number,
     @getUser('id') userAuthId: number,
     @Body() newRole: UpdateRoleDto) {
     return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
@@ -93,10 +93,11 @@ export class ChannelController {
 	}
 
   // Retire un user d'un channel
-  @Delete('leave/:id')
-  leave(@Param('id', ParseIntPipe) channelId: number,
-  @getUser('id') userId: number) {
-    return this.channelsService.leaveChannel(userId, channelId);
+  @Delete(':channelId/leave/:userTargetId')
+  leave(@Param('channelId', ParseIntPipe) channelId: number,
+    @Param('userTargetId', ParseIntPipe) userTargetId: number,
+    @getUser('id') userAuthId: number) {
+    return this.channelsService.leaveChannel(channelId, userTargetId, userAuthId);
 	}
   /* soso  ajout de message  avec l'id du channel  */
 

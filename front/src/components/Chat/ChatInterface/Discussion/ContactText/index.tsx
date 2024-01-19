@@ -14,8 +14,10 @@ import CardContext from "../../../../../contexts/CardContext"
 import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
 
+import { getContextualMenuHeight } from "../../../../../utils/functions"
+
 import { User } from "../../../../../utils/types"
-import { contextualMenuStatus, userStatus } from "../../../../../utils/status"
+import { contextualMenuStatus } from "../../../../../utils/status"
 
 type PropsContactText = {
 	sender: User,
@@ -55,29 +57,11 @@ function ContactText({ sender, content }: PropsContactText) {
 
 		const gameWrapperContainer = GameWrapperRef.current
 
-		if (gameWrapperContainer) {
-			function getContextualMenuHeight() { // determine la taille du menu par rapport aux status du user authentifie et de la cible
-				if (channelTarget) {
-					if (channelTarget.owner?.id === userAuthenticate.id) {
-						if (userTarget.status === userStatus.OFFLINE)
-							return (280)
-						else
-							return (315)
-					}
-					else if (channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
-						(channelTarget.owner?.id !== userTarget.id &&
-						!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))
-						return (280)
-					else
-						return (175)
-				}
-				else
-					return (0)
-			}
+		if (gameWrapperContainer && channelTarget) {
 
 			setUserTarget(sender)
 
-			const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel du chat
+			const heightContextualMenu = getContextualMenuHeight(contextualMenuStatus.CHAT, userTarget, userAuthenticate, channelTarget) // height du menu contextuel du chat
 			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas

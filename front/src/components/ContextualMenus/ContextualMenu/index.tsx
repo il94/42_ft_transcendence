@@ -346,15 +346,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.members.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/users/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.members.splice(channelTarget.members.indexOf(userTarget), 1)
-			}
+			await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/leave/${userTarget.id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
@@ -449,38 +445,43 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 												{
 													adminSections &&
 													<>
-														{
-															channelTarget.owner?.id === userAuthenticate.id &&
-															<Section onClick={handleGradeClickEvent}>
+													{
+														channelIncludeUser(channelTarget, userTarget) &&
+														<>
+															{
+																channelTarget.owner?.id === userAuthenticate.id &&
+																<Section onClick={handleGradeClickEvent}>
+																	<SectionName>
+																		{
+																			!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
+																				"Upgrade"
+																				:
+																				"Downgrade"
+																		}
+																	</SectionName>
+																</Section>
+															}
+															<Section onClick={handleMuteClickEvent}>
 																<SectionName>
-																	{
-																		!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
-																			"Upgrade"
-																			:
-																			"Downgrade"
-																	}
+																	Mute
 																</SectionName>
 															</Section>
-														}
-														<Section onClick={handleMuteClickEvent}>
-															<SectionName>
-																Mute
-															</SectionName>
-														</Section>
-														<Section onClick={handleKickClickEvent}>
-															<SectionName>
-																Kick
-															</SectionName>
-														</Section>
+															<Section onClick={handleKickClickEvent}>
+																<SectionName>
+																	Kick
+																</SectionName>
+															</Section>
+														</>
+													}
 														<Section onClick={handleBanClickEvent}>
-														<SectionName>
-															{
-																channelIncludeUser(channelTarget, userTarget) ?
-																	"Ban"
-																	:
-																	"Unban"
-															}
-														</SectionName>
+															<SectionName>
+																{
+																	channelIncludeUser(channelTarget, userTarget) ?
+																		"Ban"
+																		:
+																		"Unban"
+																}
+															</SectionName>
 														</Section>
 													</>
 												}

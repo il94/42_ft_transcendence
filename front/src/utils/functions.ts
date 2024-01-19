@@ -1,4 +1,4 @@
-import { userStatus } from "./status"
+import { contextualMenuStatus, userStatus } from "./status"
 import { Channel, User, UserAuthenticate } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
@@ -29,6 +29,47 @@ export function getRandomDefaultAvatar(): string {
 
 	return (defaultAvatars[randomIndex])
 }
+
+export function getContextualMenuHeight(type: contextualMenuStatus, userTarget: User, userAuthenticate?: User, channel?: Channel) { // determine la taille du menu par rapport aux status du user authentifie et de la cible
+	
+	if (type === contextualMenuStatus.CHAT)
+	{
+		if (!channel || !userAuthenticate)
+			return (0)
+		if (channel.owner?.id === userAuthenticate.id)
+		{
+			if (channelIncludeUser(channel, userTarget))
+			{
+				if (userTarget.status === userStatus.OFFLINE)
+					return (280)
+				else
+					return (315)
+			}
+			else
+			{
+				if (userTarget.status === userStatus.OFFLINE)
+					return (175)
+				else
+					return (210)
+			}
+	
+		}
+		else if (channel.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
+			(channel.owner?.id !== userTarget.id &&
+			!channel.administrators.some((administrator) => administrator.id === userTarget.id)))
+			return (280)
+		else
+			return (175)
+	}
+	else
+	{
+		if (userTarget.status === userStatus.OFFLINE)
+			return (140)
+		else
+			return (175)
+	}
+}
+
 
 export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
