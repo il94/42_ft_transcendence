@@ -40,11 +40,8 @@ import DisplayContext from '../../contexts/DisplayContext'
 import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
-import { getAllUsersInChannel } from '../../utils/functions';
-
 import { Channel, User, UserAuthenticate } from '../../utils/types'
 import {
-	channelStatus,
 	chatWindowStatus,
 	contextualMenuStatus,
 	userStatus
@@ -176,9 +173,9 @@ function Game() {
 					email: responseMe.data.email,
 					phoneNumber: responseMe.data.phoneNumber,
 					twoFA: responseMe.data.twoFA,
-					friends: friends, // a recuperer depuis la reponse
-					blockedUsers: blockedUsers, // a recuperer depuis la reponse
-					channels: channels, // a recuperer depuis la reponse
+					friends: friends,
+					blockedUsers: blockedUsers,
+					channels: channels,
 					socket: socket
 				})
 			}

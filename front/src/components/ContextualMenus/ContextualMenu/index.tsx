@@ -16,7 +16,7 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { userIsBannedFromChannel, userIsInChannel } from "../../../utils/functions"
+import { userIsBanned, userIsInChannel } from "../../../utils/functions"
 
 import {
 	Channel,
@@ -398,11 +398,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			{
 				userTarget ?
 					<>
-						<Section onMouseEnter={showSecondaryContextualMenu}>
-							<SectionName>
-								Invite
-							</SectionName>
-						</Section>
+						{
+							userAuthenticate.channels.length > 0 &&
+							<Section onMouseEnter={showSecondaryContextualMenu}>
+								<SectionName>
+									Invite
+								</SectionName>
+							</Section>
+						}
 						<div onMouseEnter={() => displaySecondaryContextualMenu(false)}>
 							<Section onClick={handleContactClickEvent}>
 								<SectionName>
@@ -417,14 +420,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 									</SectionName>
 								</Section>
 							}
-
-							<Section onClick={handleContactClickEvent}>
-								<SectionName>
-									Spectate
-								</SectionName>
-							</Section>
-
-
+							{
+								userTarget.status === userStatus.PLAYING &&
+								<Section onClick={handleContactClickEvent}>
+									<SectionName>
+										Spectate
+									</SectionName>
+								</Section>
+							}
 							<Section onClick={handleManageFriendClickEvent}>
 								<SectionName>
 									{
@@ -488,7 +491,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 															</>
 														}
 														{
-															userIsBannedFromChannel(channelTarget, userTarget.id) &&
+															userIsBanned(channelTarget, userTarget.id) &&
 															<Section onClick={handleBanClickEvent}>
 																<SectionName>
 																	Unban

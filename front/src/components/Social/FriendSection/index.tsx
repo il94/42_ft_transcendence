@@ -75,11 +75,11 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 		}
 	}
 
-	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
+	async function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
 		setUserTarget(friend)
 
-		const heightContextualMenu = getContextualMenuHeight(contextualMenuStatus.SOCIAL, userTarget) // height du menu contextuel de la liste d'amis
+		const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.SOCIAL, userTarget, userAuthenticate) // height du menu contextuel de la liste d'amis
 		const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
 		const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 

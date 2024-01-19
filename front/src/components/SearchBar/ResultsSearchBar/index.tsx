@@ -28,7 +28,7 @@ import {
 	userIsInChannel,
 	sortChannelByName,
 	sortUserByName,
-	userIsBannedFromChannel
+	userIsBanned
 } from "../../../utils/functions"
 
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
@@ -167,7 +167,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 				}
 			})
 
-			if (userIsBannedFromChannel(channelResponse.data, userAuthenticate.id))
+			if (userIsBanned(channelResponse.data, userAuthenticate.id))
 				throw new Error
 			else if (!userIsInChannel(channelResponse.data, userAuthenticate.id))
 			{
