@@ -116,6 +116,7 @@ function Game() {
 
 		async function fetchChannels(userAuthId: number): Promise<Channel[]> {
 			try {
+				console.log("token in fetchchannels: ", token);
 				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -168,11 +169,14 @@ function Game() {
 
 		async function fetchMe() {
 			try {
+				console.log("le token: ", token);
 				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
+				console.log("respme token: ", responseMe);
+
 
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()

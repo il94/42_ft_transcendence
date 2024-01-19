@@ -77,8 +77,6 @@ function Signin() {
 
 			const response = await axios.post("http://localhost:3333/auth/signin", user)
 	
-			console.log("response =", response)
-
 			//temporaire
 			if (response.data.twoFA)
 				navigate("/twofa")
@@ -124,22 +122,21 @@ function Signin() {
 		}
 	}
 
-	// async function connectionBy42() {
-	// 	try {
-
-	// 		const test = await axios.get("http://localhost:3333/auth/api42")
+	async function connectionBy42() {
+		try {
+			const test = await axios.get("http://localhost:3333/auth/api42")
 			
-	// 		console.log(test)
+			console.log("testtttt",test)
 			
-	// 		setToken(test.data.access_token)
-	// 		localStorage.setItem('token', test.data.access_token)
+			setToken(test.data.access_token)
+			localStorage.setItem('token', test.data.access_token)
 			
-	// 		navigate("/game")
-	// 	}
-	// 	catch (error) {
-	// 		console.log(error)
-	// 	}
-	// }
+			navigate("/game")
+		}
+		catch (error) {
+			console.log("error",error)
+		}
+	}
 
 /* ================================ LOGIN =================================== */
 
@@ -247,7 +244,7 @@ function Signin() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to="http://localhost:3333/auth/api42">
+						<LinkButtonImage onClick={() => connectionBy42()} >
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

@@ -6,6 +6,7 @@ import { Public, getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
 import { Response, Request } from 'express';
 import { User, UserStatus } from '@prisma/client';
+import { nextTick } from "process";
 
 @Controller('auth')
 export class AuthController {
@@ -64,12 +65,12 @@ export class AuthController {
 	) {
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
-
-			req.headers.authorization = "Bearer" + token.access_token;
+			
+			req.headers.authorization = "Bearer " + token.access_token;
 			res.set('Authorization', `Bearer ${token.access_token}`)
-			//res.send()
-			res.redirect("http://localhost:5173/game")
-			//return { user };
+			// res.send()
+			//return res.redirect(`http://localhost:5173/game`)
+			return token;		 
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");
