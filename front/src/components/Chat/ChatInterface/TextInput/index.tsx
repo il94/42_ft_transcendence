@@ -56,7 +56,7 @@ function TextInput({ channel }: PropsTextInput) {
 						}
 					}
 				);
-				userAuthenticate.socket?.emit("sendMessage", sockets.data, userAuthenticate.id, channel.id, message);
+				userAuthenticate.socket?.emit("newMessage", sockets.data, userAuthenticate.id, channel.id, message);
 				
 				setMessage("");
 			  } catch (error) {

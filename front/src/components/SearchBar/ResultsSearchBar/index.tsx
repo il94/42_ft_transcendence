@@ -24,7 +24,12 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
-import { channelIncludeUser, sortChannelByName, sortUserByName } from "../../../utils/functions"
+import {
+	userIsInChannel,
+	sortChannelByName,
+	sortUserByName,
+	userIsBannedFromChannel
+} from "../../../utils/functions"
 
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
@@ -162,7 +167,9 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 				}
 			})
 
-			if (!channelIncludeUser(channelResponse.data, userAuthenticate))
+			if (userIsBannedFromChannel(channelResponse.data, userAuthenticate.id))
+				throw new Error
+			else if (!userIsInChannel(channelResponse.data, userAuthenticate.id))
 			{
 				if (channelResponse.data.type === channelStatus.PROTECTED)
 					setChannelTarget(channelResponse.data)
@@ -184,14 +191,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 						...channelResponse.data,
 						members: [...channelResponse.data.members, userAuthenticate]
 					}))
-
-					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channelId}/sockets`, {
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
-
-					userAuthenticate.socket?.emit("joinChannel", socketsResponse.data, userAuthenticate.id, channelId)
 				}
 			}
 			else

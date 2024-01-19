@@ -1,4 +1,4 @@
-import { userStatus } from "./status"
+import { contextualMenuStatus, userStatus } from "./status"
 import { Channel, User, UserAuthenticate } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
@@ -30,6 +30,47 @@ export function getRandomDefaultAvatar(): string {
 	return (defaultAvatars[randomIndex])
 }
 
+export async function getContextualMenuHeight(type: contextualMenuStatus, userTarget: User, userAuthenticate?: User, channel?: Channel) { // determine la taille du menu par rapport aux status du user authentifie et de la cible
+	
+	if (type === contextualMenuStatus.CHAT)
+	{
+		if (!channel || !userAuthenticate)
+			return (0)
+		if (channel.owner?.id === userAuthenticate.id)
+		{
+			if (userIsInChannel(channel, userTarget.id))
+			{
+				if (userTarget.status === userStatus.OFFLINE)
+					return (280)
+				else
+					return (315)
+			}
+			else
+			{
+				if (userTarget.status === userStatus.OFFLINE)
+					return (175)
+				else
+					return (210)
+			}
+	
+		}
+		else if (channel.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
+			(channel.owner?.id !== userTarget.id &&
+			!channel.administrators.some((administrator) => administrator.id === userTarget.id)))
+			return (280)
+		else
+			return (175)
+	}
+	else
+	{
+		if (userTarget.status === userStatus.OFFLINE)
+			return (140)
+		else
+			return (175)
+	}
+}
+
+
 export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
 }
@@ -58,7 +99,6 @@ export function getAllUsersInChannel(channel: Channel): User[] {
 	return (users)
 }
 
-
 export function findUserInChannel(channel: Channel, userId: number): User | UserAuthenticate | undefined {
 	const inMembers = channel.members.find((member) => member.id === userId)
 	if (inMembers)
@@ -73,11 +113,17 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
-export function channelIncludeUser(channel: Channel, user: User | UserAuthenticate): boolean {
+export function userIsInChannel(channel: Channel, userId: number): boolean {
 	return (
-		channel.members.some((member) => member?.id === user.id) ||
-		channel.administrators.some((administrator) => administrator?.id === user.id) ||
-		channel.owner?.id === user.id
+		channel.members.some((member) => member.id === userId) ||
+		channel.administrators.some((administrator) => administrator.id === userId) ||
+		channel.owner?.id === userId
+	)
+}
+
+export function userIsBannedFromChannel(channel: Channel, userId: number): boolean {
+	return (
+		channel.banneds.some((banned) => banned.id === userId)
 	)
 }
 

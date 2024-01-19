@@ -114,7 +114,7 @@ function Game() {
 			}
 		}
 
-		async function fetchChannels(userAuthId: number): Promise<Channel[]> {
+		async function fetchChannels(): Promise<Channel[]> {
 			try {
 				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
 					headers: {
@@ -122,40 +122,15 @@ function Game() {
 					}
 				})
 
-				function setDataChannelMP(channel: Channel): Channel {
-					const users = getAllUsersInChannel(channel)
-					const recipient = users.find((user) => user.id !== userAuthId)
-		
-					if (!recipient)
-					{
-						setErrorRequest(true)
-						return (channel)
-					}
-					else
-					{
-						const { name, avatar, ...rest } = channel
-		
-						const channelMP: Channel = {
-							name: recipient.username,
-							avatar: recipient.avatar,
-							...rest
-						}
-		
-						return (channelMP)
-					}
-				}
-
 				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => {
-
-					const channelMapped = channel.type === channelStatus.MP ? setDataChannelMP(channel) : channel
 					return {
-						...channelMapped,
+						...channel,
 						messages: [],
 						owner: undefined,
 						administrators: [],
 						users: [],
 						mutedUsers: [],
-						bannedUsers: []
+						banneds: []
 					}
 				})
 
@@ -176,7 +151,7 @@ function Game() {
 
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()
-				const channels: Channel[] = await fetchChannels(responseMe.data.id)
+				const channels: Channel[] = await fetchChannels()
 
 				const socket = io('http://localhost:3333', {
 					transports: ["websocket"],
@@ -208,10 +183,6 @@ function Game() {
 				})
 			}
 			catch (error) {
-
-				// temporaire
-				// Si la socket doit etre close manuellement, il la close ici en cas d'erreur au lancement
-
 				localStorage.removeItem('token')
 				setErrorRequest(true)
 			}
@@ -281,7 +252,82 @@ function Game() {
 	}, [])
 	
 
-	/* ========================================================================== */
+/* ========================================================================== */
+
+	async function refreshUpdateChannel(channelId: number, newDatas: any) {
+		setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+			{
+				return {
+					...prevState,
+					...newDatas
+				}
+			}
+			else
+				return (undefined)
+
+		});
+
+		setUserAuthenticate((prevState) => ({
+			...prevState,
+			channels: prevState.channels.map((channel) => {
+				if (channel.id === channelId)
+				{
+					return {
+						...channel,
+						...newDatas
+					}
+				}
+				else
+					return channel
+			})
+		}))
+	}
+
+	async function refreshDeleteChannel(channelId: number) {
+		setUserAuthenticate((prevState) => ({
+			...prevState,
+			channels: prevState.channels.filter((channel) => channel.id !== channelId)
+		}))
+		
+		setChannelTarget(undefined)
+	}
+
+	async function recieveChannelMP(channelId: number) {
+
+		const channelMPResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}/relations`, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+
+		setChannelTarget(channelMPResponse.data)
+
+		setUserAuthenticate((prevState) => ({
+			...prevState,
+			channels: [
+				...prevState.channels,
+				channelMPResponse.data
+			]
+		}))
+	}
+
+
+	useEffect(() => {
+		
+		userAuthenticate.socket?.on("updateChannel", refreshUpdateChannel);
+		userAuthenticate.socket?.on("deleteChannel", refreshDeleteChannel);
+		userAuthenticate.socket?.on("createChannelMP", recieveChannelMP);
+
+		return () => {
+			userAuthenticate.socket?.off("updateChannel", refreshUpdateChannel);
+			userAuthenticate.socket?.off("deleteChannel", refreshDeleteChannel);
+			userAuthenticate.socket?.off("createChannelMP", recieveChannelMP);
+		}
+
+	}, [userAuthenticate.socket])
+
+/* ========================================================================== */
 
 	return (
 		<TempContext.Provider value={{ userSomeone }}>
@@ -373,6 +419,7 @@ function Game() {
 																chat={chat}
 																displayChat={displayChat}
 																channels={userAuthenticate.channels}
+																setUserAuthenticate={setUserAuthenticate}
 																channelTarget={channelTarget}
 																setChannelTarget={setChannelTarget}
 																chatWindowState={chatWindowState}

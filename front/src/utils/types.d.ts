@@ -39,7 +39,7 @@ export type Channel = {
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
 	mutedUsers: (User | UserAuthenticate)[],
-	bannedUsers: (User | UserAuthenticate)[]
+	banneds: (User | UserAuthenticate)[]
 }
 
 export type Message = {

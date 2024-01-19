@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation, ChannelStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 
@@ -142,7 +142,12 @@ export class UsersService {
 	async findUserChannel(member: User) {
 
 		const channelsId = await this.prisma.usersOnChannels.findMany({
-			where: { userId: member.id }
+			where: {
+				userId: member.id,
+				role: {
+					not: Role.BANNED
+				}
+			}
 		})
 
 		const userChannels = await this.prisma.channel.findMany({
@@ -152,19 +157,19 @@ export class UsersService {
 				},
 				AND: {
 					type: {
-						in: ["PUBLIC", "PROTECTED", "PRIVATE"]
+						in: [ChannelStatus.PUBLIC, ChannelStatus.PROTECTED, ChannelStatus.PRIVATE]
 					}
 				}
 			}
 		})
-		
+
 		const userChannelsMP = await this.prisma.channel.findMany({
 			where: {
 				id: {
 					in: channelsId.map((channelId) => (channelId.channelId))
 				},
 				AND: {
-					type: "MP"
+					type: ChannelStatus.MP
 				}
 			},
 			include: {
@@ -183,16 +188,14 @@ export class UsersService {
 		})
 
 		const userAllChannels = [
-
 			...userChannels,
 			...userChannelsMP.map((channelMP) => {
 				const { users, ...rest } = channelMP
 
 				return {
 					...rest,
-					members: users.map((member) => {
-						return (member.user)
-					})
+					name: users.find((user) => user.user.id !== member.id).user.username,
+					avatar: users.find((user) => user.user.id !== member.id).user.avatar
 				}
 			})
 		]

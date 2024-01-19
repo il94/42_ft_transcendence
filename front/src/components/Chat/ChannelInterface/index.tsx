@@ -6,7 +6,7 @@ import {
 	useContext,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
 	Avatar,
@@ -69,7 +69,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
-
 					const newDatas: any = {
 						name: name.value !== channel.name ? name.value : channel.name,
 						type: channelType !== channel.type ? channelType : channel.type,
@@ -82,35 +81,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
-					})		
-
-					setChannelTarget((prevState: Channel | undefined) => {
-						if (prevState)
-						{
-							const updateChannel: Channel = {
-								...prevState,
-								...newDatas
-							}
-							return (updateChannel)
-						}
-						else
-							return (undefined)
 					})
-
-					setUserAuthenticate((prevState) => ({
-						...prevState,
-						channels: prevState.channels.map((channelToFind) => {
-							if (channelToFind.id === channel.id)
-							{
-								return {
-									...channelToFind,
-									...newDatas
-								}
-							}
-							else
-								return channelToFind
-						})
-					}))
 				}
 				else
 					throw new Error
@@ -142,8 +113,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					members: [
 						userAuthenticate
 					],
-					mutedUsers: [],
-					bannedUsers: [],
+					mutedUsers: []
 				}
 
 				setUserAuthenticate((prevState) => ({

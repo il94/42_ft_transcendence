@@ -16,6 +16,8 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
+import { userIsBannedFromChannel, userIsInChannel } from "../../../utils/functions"
+
 import {
 	Channel,
 	MessageInvitation,
@@ -25,6 +27,7 @@ import {
 
 import {
 	challengeStatus,
+	channelRole,
 	channelStatus,
 	contextualMenuStatus,
 	messageStatus,
@@ -89,13 +92,13 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	const [adminSections, displayAdminSections] = useState<boolean>(false)
 
 	useEffect(() => {
-	
-		if (channelTarget && type === contextualMenuStatus.CHAT &&
-			(channelTarget.owner === userAuthenticate ||
-				(channelTarget.administrators.includes(userAuthenticate) &&
-				!channelTarget.administrators.includes(userTarget)) &&
-				(channelTarget.owner !== userTarget &&
-					!channelTarget.administrators.includes(userTarget)))) {
+		if (channelTarget &&
+			type === contextualMenuStatus.CHAT &&
+			(channelTarget.owner?.id === userAuthenticate.id ||
+			(channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
+				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) &&
+			(channelTarget.owner?.id !== userTarget.id &&
+				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))) {
 			displayAdminSections(true)
 		}
 		else
@@ -119,35 +122,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					type: channelStatus.MP
 				}		
 
-				const postChannelMPResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				const newChannelMP: Channel = {
-					id: postChannelMPResponse.data.id,
-					name: userTarget.username,
-					avatar: userTarget.avatar,
-					type: channelStatus.MP,
-					messages: [],
-					owner: undefined,
-					administrators: [],
-					members: [
-						userAuthenticate,
-						userTarget
-					],
-					mutedUsers: [],
-					bannedUsers: []
-				}
-
-				setUserAuthenticate((prevState) => ({
-					...prevState,
-					channels: [...prevState.channels, newChannelMP]
-				}))
-				
-				setChannelTarget(newChannelMP)
 			}
 			displayChat(true)
 		}
@@ -201,7 +181,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							userTarget
 						],
 						mutedUsers: [],
-						bannedUsers: []
+						banneds: []
 					}
 
 					/* ============ Temporaire ============== */
@@ -317,23 +297,26 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.administrators.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) {
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/administrators/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.administrators.push(userTarget)
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.ADMIN
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 			else {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/administrators/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.administrators.splice(channelTarget.administrators.indexOf(userTarget), 1)
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.MEMBER
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -364,15 +347,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.members.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/users/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.members.splice(channelTarget.members.indexOf(userTarget), 1)
-			}
+			await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/leave/${userTarget.id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
@@ -383,15 +362,26 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.bannedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id)) {
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/bannedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.bannedUsers.push(userTarget)
-				handleKickClickEvent()
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.BANNED
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+			}
+			else {
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.UNBANNED
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -465,33 +455,46 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 													adminSections &&
 													<>
 														{
-															channelTarget.owner === userAuthenticate &&
-															<Section onClick={handleGradeClickEvent}>
+															userIsInChannel(channelTarget, userTarget.id) &&
+															<>
+																{
+																channelTarget.owner?.id === userAuthenticate.id &&
+																	<Section onClick={handleGradeClickEvent}>
+																		<SectionName>
+																			{
+																				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
+																					"Upgrade"
+																					:
+																					"Downgrade"
+																			}
+																		</SectionName>
+																	</Section>
+																}
+																<Section onClick={handleMuteClickEvent}>
+																	<SectionName>
+																		Mute
+																	</SectionName>
+																</Section>
+																<Section onClick={handleKickClickEvent}>
+																	<SectionName>
+																		Kick
+																	</SectionName>
+																</Section>
+																<Section onClick={handleBanClickEvent}>
+																	<SectionName>
+																		Ban
+																	</SectionName>
+																</Section>
+															</>
+														}
+														{
+															userIsBannedFromChannel(channelTarget, userTarget.id) &&
+															<Section onClick={handleBanClickEvent}>
 																<SectionName>
-																	{
-																		!channelTarget.administrators.includes(userTarget) ?
-																			"Upgrade"
-																			:
-																			"Downgrade"
-																	}
+																	Unban
 																</SectionName>
 															</Section>
 														}
-														<Section onClick={handleMuteClickEvent}>
-															<SectionName>
-																Mute
-															</SectionName>
-														</Section>
-														<Section onClick={handleKickClickEvent}>
-															<SectionName>
-																Kick
-															</SectionName>
-														</Section>
-														<Section onClick={handleBanClickEvent}>
-															<SectionName>
-																Ban
-															</SectionName>
-														</Section>
 													</>
 												}
 											</>

@@ -34,19 +34,7 @@ function ChannelSection({ channel, setChannelTarget, setErrorRequest, background
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
-			if (channelWithRelationsResponse.data.type === channelStatus.MP)
-			{
-				const { name, avatar, ...rest } = channelWithRelationsResponse.data
-
-				setChannelTarget({
-					...rest,
-					name: channel.name,
-					avatar: channel.avatar
-				})
-			}
-			else
-				setChannelTarget(channelWithRelationsResponse.data)
+			setChannelTarget(channelWithRelationsResponse.data)
 		}
 		catch (error) {
 			setErrorRequest(true)

@@ -53,25 +53,98 @@ export class ChannelsGateway implements OnModuleInit {
     args[3] message recu
    */
 
-  @SubscribeMessage('sendMessage')
-  async handleSendMessage(client: Socket, args: string[]) {
+  @SubscribeMessage('newMessage')
+  async handleSendMessage(client: Socket, args: any[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("printMessage", args[1], args[2], args[3].toString());
+      this.server.to(socket).emit("newMessage", args[1], args[2], args[3]);
     }
   }
 
   /*
     args[0] tableau de sockets des users channel
-    args[1] user qui a join
-    args[2] id du channel rejoint
+    args[1] id du channel MP cree
+   */
+
+    @SubscribeMessage('createChannelMP')
+    async handleCreateChannelMP(client: Socket, args: any[]) {
+      const argsToSend = args.slice(1)
+      for (const socket of args[0]) {
+        this.server.to(socket).emit("createChannelMP", ...argsToSend);
+      }
+    }  
+
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel rejoint
+    args[2] user qui a join
    */
 
   @SubscribeMessage('joinChannel')
-  async handleJoinChannel(client: Socket, args: string[]) {
+  async handleJoinChannel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
     for (const socket of args[0]) {
-      this.server.to(socket).emit("userJoinedChannel", parseInt(args[1]), parseInt(args[2]));
+      this.server.to(socket).emit("joinChannel", ...argsToSend);
     }
   }
+
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel
+    args[2] nouvelles donnees du channel
+   */
+
+  @SubscribeMessage('updateChannel')
+  async handleUpdateChannel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("updateChannel", ...argsToSend);
+    }
+  }
+
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel
+    args[2] id du user modifie
+    args[3] nouveau role du user modifie
+   */
+
+  @SubscribeMessage('updateUserRole')
+  async handleUpdateUserRole(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("updateUserRole", ...argsToSend);
+    }
+  }
+  
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel
+   */
+
+  @SubscribeMessage('deleteChannel')
+  async handleDeleteChannel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("deleteChannel", ...argsToSend);
+    }
+  }
+
+  /*
+    args[0] tableau de sockets des users channel
+    args[1] id du channel quitte
+    args[2] user qui a leave
+   */
+
+    @SubscribeMessage('leaveChannel')
+    async handleLeaveChannel(client: Socket, args: any[]) {
+      const argsToSend = args.slice(1)
+      for (const socket of args[0]) {
+        this.server.to(socket).emit("leaveChannel", ...argsToSend);
+      }
+    }
+  
+
+
 //   // afterInit(server: Server) {
 //   //   console.log("server after init" );
 //   // }
