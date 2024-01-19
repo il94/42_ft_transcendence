@@ -47,7 +47,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		return (undefined)
 	}
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function deleteChannelMP() {
@@ -55,7 +55,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 			if (!channelTarget)
 				throw new Error
 		
-			await axios.delete(`http://localhost:3333/channel/${channelTarget.id}`, {
+			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -70,7 +70,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 
 		async function memberLeaveChannel(channelId: number) {
 			try {
-				await axios.delete(`http://localhost:3333/channel/${channelId}/leave/${userAuthenticate.id}`, {
+				await axios.delete(`http://${url}:3333/channel/${channelId}/leave/${userAuthenticate.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}

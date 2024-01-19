@@ -46,7 +46,7 @@ type PropsChannelInterface = {
 
 function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBannerName }: PropsChannelInterface) {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	const [error, setError] = useState<boolean>(false)
 
@@ -76,7 +76,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 						avatar: avatar !== channel.avatar ? avatar : channel.avatar
 					}		
 
-					await axios.patch(`http://localhost:3333/channel/${channel.id}`, newDatas,
+					await axios.patch(`http://${url}:3333/channel/${channel.id}`, newDatas,
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
@@ -95,7 +95,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					avatar: avatar
 				}		
 
-				const postChannelResponse = await axios.post("http://localhost:3333/channel", newDatas,
+				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`

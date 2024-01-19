@@ -50,7 +50,7 @@ function TwoFA() {
 
 			/* ============ Temporaire ============== */
 			
-			// const response = await axios.post("http://localhost:3333/auth/signin/twofa", code)
+			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`, code)
 	
 			// setToken(response.data.access_token)
 			// localStorage.setItem('token', response.data.access_token)
@@ -87,7 +87,7 @@ function TwoFA() {
 				
 				/* ============ Temporaire ============== */
 				
-				// const response = await axios.post("http://localhost:3333/auth/signin/twofa")
+				// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
 	
 				/* ====================================== */
 			}

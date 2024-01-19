@@ -76,14 +76,14 @@ function Game() {
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
 
 		async function fetchFriends(): Promise<User[]> {
 			try {
-				const friends: AxiosResponse<User[]> = await axios.get("http://localhost:3333/friends", {
+				const friends: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/friends`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -98,7 +98,7 @@ function Game() {
 
 		async function fetchBlockedUsers(): Promise<User[]> {
 			try {
-				const blockedUsers: AxiosResponse<User[]> = await axios.get("http://localhost:3333/blockeds", {
+				const blockedUsers: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/blockeds`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -113,7 +113,7 @@ function Game() {
 
 		async function fetchChannels(): Promise<Channel[]> {
 			try {
-				const channelsResponse: AxiosResponse<[]> = await axios.get("http://localhost:3333/user/channels", {
+				const channelsResponse: AxiosResponse<[]> = await axios.get(`http://${url}:3333/user/channels`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -140,7 +140,7 @@ function Game() {
 
 		async function fetchMe() {
 			try {
-				const responseMe: AxiosResponse = await axios.get("http://localhost:3333/user/me", {
+				const responseMe: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -150,7 +150,7 @@ function Game() {
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
 
-				const socket = io('http://localhost:3333', {
+				const socket = io(`http://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
 						id: responseMe.data.id,
@@ -292,7 +292,7 @@ function Game() {
 
 	async function recieveChannelMP(channelId: number) {
 
-		const channelMPResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}/relations`, {
+		const channelMPResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
@@ -404,7 +404,10 @@ function Game() {
 											{
 												settings &&
 												<SettingsMenu
+													token={token}
+													url={url}
 													userAuthenticate={userAuthenticate}
+													setUserAuthenticate={setUserAuthenticate}
 													displaySettingsMenu={displaySettingsMenu} />
 											}
 											<TestsBack />

@@ -58,7 +58,7 @@ type PropsChat = {
 
 function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	function updateDiscussion(idSend: number, idChannel: number, msg: string) {
 		if (channelTarget)
@@ -91,7 +91,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	async function refreshJoinChannel(channelId: number, userId: number) {
 		if (channelTarget?.id === channelId)
 		{
-			const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -146,7 +146,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 
 	async function refreshUserRole(channelId: number, userId: number, newRole: any) {
 
-		const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
+		const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${userId}`, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
