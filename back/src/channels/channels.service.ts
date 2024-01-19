@@ -98,8 +98,13 @@ export class ChannelsService {
       const channelToJoin = await this.findChannel(channelId, userId);
       
       const inChan = await this.isInChannel(userId, channelToJoin.id);
+
       if (inChan)
+      {
+        if (inChan.role === Role.BANNED)
+          throw new ForbiddenException(`User ${userId} is banned from channel ${channelToJoin.id}'`);
         throw new BadRequestException(`User ${userId} is already in channel ${channelToJoin.id}`);
+      }
 
       if (channelToJoin.password) {
         const pwdMatch = await argon.verify(channelToJoin.password, joinChannelDatas.password);
@@ -285,10 +290,11 @@ export class ChannelsService {
       }).filter(Boolean),
       owner: channelDatas.users.find((user) => user.role === Role.OWNER)?.user,
       mutedUsers: [], // en attendant de pouvoir recup les users mutes
-      bannedUsers: [] // en attendant de pouvoir recup les users bans
+      banneds: channelDatas.users.map((user) => {
+        if (user.role === Role.BANNED)
+          return (user.user)
+      }).filter(Boolean)
     }
-
-
 
     // console.log(`Channel ${chanId} with relations :`, channelWithRelations)
     return channelWithRelations;
@@ -377,7 +383,9 @@ export class ChannelsService {
       }
       else
       {
-        if ((newRole.role === Role.ADMIN || newRole.role === Role.MEMBER) && userAuthRole.role !== Role.OWNER)
+        if (((newRole.role === Role.ADMIN || newRole.role === Role.MEMBER)
+            && userAuthRole.role !== Role.OWNER)
+            || newRole.role === Role.BANNED && userAuthRole.role !== Role.OWNER && userAuthRole.role !== Role.ADMIN)
           throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
 
         const updateRole = await this.prisma.usersOnChannels.update({

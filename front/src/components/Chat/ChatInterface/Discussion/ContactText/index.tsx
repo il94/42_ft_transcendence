@@ -53,7 +53,7 @@ function ContactText({ sender, content }: PropsContactText) {
 		}
 	}
 
-	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
+	async function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
 		const gameWrapperContainer = GameWrapperRef.current
 
@@ -61,7 +61,7 @@ function ContactText({ sender, content }: PropsContactText) {
 
 			setUserTarget(sender)
 
-			const heightContextualMenu = getContextualMenuHeight(contextualMenuStatus.CHAT, userTarget, userAuthenticate, channelTarget) // height du menu contextuel du chat
+			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, sender, userAuthenticate, channelTarget) // height du menu contextuel du chat
 			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas

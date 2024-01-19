@@ -145,16 +145,74 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	}
 
 	async function refreshUserRole(channelId: number, userId: number, newRole: any) {
+
+		const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+
+
 		if (newRole === channelRole.BANNED)
-			await refreshLeaveChannel(channelId, userId)
+		{
+			if (userAuthenticate.id === userId)
+			{
+				setUserAuthenticate((prevState: UserAuthenticate) => {
+					return {
+						...prevState,
+						channels: prevState.channels.filter((channel) => channel.id !== channelId)
+					}
+				})
+				setChannelTarget(undefined)
+			}
+			else if (channelTarget)
+			{
+				setChannelTarget((prevState: Channel | undefined) => {
+					if (prevState)
+					{
+						return {
+							...prevState,
+							members: channelTarget.members.filter((member) => member.id !== userId),
+							administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId),
+							banneds: [
+								...prevState.banneds,
+								userResponse.data
+							]
+						}
+					}
+					else
+						return (undefined)
+				})
+			}
+		}
+		else if (newRole === channelRole.UNBANNED)
+		{
+			if (userAuthenticate.id === userId)
+			{
+				setUserAuthenticate((prevState: UserAuthenticate) => {
+					return {
+						...prevState,
+						channels: prevState.channels.filter((channel) => channel.id !== channelId)
+					}
+				})
+			}
+			if (channelTarget?.id === channelId)
+			{
+				setChannelTarget((prevState: Channel | undefined) => {
+					if (prevState)
+					{
+						return {
+							...prevState,
+							banneds: prevState.banneds.filter((banned) => banned.id !== userId)
+						}
+					}
+					else
+				return (undefined)
+			})
+			}
+		}
 		else if (channelTarget?.id === channelId)
 		{
-			const userResponse: AxiosResponse<User> = await axios.get(`http://localhost:3333/user/${userId}`, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
 			if (newRole === channelRole.MEMBER)
 			{
 				const isAlreadyMember = channelTarget.members.find((member) => member.id === userId)
@@ -190,7 +248,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 					else
 						return (undefined)
 				})
-			}
+			}			
 		}
 	}
 

@@ -16,7 +16,7 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { channelIncludeUser } from "../../../utils/functions"
+import { userIsBannedFromChannel, userIsInChannel } from "../../../utils/functions"
 
 import {
 	Channel,
@@ -180,7 +180,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							userAuthenticate,
 							userTarget
 						],
-						mutedUsers: []
+						mutedUsers: [],
+						banneds: []
 					}
 
 					/* ============ Temporaire ============== */
@@ -361,7 +362,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (channelIncludeUser(channelTarget, userTarget)) {
+			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id)) {
 
 				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.BANNED
@@ -445,44 +446,47 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 												{
 													adminSections &&
 													<>
-													{
-														channelIncludeUser(channelTarget, userTarget) &&
-														<>
-															{
+														{
+															userIsInChannel(channelTarget, userTarget.id) &&
+															<>
+																{
 																channelTarget.owner?.id === userAuthenticate.id &&
-																<Section onClick={handleGradeClickEvent}>
+																	<Section onClick={handleGradeClickEvent}>
+																		<SectionName>
+																			{
+																				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
+																					"Upgrade"
+																					:
+																					"Downgrade"
+																			}
+																		</SectionName>
+																	</Section>
+																}
+																<Section onClick={handleMuteClickEvent}>
 																	<SectionName>
-																		{
-																			!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
-																				"Upgrade"
-																				:
-																				"Downgrade"
-																		}
+																		Mute
 																	</SectionName>
 																</Section>
-															}
-															<Section onClick={handleMuteClickEvent}>
+																<Section onClick={handleKickClickEvent}>
+																	<SectionName>
+																		Kick
+																	</SectionName>
+																</Section>
+																<Section onClick={handleBanClickEvent}>
+																	<SectionName>
+																		Ban
+																	</SectionName>
+																</Section>
+															</>
+														}
+														{
+															userIsBannedFromChannel(channelTarget, userTarget.id) &&
+															<Section onClick={handleBanClickEvent}>
 																<SectionName>
-																	Mute
+																	Unban
 																</SectionName>
 															</Section>
-															<Section onClick={handleKickClickEvent}>
-																<SectionName>
-																	Kick
-																</SectionName>
-															</Section>
-														</>
-													}
-														<Section onClick={handleBanClickEvent}>
-															<SectionName>
-																{
-																	channelIncludeUser(channelTarget, userTarget) ?
-																		"Ban"
-																		:
-																		"Unban"
-																}
-															</SectionName>
-														</Section>
+														}
 													</>
 												}
 											</>

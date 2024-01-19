@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation, ChannelStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 
@@ -157,7 +157,7 @@ export class UsersService {
 				},
 				AND: {
 					type: {
-						in: ["PUBLIC", "PROTECTED", "PRIVATE"]
+						in: [ChannelStatus.PUBLIC, ChannelStatus.PROTECTED, ChannelStatus.PRIVATE]
 					}
 				}
 			}
@@ -169,7 +169,7 @@ export class UsersService {
 					in: channelsId.map((channelId) => (channelId.channelId))
 				},
 				AND: {
-					type: "MP"
+					type: ChannelStatus.MP
 				}
 			},
 			include: {

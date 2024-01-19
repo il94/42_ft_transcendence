@@ -30,7 +30,7 @@ export function getRandomDefaultAvatar(): string {
 	return (defaultAvatars[randomIndex])
 }
 
-export function getContextualMenuHeight(type: contextualMenuStatus, userTarget: User, userAuthenticate?: User, channel?: Channel) { // determine la taille du menu par rapport aux status du user authentifie et de la cible
+export async function getContextualMenuHeight(type: contextualMenuStatus, userTarget: User, userAuthenticate?: User, channel?: Channel) { // determine la taille du menu par rapport aux status du user authentifie et de la cible
 	
 	if (type === contextualMenuStatus.CHAT)
 	{
@@ -38,7 +38,7 @@ export function getContextualMenuHeight(type: contextualMenuStatus, userTarget: 
 			return (0)
 		if (channel.owner?.id === userAuthenticate.id)
 		{
-			if (channelIncludeUser(channel, userTarget))
+			if (userIsInChannel(channel, userTarget.id))
 			{
 				if (userTarget.status === userStatus.OFFLINE)
 					return (280)
@@ -99,7 +99,6 @@ export function getAllUsersInChannel(channel: Channel): User[] {
 	return (users)
 }
 
-
 export function findUserInChannel(channel: Channel, userId: number): User | UserAuthenticate | undefined {
 	const inMembers = channel.members.find((member) => member.id === userId)
 	if (inMembers)
@@ -114,11 +113,17 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
-export function channelIncludeUser(channel: Channel, user: User | UserAuthenticate): boolean {
+export function userIsInChannel(channel: Channel, userId: number): boolean {
 	return (
-		channel.members.some((member) => member?.id === user.id) ||
-		channel.administrators.some((administrator) => administrator?.id === user.id) ||
-		channel.owner?.id === user.id
+		channel.members.some((member) => member.id === userId) ||
+		channel.administrators.some((administrator) => administrator.id === userId) ||
+		channel.owner?.id === userId
+	)
+}
+
+export function userIsBannedFromChannel(channel: Channel, userId: number): boolean {
+	return (
+		channel.banneds.some((banned) => banned.id === userId)
 	)
 }
 
