@@ -16,6 +16,8 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
+import { channelIncludeUser } from "../../../utils/functions"
+
 import {
 	Channel,
 	MessageInvitation,
@@ -178,8 +180,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							userAuthenticate,
 							userTarget
 						],
-						mutedUsers: [],
-						bannedUsers: []
+						mutedUsers: []
 					}
 
 					/* ============ Temporaire ============== */
@@ -305,19 +306,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				setChannelTarget((prevState) => {
-					if (prevState)
-					{
-						return {
-							...prevState,
-							administrators: [
-								...prevState.administrators,
-								userTarget
-							]
-						}
-					}
-				})
 			}
 			else {
 				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
@@ -326,16 +314,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
-					}
-				})
-
-				setChannelTarget((prevState) => {
-					if (prevState)
-					{
-						return {
-							...prevState,
-							administrators: prevState.administrators.filter((administrator) => administrator.id !== userTarget.id)
-						}
 					}
 				})
 			}
@@ -387,15 +365,26 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.bannedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (channelIncludeUser(channelTarget, userTarget)) {
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/bannedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.bannedUsers.push(userTarget)
-				handleKickClickEvent()
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.BANNED
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+			}
+			else {
+				await axios.patch(`http://localhost:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.UNBANNED
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -484,9 +473,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 															</SectionName>
 														</Section>
 														<Section onClick={handleBanClickEvent}>
-															<SectionName>
-																Ban
-															</SectionName>
+														<SectionName>
+															{
+																channelIncludeUser(channelTarget, userTarget) ?
+																	"Ban"
+																	:
+																	"Unban"
+															}
+														</SectionName>
 														</Section>
 													</>
 												}

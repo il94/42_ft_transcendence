@@ -129,8 +129,7 @@ function Game() {
 						owner: undefined,
 						administrators: [],
 						users: [],
-						mutedUsers: [],
-						bannedUsers: []
+						mutedUsers: []
 					}
 				})
 

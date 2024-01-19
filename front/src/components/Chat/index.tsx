@@ -142,25 +142,32 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 				}
 			})
 
-			setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					if (newRole === channelRole.MEMBER)
-					{
-						const isAlreadyMember = prevState.members.find((member) => member.id === userId)
-						const members = isAlreadyMember ? prevState.members : [ ...prevState.members, userResponse.data ]
+			if (newRole === channelRole.MEMBER)
+			{
+				const isAlreadyMember = channelTarget.members.find((member) => member.id === userId)
+				const members = isAlreadyMember ? channelTarget.members : [ ...channelTarget.members, userResponse.data ]
 
+				setChannelTarget((prevState: Channel | undefined) => {
+					if (prevState)
+					{
 						return {
-							...prevState,
+							...channelTarget,
 							members: members,
-							administrators: prevState.administrators.filter((administrator) => administrator.id !== userId)
+							administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId)
 						}
 					}
-					else if (newRole === channelRole.ADMIN)
-					{
-						const isAlreadyAdministrator = prevState.administrators.find((administrator) => administrator.id === userId)
-						const administrators = isAlreadyAdministrator ? prevState.administrators : [ ...prevState.administrators, userResponse.data ]
+					else
+						return (undefined)
+				})
+			}
+			else if (newRole === channelRole.ADMIN)
+			{
+				const isAlreadyAdministrator = channelTarget.administrators.find((administrator) => administrator.id === userId)
+				const administrators = isAlreadyAdministrator ? channelTarget.administrators : [ ...channelTarget.administrators, userResponse.data ]
 
+				setChannelTarget((prevState: Channel | undefined) => {
+					if (prevState)
+					{
 						return {
 							...prevState,
 							members: prevState.members.filter((member) => member.id !== userId),
@@ -169,10 +176,36 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 					}
 					else
 						return (undefined)
+				})
+			}
+			else if (newRole === channelRole.BANNED)
+			{
+				if (userId === userAuthenticate.id)
+				{
+					setUserAuthenticate((prevState: UserAuthenticate) => {
+						return {
+							...prevState,
+							channels: prevState.channels.filter((channel) => channel.id !== channelId)
+						}
+					})
+					setChannelTarget(undefined)
 				}
 				else
-					return (undefined)
-			})
+				{
+					setChannelTarget((prevState: Channel | undefined) => {
+						if (prevState)
+						{
+							return {
+								...prevState,
+								members: prevState.members.filter((member) => member.id !== userId),
+								administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId)
+							}
+						}
+						else
+							return (undefined)
+					})	
+				}
+			}
 		}
 	}
 

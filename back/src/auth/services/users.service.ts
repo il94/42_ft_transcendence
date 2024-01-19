@@ -142,7 +142,12 @@ export class UsersService {
 	async findUserChannel(member: User) {
 
 		const channelsId = await this.prisma.usersOnChannels.findMany({
-			where: { userId: member.id }
+			where: {
+				userId: member.id,
+				role: {
+					not: Role.BANNED
+				}
+			}
 		})
 
 		const userChannels = await this.prisma.channel.findMany({

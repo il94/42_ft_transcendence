@@ -346,37 +346,59 @@ export class ChannelsService {
   // Change le role d'un user du channel
   async updateUserRole(channelId: number, userTargetId: number, userAuthId: number, newRole: UpdateRoleDto) {
     try {
-      const userAuthIsOwner = await this.prisma.usersOnChannels.findUnique({
+      const userAuthRole = await this.prisma.usersOnChannels.findUnique({
         where: {
           userId_channelId: {
             userId: userAuthId,
             channelId: channelId
-          },
-          AND: {
-            role: Role.OWNER
-          }
-        }
-      })
-
-      if (!userAuthIsOwner)
-        throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
-
-      const updateRole = await this.prisma.usersOnChannels.update({
-        where: {
-          userId_channelId: {
-            userId: userTargetId,
-            channelId: channelId
           }
         },
-        data: {
-          role: newRole.role
+        select: {
+          role: true
         }
       })
-      
+
+      let response: any
+
+      if (newRole.role === Role.UNBANNED)
+      {
+        if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
+         throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+        const unbannedUser = await this.prisma.usersOnChannels.delete({
+          where: {
+            userId_channelId: {
+              userId: userTargetId,
+              channelId: channelId
+            }
+          }
+        })
+
+        response = unbannedUser
+      }
+      else
+      {
+        if ((newRole.role === Role.ADMIN || newRole.role === Role.MEMBER) && userAuthRole.role !== Role.OWNER)
+          throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+
+        const updateRole = await this.prisma.usersOnChannels.update({
+          where: {
+            userId_channelId: {
+              userId: userTargetId,
+              channelId: channelId
+            }
+          },
+          data: {
+            role: newRole.role
+          }
+        })
+
+        response = updateRole
+      }
+
       await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole.role)
 
       console.log(`User ${userTargetId} is now ${newRole.role} on channel ${channelId}`)
-      return (updateRole)
+      return (response)
 
     } catch (error) { }    
   }

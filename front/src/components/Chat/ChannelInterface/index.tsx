@@ -113,8 +113,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					members: [
 						userAuthenticate
 					],
-					mutedUsers: [],
-					bannedUsers: [],
+					mutedUsers: []
 				}
 
 				setUserAuthenticate((prevState) => ({
