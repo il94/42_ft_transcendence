@@ -31,6 +31,7 @@ import { findUserInChannel } from "../../utils/functions"
 
 import {
 	Channel,
+	Message,
 	MessageInvitation,
 	MessageText,
 	UserAuthenticate
@@ -59,10 +60,29 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 
 	const { token } = useContext(AuthContext)!
 
-	function updateDiscussion(idSend: number, idChannel: number, msg: string) {
+	function updateDiscussion(idSend: number, idChannel: number, idTargetOrMsg: number | string) {
 		if (channelTarget)
 		{
+			console.log("here");
+			let messageContent: Message;
 			const userSend = findUserInChannel(channelTarget, idSend);
+			if (typeof idTargetOrMsg === 'number'){
+				const userTarget = findUserInChannel(channelTarget , idTargetOrMsg);
+				messageContent = {
+					sender: userSend,
+					type: messageStatus.INVITATION,
+					target: userTarget,
+					status: challengeStatus.PENDING
+				} as MessageInvitation
+			
+			}
+			else {
+				messageContent ={
+					sender: userSend,
+					type: messageStatus.TEXT,
+					content: idTargetOrMsg
+				} as MessageText
+			}
 			if (idChannel === channelTarget.id)
 			{
 				setChannelTarget((prevState: Channel | undefined) => {
@@ -72,41 +92,7 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 						...prevState,
 						messages: [
 							...prevState.messages,
-							{
-								sender: userSend,
-								type: messageStatus.TEXT,
-								content: msg
-							} as MessageText
-						]
-					}
-				}
-				else
-					return (undefined)
-				});
-			};
-		}
-	};
-
-	function updateInvitation(idSend: number, idChannel: number, idTarget: number) {
-		if (channelTarget)
-		{
-			const userSend = findUserInChannel(channelTarget, idSend);
-			const userTarget = findUserInChannel(channelTarget, idTarget);
-			if (idChannel === channelTarget.id)
-			{
-				setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						messages: [
-							...prevState.messages,
-							{
-								sender: userSend,
-								type: messageStatus.INVITATION,
-								target: userTarget,
-								status: challengeStatus.PENDING
-							} as MessageInvitation
+							messageContent
 						]
 					}
 				}
@@ -161,13 +147,10 @@ function Chat({ chat, displayChat, channels, channelTarget, setChannelTarget, ch
 
 	function handleListenSockets() {
 		userAuthenticate.socket?.on("userJoinedChannel", refreshJoinChannel);
-		userAuthenticate.socket?.on("printMessage", updateDiscussion);
-		userAuthenticate.socket?.on("sendInvitation", updateInvitation);
-
+		userAuthenticate.socket?.on("updateDiscussion", updateDiscussion);
 		return () => {
 			userAuthenticate.socket?.off("userJoinedChannel", refreshJoinChannel);
-			userAuthenticate.socket?.off("printMessage", updateDiscussion);
-			userAuthenticate.socket?.off("sendInvitation", updateInvitation);
+			userAuthenticate.socket?.off("updateDiscussion", updateDiscussion);
 		};
 	}
 

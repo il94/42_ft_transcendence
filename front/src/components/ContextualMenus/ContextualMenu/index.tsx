@@ -235,8 +235,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
-			userAuthenticate.socket?.emit("sendInvitation", sockets.data, userAuthenticate.id, channelTarget?.id, userTarget.id);
+			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channelTarget?.id, userTarget.id);
+																				 
 		}
 		catch (error) {
 			console.log(error);
