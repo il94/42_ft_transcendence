@@ -138,15 +138,15 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleChallengeClickEvent() {
 		try {
-
-			const challengeInvitation: MessageInvitation = {
-				id: -1, //???
-				sender: userAuthenticate,
-				type: messageStatus.INVITATION,
-				target: userTarget,
-				status: challengeStatus.PENDING	
-			}
-
+			console.log(userTarget.id);
+			await axios.post(`http://localhost:3333/channel/${channelTarget?.id}/invitation`, 
+				{ msgStatus : messageStatus.INVITATION, targetId : userTarget.id},
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					}
+				);
 			/* ============ Temporaire ============== */
 
 			// Verifier si une invitation n'existe pas deja
@@ -158,58 +158,67 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 			if (type === contextualMenuStatus.SOCIAL)
 			{
-				const findResult = userAuthenticate.channels.find((channel) => (
-					channel.name === userTarget.username && channel.type === channelStatus.MP
-				))
-				if (findResult)
-				{
-					findResult.messages.push(challengeInvitation)
-					setChannelTarget(findResult)
-				}
-				else
-				{
-					const newChannel: Channel = {
-						id: -1, //???
-						name: userTarget.username,
-						avatar: userTarget.avatar,
-						type: channelStatus.MP,
-						messages: [],
-						owner: userAuthenticate,
-						administrators: [],
-						members: [
-							userAuthenticate,
-							userTarget
-						],
-						mutedUsers: [],
-						banneds: []
-					}
+				console.log("here")
+				// const findResult = userAuthenticate.channels.find((channel) => (
+				// 	channel.name === userTarget.username && channel.type === channelStatus.MP
+				// ))
+				// if (findResult)
+				// {
+				// 	findResult.messages.push(challengeInvitation)
+				// 	setChannelTarget(findResult)
+				// }
+				// else
+				// {
+				// 	const newChannel: Channel = {
+				// 		id: -1, //???
+				// 		name: userTarget.username,
+				// 		avatar: userTarget.avatar,
+				// 		type: channelStatus.MP,
+				// 		messages: [],
+				// 		owner: userAuthenticate,
+				// 		administrators: [],
+				// 		members: [
+				// 			userAuthenticate,
+				// 			userTarget
+				// 		],
+				// 		mutedUsers: [],
+				// 		bannedUsers: []
+				// 	}
 
-					/* ============ Temporaire ============== */
+				// 	/* ============ Temporaire ============== */
 
-					// Verifier si le channel mp n'existe pas deja
-					// await axios.post(`http://${url}:3333/channel`, {
-					// 	name: userTarget.id,
-					// 	avatar: userTarget.avatar,
-					// 	type: channelStatus.MP
-					// })
+				// 	// Verifier si le channel mp n'existe pas deja
+				// 	// await axios.post(`http://localhost:3333/channel`, {
+				// 	// 	name: userTarget.id,
+				// 	// 	avatar: userTarget.avatar,
+				// 	// 	type: channelStatus.MP
+				// 	// })
 
-					/* ====================================== */
+				// 	/* ====================================== */
 
-					newChannel.messages.push(challengeInvitation)
-					userAuthenticate.channels.push(newChannel)
-					setChannelTarget(newChannel)
-				}
-				displayChat(true)
+				// 	newChannel.messages.push(challengeInvitation)
+				// 	userAuthenticate.channels.push(newChannel)
+				// 	setChannelTarget(newChannel)
+				// }
+				// displayChat(true)
 			}
 			else
 			{
-				if (channelTarget)
-					channelTarget.messages.push(challengeInvitation)
-				else
-					throw new Error
+				// if (channelTarget)
+				// 	channelTarget.messages.push(challengeInvitation)
+				// else
+				// 	throw new Error
 			}
+			const sockets = await axios.get(`http://localhost:3333/channel/${channelTarget?.id}/sockets`, {
+			headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channelTarget?.id, userTarget.id);
+																				 
 		}
 		catch (error) {
+			console.log(error);
 			displayErrorContextualMenu(true)
 		}
 	}

@@ -24,7 +24,7 @@ export class ChannelsGateway implements OnModuleInit {
   @WebSocketServer() server: Server;
 
   // Gestion de la map userConnected (ajoute/supprime des sockets)
-  onModuleInit() {
+  onModuleInit() { 
     this.server.on('connection', (socket: Socket) => {
       const userid = socket.handshake.query.id;
       //console.log("Connected id =", userid);
@@ -35,6 +35,7 @@ export class ChannelsGateway implements OnModuleInit {
 
         // Écouter le débranchement du socket
         socket.on('disconnect', () => {
+          console.log("deleted user = ", userid);
           connectedUsers.delete(userid);
         });
       } else {
@@ -46,17 +47,18 @@ export class ChannelsGateway implements OnModuleInit {
     return connectedUsers.get(userid);
   }
 
-  /*
+
+   /*
     args[0] tableau de sockets des users channel
     args[1] id du user qui envoie (sender)
     args[2] channel id
-    args[3] message recu
+    args[3] target id / message
    */
 
-  @SubscribeMessage('newMessage')
-  async handleSendMessage(client: Socket, args: any[]) {
+  @SubscribeMessage('sendDiscussion')
+  async handleUpdateDiscussion(client: Socket, args: string[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("newMessage", args[1], args[2], args[3]);
+      this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3]);
     }
   }
 
@@ -143,8 +145,6 @@ export class ChannelsGateway implements OnModuleInit {
       }
     }
   
-
-
 //   // afterInit(server: Server) {
 //   //   console.log("server after init" );
 //   // }
