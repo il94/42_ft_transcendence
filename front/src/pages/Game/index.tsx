@@ -384,7 +384,6 @@ function Game() {
 											<Profile
 												userAuthenticate={userAuthenticate}
 												card={card}
-												userTarget={userTarget}
 												setUserTarget={setUserTarget}
 												displayCard={displayCard}
 												setCardPosition={setCardPosition}
@@ -420,6 +419,7 @@ function Game() {
 																displayChat={displayChat}
 																channels={userAuthenticate.channels}
 																setUserAuthenticate={setUserAuthenticate}
+																userTarget={userTarget}
 																channelTarget={channelTarget}
 																setChannelTarget={setChannelTarget}
 																chatWindowState={chatWindowState}

@@ -14,6 +14,7 @@ import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { Channel, MessageInvitation, MessageText } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
+import OtherInvitation from "./ContactInvitation copy"
 
 type PropsDiscussion = {
 	channel: Channel
@@ -48,6 +49,7 @@ function Discussion({ channel } : PropsDiscussion) {
 										initialStatus={(message as MessageInvitation).status}
 									/>
 								:
+
 								message.type === messageStatus.TEXT ?
 									<ContactText
 										key={"message" + index} // a definir
@@ -55,12 +57,20 @@ function Discussion({ channel } : PropsDiscussion) {
 										content={(message as MessageText).content}
 									/>
 									:
-									<ContactInvitation
-										key={"message" + index} // a definir
-										sender={message.sender}
-										target={(message as MessageInvitation).target}
-										initialStatus={(message as MessageInvitation).status}
-									/>
+									// (message as MessageInvitation).target.id === userAuthenticate.id ?
+										<ContactInvitation
+											key={"message" + index} // a definir
+											sender={message.sender}
+											target={(message as MessageInvitation).target}
+											initialStatus={(message as MessageInvitation).status}
+										/>
+									// :
+									// 	<OtherInvitation
+									// 		key={"message" + index} // a definir
+									// 		sender={message.sender}
+									// 		target={(message as MessageInvitation).target}
+									// 		initialStatus={(message as MessageInvitation).status}
+									// 	/>
 						))
 					}
 					<div style={{ marginTop: "3px" }} />

@@ -94,7 +94,7 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 					{sender.username} challenge {target.username} to a duel !
 				</Text>
 				{
-					status === challengeStatus.PENDING &&
+					status === challengeStatus.PENDING && target.id === userAuthenticate.id &&
 					<ButtonsWrapper>
 						<ButtonChallenge
 							onClick={() => setStatus(challengeStatus.ACCEPTED)}

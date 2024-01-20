@@ -38,6 +38,7 @@ import {
 	UserAuthenticate
 } from "../../utils/types"
 import {
+	challengeStatus,
 	channelRole,
 	channelStatus,
 	chatWindowStatus,
@@ -68,8 +69,14 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 			console.log("here");
 			let messageContent: Message;
 			const userSend = findUserInChannel(channelTarget, idSend);
-			if (typeof idTargetOrMsg === 'number'){
+			if (!userSend)
+				throw new Error
+			if (typeof idTargetOrMsg === 'number')
+			{
+
 				const userTarget = findUserInChannel(channelTarget , idTargetOrMsg);
+				if (!userTarget)
+				throw new Error
 				messageContent = {
 					sender: userSend,
 					type: messageStatus.INVITATION,
