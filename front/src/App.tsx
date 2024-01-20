@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { Socket } from 'socket.io-client'
 
 import Home from './pages/Home'
 import Game from './pages/Game'
@@ -14,10 +15,11 @@ function App() {
 
 	const localToken = localStorage.getItem('token')
 	const [token, setToken] = useState<string>(localToken ? localToken : '')
+	const [socket, setSocket] = useState<Socket | undefined>(undefined)
 	const url = new URL(window.location.href).hostname
 
 	return (
-		<AuthContext.Provider value={{ token, setToken, url }}>
+		<AuthContext.Provider value={{ token, setToken, socket, setSocket, url }}>
 			<Router>
 				<Routes>
 					<Route path="/" element={<Home />} />

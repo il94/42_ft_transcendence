@@ -6,7 +6,6 @@ import {
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import axios, { AxiosResponse } from 'axios'
-import io from 'socket.io-client';
 
 import {
 	GamePage,
@@ -40,7 +39,17 @@ import DisplayContext from '../../contexts/DisplayContext'
 import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
-import { Channel, User, UserAuthenticate } from '../../utils/types'
+import {
+	updateUserInChannel,
+	userIsFriend,
+	userIsInChannel
+} from '../../utils/functions';
+
+import {
+	Channel,
+	User,
+	UserAuthenticate
+} from '../../utils/types'
 import {
 	chatWindowStatus,
 	contextualMenuStatus,
@@ -76,7 +85,7 @@ function Game() {
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
-	const { token, url } = useContext(AuthContext)!
+	const { token, url, socket } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
@@ -150,18 +159,6 @@ function Game() {
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
 
-				const socket = io(`http://${url}:3333`, {
-					transports: ["websocket"],
-					query: {
-						id: responseMe.data.id,
-					}
-					});
-		
-				socket.on('connect_error', (error) => {
-					console.error('Erreur de connexion à la socket :', error.message);
-					throw new Error;
-				});
-				
 				setUserAuthenticate({
 					id: responseMe.data.id,
 					username: responseMe.data.username,
@@ -251,6 +248,54 @@ function Game() {
 
 /* ========================================================================== */
 
+
+async function refreshUserStatus(userId: number, newStatus: userStatus) {
+
+	console.log("REFRESH USER STATUS", userId)
+
+
+	if (userId === userAuthenticate.id)
+	{
+		console.log("IS AUTH //////////")
+		setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				status: newStatus
+			}
+		})
+	}
+	else if (userIsFriend(userAuthenticate, userId)) 
+	{
+		console.log("IS FRIEND")
+		setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				friends: prevState.friends.map((friend) => {
+					if (friend.id === userId)
+					{
+						console.log("FRIEND FIND")
+						return {
+							...friend,
+							status: newStatus
+						}
+					}
+					else
+						return (friend)
+				})
+			}
+		})
+
+		if (channelTarget && userIsInChannel(channelTarget, userId))
+		{
+			setChannelTarget((prevState: Channel| undefined) => {
+				if (prevState)
+					return updateUserInChannel(prevState, userId, newStatus)
+			})
+		}
+	}
+}
+
+
 	async function refreshUpdateChannel(channelId: number, newDatas: any) {
 		setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState)
@@ -312,11 +357,16 @@ function Game() {
 
 	useEffect(() => {
 		
+		userAuthenticate.socket?.on("updateUserStatus", refreshUserStatus);
+
 		userAuthenticate.socket?.on("updateChannel", refreshUpdateChannel);
 		userAuthenticate.socket?.on("deleteChannel", refreshDeleteChannel);
 		userAuthenticate.socket?.on("createChannelMP", recieveChannelMP);
 
 		return () => {
+
+			userAuthenticate.socket?.off("updateUserStatus", refreshUserStatus);
+		
 			userAuthenticate.socket?.off("updateChannel", refreshUpdateChannel);
 			userAuthenticate.socket?.off("deleteChannel", refreshDeleteChannel);
 			userAuthenticate.socket?.off("createChannelMP", recieveChannelMP);
