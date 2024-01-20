@@ -6,7 +6,7 @@ import {
 	useContext,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
 	Avatar,
@@ -46,7 +46,7 @@ type PropsChannelInterface = {
 
 function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBannerName }: PropsChannelInterface) {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	const [error, setError] = useState<boolean>(false)
 
@@ -69,7 +69,6 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
 				if (channel) {
-
 					const newDatas: any = {
 						name: name.value !== channel.name ? name.value : channel.name,
 						type: channelType !== channel.type ? channelType : channel.type,
@@ -77,40 +76,12 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 						avatar: avatar !== channel.avatar ? avatar : channel.avatar
 					}		
 
-					await axios.patch(`http://localhost:3333/channel/${channel.id}`, newDatas,
+					await axios.patch(`http://${url}:3333/channel/${channel.id}`, newDatas,
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
-					})		
-
-					setChannelTarget((prevState: Channel | undefined) => {
-						if (prevState)
-						{
-							const updateChannel: Channel = {
-								...prevState,
-								...newDatas
-							}
-							return (updateChannel)
-						}
-						else
-							return (undefined)
 					})
-
-					setUserAuthenticate((prevState) => ({
-						...prevState,
-						channels: prevState.channels.map((channelToFind) => {
-							if (channelToFind.id === channel.id)
-							{
-								return {
-									...channelToFind,
-									...newDatas
-								}
-							}
-							else
-								return channelToFind
-						})
-					}))
 				}
 				else
 					throw new Error
@@ -124,7 +95,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					avatar: avatar
 				}		
 
-				const postChannelResponse = await axios.post("http://localhost:3333/channel", newDatas,
+				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -142,8 +113,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 					members: [
 						userAuthenticate
 					],
-					mutedUsers: [],
-					bannedUsers: [],
+					mutedUsers: []
 				}
 
 				setUserAuthenticate((prevState) => ({

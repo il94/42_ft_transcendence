@@ -24,7 +24,12 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
-import { channelIncludeUser, sortChannelByName, sortUserByName } from "../../../utils/functions"
+import {
+	userIsInChannel,
+	sortChannelByName,
+	sortUserByName,
+	userIsBanned
+} from "../../../utils/functions"
 
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
@@ -36,7 +41,7 @@ type PropsSearchBar = {
 
 function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	function generateResults(results: User[] | Channel[], type: string) {
 		return (
@@ -137,7 +142,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		try {
 			if (!userAuthenticate.friends.some((friend) => friend.id === user.id))
 			{
-				await axios.post(`http://localhost:3333/friends/${user.id}`, {}, {
+				await axios.post(`http://${url}:3333/friends/${user.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -156,19 +161,21 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	async function addChannelToChannelList(channelId: number) {
 		try {
-			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://localhost:3333/channel/${channelId}/relations`, {
+			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
 
-			if (!channelIncludeUser(channelResponse.data, userAuthenticate))
+			if (userIsBanned(channelResponse.data, userAuthenticate.id))
+				throw new Error
+			else if (!userIsInChannel(channelResponse.data, userAuthenticate.id))
 			{
 				if (channelResponse.data.type === channelStatus.PROTECTED)
 					setChannelTarget(channelResponse.data)
 				else
 				{
-					await axios.post(`http://localhost:3333/channel/join/${channelId}`, {},
+					await axios.post(`http://${url}:3333/channel/join/${channelId}`, {},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
@@ -184,14 +191,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 						...channelResponse.data,
 						members: [...channelResponse.data.members, userAuthenticate]
 					}))
-
-					const socketsResponse: AxiosResponse<string[]> = await axios.get(`http://localhost:3333/channel/${channelId}/sockets`, {
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
-
-					userAuthenticate.socket?.emit("joinChannel", socketsResponse.data, userAuthenticate.id, channelId)
 				}
 			}
 			else
@@ -207,7 +206,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
-				const usersResponse = await axios.get("http://localhost:3333/user", {
+				const usersResponse = await axios.get(`http://${url}:3333/user`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -217,7 +216,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					user.username != userAuthenticate.username
 				)).sort(sortUserByName))
 
-				const accessiblesChannelsResponse = await axios.get("http://localhost:3333/channel/accessibles", {
+				const accessiblesChannelsResponse = await axios.get(`http://${url}:3333/channel/accessibles`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}

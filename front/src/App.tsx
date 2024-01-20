@@ -14,9 +14,10 @@ function App() {
 
 	const localToken = localStorage.getItem('token')
 	const [token, setToken] = useState<string>(localToken ? localToken : '')
+	const url = new URL(window.location.href).hostname
 
 	return (
-		<AuthContext.Provider value={{ token, setToken }}>
+		<AuthContext.Provider value={{ token, setToken, url }}>
 			<Router>
 				<Routes>
 					<Route path="/" element={<Home />} />

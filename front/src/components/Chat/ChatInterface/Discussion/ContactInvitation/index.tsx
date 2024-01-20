@@ -15,7 +15,9 @@ import CardContext from "../../../../../contexts/CardContext"
 import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
 
-import { challengeStatus, contextualMenuStatus, userStatus } from "../../../../../utils/status"
+import { getContextualMenuHeight } from "../../../../../utils/functions"
+
+import { challengeStatus, contextualMenuStatus } from "../../../../../utils/status"
 import { User, UserAuthenticate } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
@@ -55,33 +57,15 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 		}
 	}
 
-	function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
+	async function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 
 		const gameWrapperContainer = GameWrapperRef.current
 
-		if (gameWrapperContainer) {
-			function getContextualMenuHeight() { // determine la taille du menu par rapport aux status du user authentifie et de la cible
-				if (channelTarget) {
-					if (channelTarget.owner === userAuthenticate) {
-						if (userTarget.status === userStatus.OFFLINE)
-							return (280)
-						else
-							return (315)
-					}
-					else if (channelTarget.administrators.includes(userAuthenticate) &&
-						(channelTarget.owner !== userTarget &&
-							!channelTarget.administrators.includes(userTarget)))
-						return (280)
-					else
-						return (175)
-				}
-				else
-					return (0)
-			}
+		if (gameWrapperContainer && channelTarget) {
 
 			setUserTarget(sender)
 
-			const heightContextualMenu = getContextualMenuHeight() // height du menu contextuel du chat
+			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, userTarget, userAuthenticate, channelTarget) // height du menu contextuel du chat
 			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas

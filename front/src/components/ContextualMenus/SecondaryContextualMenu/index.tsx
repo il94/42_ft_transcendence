@@ -30,7 +30,7 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 			if (!channel.members.includes(userTarget)) {
 				/* ============ Temporaire ============== */
 
-				// await axios.post(`http://localhost:3333/channel/${channel.id}/users/${userTarget.id}`, userTarget)
+				// await axios.post(`http://${url}:3333/channel/${channel.id}/users/${userTarget.id}`, userTarget)
 
 				/* ====================================== */
 				channel.members.push(userTarget)

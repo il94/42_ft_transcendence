@@ -21,6 +21,14 @@ export enum channelStatus {
 	MP = "MP"
 }
 
+export enum channelRole {
+	MEMBER = "MEMBER",
+	ADMIN = "ADMIN",
+	OWNER = "OWNER",
+	BANNED = "BANNED",
+	UNBANNED = "UNBANNED"
+}
+
 export enum chatWindowStatus {
 	HOME,
 	CHANNEL,

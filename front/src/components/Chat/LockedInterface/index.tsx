@@ -30,7 +30,7 @@ type PropsLockedInterface = {
 
 function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedInterface) {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	type PropsSetting = {
 		value: string,
@@ -66,7 +66,7 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 				return
 			}
 
-			await axios.post(`http://localhost:3333/channel/join/${channel.id}`, {
+			await axios.post(`http://${url}:3333/channel/join/${channel.id}`, {
 				password: password.value
 			},
 			{

@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ChatsModule } from './channels/channels.module';
 import { FriendsModule } from './friends/friends.module';
 import { BlockedsModule } from './blockeds/blockeds.module';
+import { PongModule } from './pong/pong.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BlockedsModule } from './blockeds/blockeds.module';
     ChatsModule,
     FriendsModule,
     BlockedsModule,
+	PongModule,
   ],
 })
 export class AppModule {}

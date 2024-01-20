@@ -16,6 +16,8 @@ import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
+import { userIsBanned, userIsInChannel } from "../../../utils/functions"
+
 import {
 	Channel,
 	MessageInvitation,
@@ -25,6 +27,7 @@ import {
 
 import {
 	challengeStatus,
+	channelRole,
 	channelStatus,
 	contextualMenuStatus,
 	messageStatus,
@@ -58,7 +61,7 @@ type PropsContextualMenu = {
 
 function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, userTarget, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	function showSecondaryContextualMenu(event: MouseEvent<HTMLButtonElement>) {
 
@@ -89,13 +92,13 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	const [adminSections, displayAdminSections] = useState<boolean>(false)
 
 	useEffect(() => {
-	
-		if (channelTarget && type === contextualMenuStatus.CHAT &&
-			(channelTarget.owner === userAuthenticate ||
-				(channelTarget.administrators.includes(userAuthenticate) &&
-				!channelTarget.administrators.includes(userTarget)) &&
-				(channelTarget.owner !== userTarget &&
-					!channelTarget.administrators.includes(userTarget)))) {
+		if (channelTarget &&
+			type === contextualMenuStatus.CHAT &&
+			(channelTarget.owner?.id === userAuthenticate.id ||
+			(channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
+				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) &&
+			(channelTarget.owner?.id !== userTarget.id &&
+				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))) {
 			displayAdminSections(true)
 		}
 		else
@@ -119,35 +122,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					type: channelStatus.MP
 				}		
 
-				const postChannelMPResponse = await axios.post(`http://localhost:3333/channel/mp/${userTarget.id}`, MPDatas,
+				await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				const newChannelMP: Channel = {
-					id: postChannelMPResponse.data.id,
-					name: userTarget.username,
-					avatar: userTarget.avatar,
-					type: channelStatus.MP,
-					messages: [],
-					owner: undefined,
-					administrators: [],
-					members: [
-						userAuthenticate,
-						userTarget
-					],
-					mutedUsers: [],
-					bannedUsers: []
-				}
-
-				setUserAuthenticate((prevState) => ({
-					...prevState,
-					channels: [...prevState.channels, newChannelMP]
-				}))
-				
-				setChannelTarget(newChannelMP)
 			}
 			displayChat(true)
 		}
@@ -170,7 +150,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			/* ============ Temporaire ============== */
 
 			// Verifier si une invitation n'existe pas deja
-			// await axios.post(`http://localhost:3333/user/me/challenge/${userTarget.id}`, {
+			// await axios.post(`http://${url}:3333/user/me/challenge/${userTarget.id}`, {
 			// 	type: challengeStatus.PENDING
 			// })
 
@@ -221,7 +201,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				// 	setChannelTarget(newChannel)
 				// }
 				// displayChat(true)
-
 			}
 			else
 			{
@@ -247,7 +226,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleManageFriendClickEvent() {
 		try {
 			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
-				await axios.post(`http://localhost:3333/friends/${userTarget.id}`, {}, {
+				await axios.post(`http://${url}:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -259,7 +238,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				}))
 			}
 			else {
-				await axios.delete(`http://localhost:3333/friends/${userTarget.id}`, {
+				await axios.delete(`http://${url}:3333/friends/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -287,7 +266,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleBlockClickEvent() {
 		try {
 			if (!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id)) {
-				await axios.post(`http://localhost:3333/blockeds/${userTarget.id}`, {}, {
+				await axios.post(`http://${url}:3333/blockeds/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -301,7 +280,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				})
 			}
 			else {
-				await axios.delete(`http://localhost:3333/blockeds/${userTarget.id}`, {
+				await axios.delete(`http://${url}:3333/blockeds/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -327,23 +306,26 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.administrators.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) {
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/administrators/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.administrators.push(userTarget)
+				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.ADMIN
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 			else {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/administrators/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.administrators.splice(channelTarget.administrators.indexOf(userTarget), 1)
+				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.MEMBER
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -358,7 +340,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			if (!channelTarget.mutedUsers.includes(userTarget)) {
 				/* ============ Temporaire ============== */
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/mutedusers/${userTarget.id}`)
+				// await axios.post(`http://${url}:3333/channel/${channelTarget.id}/mutedusers/${userTarget.id}`)
 
 				/* ====================================== */
 
@@ -374,15 +356,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.members.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.delete(`http://localhost:3333/channel/${channelTarget.id}/users/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.members.splice(channelTarget.members.indexOf(userTarget), 1)
-			}
+			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}/leave/${userTarget.id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
@@ -393,15 +371,26 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.bannedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
+			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id)) {
 
-				// await axios.post(`http://localhost:3333/channel/${channelTarget.id}/bannedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.bannedUsers.push(userTarget)
-				handleKickClickEvent()
+				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.BANNED
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+			}
+			else {
+				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+					role: channelRole.UNBANNED
+				},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 		}
 		catch (error) {
@@ -418,11 +407,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			{
 				userTarget ?
 					<>
-						<Section onMouseEnter={showSecondaryContextualMenu}>
-							<SectionName>
-								Invite
-							</SectionName>
-						</Section>
+						{
+							userAuthenticate.channels.length > 0 &&
+							<Section onMouseEnter={showSecondaryContextualMenu}>
+								<SectionName>
+									Invite
+								</SectionName>
+							</Section>
+						}
 						<div onMouseEnter={() => displaySecondaryContextualMenu(false)}>
 							<Section onClick={handleContactClickEvent}>
 								<SectionName>
@@ -434,6 +426,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 								<Section onClick={handleChallengeClickEvent}>
 									<SectionName>
 										Challenge
+									</SectionName>
+								</Section>
+							}
+							{
+								userTarget.status === userStatus.PLAYING &&
+								<Section onClick={handleContactClickEvent}>
+									<SectionName>
+										Spectate
 									</SectionName>
 								</Section>
 							}
@@ -467,33 +467,46 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 													adminSections &&
 													<>
 														{
-															channelTarget.owner === userAuthenticate &&
-															<Section onClick={handleGradeClickEvent}>
+															userIsInChannel(channelTarget, userTarget.id) &&
+															<>
+																{
+																channelTarget.owner?.id === userAuthenticate.id &&
+																	<Section onClick={handleGradeClickEvent}>
+																		<SectionName>
+																			{
+																				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
+																					"Upgrade"
+																					:
+																					"Downgrade"
+																			}
+																		</SectionName>
+																	</Section>
+																}
+																<Section onClick={handleMuteClickEvent}>
+																	<SectionName>
+																		Mute
+																	</SectionName>
+																</Section>
+																<Section onClick={handleKickClickEvent}>
+																	<SectionName>
+																		Kick
+																	</SectionName>
+																</Section>
+																<Section onClick={handleBanClickEvent}>
+																	<SectionName>
+																		Ban
+																	</SectionName>
+																</Section>
+															</>
+														}
+														{
+															userIsBanned(channelTarget, userTarget.id) &&
+															<Section onClick={handleBanClickEvent}>
 																<SectionName>
-																	{
-																		!channelTarget.administrators.includes(userTarget) ?
-																			"Upgrade"
-																			:
-																			"Downgrade"
-																	}
+																	Unban
 																</SectionName>
 															</Section>
 														}
-														<Section onClick={handleMuteClickEvent}>
-															<SectionName>
-																Mute
-															</SectionName>
-														</Section>
-														<Section onClick={handleKickClickEvent}>
-															<SectionName>
-																Kick
-															</SectionName>
-														</Section>
-														<Section onClick={handleBanClickEvent}>
-															<SectionName>
-																Ban
-															</SectionName>
-														</Section>
 													</>
 												}
 											</>
