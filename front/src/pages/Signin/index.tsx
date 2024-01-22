@@ -6,7 +6,6 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 import axios, { AxiosError } from 'axios'
-import { io } from 'socket.io-client'
 
 import {
 	SigninPage,
@@ -39,7 +38,7 @@ import FTButton from "../../assets/42.png"
 
 function Signin() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { setToken, url, setSocket } = useContext(AuthContext)!
+	const { setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -76,20 +75,6 @@ function Signin() {
 			
 			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
 	
-			const socket = io(`http://${url}:3333`, {
-				transports: ["websocket"],
-				query: {
-					id: response.data.id,
-				}
-			});
-	
-			socket.on('connect_error', (error) => {
-				console.error('Erreur de connexion à la socket :', error.message);
-				throw new Error;
-			});
-
-			setSocket(socket)
-			
 			//temporaire
 			if (response.data.twoFA)
 				navigate("/twofa")

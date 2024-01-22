@@ -6,6 +6,7 @@ import {
 } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import axios, { AxiosResponse } from 'axios'
+import { io } from 'socket.io-client'
 
 import {
 	GamePage,
@@ -85,7 +86,7 @@ function Game() {
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
-	const { token, url, socket } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	useEffect(() => {
@@ -158,6 +159,18 @@ function Game() {
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
+
+				const socket = io(`http://${url}:3333`, {
+					transports: ["websocket"],
+					query: {
+						id: responseMe.data.id,
+					}
+				});
+		
+				socket.on('connect_error', (error) => {
+					console.error('Erreur de connexion à la socket :', error.message);
+					throw new Error;
+				});	
 
 				setUserAuthenticate({
 					id: responseMe.data.id,
