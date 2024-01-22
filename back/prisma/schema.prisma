@@ -31,6 +31,7 @@ enum Role {
   ADMIN
   OWNER
   BANNED
+  UNBANNED
 }
 
 enum ChannelStatus {
@@ -145,10 +146,13 @@ model Message {
   authorId  Int
   channel   Channel @relation(fields: [channelId], references: [id])
   channelId Int
-  //targetId  Int? // add
-  content   String? 
   type      messageStatus // add
+
+  content   String? 
+
+  targetId  Int? // add
   status    challengeStatus? // add
+  
   isInvit   Boolean @default(false)
 }
 

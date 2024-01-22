@@ -33,14 +33,14 @@ import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
 	token: string,
+	url: string,
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
 
-function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
-	const [testt, setTestt] = useState()
+function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
 
 	type PropsSetting = {
 		value: string,
@@ -109,13 +109,12 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 				twoFA: twoFA.value !== userAuthenticate.twoFA ? twoFA.value : undefined,
 			}
 
-			const patch = await axios.patch(`http://localhost:3333/user/${userAuthenticate.id}`, newDatas,
+			await axios.patch(`http://${url}:3333/user/${userAuthenticate.id}`, newDatas,
 			{
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-			console.log("patch", patch)
 			setUserAuthenticate((prevState) => ({
 				...prevState,
 				...newDatas,
@@ -388,7 +387,7 @@ function SettingsMenu({ token, userAuthenticate, setUserAuthenticate, displaySet
 							}
 						</Button>
 					</Setting>
-					<img src={testt} />
+					<img src={test} />
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />

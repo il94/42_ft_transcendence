@@ -43,7 +43,7 @@ const Bout = styled.button`
 
 function TestsBack() {
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 
 	function getRandomDefaultAvatar(): string {
 		const defaultAvatars: string[] = [
@@ -64,7 +64,7 @@ function TestsBack() {
 
 	async function getUsers() {
 		try {
-			const test = await axios.get("http://localhost:3333/user", {
+			const test = await axios.get(`http://${url}:3333/user`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -78,7 +78,7 @@ function TestsBack() {
 
 	async function postUser() {
 		try {
-			const test = await axios.post("http://localhost:3333/auth/signup",
+			const test = await axios.post(`http://${url}:3333/auth/signup`,
 				{
 					username: "user",
 					hash: "123456",
@@ -105,7 +105,7 @@ function TestsBack() {
 
 			while (i < 5)
 			{
-				let test = await axios.post("http://localhost:3333/auth/signup",
+				let test = await axios.post(`http://${url}:3333/auth/signup`,
 					{
 						username: `user_${i}`,
 						hash: "123456",
@@ -130,15 +130,14 @@ function TestsBack() {
 
 /* ============================== CHANNELS ================================== */
 
-	async function getChannel() {
+	async function getChannel() { 
 		try {
-			const test = await axios.get("http://localhost:3333/channel", {
+			const test = await axios.get(`http://${url}:3333/channel`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
-			})
+			}) 
 			console.log("CHANNELS = ", test)
-
 		}
 		catch (error) {
 			console.log(error)
@@ -147,7 +146,7 @@ function TestsBack() {
 
 	async function postChannel() {
 		try {
-			const test = await axios.post("http://localhost:3333/channel",
+			const test = await axios.post(`http://${url}:3333/channel`,
 				{
 					name: "channl_1",
 					type: "PUBLIC",
@@ -172,7 +171,7 @@ function TestsBack() {
 
 			while (i < 5)
 			{
-				let test = await axios.post("http://localhost:3333/channel",
+				let test = await axios.post(`http://${url}:3333/channel`,
 					{
 						name: `channl_${i}`,
 						type: "PUBLIC",
@@ -197,7 +196,7 @@ function TestsBack() {
 		try {
 			let i = 0
 
-			const channels: AxiosResponse = await axios.get("http://localhost:3333/channel", {
+			const channels: AxiosResponse = await axios.get(`http://${url}:3333/channel`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -205,7 +204,7 @@ function TestsBack() {
 			while (i < channels.data.length)
 			{
 				console.log("ID = ", channels.data[i].id)
-				let test = await axios.delete(`http://localhost:3333/channel/${channels.data[i].id}`, {
+				let test = await axios.delete(`http://${url}:3333/channel/${channels.data[i].id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -224,7 +223,7 @@ function TestsBack() {
 
 async function getFriends() {
 	try {
-		const test: AxiosResponse<User> = await axios.get("http://localhost:3333/friends", {
+		const test: AxiosResponse<User> = await axios.get(`http://${url}:3333/friends`, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
@@ -241,7 +240,7 @@ async function deleteFriends() {
 	try {
 		let i = 0
 
-		const friends: AxiosResponse = await axios.get("http://localhost:3333/friends", {
+		const friends: AxiosResponse = await axios.get(`http://${url}:3333/friends`, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
@@ -249,7 +248,7 @@ async function deleteFriends() {
 		while (i < friends.data.length)
 		{
 			console.log("ID = ", friends.data[i].id)
-			let test = await axios.delete(`http://localhost:3333/friends/${friends.data[i].id}`, {
+			let test = await axios.delete(`http://${url}:3333/friends/${friends.data[i].id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -268,7 +267,7 @@ async function deleteFriends() {
 
 async function getBlockeds() {
 	try {
-		const test: AxiosResponse<User> = await axios.get("http://localhost:3333/blockeds", {
+		const test: AxiosResponse<User> = await axios.get(`http://${url}:3333/blockeds`, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
@@ -285,7 +284,7 @@ async function deleteBlockeds() {
 	try {
 		let i = 0
 
-		const blockeds: AxiosResponse = await axios.get("http://localhost:3333/blockeds", {
+		const blockeds: AxiosResponse = await axios.get(`http://${url}:3333/blockeds`, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
@@ -293,7 +292,7 @@ async function deleteBlockeds() {
 		while (i < blockeds.data.length)
 		{
 			console.log("ID = ", blockeds.data[i].id)
-			let test = await axios.delete(`http://localhost:3333/blockeds/${blockeds.data[i].id}`, {
+			let test = await axios.delete(`http://${url}:3333/blockeds/${blockeds.data[i].id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

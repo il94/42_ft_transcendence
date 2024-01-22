@@ -105,8 +105,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -136,8 +135,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -167,8 +165,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -197,8 +194,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -228,8 +224,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -259,8 +254,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -291,8 +285,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -322,8 +315,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -353,8 +345,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: -1,
@@ -384,8 +375,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: 4,
@@ -409,8 +399,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userAuthenticate,
 				userSomeone
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		},
 		{
 			id: 5,
@@ -432,8 +421,7 @@ export function getTempChannels(userAuthenticate: UserAuthenticate) : Channel[] 
 				userSomeone,
 				userAuthenticate
 			],
-			mutedUsers: [],
-			bannedUsers: []
+			mutedUsers: []
 		}
 	]
 

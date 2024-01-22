@@ -6,7 +6,8 @@ import {
 
 const AuthContext = createContext<{
 	token: string,
-	setToken: Dispatch<SetStateAction<string>>
+	setToken: Dispatch<SetStateAction<string>>,
+	url: string
 } | undefined>(undefined)
 
 export default AuthContext

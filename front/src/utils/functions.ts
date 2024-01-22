@@ -1,4 +1,4 @@
-import { userStatus } from "./status"
+import { contextualMenuStatus, userStatus } from "./status"
 import { Channel, User, UserAuthenticate } from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
@@ -30,6 +30,62 @@ export function getRandomDefaultAvatar(): string {
 	return (defaultAvatars[randomIndex])
 }
 
+export async function getContextualMenuHeight(type: contextualMenuStatus, userTarget: User, userAuthenticate: UserAuthenticate, channel?: Channel) { // determine la taille du menu par rapport aux status du user authentifie et de la cible
+	
+	const sectionSize: number = 35
+
+	let size: number = 0
+
+	// Invite section
+	if (userAuthenticate.channels.length > 0)
+		size += sectionSize
+
+	// Contact section
+		size += sectionSize
+
+	// Challenge section
+	if (userTarget.status !== userStatus.OFFLINE)
+		size += sectionSize
+
+	// Spectate section
+	if (userTarget.status === userStatus.PLAYING)
+		size += sectionSize
+
+	// Add / Delete section
+		size += sectionSize
+
+	// Block / Unblock section
+		size += sectionSize
+
+	if (type === contextualMenuStatus.CHAT && channel)
+	{
+		if (channel.owner?.id === userAuthenticate.id)
+		{
+			// Upgrade / Downgrade section
+			// Mute / Unmute section
+			// Kick section
+			// Ban section
+			if (userIsInChannel(channel, userTarget.id))
+				size += sectionSize * 4
+		
+			// Unban section
+			else if (userIsBanned(channel, userTarget.id))
+				size += sectionSize
+		}
+		else if (userIsAdministrator(channel, userAuthenticate.id))
+		{
+			// Mute / Unmute section
+			// Kick section
+			// Ban section
+			if (userIsMember(channel, userTarget.id))
+				size += sectionSize * 3
+		}
+	}
+
+	return (size)
+}
+
+
 export function sortUserByName(a: User, b: User) {
 	return (a.username.localeCompare(b.username))
 }
@@ -58,7 +114,6 @@ export function getAllUsersInChannel(channel: Channel): User[] {
 	return (users)
 }
 
-
 export function findUserInChannel(channel: Channel, userId: number): User | UserAuthenticate | undefined {
 	const inMembers = channel.members.find((member) => member.id === userId)
 	if (inMembers)
@@ -73,11 +128,35 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
-export function channelIncludeUser(channel: Channel, user: User | UserAuthenticate): boolean {
+export function userIsInChannel(channel: Channel, userId: number): boolean {
 	return (
-		channel.members.some((member) => member?.id === user.id) ||
-		channel.administrators.some((administrator) => administrator?.id === user.id) ||
-		channel.owner?.id === user.id
+		userIsMember(channel, userId) ||
+		userIsAdministrator(channel, userId) ||
+		userIsOwner(channel, userId)
+	)
+}
+
+export function userIsMember(channel: Channel, userId: number): boolean {
+	return (
+		channel.members.some((member) => member.id === userId)
+	)
+}
+
+export function userIsAdministrator(channel: Channel, userId: number): boolean {
+	return (
+		channel.administrators.some((administrator) => administrator.id === userId)
+	)
+}
+
+export function userIsOwner(channel: Channel, userId: number): boolean {
+	return (
+		channel.owner?.id === userId
+	)
+}
+
+export function userIsBanned(channel: Channel, userId: number): boolean {
+	return (
+		channel.banneds.some((banned) => banned.id === userId)
 	)
 }
 

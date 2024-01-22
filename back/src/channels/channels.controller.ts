@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
-import { CreateChannelDto, UpdateChannelDto, AuthChannelDto } from './dto';
+import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto';
 import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
@@ -33,7 +33,7 @@ export class ChannelController {
     @getUser('id') userId: number) {
     return this.channelsService.joinChannel(joinChannelDatas, channelId, userId);
   }
-  
+
   // Retourne tout les channels
   @Get()
   async findAll() {
@@ -50,14 +50,16 @@ export class ChannelController {
 
   // Retourne un channel
   @Get(':id')
-  find(@Param('id', ParseIntPipe) channelId: number) {
-    return this.channelsService.findChannel(channelId);
+  find(@Param('id', ParseIntPipe) channelId: number,
+    @getUser('id') userId: number) {
+    return this.channelsService.findChannel(channelId, userId);
   }
 
   // Retourne un channel avec ses relations
   @Get(':id/relations')
-  findWithRelations(@Param('id', ParseIntPipe) channelId: number) {
-    return this.channelsService.findChannelWithRelations(channelId);
+  findWithRelations(@Param('id', ParseIntPipe) channelId: number,
+    @getUser('id') userId: number) {
+    return this.channelsService.findChannelWithRelations(channelId, userId);
   }
 
   // Retourne les sockets (string) des users
@@ -75,6 +77,15 @@ export class ChannelController {
     return this.channelsService.updateChannel(channelId, newChannelDatas, userId);
   }
 
+  // Change le role d'un user du channel
+  @Patch(':channelId/role/:userTargetId')
+  updateRole(@Param('channelId', ParseIntPipe) channelId: number,
+    @Param('userTargetId', ParseIntPipe) userTargetId: number,
+    @getUser('id') userAuthId: number,
+    @Body() newRole: UpdateRoleDto) {
+    return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
+  }
+
   // Supprime un channel
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) channelId: number) {
@@ -82,30 +93,43 @@ export class ChannelController {
 	}
 
   // Retire un user d'un channel
-  @Delete('leave/:id')
-  leave(@Param('id', ParseIntPipe) channelId: number,
-  @getUser('id') userId: number) {
-    return this.channelsService.leaveChannel(userId, channelId);
+  @Delete(':channelId/leave/:userTargetId')
+  leave(@Param('channelId', ParseIntPipe) channelId: number,
+    @Param('userTargetId', ParseIntPipe) userTargetId: number,
+    @getUser('id') userAuthId: number) {
+    return this.channelsService.leaveChannel(channelId, userTargetId, userAuthId);
 	}
   /* soso  ajout de message  avec l'id du channel  */
 
   @Post(':id/message') // à accorder
 async addMessage( 
-  @getUser() user: User,
+  @getUser('id') userId: number,
   @Param('id', ParseIntPipe) id: number,
   @Body('msg') msg: string, 
-  @Body('msgStatus') msgStatus: messageStatus, // Ajout du paramètre msgStatus
+  @Body('msgStatus') msgStatus: messageStatus,
 ) {
-  return await this.channelsService.addContent(id, msg, user, msgStatus);
+  return await this.channelsService.addContent(id, msg, userId, msgStatus);
+} 
+
+@Post(':id/invitation') // à accorder
+async addInvitation( 
+  @getUser() user: User,
+  @Param('id', ParseIntPipe) id: number,
+  @Body('msgStatus') msgStatus: messageStatus,
+  @Body('targetId') targetId: number, 
+) {
+  return await this.channelsService.addContentInvitation(id, user.id, targetId, msgStatus);
 }
+
+
 
   /* soso obtenir tout les messages  edit : format de renvoie pas encore confirmer */
 
-  @Get(':id/message') // a acorder
-  getMessages(
-    @Param('id', ParseIntPipe) id: number) {
-    return this.channelsService.getAllMessage(id);
-  }
+  // @Get(':id/message') // a acorder
+  // getMessages(
+  //   @Param('id', ParseIntPipe) id: number) {
+  //   return this.channelsService.getAllMessage(id);
+  // }
 
 
 /* =========================== PAS UTILISEES ================================ */

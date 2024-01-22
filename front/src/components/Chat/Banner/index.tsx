@@ -47,7 +47,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 		return (undefined)
 	}
 
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function deleteChannelMP() {
@@ -55,18 +55,11 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 			if (!channelTarget)
 				throw new Error
 		
-			await axios.delete(`http://localhost:3333/channel/${channelTarget.id}`, {
+			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
-			setUserAuthenticate((prevState) => ({
-				...prevState,
-				channels: prevState.channels.filter((channel) => channel.id !== channelTarget.id)
-			}))
-
-			setChannelTarget(undefined)
 		}
 		catch (error) {
 			throw error
@@ -75,23 +68,9 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 
 	async function leaveChannel() {
 
-		async function deleteChannel(channelId: number) {
-			try {
-				await axios.delete(`http://localhost:3333/channel/${channelId}`, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
-				setChannelTarget(undefined)
-			}
-			catch (error) {
-				throw error
-			}
-		}
-
 		async function memberLeaveChannel(channelId: number) {
 			try {
-				await axios.delete(`http://localhost:3333/channel/leave/${channelId}`, {
+				await axios.delete(`http://${url}:3333/channel/${channelId}/leave/${userAuthenticate.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -101,22 +80,6 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 					...prevState,
 					channels: prevState.channels.filter((channel) => channel.id !== channelId)
 				}))
-
-				setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-					{
-						const { members, administrators, owner , ...rest } = prevState
-						
-						return {
-							...rest,
-							members: prevState.members.filter((member) => member.id !== userAuthenticate.id),
-							administrators: prevState.administrators.filter((administrator) => administrator.id !== userAuthenticate.id),
-							owner: prevState.owner?.id === userAuthenticate.id ? getNewOwner(prevState) : prevState.owner
-						}
-					}
-					else
-						return (undefined)
-				})
 
 				setChannelTarget(undefined)
 			}
@@ -128,11 +91,7 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 
 		try {
 			if (channelTarget)
-			{
 				await memberLeaveChannel(channelTarget.id)
-				if (channelIsEmpty(channelTarget))
-					await deleteChannel(channelTarget.id)
-			}
 			else
 				throw new Error
 		}

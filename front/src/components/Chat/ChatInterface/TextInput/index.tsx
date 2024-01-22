@@ -23,7 +23,7 @@ type PropsTextInput = {
  
 
 function TextInput({ channel }: PropsTextInput) {
-	const { token } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate } = useContext(InteractionContext)!
@@ -41,14 +41,14 @@ function TextInput({ channel }: PropsTextInput) {
 			return
 			try {
 
-				const sockets = await axios.get(`http://localhost:3333/channel/${channel.id}/sockets`, {
+				const sockets = await axios.get(`http://${url}:3333/channel/${channel.id}/sockets`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
 				/* post le meesage dans le back */
-				await axios.post(`http://localhost:3333/channel/${channel.id}/message`, 
+				await axios.post(`http://${url}:3333/channel/${channel.id}/message`, 
 				{ msg: message , msgStatus : messageStatus.TEXT},
 					{
 						headers: {
@@ -56,7 +56,7 @@ function TextInput({ channel }: PropsTextInput) {
 						}
 					}
 				);
-				userAuthenticate.socket?.emit("sendMessage", sockets.data, userAuthenticate.id, channel.id, message);
+				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, message);
 				
 				setMessage("");
 			  } catch (error) {
@@ -82,7 +82,7 @@ function TextInput({ channel }: PropsTextInput) {
 		<Style
 			onSubmit={handleSubmit}
 			autoComplete="off"
-			spellCheck="false">
+			spellCheck="false"> 
 			{
 				!errorRequest ?
 					<Input
