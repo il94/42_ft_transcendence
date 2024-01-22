@@ -4,6 +4,7 @@ import {
 	useContext
 } from "react"
 import { useNavigate } from "react-router"
+import axios from "axios"
 
 import {
 	Style,
@@ -40,7 +41,7 @@ type PropsProfile = {
 
 function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarget, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
-	const { setToken } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	function showCard() {
@@ -54,6 +55,13 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	}
 
 	async function handleDeconnexionClickButton() {
+		
+		await axios.patch(`http://${url}:3333/auth/logout`, {}, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+
 		localStorage.removeItem('token')
 		setToken('')
 		navigate("/")

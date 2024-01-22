@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { Socket } from 'socket.io-client'
 
 import Home from './pages/Home'
 import Game from './pages/Game'

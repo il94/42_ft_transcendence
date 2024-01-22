@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException } from "@nestjs/common";
+import { Body, Controller, Get, Post, HttpCode, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Patch } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, LocalAuthGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
@@ -94,4 +94,9 @@ export class AuthController {
 		return 'Hello cookie';
 	}
 
+	@Patch('logout')
+  	@UseGuards(JwtGuard)
+	async logout(@getUser('id') userId: number) {
+		return this.authService.disconnect(userId);
+	}
 }

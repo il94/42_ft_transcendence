@@ -2,7 +2,6 @@ import {
 	ChangeEvent,
 	FormEvent,
 	useContext,
-	useEffect,
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
@@ -36,7 +35,6 @@ import { emptySetting } from '../../utils/emptyObjects'
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
-import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 function Signin() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
