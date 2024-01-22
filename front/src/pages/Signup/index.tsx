@@ -1,5 +1,11 @@
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react'
-import axios from 'axios'
+import {
+	ChangeEvent,
+	FormEvent,
+	useContext,
+	useEffect,
+	useState
+} from 'react'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { useNavigate } from 'react-router'
 
 import {
@@ -26,7 +32,7 @@ import AuthContext from '../../contexts/AuthContext'
 
 import { getRandomDefaultAvatar } from '../../utils/functions'
 
-import { SettingData } from '../../utils/types'
+import { ErrorResponse, SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
@@ -87,19 +93,36 @@ function Signup() {
 				avatar: getRandomDefaultAvatar()
 			}
 
-			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
+			const signupResponse: AxiosResponse = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
-			setToken(response.data.access_token)
-			localStorage.setItem('token', response.data.access_token)
+			setToken(signupResponse.data.access_token)
+			localStorage.setItem('token', signupResponse.data.access_token)
 
 			navigate("/")
 		}
 		catch (error) {
-			// temporaire
-			// Gestion d'erreurs utilisateur a faire
-			console.log(error)
-			setErrorRequest(true)
-			localStorage.removeItem('token')
+			if (axios.isAxiosError(error))
+			{
+				const axiosError = error as AxiosError<ErrorResponse>
+				if (axiosError.response?.data?.statusCode === 409)
+				{
+					setGlobal({
+						value: '',
+						error: true,
+						errorMessage: axiosError.response.data.message
+					})
+				}
+				else
+				{
+					setErrorRequest(true)
+					localStorage.removeItem('token')
+				}
+			}
+			else
+			{
+				setErrorRequest(true)
+				localStorage.removeItem('token')
+			}
 		}
 	}
 
@@ -109,14 +132,35 @@ function Signup() {
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length > 8) {
+		if (value.length === 0) {
+			setUsername({
+				value: value,
+				error: true,
+				errorMessage: "Username cannot be empty"
+			})
+		}
+		else if (value.length > 8) {
 			setUsername((prevState) => ({
 				...prevState,
 				error: true,
-				errorMessage: "8 characters max"
+				errorMessage: "Username must not exceed 8 characters"
 			}))
 		}
-		else if (!/^[a-zA-Z0-9-_.]*$/.test(value)) {
+		else if (/\d/.test(value)) {
+			setUsername((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username must not contain digits",
+			}))
+		}
+		else if (/[A-Z]/.test(value)) {
+			setUsername((prevState) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username must not contain uppercase",
+			}))
+		}
+		else if (!/^[a-z]+$/.test(value)) {
 			setUsername((prevState) => ({
 				...prevState,
 				error: true,
@@ -131,12 +175,11 @@ function Signup() {
 		}
 	}
 
-	function handleInputUsernameBlur(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		setUsername({
-			value: value,
+	function handleInputUsernameBlur() {
+		setUsername((prevState) => ({
+			...prevState,
 			error: false
-		})
+		}))
 	}
 
 /* ============================== PASSWORD ================================== */
@@ -145,10 +188,44 @@ function Signup() {
 
 	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setPassword({
-			value: value,
-			error: false
-		})
+
+		if (value.length < 8 ||
+			!/[A-Z]/.test(value) ||
+			!/[a-z]/.test(value) ||
+			!/\d/.test(value) ||
+			!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value))
+		{
+			let errorMessages: string[] = []
+			if (value.length === 0) {
+				errorMessages.push("Password cannot be empty")
+			}
+			else if (value.length < 8) {
+				errorMessages.push("Password must be at least 8 characters long")
+			}
+			if (!/[A-Z]/.test(value)) {
+				errorMessages.push("Password must contain one uppercase")
+			}
+			if (!/[a-z]/.test(value)) {
+				errorMessages.push("Password must contain one lowercase")
+			}
+			if (!/\d/.test(value)) {
+				errorMessages.push("Password must contain one number")
+			}
+			if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
+				errorMessages.push("Password must contain one special character")
+			}
+			setPassword({
+				value: value,
+				error: true,
+				errorMessage: errorMessages
+			})
+		}
+		else {
+			setPassword({
+				value: value,
+				error: false
+			})
+		}
 	}
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -159,11 +236,18 @@ function Signup() {
 
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (!/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(value)) {
+		if (value.length === 0) {
 			setEmail({
 				value: value,
 				error: true,
-				errorMessage: "Invalid email"
+				errorMessage: "Email cannot be empty"
+			})
+		}
+		else if (value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Invalid email format"
 			})
 		}
 		else {
@@ -180,11 +264,18 @@ function Signup() {
 
 	function handleInputPhoneNumberChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value) && value.length !== 0) {
+		if (value.length === 0) {
 			setPhoneNumber({
 				value: value,
 				error: true,
-				errorMessage: "Invalid phone number"
+				errorMessage: "Phone number cannot be empty"
+			})
+		}
+		else if (!/^(?:\+(?:[0-9] ?){6,14}[0-9]|[0-9]{10})$/.test(value)) {
+			setPhoneNumber({
+				value: value,
+				error: true,
+				errorMessage: "Invalid phone number format"
 			})
 		}
 		else {
@@ -195,6 +286,17 @@ function Signup() {
 		}
 	}
 	
+/* ============================ GLOBAL ================================ */
+
+	const [global, setGlobal] = useState<SettingData>(emptySetting)
+
+	useEffect(() => {
+		setGlobal({
+			value: '',
+			error: false
+		})
+	}, [username, password, email, phoneNumber])
+
 /* ========================================================================== */
 
 	useEffect(() => {
@@ -242,9 +344,23 @@ function Signup() {
 								width={231}
 								fontSize={25}
 								$error={password.error} />
-							<ErrorMessage>
-								{password.error && password.errorMessage}
-							</ErrorMessage>
+							{
+								password.errorMessage ?
+								<>
+								{
+									(password.errorMessage as string[]).map((errorMessage, index) => {
+										return (
+											<ErrorMessage
+												key={"error_message" + index}>
+												{errorMessage}
+											</ErrorMessage>)
+										}
+									)
+								}
+								</>
+								:
+								<div style={{ height: "15px" }} />
+							}
 							<Button
 								onClick={() => setShowPassword(!showPassword)}
 								type="button"
@@ -282,6 +398,7 @@ function Signup() {
 								$error={phoneNumber.error} />
 							<ErrorMessage>
 								{phoneNumber.error && phoneNumber.errorMessage}
+								{global.error && global.errorMessage}
 							</ErrorMessage>
 						</Setting>
 						<div style={{ marginTop: "10px" }} />

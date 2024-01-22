@@ -1,8 +1,9 @@
 import { User, UserStatus } from "@prisma/client"
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsEmail, IsString, IsNotEmpty, 
-	IsMobilePhone, IsOptional, MaxLength, MinLength, IsBoolean
+import { IsString, IsNotEmpty, 
+	IsMobilePhone, IsOptional, MaxLength, MinLength, IsBoolean, IsAlphanumeric, IsLowercase, IsAlpha
  } from "class-validator";
+import { ContainsLowercase, ContainsNumber, ContainsSpecialCharacter, ContainsUppercase, IsEmail, IsPhoneNumber } from "../decorators/auth.decorators";
 
 export class CreateUserDto implements User {
 	
@@ -12,30 +13,37 @@ export class CreateUserDto implements User {
 
 	@IsString()
 	@IsNotEmpty()
-	@MaxLength(10)
-	@ApiProperty()
+	@MaxLength(8)
+	@IsAlpha()
+	@IsLowercase()
 	username: string;
 
 	@IsString()
 	@IsNotEmpty()
-	@MinLength(5)
-	@ApiProperty()
+	@MinLength(8)
+	@ContainsUppercase()
+	@ContainsLowercase()
+	@ContainsNumber()
+	@ContainsSpecialCharacter()
 	hash: string;
 
-	@IsEmail()
+	@IsString()
 	@IsNotEmpty()
+	@IsEmail()
 	@ApiProperty()
 	email: string;
 
 	@IsString()
-	@IsOptional()
-	@ApiProperty()
-	avatar: string;
-
-	@IsMobilePhone()
-	@IsOptional()
+	@IsNotEmpty()
+	@IsPhoneNumber()
 	@ApiProperty()
 	phoneNumber: string;
+
+	@IsOptional()
+	@IsString()
+	@IsNotEmpty()
+	@ApiProperty()
+	avatar: string;
 
 	twoFA: boolean;
 	twoFASecret: string; 

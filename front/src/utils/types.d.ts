@@ -68,5 +68,11 @@ export type MatchData = {
 export type SettingData = {
 	value: string,
 	error: boolean,
-	errorMessage?: string
+	errorMessage?: string | string[]
+}
+
+export type ErrorResponse = {
+	error: string,
+	message: string,
+	statusCode: number
 }

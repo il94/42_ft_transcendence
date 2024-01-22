@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation, ChannelStatus } from '@prisma/client';
@@ -18,7 +18,7 @@ export class UsersService {
 				],}
 			})
 			if (userExists[0])
-				throw new BadRequestException("User already exists");
+				throw new ConflictException("User already exists");
 			console.log("creating user")
 			const hash = await argon.hash(createUserDto.hash);
 			const user = await this.prisma.user.create({
