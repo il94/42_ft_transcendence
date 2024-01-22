@@ -5,7 +5,7 @@ CREATE TYPE "UserStatus" AS ENUM ('ONLINE', 'OFFLINE', 'PLAYING', 'WAITING', 'WA
 CREATE TYPE "RequestStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'PROGRESSING', 'FINISHED');
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('MEMBER', 'ADMIN', 'OWNER', 'BANNED');
+CREATE TYPE "Role" AS ENUM ('MEMBER', 'ADMIN', 'OWNER', 'BANNED', 'UNBANNED');
 
 -- CreateEnum
 CREATE TYPE "ChannelStatus" AS ENUM ('PRIVATE', 'PUBLIC', 'PROTECTED', 'MP');
@@ -92,8 +92,9 @@ CREATE TABLE "Message" (
     "id" SERIAL NOT NULL,
     "authorId" INTEGER NOT NULL,
     "channelId" INTEGER NOT NULL,
-    "content" TEXT,
     "type" "messageStatus" NOT NULL,
+    "content" TEXT,
+    "targetId" INTEGER,
     "status" "challengeStatus",
     "isInvit" BOOLEAN NOT NULL DEFAULT false,
 
