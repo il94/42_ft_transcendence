@@ -31,11 +31,14 @@ import { findUserInChannel } from "../../utils/functions"
 
 import {
 	Channel,
+	Message,
+	MessageInvitation,
 	MessageText,
 	User,
 	UserAuthenticate
 } from "../../utils/types"
 import {
+	challengeStatus,
 	channelRole,
 	channelStatus,
 	chatWindowStatus,
@@ -60,10 +63,35 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 
 	const { token, url } = useContext(AuthContext)!
 
-	function updateDiscussion(idSend: number, idChannel: number, msg: string) {
+	function updateDiscussion(idSend: number, idChannel: number, idTargetOrMsg: number | string) {
 		if (channelTarget)
 		{
+			console.log("here");
+			let messageContent: Message;
 			const userSend = findUserInChannel(channelTarget, idSend);
+			if (!userSend)
+				throw new Error
+			if (typeof idTargetOrMsg === 'number')
+			{
+
+				const userTarget = findUserInChannel(channelTarget , idTargetOrMsg);
+				if (!userTarget)
+				throw new Error
+				messageContent = {
+					sender: userSend,
+					type: messageStatus.INVITATION,
+					target: userTarget,
+					status: challengeStatus.PENDING
+				} as MessageInvitation
+			
+			}
+			else {
+				messageContent ={
+					sender: userSend,
+					type: messageStatus.TEXT,
+					content: idTargetOrMsg
+				} as MessageText
+			}
 			if (idChannel === channelTarget.id)
 			{
 				setChannelTarget((prevState: Channel | undefined) => {
@@ -73,11 +101,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 						...prevState,
 						messages: [
 							...prevState.messages,
-							{
-								sender: userSend,
-								type: messageStatus.TEXT,
-								content: msg
-							} as MessageText
+							messageContent
 						]
 					}
 				}
@@ -267,13 +291,13 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	}
 
 	function handleListenSockets() {
-		userAuthenticate.socket?.on("newMessage", updateDiscussion);
+		userAuthenticate.socket?.on("updateDiscussion", updateDiscussion);
 		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
 		userAuthenticate.socket?.on("leaveChannel", refreshLeaveChannel);
 		userAuthenticate.socket?.on("updateUserRole", refreshUserRole);
 
 		return () => {
-			userAuthenticate.socket?.off("newMessage", updateDiscussion);
+			userAuthenticate.socket?.off("updateDiscussion", updateDiscussion);
 			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
 			userAuthenticate.socket?.off("leaveChannel", refreshLeaveChannel);
 			userAuthenticate.socket?.off("updateUserRole", refreshUserRole);

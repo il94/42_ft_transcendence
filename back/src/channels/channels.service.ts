@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto/';
-import { Channel, User, ChannelStatus, Role, Prisma, messageStatus } from '@prisma/client';
+import { Channel, User, ChannelStatus, Role, Prisma, messageStatus, challengeStatus  } from '@prisma/client';
 import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
@@ -236,6 +236,7 @@ export class ChannelsService {
                 losses : true 
               }
             },
+            targetId: true,
             type: true,
             content: true,
             status: true
@@ -245,27 +246,35 @@ export class ChannelsService {
     })
     if (!channelDatas)
       throw new NotFoundException(`Channel ${chanId} not found`);
-
     const { users, content, ...rest } = channelDatas
-    const cleanedMessages = content.map((message) => {
-      if (message.type === "TEXT")
-      {
-        const { status, author, ...rest } = message
+    const cleanedMessages = await Promise.all(content.map(async (message) => {
+      if (message.type === "TEXT") {
+        const { status, author, ...rest } = message;
+        console.log("TEXT = ", message);
         return {
           ...rest,
           sender: author
-        }
+        };
       }
-      else
-      {
-        // penser a ajouter targetID
-        const { content, author, ...rest } = message
+
+      else {
+        const { author, targetId, ...rest } = message;
+        console.log("INVITATION = ", message);
+        const target = await this.prisma.user.findUnique({
+          where: {
+            id: targetId
+          }
+        });
         return {
           ...rest,
-          sender: author
-        }
+          sender: author,
+          target: target
+        };
       }
-    })
+
+    }))
+
+    console.log("RESULT", cleanedMessages)
 
     function getMPData() {
       return {
@@ -505,21 +514,51 @@ export class ChannelsService {
 
     /****************************** gestion message ***********************/
 
-    async addContent(id: number, msg:string, user :User, msgStatus : messageStatus) {
+    /* 
+    
+    model Message {
+      id        Int  @id @default(autoincrement()) 
+      author    User @relation(fields: [authorId], references: [id])
+      authorId  Int
+      channel   Channel @relation(fields: [channelId], references: [id])
+      channelId Int
+      //targetId  Int? // add
+      content   String? 
+      type      messageStatus // add
+      status    challengeStatus? // add
+      isInvit   Boolean @default(false)
+}
+    
+    */
 
-
+    async addContent(chanId: number, msg:string, userId :number, msgStatus : messageStatus) {
+  
+        const newMessage = await this.prisma.message.create({
+          data: {
+            author: { connect: { id: userId} },  // Connectez le message à l'utilisateur existant
+            channel: { connect: { id: chanId } }, 
+            content: msg,
+            isInvit: true,
+            type: msgStatus,
+          },
+        });
+        //console.log(newMessage.content);
+      }
+  
+    async addContentInvitation(id: number, userId : number, targetId : number, msgStatus : messageStatus) {
       const newMessage = await this.prisma.message.create({
         data: {
-          author: { connect: { id: user.id } },  // Connectez le message à l'utilisateur existant
-          channel: { connect: { id: id } }, 
-          content: msg,
+          author: { connect: { id: userId } },  // Connectez le message à l'utilisateur existant
+          channel: { connect: { id: id } },
           isInvit: true,
+          targetId: targetId,
+          status:  challengeStatus.PENDING,
           type: msgStatus,
         },
       });
-      //console.log(newMessage.content);
+      console.log(newMessage.content);
     }
-  
+
     async getAllMessage(id: number) {
       try {
         const channel = await this.prisma.channel.findUnique({
@@ -531,10 +570,10 @@ export class ChannelsService {
           console.error("Le canal n'existe pas.");
           return null; // Retournez une valeur ou utilisez une exception appropriée
         }
-    
+        
         const messages = channel.content;
     
-        if (!messages) {
+        if (!messages) { 
           console.error("Aucun message trouvé dans le canal.");
           return null; // Retournez une valeur ou utilisez une exception appropriée
         }

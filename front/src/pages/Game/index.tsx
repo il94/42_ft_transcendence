@@ -447,7 +447,6 @@ async function refreshUserStatus(userId: number, newStatus: userStatus) {
 											<Profile
 												userAuthenticate={userAuthenticate}
 												card={card}
-												userTarget={userTarget}
 												setUserTarget={setUserTarget}
 												displayCard={displayCard}
 												setCardPosition={setCardPosition}
@@ -483,6 +482,7 @@ async function refreshUserStatus(userId: number, newStatus: userStatus) {
 																displayChat={displayChat}
 																channels={userAuthenticate.channels}
 																setUserAuthenticate={setUserAuthenticate}
+																userTarget={userTarget}
 																channelTarget={channelTarget}
 																setChannelTarget={setChannelTarget}
 																chatWindowState={chatWindowState}

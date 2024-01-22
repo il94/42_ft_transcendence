@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import { Style } from "./style"
 
@@ -113,7 +113,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				channel.name === userTarget.username && channel.type === channelStatus.MP
 			))
 			if (findChannelMP)
+			{
 				setChannelTarget(findChannelMP)
+				displayChat(true)
+				return (findChannelMP)
+			}
 			else
 			{
 				const MPDatas: any = {
@@ -122,14 +126,29 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					type: channelStatus.MP
 				}		
 
-				await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
+				const newChannelMPResponse: AxiosResponse = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
+				console.log("newChannelMPResponse", newChannelMPResponse)
+
+				const newChannelMP = {
+					...newChannelMPResponse.data,
+					messages: [],
+					members: [
+						userAuthenticate,
+						userTarget
+					],
+					administrators: [],
+					owner: undefined,
+					mutedUsers: [],
+					banneds: []
+				}
+				displayChat(true)
+				return (newChannelMP)
 			}
-			displayChat(true)
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
@@ -138,78 +157,43 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleChallengeClickEvent() {
 		try {
-
-			const challengeInvitation: MessageInvitation = {
-				id: -1, //???
-				sender: userAuthenticate,
-				type: messageStatus.INVITATION,
-				target: userTarget,
-				status: challengeStatus.PENDING	
-			}
-
+			console.log(userTarget.id);
+			
 			/* ============ Temporaire ============== */
-
 			// Verifier si une invitation n'existe pas deja
-			// await axios.post(`http://${url}:3333/user/me/challenge/${userTarget.id}`, {
-			// 	type: challengeStatus.PENDING
-			// })
-
 			/* ====================================== */
+
+			let channel: Channel
 
 			if (type === contextualMenuStatus.SOCIAL)
 			{
-				const findResult = userAuthenticate.channels.find((channel) => (
-					channel.name === userTarget.username && channel.type === channelStatus.MP
-				))
-				if (findResult)
-				{
-					findResult.messages.push(challengeInvitation)
-					setChannelTarget(findResult)
-				}
-				else
-				{
-					const newChannel: Channel = {
-						id: -1, //???
-						name: userTarget.username,
-						avatar: userTarget.avatar,
-						type: channelStatus.MP,
-						messages: [],
-						owner: userAuthenticate,
-						administrators: [],
-						members: [
-							userAuthenticate,
-							userTarget
-						],
-						mutedUsers: [],
-						banneds: []
-					}
-
-					/* ============ Temporaire ============== */
-
-					// Verifier si le channel mp n'existe pas deja
-					// await axios.post(`http://${url}:3333/channel`, {
-					// 	name: userTarget.id,
-					// 	avatar: userTarget.avatar,
-					// 	type: channelStatus.MP
-					// })
-
-					/* ====================================== */
-
-					newChannel.messages.push(challengeInvitation)
-					userAuthenticate.channels.push(newChannel)
-					setChannelTarget(newChannel)
-				}
-				displayChat(true)
+				console.log("here")
+				const channelMP = await handleContactClickEvent()
+				
+				channel = channelMP
 			}
+			else if (channelTarget)
+				channel = channelTarget
 			else
-			{
-				if (channelTarget)
-					channelTarget.messages.push(challengeInvitation)
-				else
-					throw new Error
-			}
+				throw new Error
+
+			await axios.post(`http://localhost:3333/channel/${channel.id}/invitation`, 
+			{ msgStatus : messageStatus.INVITATION, targetId : userTarget.id},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				}
+			);
+			const sockets = await axios.get(`http://localhost:3333/channel/${channel.id}/sockets`, {
+			headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id);													 
 		}
 		catch (error) {
+			console.log(error);
 			displayErrorContextualMenu(true)
 		}
 	}
@@ -247,9 +231,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-
 			console.log(error)
-			
 			displayErrorContextualMenu(true)
 		}
 	}

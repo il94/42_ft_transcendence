@@ -23,18 +23,17 @@ export class ChannelsGateway {
 
   @WebSocketServer() server: Server;
 
-
-  /*
+   /*
     args[0] tableau de sockets des users channel
     args[1] id du user qui envoie (sender)
     args[2] channel id
-    args[3] message recu
+    args[3] target id / message
    */
 
-  @SubscribeMessage('newMessage')
-  async handleSendMessage(client: Socket, args: any[]) {
+  @SubscribeMessage('sendDiscussion')
+  async handleUpdateDiscussion(client: Socket, args: string[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("newMessage", args[1], args[2], args[3]);
+      this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3]);
     }
   }
 
@@ -121,8 +120,6 @@ export class ChannelsGateway {
       }
     }
   
-
-
 //   // afterInit(server: Server) {
 //   //   console.log("server after init" );
 //   // }
