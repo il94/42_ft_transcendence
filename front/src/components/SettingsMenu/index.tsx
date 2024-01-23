@@ -36,11 +36,13 @@ type PropsSettingsMenu = {
 	url: string,
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
-	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
+	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
+	setTwoFACodeQR: Dispatch<SetStateAction<string>>
 }
 
 
-function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
+function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
 
 	type PropsSetting = {
 		value: string,
@@ -80,6 +82,37 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 		errorMessage: ''
 	})
 	const [avatar, setAvatar] = useState<string>(userAuthenticate.avatar)
+
+
+
+	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
+		try {
+
+			console.log("SUBMIT")
+
+			event.preventDefault()
+
+			await axios.patch(`http://${url}:3333/auth/2fa/enable`, {
+				twoFACode: QRcodeValue
+			},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+		}
+		catch (error) {
+
+			// afficher correctement la gestion d'erreur
+
+			console.log(error)
+		}
+	}
+
+
+
+
+
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -237,20 +270,27 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	/* ================================= 2FA ==================================== */
 
+	const [QRcode, setQRcode] = useState<string>('')
+	const [QRcodeValue, setQRcodeValue] = useState<string>('')
+
+	function handleInputQRcodeChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setQRcodeValue(value)
+	}
+
 	async function handleClickTwoFAChange() {
 		try {
-
-			const response = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
+			const responseQRcode = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
 
-			console.log("RESPONSE = ", response)
-
+			displayTwoFAMenu(true)
+			setTwoFACodeQR(responseQRcode.data)
 		}
 		catch (error) {
-			console.log("HERE", error)
+			console.log(error)
 		}
 	}
 
@@ -391,7 +431,14 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 							}
 						</Button>
 					</Setting>
-					{/* <img src={test} /> */}
+
+							{/* <img src={QRcode} />
+							<InputText
+								onSubmit={handleSubmitTWOfa}
+								onChange={handleInputQRcodeChange}
+								type="text" value={QRcodeValue}
+								fontSize={16} /> */}
+
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />

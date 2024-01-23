@@ -51,6 +51,13 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, userSomeone } from '../../temp/temp'
+import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu';
+
+
+
+
+
+
 
 function Game() {
 
@@ -214,6 +221,8 @@ function Game() {
 	const [searchBarResults, displaySearchBarResults] = useState<boolean>(false)
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
+	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
+	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
 	/* ============================ DISPLAY STATES ============================== */
 
@@ -407,7 +416,14 @@ function Game() {
 													url={url}
 													userAuthenticate={userAuthenticate}
 													setUserAuthenticate={setUserAuthenticate}
-													displaySettingsMenu={displaySettingsMenu} />
+													displaySettingsMenu={displaySettingsMenu}
+													displayTwoFAMenu={displayTwoFAMenu}
+													setTwoFACodeQR={setTwoFACodeQR} />
+											}
+											{
+												twoFAMenu &&
+												<TwoFaMenu
+													twoFAcodeQR={twoFAcodeQR} />
 											}
 											<TestsBack />
 											{

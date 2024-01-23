@@ -23,7 +23,7 @@ export class AuthController {
 
 	@Post('signin')
 	@HttpCode(HttpStatus.OK)
-	async signin(@Body() dto: AuthDto): Promise<string | { access_token: string }> {
+	async signin(@Body() dto: AuthDto): Promise<string | { access_token: string } | { twoFA: boolean } > {
 		return this.authService.validateUser(dto);
 	}
 
@@ -62,16 +62,17 @@ export class AuthController {
 
 	@Get('2fa/generate')  // cree le service de 2FA en creeant le twoFASecret du user et en generant un QRcode 
 	@UseGuards(JwtGuard)
-	async register(@Res() res, @getUser() user: User) {
-		const { otpAuthURL } =
-		await this.authService.generateTwoFASecret(user);
-	  return res.json(
-		await this.authService.generateQrCodeDataURL(otpAuthURL),
-	  );
+	async register(@getUser() user: User) {
+		console.log("HERE")
+		const { otpAuthURL } = await this.authService.generateTwoFASecret(user);
+		
+		const QRcode = await this.authService.generateQrCodeDataURL(otpAuthURL) 
+
+	  return (QRcode) ;
 	}
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
-	@UseGuards(JwtGuard, Jwt2faAuthGuard )
+	@UseGuards(JwtGuard)
 	async turnOnTwoFA(@getUser() user: User, @Body() body) {
 		try {
 			if (!body.twoFACode)
@@ -84,8 +85,9 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
   	@HttpCode(200)
-  	//@UseGuards(JwtGuard)
+  	@UseGuards(Jwt2faAuthGuard)
   	async authenticate(@getUser() user: User, @Body() body) {
+		console.log("C'EST GOOD")
     	if (user.status === UserStatus.ONLINE)
 			throw new BadRequestException('User is already authenticated');
 		if (!body.twoFACode)

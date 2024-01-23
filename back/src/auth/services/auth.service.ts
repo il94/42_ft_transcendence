@@ -26,7 +26,7 @@ export class AuthService {
 		return this.signToken(newUser.id, newUser.username);
 	}
 
-	async validateUser(dto: AuthDto): Promise<string | { access_token: string }> {
+	async validateUser(dto: AuthDto): Promise<string | { access_token: string } | { twoFA: boolean } > {
 		try {
 			const user = await this.prisma.user.findUnique({
 					where: { username: dto.username, },
@@ -42,8 +42,14 @@ export class AuthService {
 					data: { status: UserStatus.ONLINE }})
 				return this.signToken(user.id, user.username)
 			}
+			else
+			{
+				return {
+					twoFA: true
+				}
+			}
 			// else : return nulll to login with 2FA
-			return `User ${user.username} must login with 2FA`
+			// return `User ${user.username} must login with 2FA`
 		} catch (error) {
             const err = error as Error;
             console.log("Validate user error: ", err.message);
@@ -114,6 +120,7 @@ export class AuthService {
 	}
 
 	async generateTwoFASecret(user: User) {
+
 		const secret = authenticator.generateSecret();
 
 		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);

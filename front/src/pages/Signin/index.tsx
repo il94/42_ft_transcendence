@@ -75,10 +75,10 @@ function Signin() {
 			
 			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
 	
-			//temporaire
-			// if (response.data.twoFA)
-			// 	navigate("/twofa")
-			// else
+			// temporaire
+			if (response.data.twoFA)
+				navigate("/twofa")
+			else
 			{
 				setToken(response.data.access_token)
 				localStorage.setItem('token', response.data.access_token)

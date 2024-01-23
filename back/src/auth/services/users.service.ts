@@ -142,24 +142,20 @@ export class UsersService {
 	}
 
 	async setTwoFASecret(secret: string, userId: number): Promise<User | string> {
-
-		console.log("SECRET = ", secret)
-		console.log("USERID = ", userId)
-
 		try {
-		// const user = await this.prisma.user.update({
-		// 	where: {
-		// 		id: userId,
-		// 		//twoFA: true
-		// 	},
-		// 	data: { twoFASecret: secret,
-		// 			twoFA: true },
-		// });
+		const user = await this.prisma.user.update({
+			where: {
+				id: userId,
+				// twoFA: true
+			},
+			data: {
+				twoFASecret: secret
+			},
+		});
 
-		console.log("USER FOUND ", "user")
 
-		// if (!user)
-		// 	throw new NotFoundException(`User with ${userId} does not exist.`);
+		if (!user)
+			throw new NotFoundException(`User with ${userId} does not exist.`);
 		return "user";
 		} catch (error) { throw error; }
 	}
