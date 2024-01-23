@@ -30,7 +30,6 @@ export class AuthController {
 	@Get('profile')
 	@UseGuards(JwtGuard)
 	getProfile(@Req() req) {
-		console.log("profile: ", req.user);
 		if (req.user) {
 			return { msg: 'Authenticated' };
 		} else { 
@@ -41,12 +40,14 @@ export class AuthController {
 	@Get('logout')
 	@UseGuards(JwtGuard)
 	async logout(@getUser() user: User, @Res({ passthrough: true }) res: Response) {
-		//console.log(req.cookies);
-		//delete req.cookies.token.access_token;
-		//console.log("cookie after delete: ", req.cookies);
-		//console.log("Res : ", res);
-		res.clearCookie('access_token', { httpOnly: true });
-		return this.authService.logout(user.id);
+
+		console.log("HERE")
+
+		res.clearCookie('access_token')
+
+		// this.authService.logout(user.id);
+		// res.redirect("http://localhost:5173")		 
+		return ""
 	}
 
 	/*********************** Api42 routes ****************** ****************/
@@ -61,16 +62,13 @@ export class AuthController {
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@getUser() user: User, 
 	@Res({ passthrough: true }) res: Response,
-	@Req() req: Request,
 	) {
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
-			
-			req.headers.authorization = "Bearer " + token.access_token;
-			res.set('Authorization', `Bearer ${token.access_token}`)
-			// res.send()
-			//return res.redirect(`http://localhost:5173/game`)
-			return token;		 
+			res.clearCookie('token', { httpOnly: true })
+
+			res.cookie("access_token", token.access_token);
+			res.redirect("http://localhost:5173")		 
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");

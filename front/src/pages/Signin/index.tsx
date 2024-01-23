@@ -2,7 +2,6 @@ import {
 	ChangeEvent,
 	FormEvent,
 	useContext,
-	useEffect,
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
@@ -36,7 +35,6 @@ import { emptySetting } from '../../utils/emptyObjects'
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
-import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 function Signin() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
@@ -127,17 +125,17 @@ function Signin() {
 
 	// 		const test = await axios.get(`http://${url}:3333/auth/api42`)
 			
-			console.log("testtttt",test)
+	// 		console.log(test)
 			
-			setToken(test.data.access_token)
-			localStorage.setItem('token', test.data.access_token)
+	// 		setToken(test.data.access_token)
+	// 		localStorage.setItem('token', test.data.access_token)
 			
-			navigate("/game")
-		}
-		catch (error) {
-			console.log("error",error)
-		}
-	}
+	// 		navigate("/game")
+	// 	}
+	// 	catch (error) {
+	// 		console.log(error)
+	// 	}
+	// }
 
 /* ================================ LOGIN =================================== */
 

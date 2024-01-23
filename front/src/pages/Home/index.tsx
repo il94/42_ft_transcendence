@@ -1,4 +1,5 @@
 import { useContext, useEffect } from 'react'
+import Cookies from "js-cookie"
 
 import {
 	HomePage,
@@ -22,23 +23,17 @@ function Home() {
 
 	useEffect(() => {
 
-			// Extraire la partie après "access_token="
-			// const tokenString: string = document.cookie.indexOf("access_token")
-			const index = document.cookie.indexOf("access_token=")
+		const access_token = Cookies.get('access_token')
 
-			const accessTokenString = document.cookie.slice(index + "access_token=".length);
-			
-			// console.log("LOL = ", accessTokenString)
-
-			if (!localStorage.getItem('token'))
-			{
-				setToken(accessTokenString)
-				localStorage.setItem('token', accessTokenString)
-			}
-
+		if (access_token)
+		{
+			localStorage.setItem('token', access_token)
+			setToken(access_token)
+		}		
 	}, [])
 
 	async function handleDeconnexionClickText() {
+		Cookies.remove('access_token')
 		localStorage.removeItem('token')
 		setToken('')
 	}

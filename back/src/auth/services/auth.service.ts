@@ -69,13 +69,13 @@ export class AuthService {
 	}
 
 	async logout(userId: number) {
-		const user = this.prisma.user.update({
-			where: { id: userId, status: UserStatus.ONLINE },
-			data: { status: UserStatus.OFFLINE }
-		})
-		if (!user)
-			throw new BadRequestException(`User with od ${userId}, not found or offline`)
-		return user;
+		// const user = this.prisma.user.update({
+		// 	where: { id: userId, status: UserStatus.ONLINE },
+		// 	data: { status: UserStatus.OFFLINE }
+		// })
+		// if (!user)
+		// 	throw new BadRequestException(`User with od ${userId}, not found or offline`)
+		return "user";
 	}
 
 	/*********************** api42 Authentication ******************************************/

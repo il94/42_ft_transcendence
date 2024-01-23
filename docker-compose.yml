@@ -6,8 +6,8 @@ services:
     image: postgres:16.0
     restart: always
     env_file: ./back/.env
-    ports:
-      - '5432:5432'
+    expose:
+      - '5432'
     networks:
       - transcendence
     volumes:
