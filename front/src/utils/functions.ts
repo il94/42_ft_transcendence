@@ -128,6 +128,10 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
+export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number): boolean {
+	return (!!userAuthenticate.friends.some((friend) => friend.id === userId))
+}
+
 export function userIsInChannel(channel: Channel, userId: number): boolean {
 	return (
 		userIsMember(channel, userId) ||
@@ -166,4 +170,35 @@ export function channelIsEmpty(channel: Channel): boolean {
 		channel.administrators.length === 0 &&
 		channel.owner === undefined
 	)
+}
+
+export function updateUserInChannel(channel: Channel, userId: number, newStatus: userStatus): Channel {
+	return {
+		...channel,
+		members: channel.members.map((member) => {
+			if (member.id === userId)
+			{
+				return {
+					...member,
+					status: newStatus
+				}
+			}
+			else
+				return (member)
+		}),
+		administrators: channel.administrators.map((administrator) => {
+			if (administrator.id === userId)
+			{
+				return {
+					...administrator,
+					status: newStatus
+				}
+			}
+			else
+				return (administrator)
+		}),
+		owner: channel.owner?.id === userId ? channel.owner as User : {
+			...(channel.owner as User), status: newStatus
+		}
+	}
 }
