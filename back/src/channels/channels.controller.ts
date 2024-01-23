@@ -4,7 +4,7 @@ import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import { getUser } from '../auth/decorators/users.decorator';
-import { User, messageStatus } from '@prisma/client';
+import { User, challengeStatus, messageStatus } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
 @UseGuards(JwtGuard)
@@ -33,6 +33,18 @@ export class ChannelController {
     @getUser('id') userId: number) {
     return this.channelsService.joinChannel(joinChannelDatas, channelId, userId);
   }
+
+    /* ajout de message  avec l'id du channel  */
+
+    @Post(':id/message') // à accorder
+    async addMessage( 
+      @getUser('id') userId: number,
+      @Param('id', ParseIntPipe) id: number,
+      @Body('msg') msg: string, 
+      @Body('msgStatus') msgStatus: messageStatus,
+    ) {
+      return await this.channelsService.addContent(id, msg, userId, msgStatus);
+    } 
 
   // Retourne tout les channels
   @Get()
@@ -86,6 +98,16 @@ export class ChannelController {
     return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
   }
 
+  // Change le challenge status d'un channel par son id
+
+  @Patch('message/:id')
+  updateStatusChannel(
+  @Param('id', ParseIntPipe) idMsg: number, 
+  @Body('msgStatus') newStatus: challengeStatus,
+  ) {
+  return this.channelsService.updateMessageStatus(idMsg, newStatus);
+}
+
   // Supprime un channel
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) channelId: number) {
@@ -99,17 +121,7 @@ export class ChannelController {
     @getUser('id') userAuthId: number) {
     return this.channelsService.leaveChannel(channelId, userTargetId, userAuthId);
 	}
-  /* soso  ajout de message  avec l'id du channel  */
 
-  @Post(':id/message') // à accorder
-async addMessage( 
-  @getUser('id') userId: number,
-  @Param('id', ParseIntPipe) id: number,
-  @Body('msg') msg: string, 
-  @Body('msgStatus') msgStatus: messageStatus,
-) {
-  return await this.channelsService.addContent(id, msg, userId, msgStatus);
-} 
 
 @Post(':id/invitation') // à accorder
 async addInvitation( 

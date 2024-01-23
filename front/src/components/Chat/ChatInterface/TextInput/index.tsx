@@ -44,11 +44,11 @@ function TextInput({ channel }: PropsTextInput) {
 				const sockets = await axios.get(`http://${url}:3333/channel/${channel.id}/sockets`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
-					}
+					} 
 				})
 
 				/* post le meesage dans le back */
-				await axios.post(`http://${url}:3333/channel/${channel.id}/message`, 
+				const idMsg = await axios.post(`http://${url}:3333/channel/${channel.id}/message`, 
 				{ msg: message , msgStatus : messageStatus.TEXT},
 					{
 						headers: {
@@ -56,7 +56,7 @@ function TextInput({ channel }: PropsTextInput) {
 						}
 					}
 				);
-				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, message);
+				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, message, idMsg.data);
 				
 				setMessage("");
 			  } catch (error) {

@@ -63,10 +63,10 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 
 	const { token, url } = useContext(AuthContext)!
 
-	function updateDiscussion(idSend: number, idChannel: number, idTargetOrMsg: number | string) {
+	function updateDiscussion(idSend: number, idChannel: number, idTargetOrMsg: number | string, idMsg : number) {
 		if (channelTarget)
 		{
-			console.log("here");
+
 			let messageContent: Message;
 			const userSend = findUserInChannel(channelTarget, idSend);
 			if (!userSend)
@@ -78,6 +78,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 				if (!userTarget)
 				throw new Error
 				messageContent = {
+					id: idMsg,
 					sender: userSend,
 					type: messageStatus.INVITATION,
 					target: userTarget,
@@ -87,6 +88,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 			}
 			else {
 				messageContent ={
+					id: idMsg,
 					sender: userSend,
 					type: messageStatus.TEXT,
 					content: idTargetOrMsg
@@ -276,6 +278,26 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		}
 	}
 
+
+	async function refreshStatusChallenge(idMsg: number, status: challengeStatus, idChan: number) {
+		if (idChan === channelTarget?.id)
+		{
+			setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState) {
+				const updatedMessages = prevState.messages.map((message) =>
+				message.id === idMsg ? { ...message, status: status } : message
+				);
+				return {
+				...prevState,
+				messages:updatedMessages,
+				};
+			} else {
+				return undefined;
+			}
+			});
+		}
+	  }
+
 	function handleChangeChatWindowState() {
 		if (channelTarget)
 		{
@@ -295,12 +317,14 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
 		userAuthenticate.socket?.on("leaveChannel", refreshLeaveChannel);
 		userAuthenticate.socket?.on("updateUserRole", refreshUserRole);
+		userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
 
 		return () => {
 			userAuthenticate.socket?.off("updateDiscussion", updateDiscussion);
 			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
 			userAuthenticate.socket?.off("leaveChannel", refreshLeaveChannel);
 			userAuthenticate.socket?.off("updateUserRole", refreshUserRole);
+			userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
 		}
 	}
 
