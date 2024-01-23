@@ -83,6 +83,9 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
+
+			console.log("SUBMIT")
+
 			event.preventDefault()
 			if (username.error ||
 				password.error ||
@@ -234,37 +237,38 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	/* ================================= 2FA ==================================== */
 
-	function handleClickTwoFAChange() {
-		if (email.error) {
-			setTwoFA({
-				value: false,
-				error: true,
-				errorMessage: "No valid email"
+	async function handleClickTwoFAChange() {
+		try {
+
+			const response = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
 			})
+
+			console.log("RESPONSE = ", response)
+
 		}
-		else {
-			setTwoFA({
-				value: !twoFA.value,
-				error: false
-			})
+		catch (error) {
+			console.log("HERE", error)
 		}
 	}
 
-	useEffect(() => {
-		if (email.error && phoneNumber.error) {
-			setTwoFA({
-				value: false,
-				error: true,
-				errorMessage: "No valid email or phone number"
-			})
-		}
-		else {
-			setTwoFA((prevState) => ({
-				...prevState,
-				error: false
-			}))
-		}
-	}, [email.value, phoneNumber.value])
+	// useEffect(() => {
+	// 	if (email.error && phoneNumber.error) {
+	// 		setTwoFA({
+	// 			value: false,
+	// 			error: true,
+	// 			errorMessage: "No valid email or phone number"
+	// 		})
+	// 	}
+	// 	else {
+	// 		setTwoFA((prevState) => ({
+	// 			...prevState,
+	// 			error: false
+	// 		}))
+	// 	}
+	// }, [email.value, phoneNumber.value])
 
 	/* ========================================================================== */
 
@@ -387,7 +391,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 							}
 						</Button>
 					</Setting>
-					<img src={test} />
+					{/* <img src={test} /> */}
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />

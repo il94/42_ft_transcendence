@@ -17,44 +17,28 @@ export class AuthController {
 
 	@Post('signup')
 	@HttpCode(HttpStatus.OK)
-	async signup(@Body() dto: CreateUserDto) {
+	async signup(@Body() dto: CreateUserDto): Promise<string | { access_token: string }> {
 		return this.authService.signup(dto);
 	}
 
 	@Post('signin')
 	@HttpCode(HttpStatus.OK)
-	async signin(@Body() dto: AuthDto) {
+	async signin(@Body() dto: AuthDto): Promise<string | { access_token: string }> {
 		return this.authService.validateUser(dto);
-	}
-
-	@Get('profile')
-	@UseGuards(JwtGuard)
-	getProfile(@Req() req) {
-		if (req.user) {
-			return { msg: 'Authenticated' };
-		} else { 
-			return { msg: 'NOT Authenticated' };
-		}
 	}
 
 	@Get('logout')
 	@UseGuards(JwtGuard)
-	async logout(@getUser() user: User, @Res({ passthrough: true }) res: Response) {
-
-		console.log("HERE")
-
+	async logout(@getUser() user: User, @Res({ passthrough: true }) res: Response): Promise<void> {
 		res.clearCookie('access_token')
-
-		// this.authService.logout(user.id);
-		// res.redirect("http://localhost:5173")		 
-		return ""
+		this.authService.logout(user.id);
 	}
 
 	/*********************** Api42 routes ****************** ****************/
 
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
-	async get42User(@getUser() user: User) {
+	async get42User(@getUser() user: User): Promise<User> {
 		return user;
 	}
 
@@ -62,7 +46,7 @@ export class AuthController {
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@getUser() user: User, 
 	@Res({ passthrough: true }) res: Response,
-	) {
+	): Promise<void> {
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
 			res.clearCookie('token', { httpOnly: true })
@@ -77,7 +61,7 @@ export class AuthController {
 	/*********************** 2FA routes *************************************/
 
 	@Get('2fa/generate')  // cree le service de 2FA en creeant le twoFASecret du user et en generant un QRcode 
-	@UseGuards(JwtGuard, Jwt2faAuthGuard )
+	@UseGuards(JwtGuard)
 	async register(@Res() res, @getUser() user: User) {
 		const { otpAuthURL } =
 		await this.authService.generateTwoFASecret(user);
@@ -100,7 +84,7 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
   	@HttpCode(200)
-  	@UseGuards(JwtGuard)
+  	//@UseGuards(JwtGuard)
   	async authenticate(@getUser() user: User, @Body() body) {
     	if (user.status === UserStatus.ONLINE)
 			throw new BadRequestException('User is already authenticated');
@@ -109,7 +93,7 @@ export class AuthController {
     	return this.authService.loginWith2fa(user, body.twoFACode);
   	}
 
-	@Post('2fa/disable')
+	@Patch('2fa/disable')
 	@HttpCode(200)
 	@UseGuards(JwtGuard)
 	async disable(@getUser() user: User, @Body() body, @Req() req) {

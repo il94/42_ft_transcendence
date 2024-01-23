@@ -26,7 +26,7 @@ export class AuthService {
 		return this.signToken(newUser.id, newUser.username);
 	}
 
-	async validateUser(dto: AuthDto) {
+	async validateUser(dto: AuthDto): Promise<string | { access_token: string }> {
 		try {
 			const user = await this.prisma.user.findUnique({
 					where: { username: dto.username, },
@@ -69,13 +69,13 @@ export class AuthService {
 	}
 
 	async logout(userId: number) {
-		// const user = this.prisma.user.update({
-		// 	where: { id: userId, status: UserStatus.ONLINE },
-		// 	data: { status: UserStatus.OFFLINE }
-		// })
-		// if (!user)
-		// 	throw new BadRequestException(`User with od ${userId}, not found or offline`)
-		return "user";
+		const user = this.prisma.user.update({
+			where: { id: userId, status: UserStatus.ONLINE },
+			data: { status: UserStatus.OFFLINE }
+		})
+		if (!user)
+			throw new BadRequestException(`User with od ${userId}, not found or offline`)
+		return user;
 	}
 
 	/*********************** api42 Authentication ******************************************/

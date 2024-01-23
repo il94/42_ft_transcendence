@@ -76,9 +76,9 @@ function Signin() {
 			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
 	
 			//temporaire
-			if (response.data.twoFA)
-				navigate("/twofa")
-			else
+			// if (response.data.twoFA)
+			// 	navigate("/twofa")
+			// else
 			{
 				setToken(response.data.access_token)
 				localStorage.setItem('token', response.data.access_token)
@@ -88,6 +88,8 @@ function Signin() {
 		}
 		catch (error) {
 			const axiosError = error as AxiosError
+
+			console.log("SIGNIN ERROR", error)
 
 			// if (axiosError.response?.status === 404)
 

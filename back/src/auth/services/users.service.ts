@@ -12,7 +12,8 @@ export class UsersService {
 
 	/*********************** General CRUD ******************************************/
 
-	async createUser(createUserDto: CreateUserDto) {
+	async createUser(createUserDto: CreateUserDto): Promise<User> {
+		console.log("BACK PRISMA")
 		try {
 			const userExists = await this.prisma.user.findMany({
 				where: { OR: [
@@ -42,6 +43,7 @@ export class UsersService {
             console.log(`User ${user.username} with id ${user.id} created successfully`);
 			return user;
 		} catch (error) {
+			console.log("ERROR PRISMA")
 			if (error instanceof PrismaClientKnownRequestError) {
 				if (error.code === 'P2002')
 					throw new ForbiddenException('Failed to create new user');
@@ -63,7 +65,7 @@ export class UsersService {
 		return users;
 	}
 
-	async findById(id: number) {
+	async findById(id: number): Promise<Partial<User>>  {
 		const user = await this.prisma.user.findUnique({
 			where: { id: id },
 			select: {  id: true,
@@ -78,8 +80,9 @@ export class UsersService {
 		return user;
 	}
 
-	async updateUser(id: number, updateUserDto: UpdateUserDto) {
+	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User>  {
 		const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
+
 		const updateUser = await this.prisma.user.update({
 			data: { 
 			username: updateUserDto.username,
@@ -90,10 +93,12 @@ export class UsersService {
 			},
 			where: { id: id },
 		});
+
+
 		return updateUser;
 	}
 
-	async remove(id: number) {
+	async remove(id: number): Promise<User> {
 		const deleteFriends =  this.prisma.friend.deleteMany({
 			where: { userId: id }});
 		const deleteChannels = this.prisma.usersOnChannels.deleteMany({
@@ -115,7 +120,7 @@ export class UsersService {
 
 	/*********************** TwoFA settings ******************************************/
 
-	async turnOnTwoFA(user: User, twoFACode: string) {
+	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
 		const setUser = await this.prisma.user.findUnique({ where: {id: user.id}});
 		if (!setUser)
 			throw new NotFoundException('User not found');
@@ -136,27 +141,40 @@ export class UsersService {
 
 	}
 
-	async setTwoFASecret(secret: string, userId: number) {
+	async setTwoFASecret(secret: string, userId: number): Promise<User | string> {
+
+		console.log("SECRET = ", secret)
+		console.log("USERID = ", userId)
+
 		try {
-		const user = this.prisma.user.update({
-			where: { id: userId, twoFA: true },
-			data: { twoFASecret: secret,
-					twoFA: true },
-		});
-		if (!user)
-			throw new NotFoundException(`User with ${userId} does not exist.`);
-		return user;
+		// const user = await this.prisma.user.update({
+		// 	where: {
+		// 		id: userId,
+		// 		//twoFA: true
+		// 	},
+		// 	data: { twoFASecret: secret,
+		// 			twoFA: true },
+		// });
+
+		console.log("USER FOUND ", "user")
+
+		// if (!user)
+		// 	throw new NotFoundException(`User with ${userId} does not exist.`);
+		return "user";
 		} catch (error) { throw error; }
 	}
 
-	async disableTwoFA(user: User, code: string) {
-		  const otpCode = await this.prisma.user.findUnique({
-			where: { id: user.id, twoFASecret:  code }
-		  })
-		  await this.prisma.user.update({
-			where: { id: user.id },
-			data: { twoFA: false },
-		  });
+	async disableTwoFA(user: User, code: string): Promise<void> {
+		try {
+
+			const otpCode = await this.prisma.user.findUnique({
+				where: { id: user.id, twoFASecret:  code }
+			})
+			await this.prisma.user.update({
+				where: { id: user.id },
+				data: { twoFA: false },
+			});
+		} catch (error) { throw error; }
 	}
 
 	/*********************** Channels ******************************************/

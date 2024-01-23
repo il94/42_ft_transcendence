@@ -145,9 +145,7 @@ function Game() {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				console.log("respme token: ", responseMe);
-
-
+				
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()

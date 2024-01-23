@@ -12,6 +12,8 @@ import {
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
+import axios from 'axios'
+import { useNavigate } from 'react-router'
 
 import AuthContext from '../../contexts/AuthContext'
 
@@ -19,7 +21,8 @@ import colors from '../../utils/colors'
 
 function Home() {
 
-	const { token, setToken } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
+	const navigate = useNavigate();
 
 	useEffect(() => {
 
@@ -33,9 +36,23 @@ function Home() {
 	}, [])
 
 	async function handleDeconnexionClickText() {
-		Cookies.remove('access_token')
-		localStorage.removeItem('token')
-		setToken('')
+		try {
+
+			await axios.get(`http://${url}:3333/auth/logout`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}) 
+			
+			Cookies.remove('access_token')
+
+			localStorage.removeItem('token')
+			setToken('')
+			navigate("/")
+		}
+		catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (
