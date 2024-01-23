@@ -2,7 +2,7 @@ import { MouseEvent, useContext, useState } from "react"
 
 import {
 	Avatar,
-	Style,
+	Style, 
 	Text,
 	InvitationContent,
 	ButtonsWrapper
@@ -17,24 +17,29 @@ import InteractionContext from "../../../../../contexts/InteractionContext"
 
 import { getContextualMenuHeight } from "../../../../../utils/functions"
 
-import { challengeStatus, contextualMenuStatus } from "../../../../../utils/status"
-import { User, UserAuthenticate } from "../../../../../utils/types"
+import { challengeStatus, contextualMenuStatus, messageStatus } from "../../../../../utils/status"
+import { MessageInvitation, User, UserAuthenticate } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
+import axios from "axios"
+import AuthContext from "../../../../../contexts/AuthContext"
 
 type PropsContactInvitation = {
 	sender: User,
 	target: User | UserAuthenticate,
-	initialStatus: challengeStatus
+	initialStatus: challengeStatus,
+	idMsg: number,
+	idChan: number
 }
 
-function ContactInvitation({ sender, target, initialStatus }: PropsContactInvitation) {
+function ContactInvitation({ sender, target, initialStatus, idMsg, idChan}: PropsContactInvitation) {
 
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
 	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(InteractionContext)!
-
+	const { token, url } = useContext(AuthContext)!
+	
 	function showCard(event: MouseEvent<HTMLDivElement>) {
 
 		const gameWrapperContainer = GameWrapperRef.current
@@ -81,8 +86,24 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 		}
 	}
 
-	const [status, setStatus] = useState<challengeStatus>(initialStatus)
+	async function handleClickChallengeStatus(status : challengeStatus, idMsg: number, idChan : number) {
+		const sockets = await axios.get(`http://${url}:3333/channel/${idChan}/sockets`, {
+				headers: {
+						'Authorization': `Bearer ${token}`
+					} 
+				})
+		await axios.patch(`http://${url}:3333/channel/message/${idMsg}`, 
+		{ idMsg: idMsg , msgStatus : status},
+		{
+		headers: {
+			'Authorization': `Bearer ${token}`
+				}
+			}
+		);
+		userAuthenticate.socket?.emit('updateChallenge', sockets.data, idMsg, status, idChan);
+	}
 
+	//const [status, setStatus] = useState<challengeStatus>(initialStatus)
 	return (
 		<Style>
 			<Avatar
@@ -91,25 +112,25 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 				onAuxClick={showContextualMenu} />
 			<InvitationContent>
 				<Text>
-					{sender.username} challenge {target.username} to a duel !
+					{sender.username} challenge {target.username} to a duel ! 
 				</Text>
 				{
-					status === challengeStatus.PENDING && target.id === userAuthenticate.id &&
+					initialStatus === challengeStatus.PENDING && target.id === userAuthenticate.id &&
 					<ButtonsWrapper>
 						<ButtonChallenge
-							onClick={() => setStatus(challengeStatus.ACCEPTED)}
+							onClick={() => handleClickChallengeStatus(challengeStatus.ACCEPTED, idMsg, idChan)}
 							color={colors.buttonGreen}>
 							Accept
 						</ButtonChallenge>
 						<ButtonChallenge
-							onClick={() => setStatus(challengeStatus.CANCELLED)}
+							onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan)}
 							color={colors.buttonRed}>
 							Decline
 						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{
-					status === challengeStatus.ACCEPTED &&
+					initialStatus === challengeStatus.ACCEPTED &&
 					<ButtonsWrapper>
 						<ButtonChallenge
 							color={colors.buttonGreen}>
@@ -118,7 +139,7 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 					</ButtonsWrapper>
 				}
 				{
-					status === challengeStatus.CANCELLED &&
+					initialStatus === challengeStatus.CANCELLED &&
 					<ButtonsWrapper>
 						<ButtonChallenge
 							color={colors.buttonGray}>
@@ -127,7 +148,7 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 					</ButtonsWrapper>
 				}
 				{
-					status === challengeStatus.IN_PROGRESS &&
+					initialStatus === challengeStatus.IN_PROGRESS &&
 					<ButtonsWrapper>
 						<ButtonChallenge
 							color={colors.button}>
@@ -136,7 +157,7 @@ function ContactInvitation({ sender, target, initialStatus }: PropsContactInvita
 					</ButtonsWrapper>
 				}
 				{
-					status === challengeStatus.FINISHED &&
+					initialStatus === challengeStatus.FINISHED &&
 					<ButtonsWrapper>
 						<ButtonChallenge
 							color={colors.button}>

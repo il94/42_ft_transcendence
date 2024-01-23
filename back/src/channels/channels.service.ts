@@ -37,8 +37,7 @@ export class ChannelsService {
         data: { password: await argon.hash(createChannelDto.password) } 
       })
     }
-
-    console.log(`Channel ${newChannel.id} was created`)
+    //console.log(`Channel ${newChannel.id} was created`)
     return newChannel;
   }
 
@@ -273,7 +272,7 @@ export class ChannelsService {
         };
       }
 
-    }))
+    })) 
 
     console.log("RESULT", cleanedMessages)
 
@@ -536,7 +535,7 @@ export class ChannelsService {
             type: msgStatus,
           },
         });
-        //console.log(newMessage.content);
+        return newMessage.id;
       }
   
     async addContentInvitation(id: number, userId : number, targetId : number, msgStatus : messageStatus) {
@@ -550,7 +549,7 @@ export class ChannelsService {
           type: msgStatus,
         },
       });
-      console.log(newMessage.content);
+      return newMessage.id;
     }
 
     async getAllMessage(id: number) {
@@ -580,6 +579,20 @@ export class ChannelsService {
         return null; // Retournez une valeur ou utilisez une exception appropriée
       }
     }
+
+
+    async updateMessageStatus(idMsg: number, newStatus: challengeStatus)
+    { 
+      try {
+        const updatedMessage = await this.prisma.message.update({
+          where: { id: idMsg },
+          data: { status: newStatus },
+        });
+        return updatedMessage;
+      } catch (error) { 
+        throw error;
+    }
+  }
 
 /* =============================== UTILS ==================================== */
 
