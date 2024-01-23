@@ -113,16 +113,10 @@ function Signup() {
 					})
 				}
 				else
-				{
 					setErrorRequest(true)
-					localStorage.removeItem('token')
-				}
 			}
 			else
-			{
 				setErrorRequest(true)
-				localStorage.removeItem('token')
-			}
 		}
 	}
 
@@ -140,28 +134,28 @@ function Signup() {
 			})
 		}
 		else if (value.length > 8) {
-			setUsername((prevState) => ({
+			setUsername((prevState: SettingData) => ({
 				...prevState,
 				error: true,
 				errorMessage: "Username must not exceed 8 characters"
 			}))
 		}
 		else if (/\d/.test(value)) {
-			setUsername((prevState) => ({
+			setUsername((prevState: SettingData) => ({
 				...prevState,
 				error: true,
 				errorMessage: "Username must not contain digits",
 			}))
 		}
 		else if (/[A-Z]/.test(value)) {
-			setUsername((prevState) => ({
+			setUsername((prevState: SettingData) => ({
 				...prevState,
 				error: true,
 				errorMessage: "Username must not contain uppercase",
 			}))
 		}
 		else if (!/^[a-z]+$/.test(value)) {
-			setUsername((prevState) => ({
+			setUsername((prevState: SettingData) => ({
 				...prevState,
 				error: true,
 				errorMessage: "Username can't contain special characters",
@@ -176,7 +170,7 @@ function Signup() {
 	}
 
 	function handleInputUsernameBlur() {
-		setUsername((prevState) => ({
+		setUsername((prevState: SettingData) => ({
 			...prevState,
 			error: false
 		}))
@@ -348,14 +342,24 @@ function Signup() {
 								password.errorMessage ?
 								<>
 								{
-									(password.errorMessage as string[]).map((errorMessage, index) => {
-										return (
-											<ErrorMessage
-												key={"error_message" + index}>
-												{errorMessage}
-											</ErrorMessage>)
-										}
-									)
+									Array.isArray(password.errorMessage) ?
+									<>
+									{
+
+										(password.errorMessage as string[]).map((errorMessage, index) => {
+											return (
+												<ErrorMessage
+													key={"error_message" + index}>
+													{errorMessage}
+												</ErrorMessage>)
+											}
+										)
+									}
+									</>
+									:
+									<ErrorMessage>
+										{password.errorMessage}
+									</ErrorMessage>
 								}
 								</>
 								:

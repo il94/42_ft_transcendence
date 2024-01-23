@@ -29,7 +29,7 @@ import ErrorRequest from '../../componentsLibrary/ErrorRequest'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { SettingData } from '../../utils/types'
+import { ErrorResponse, SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
@@ -87,36 +87,30 @@ function Signin() {
 			}
 		}
 		catch (error) {
-			const axiosError = error as AxiosError
-
-			// if (axiosError.response?.status === 404)
-
-			// temporaire
-			if ((axiosError.response?.data as any)?.message === "user not found")
+			if (axios.isAxiosError(error))
 			{
-				setLogin((prevState) => ({
-					...prevState,
-					error: true,
-					errorMessage: "User not found",
-				}))
-			}
-
-			// else if (axiosError.response?.status === 401)
-			
-			// temporaire
-			else if ((axiosError.response?.data as any)?.message === "incorrect password")
-			{
-				setPassword((prevState) => ({
-					...prevState,
-					error: true,
-					errorMessage: "Incorrect password",
-				}))
+				const axiosError = error as AxiosError<ErrorResponse>
+				if (axiosError.response?.data?.statusCode === 404)
+				{
+					setLogin((prevState: SettingData) => ({
+						...prevState,
+						error: true,
+						errorMessage: axiosError.response?.data.message
+					}))
+				}
+				else if (axiosError.response?.data?.statusCode === 403)
+				{
+					setPassword((prevState: SettingData) => ({
+						...prevState,
+						error: true,
+						errorMessage: axiosError.response?.data.message
+					}))
+				}
+				else
+					setErrorRequest(true)
 			}
 			else
-			{
 				setErrorRequest(true)
-				localStorage.removeItem('token')
-			}
 		}
 	}
 

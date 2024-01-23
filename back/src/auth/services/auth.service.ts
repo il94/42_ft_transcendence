@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -31,10 +31,10 @@ export class AuthService {
 					where: { username: dto.username, },
 				});
 			if (!user)
-				throw new BadRequestException('user not found');
+				throw new NotFoundException("User not found");
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
-				throw new ForbiddenException('incorrect password');
+				throw new ForbiddenException("Incorrect password");
 
 			await this.prisma.user.update({
 				where: {
@@ -49,9 +49,10 @@ export class AuthService {
 
 			return this.signToken(user.id, user.username)
 		} catch (error) {
-            const err = error as Error;
-            console.log("Validate user error: ", err.message);
-            throw new BadRequestException(err.message)
+			throw error
+            // const err = error as Error;
+            // console.log("Validate user error: ", err.message);
+            // throw new BadRequestException(err.message)
         }
 	}
 
