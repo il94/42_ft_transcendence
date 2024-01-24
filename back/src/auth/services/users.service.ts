@@ -17,8 +17,9 @@ export class UsersService {
 				}
 			})
 			if (userExists)
-				throw new ConflictException("User already exists");
-
+				throw new ConflictException("Email is already used");
+			else if (createUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException("42 emails are forbidden");
 			const hash = await argon.hash(createUserDto.hash);
 			const userDatas = {
 				...createUserDto,
@@ -37,14 +38,8 @@ export class UsersService {
 			});
             console.log(`User ${user.username} with id ${user.id} created successfully`);
 			return user;
-		} catch (error) {
-
-			console.log("ERROR", error)
-
-			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002')
-					throw new ForbiddenException('Failed to create new user');
-			}
+		}
+		catch (error) {
 			throw error;
 		}
 	}
@@ -91,6 +86,8 @@ export class UsersService {
 			})
 			if (userExists)
 				throw new ConflictException("Email is already used");
+			else if (updateUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException("42 emails are forbidden");
 			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
 
 			const userNewDatas = hash ? {

@@ -104,13 +104,14 @@ function Signup() {
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
-				if (axiosError.response?.data?.statusCode === 409)
+				const statusCode = axiosError.response?.data?.statusCode
+				if (statusCode === 403 || statusCode === 409)
 				{
-					setGlobal({
-						value: '',
+					setEmail((prevState) => ({
+						...prevState,
 						error: true,
-						errorMessage: axiosError.response.data.message
-					})
+						errorMessage: axiosError.response?.data.message
+					}))
 				}
 				else
 					setErrorRequest(true)
@@ -244,6 +245,13 @@ function Signup() {
 				errorMessage: "Invalid email format"
 			})
 		}
+		else if (value.endsWith("@student.42.fr")) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "42 emails are forbidden"
+			})
+		}
 		else {
 			setEmail({
 				value: value,
@@ -280,17 +288,6 @@ function Signup() {
 		}
 	}
 	
-/* ============================ GLOBAL ================================ */
-
-	const [global, setGlobal] = useState<SettingData>(emptySetting)
-
-	useEffect(() => {
-		setGlobal({
-			value: '',
-			error: false
-		})
-	}, [username, password, email, phoneNumber])
-
 /* ========================================================================== */
 
 	useEffect(() => {
@@ -402,7 +399,6 @@ function Signup() {
 								$error={phoneNumber.error} />
 							<ErrorMessage>
 								{phoneNumber.error && phoneNumber.errorMessage}
-								{global.error && global.errorMessage}
 							</ErrorMessage>
 						</Setting>
 						<div style={{ marginTop: "10px" }} />

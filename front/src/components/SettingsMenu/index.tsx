@@ -269,6 +269,13 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 				errorMessage: "Invalid email format"
 			})
 		}
+		else if (value.endsWith("@student.42.fr")) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "42 emails are forbidden"
+			})
+		}
 		else {
 			setEmail({
 				value: value,
