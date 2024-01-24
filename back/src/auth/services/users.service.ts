@@ -17,7 +17,7 @@ export class UsersService {
 				}
 			})
 			if (userExists)
-				throw new ConflictException("Email is already used");
+				throw new ConflictException();
 			else if (createUserDto.email.endsWith("@student.42.fr"))
 				throw new ForbiddenException("42 emails are forbidden");
 			const hash = await argon.hash(createUserDto.hash);
@@ -85,7 +85,7 @@ export class UsersService {
 				}
 			})
 			if (userExists)
-				throw new ConflictException("Email is already used");
+				throw new ConflictException();
 			else if (updateUserDto.email.endsWith("@student.42.fr"))
 				throw new ForbiddenException("42 emails are forbidden");
 			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;

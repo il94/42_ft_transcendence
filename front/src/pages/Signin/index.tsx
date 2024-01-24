@@ -44,15 +44,15 @@ function Signin() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (login.value.length === 0 ||
+			if (email.value.length === 0 ||
 				password.value.length === 0)
 			{
-				if (login.value.length === 0)
+				if (email.value.length === 0)
 				{
-					setLogin({
+					setEmail({
 						value: '',
 						error: true,
-						errorMessage: "Insert username or email",
+						errorMessage: "Insert email",
 					})
 				}
 				if (password.value.length === 0) 
@@ -65,11 +65,11 @@ function Signin() {
 				}
 				return
 			}
-			if (login.error || password.error)
+			if (email.error || password.error)
 				return
 
 			const user = {
-				username: login.value,
+				email: email.value,
 				hash: password.value
 			}
 			
@@ -90,20 +90,13 @@ function Signin() {
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
-				if (axiosError.response?.data?.statusCode === 404)
+				const { statusCode } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
 				{
-					setLogin((prevState: SettingData) => ({
+					setEmail((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: axiosError.response?.data.message
-					}))
-				}
-				else if (axiosError.response?.data?.statusCode === 403)
-				{
-					setPassword((prevState: SettingData) => ({
-						...prevState,
-						error: true,
-						errorMessage: axiosError.response?.data.message
+						errorMessage: "Invalid email"
 					}))
 				}
 				else
@@ -131,13 +124,13 @@ function Signin() {
 	// 	}
 	// }
 
-/* ================================ LOGIN =================================== */
+/* ================================ EMAIL =================================== */
 
-	const [login, setLogin] = useState<SettingData>(emptySetting)
+	const [email, setEmail] = useState<SettingData>(emptySetting)
 
-	function handleInputLoginChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setLogin({
+		setEmail({
 			value: value,
 			error: false
 		})
@@ -178,15 +171,15 @@ function Signin() {
 						autoComplete="off"
 						spellCheck="false">
 						<Setting>
-							Login or email
+							Email
 							<InputText
-								onChange={handleInputLoginChange}
-								type="text" value={login.value}
+								onChange={handleInputEmailChange}
+								type="text" value={email.value}
 								width={231}
 								fontSize={25}
-								$error={login.error} />
+								$error={email.error} />
 							<ErrorMessage>
-								{login.error && login.errorMessage}
+								{email.error && email.errorMessage}
 							</ErrorMessage>
 						</Setting>
 						<Setting>

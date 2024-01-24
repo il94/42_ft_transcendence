@@ -28,13 +28,15 @@ export class AuthService {
 	async validateUser(dto: AuthDto) {
 		try {
 			let user = await this.prisma.user.findUnique({
-					where: { username: dto.username, },
-				});
+				where: {
+					email: dto.email
+				},
+			});
 			if (!user)
-				throw new NotFoundException("User not found");
+				throw new NotFoundException();
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
-				throw new ForbiddenException("Incorrect password");
+				throw new ForbiddenException();
 
 			await this.prisma.user.update({
 				where: {
@@ -50,9 +52,6 @@ export class AuthService {
 			return this.signToken(user.id, user.username)
 		} catch (error) {
 			throw error
-            // const err = error as Error;
-            // console.log("Validate user error: ", err.message);
-            // throw new BadRequestException(err.message)
         }
 	}
 

@@ -120,12 +120,13 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
-				if (axiosError.response?.data?.statusCode === 409)
+				const { statusCode } = axiosError.response?.data!
+				if (statusCode === 409)
 				{
 					setEmail((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: axiosError.response?.data.message
+						errorMessage: "Invalid email"
 					}))
 				}
 				else
@@ -266,7 +267,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 			setEmail({
 				value: value,
 				error: true,
-				errorMessage: "Invalid email format"
+				errorMessage: "Invalid email"
 			})
 		}
 		else if (value.endsWith("@student.42.fr")) {
@@ -305,7 +306,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 			setPhoneNumber({
 				value: value,
 				error: true,
-				errorMessage: "Invalid phone number format"
+				errorMessage: "Invalid phone number"
 			})
 		}
 		else {

@@ -104,13 +104,13 @@ function Signup() {
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
-				const statusCode = axiosError.response?.data?.statusCode
+				const { statusCode } = axiosError.response?.data!
 				if (statusCode === 403 || statusCode === 409)
 				{
 					setEmail((prevState) => ({
 						...prevState,
 						error: true,
-						errorMessage: axiosError.response?.data.message
+						errorMessage: "Invalid email"
 					}))
 				}
 				else
@@ -242,7 +242,7 @@ function Signup() {
 			setEmail({
 				value: value,
 				error: true,
-				errorMessage: "Invalid email format"
+				errorMessage: "Invalid email"
 			})
 		}
 		else if (value.endsWith("@student.42.fr")) {
@@ -277,7 +277,7 @@ function Signup() {
 			setPhoneNumber({
 				value: value,
 				error: true,
-				errorMessage: "Invalid phone number format"
+				errorMessage: "Invalid phone number"
 			})
 		}
 		else {
