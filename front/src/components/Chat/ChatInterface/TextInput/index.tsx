@@ -9,7 +9,7 @@ import axios from "axios"
 
 import { Input, Style } from "./style"
 
-import ErrorRequest from "../../../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
@@ -92,7 +92,7 @@ function TextInput({ channel }: PropsTextInput) {
 						value={message}
 						placeholder="Type here..." />
 					:
-					<ErrorRequest />
+					<ErrorRequestMessage />
 			}
 		</Style>
 	)

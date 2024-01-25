@@ -5,7 +5,7 @@ import { Style } from "./style"
 
 import Match from "./Match"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
-import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import { MatchData, User, UserAuthenticate } from "../../../utils/types"
 import { matchResultStatus } from "../../../utils/status"
@@ -83,7 +83,7 @@ function MatchHistory({ userTarget }: PropsMatchHistory) {
 						}
 					</ScrollBar>
 					:
-					<ErrorRequest />
+					<ErrorRequestMessage />
 			}
 		</Style>
 	)

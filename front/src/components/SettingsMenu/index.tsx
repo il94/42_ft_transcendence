@@ -24,7 +24,7 @@ import Icon from "../../componentsLibrary/Icon"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
-import ErrorRequest from "../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
 
@@ -498,7 +498,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 				</SettingsForm>
 			</ScrollBar>
 			:
-			<ErrorRequest />
+			<ErrorRequestMessage />
 		}
 		</Style>
 	)

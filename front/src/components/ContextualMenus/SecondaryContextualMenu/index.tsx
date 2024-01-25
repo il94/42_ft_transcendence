@@ -5,7 +5,7 @@ import { Style } from "./style"
 
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
-import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import { Channel, User, UserAuthenticate } from "../../../utils/types"
 
@@ -63,7 +63,7 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 						}
 					</ScrollBar>
 					:
-					<ErrorRequest />
+					<ErrorRequestMessage />
 			}
 		</Style>
 	)

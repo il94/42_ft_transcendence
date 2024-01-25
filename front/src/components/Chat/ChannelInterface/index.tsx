@@ -24,7 +24,7 @@ import {
 import Button from "../../../componentsLibrary/Button"
 import Icon from "../../../componentsLibrary/Icon"
 import IconUploadFile, { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
-import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
@@ -346,7 +346,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 						</ButtonsWrapper>
 					</CreateChannelForm>
 					:
-					<ErrorRequest />
+					<ErrorRequestMessage />
 			}
 		</Style>
 	)

@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect } from "react"
 
 import styled from "styled-components"
 
-import Error from "../../../componentsLibrary/ErrorRequest"
+import Error from "../../../componentsLibrary/ErrorRequestMessage"
 
 import effects from "../../../utils/effects"
 import colors from "../../../utils/colors"

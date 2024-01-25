@@ -11,7 +11,7 @@ import axios, { AxiosResponse } from "axios"
 import { Style } from "./style"
 
 import Section, { SectionName } from "../../../componentsLibrary/Section"
-import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
@@ -484,14 +484,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 												}
 											</>
 											:
-											<ErrorRequest />
+											<ErrorRequestMessage />
 									}
 								</>
 							}
 						</div>
 					</>
 					:
-					<ErrorRequest />
+					<ErrorRequestMessage />
 			}
 		</Style>
 	)

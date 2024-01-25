@@ -62,7 +62,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 			}
 		})
 
-		localStorage.removeItem('token')
+		localStorage.removeItem("access_token")
 		setToken('')
 		navigate("/")
 	}

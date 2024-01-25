@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { Socket } from 'socket.io-client'
 
 import Home from './pages/Home'
 import Game from './pages/Game'
@@ -8,12 +7,13 @@ import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import TwoFA from './pages/twoFA'
 import Error from './pages/Error'
+import NotFound from './pages/NotFound'
 
 import AuthContext from './contexts/AuthContext'
 
 function App() {
 
-	const localToken = localStorage.getItem('token')
+	const localToken = localStorage.getItem("access_token")
 	const [token, setToken] = useState<string>(localToken ? localToken : '')
 	const url = new URL(window.location.href).hostname
 
@@ -26,7 +26,8 @@ function App() {
 					<Route path="/signup" element={<Signup />} />
 					<Route path="/twofa" element={<TwoFA />} />
 					<Route path="/game" element={<Game />} />
-					<Route path="*" element={<Error />} />
+					<Route path="/error" element={<Error />} />
+					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</Router>
 		</AuthContext.Provider>

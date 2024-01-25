@@ -22,7 +22,7 @@ import Banner from "./Banner"
 import Icon from "../../componentsLibrary/Icon"
 import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
-import ErrorRequest from "../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import AuthContext from "../../contexts/AuthContext"
@@ -418,7 +418,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 							</BottomChatWrapper>
 						</>
 						:
-						<ErrorRequest />
+						<ErrorRequestMessage />
 				}
 			</Style>
 			:
