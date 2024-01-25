@@ -147,6 +147,7 @@ function Game() {
 
 		async function fetchMe() {
 			try {
+				console.log("TOKEN : ", token);
 				const responseMe: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`

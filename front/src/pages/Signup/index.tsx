@@ -305,7 +305,7 @@ function Signup() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to={`http://${url}:3333/auth/api42/login`}>
+						<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

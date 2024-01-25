@@ -17,11 +17,11 @@ export class AuthController {
 
 	@Post('signup')
 	@HttpCode(HttpStatus.OK)
-	async signup(@Body() dto: CreateUserDto, @Res({ passthrough: true }) res: Response): Promise<string> {
+	async signup(@Body() dto: CreateUserDto, @Res({ passthrough: true }) res: Response): Promise<{ access_token: string }> {
 		try {
 			const token = await this.authService.signup(dto);
 			res.cookie('access_token', token.access_token, { httpOnly: true });
-			return "New user authenticated"; 
+			return token; 
 		} catch (error) {
 			throw new BadRequestException(error.message)
 		}
@@ -34,10 +34,8 @@ export class AuthController {
 		try {
 			type token = { twoFA: boolean } | { access_token: string }
 			const tok: token  = await this.authService.validateUser(dto);
-			if ('access_token' in tok) {
+			if ('access_token' in tok) 
 				res.cookie('access_token', tok.access_token, { httpOnly: true });
-				return "New user authenticated"; 
-			}
 			return tok;
 		} catch (error) {
 			throw new BadRequestException(error.message)
@@ -64,11 +62,9 @@ export class AuthController {
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@getUser() user: User, @Res({ passthrough: true }) res: Response,
 	): Promise<void> {
-		console.log("user est dans callback : ", user);
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
 			res.clearCookie('token', { httpOnly: true })
-
 			res.cookie("access_token", token.access_token, { httpOnly: true });
 			res.redirect("http://localhost:5173")
 		}
@@ -79,7 +75,7 @@ export class AuthController {
 	/*********************** 2FA routes *************************************/
 
 	@Get('2fa/generate')  // cree le service de 2FA en creeant le twoFASecret du user et en generant un QRcode 
-	@UseGuards(JwtGuard, Jwt2faAuthGuard)
+	@UseGuards(JwtGuard)
 	async register(@getUser() user: User) {
 		const { otpAuthURL } = await this.authService.generateTwoFASecret(user);	
 		const QRcode = await this.authService.generateQrCodeDataURL(otpAuthURL);
@@ -87,7 +83,7 @@ export class AuthController {
 	}
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
-	@UseGuards(JwtGuard, Jwt2faAuthGuard)
+	@UseGuards(JwtGuard)
 	async turnOnTwoFA(@getUser() user: User, @Body() body) {
 		try {
 			if (!body.twoFACode)
@@ -100,7 +96,7 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
   	@HttpCode(200)
-  	@UseGuards(Jwt2faAuthGuard)
+  	//@UseGuards(Jwt2faAuthGuard)
   	async authenticate(@getUser() user: User, @Body() body) {
 		console.log("C'EST GOOD")
 		try {

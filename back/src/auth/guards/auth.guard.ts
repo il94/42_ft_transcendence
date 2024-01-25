@@ -22,4 +22,6 @@ export class Api42AuthGuard extends AuthGuard('42') {
 }
 
 @Injectable()
-export class Jwt2faAuthGuard extends AuthGuard('jwt-2fa') {}
+export class Jwt2faAuthGuard extends AuthGuard('jwt-2fa') {
+	
+}

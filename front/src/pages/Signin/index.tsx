@@ -6,6 +6,7 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 import axios, { AxiosError } from 'axios'
+import Cookies from "js-cookie"
 
 import {
 	SigninPage,
@@ -74,12 +75,21 @@ function Signin() {
 			}
 			
 			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
-	
+			console.log("REPONSE : ", response.status);
 			// temporaire
-			if (response.data.twoFA)
-				navigate("/twofa")
-			else
+			// if (response.data.twoFA)
+			// 	navigate("/twofa")
+			if (response.status == 200)
 			{
+				const access_token = Cookies.get()
+				console.log("LACCESS : ", access_token)
+
+
+				if (access_token)
+				{
+					// localStorage.setItem('token', access_token)
+					// setToken(access_token)
+				}
 				setToken(response.data.access_token)
 				localStorage.setItem('token', response.data.access_token)
 				
