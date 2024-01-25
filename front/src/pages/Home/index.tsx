@@ -1,12 +1,5 @@
 import { useContext, useEffect } from 'react'
-
-import {
-	HomePage,
-	MainTitle,
-	CentralWindow,
-	StyledTitle,
-	ButtonsWrapper
-} from './style'
+import styled from 'styled-components'
 
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -15,6 +8,21 @@ import ActiveText from '../../componentsLibrary/ActiveText/Index'
 import AuthContext from '../../contexts/AuthContext'
 
 import colors from '../../utils/colors'
+import Page from '../../componentsLibrary/Page'
+import MainTitle from '../../componentsLibrary/MainTitle'
+import CentralWindow from '../../componentsLibrary/CentralWindow'
+import WindowTitle from '../../componentsLibrary/WindowTitle'
+
+const ButtonsWrapper = styled.div`
+
+	display: flex;
+	justify-content: space-evenly;
+
+	width: 100%;
+
+	padding-bottom: 15px;
+
+`
 
 function Home() {
 
@@ -22,38 +30,37 @@ function Home() {
 
 	useEffect(() => {
 
-			// Extraire la partie après "access_token="
-			// const tokenString: string = document.cookie.indexOf("access_token")
-			const index = document.cookie.indexOf("access_token=")
+		// Extraire la partie après "access_token="
+		// const tokenString: string = document.cookie.indexOf("access_token")
+		const index = document.cookie.indexOf("access_token=")
 
-			const accessTokenString = document.cookie.slice(index + "access_token=".length);
-			
-			// console.log("LOL = ", accessTokenString)
+		const accessTokenString = document.cookie.slice(index + "access_token=".length);
 
-			if (!localStorage.getItem('token'))
-			{
-				setToken(accessTokenString)
-				localStorage.setItem('token', accessTokenString)
-			}
+		// console.log("LOL = ", accessTokenString)
+
+		if (!localStorage.getItem("access_token")) {
+			setToken(accessTokenString)
+			localStorage.setItem("access_token", accessTokenString)
+		}
 
 	}, [])
 
 	async function handleDeconnexionClickText() {
-		localStorage.removeItem('token')
+		localStorage.removeItem("access_token")
 		setToken('')
 	}
 
 	return (
-		<HomePage>
+		<Page>
 			<MainTitle>
 				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
 			<CentralWindow>
-				<StyledTitle>
+				<WindowTitle>
 					Welcome
-				</StyledTitle>
+				</WindowTitle>
 				{
 					token ?
 						<>
@@ -83,7 +90,7 @@ function Home() {
 						</ButtonsWrapper>
 				}
 			</CentralWindow>
-		</HomePage>
+		</Page>
 	)
 }
 

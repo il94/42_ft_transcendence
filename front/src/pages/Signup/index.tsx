@@ -8,25 +8,16 @@ import {
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { useNavigate } from 'react-router'
 
-import {
-	SignupPage,
-	MainTitle,
-	CentralWindow,
-	StyledTitle,
-	SettingsForm,
-	Setting,
-	FTRedirectWrapper,
-	Separator,
-	Line,
-	TextSeparator,
-	ErrorMessage
-} from './style'
-
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
-import LinkButtonImage from '../../componentsLibrary/LinkButtonImage'
 import InputText from '../../componentsLibrary/InputText'
-import ErrorRequest from '../../componentsLibrary/ErrorRequest'
+import Page from '../../componentsLibrary/Page'
+import MainTitle from '../../componentsLibrary/MainTitle'
+import CentralWindow from '../../componentsLibrary/CentralWindow'
+import WindowTitle from '../../componentsLibrary/WindowTitle'
+import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
+import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
+import Setting from '../../componentsLibrary/Setting/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
@@ -37,13 +28,15 @@ import { emptySetting } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
 
-import FTButton from "../../assets/42.png"
-
 function Signup() {
 
 	const { token, setToken, url } = useContext(AuthContext)!
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (token)
+			navigate("/error")
+	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -96,17 +89,15 @@ function Signup() {
 			const signupResponse: AxiosResponse = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
 			setToken(signupResponse.data.access_token)
-			localStorage.setItem('token', signupResponse.data.access_token)
+			localStorage.setItem("access_token", signupResponse.data.access_token)
 
 			navigate("/")
 		}
 		catch (error) {
-			if (axios.isAxiosError(error))
-			{
+			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 403 || statusCode === 409)
-				{
+				if (statusCode === 403 || statusCode === 409) {
 					setEmail((prevState) => ({
 						...prevState,
 						error: true,
@@ -114,14 +105,14 @@ function Signup() {
 					}))
 				}
 				else
-					setErrorRequest(true)
+					navigate("/error")
 			}
 			else
-				setErrorRequest(true)
+				navigate("/error")
 		}
 	}
 
-/* ============================== USERNAME ================================== */
+	/* ============================== USERNAME ================================== */
 
 	const [username, setUsername] = useState<SettingData>(emptySetting)
 
@@ -177,7 +168,7 @@ function Signup() {
 		}))
 	}
 
-/* ============================== PASSWORD ================================== */
+	/* ============================== PASSWORD ================================== */
 
 	const [password, setPassword] = useState<SettingData>(emptySetting)
 
@@ -188,8 +179,7 @@ function Signup() {
 			!/[A-Z]/.test(value) ||
 			!/[a-z]/.test(value) ||
 			!/\d/.test(value) ||
-			!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value))
-		{
+			!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
 			let errorMessages: string[] = []
 			if (value.length === 0) {
 				errorMessages.push("Password cannot be empty")
@@ -225,7 +215,7 @@ function Signup() {
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
-/* =============================== EMAIL ==================================== */
+	/* =============================== EMAIL ==================================== */
 
 	const [email, setEmail] = useState<SettingData>(emptySetting)
 
@@ -260,7 +250,7 @@ function Signup() {
 		}
 	}
 
-/* ============================ PHONE NUMBER ================================ */
+	/* ============================ PHONE NUMBER ================================ */
 
 	const [phoneNumber, setPhoneNumber] = useState<SettingData>(emptySetting)
 
@@ -287,152 +277,128 @@ function Signup() {
 			})
 		}
 	}
-	
-/* ========================================================================== */
 
-	useEffect(() => {
-		if (token)
-			setErrorRequest(true)
-	}, [])
+	/* ========================================================================== */
 
 	return (
-		<SignupPage>
+		<Page>
 			<MainTitle>
 				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
 			<CentralWindow>
-			{
-				!errorRequest ?
-				<>
-					<StyledTitle>
-						Sign up
-					</StyledTitle>
-					<SettingsForm
-						onSubmit={handleSubmit}
-						autoComplete="off"
-						spellCheck="false">
-						<Setting>
-							Username
-							<InputText
-								onChange={handleInputUsernameChange}
-								onBlur={handleInputUsernameBlur}
-								type="text" value={username.value}
-								width={231}
-								fontSize={25}
-								$error={username.error} />
-							<ErrorMessage>
-								{username.error && username.errorMessage}
-							</ErrorMessage>
-						</Setting>
-						<Setting>
-							Password
-							<InputText
-								onChange={handleInputPasswordChange}
-								type={showPassword ? "text" : "password"}
-								value={password.value as string}
-								width={231}
-								fontSize={25}
-								$error={password.error} />
-							{
-								password.errorMessage ?
+				<WindowTitle>
+					Sign up
+				</WindowTitle>
+				<SettingsForm
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					spellCheck="false">
+					<Setting>
+						Username
+						<InputText
+							onChange={handleInputUsernameChange}
+							onBlur={handleInputUsernameBlur}
+							type="text" value={username.value}
+							width={231}
+							fontSize={25}
+							$error={username.error} />
+						<ErrorMessage>
+							{username.error && username.errorMessage}
+						</ErrorMessage>
+					</Setting>
+					<Setting>
+						Password
+						<InputText
+							onChange={handleInputPasswordChange}
+							type={showPassword ? "text" : "password"}
+							value={password.value as string}
+							width={231}
+							fontSize={25}
+							$error={password.error} />
+						{
+							password.errorMessage ?
 								<>
-								{
-									Array.isArray(password.errorMessage) ?
-									<>
 									{
+										Array.isArray(password.errorMessage) ?
+											<>
+												{
 
-										(password.errorMessage as string[]).map((errorMessage, index) => {
-											return (
-												<ErrorMessage
-													key={"error_message" + index}>
-													{errorMessage}
-												</ErrorMessage>)
-											}
-										)
+													(password.errorMessage as string[]).map((errorMessage, index) => {
+														return (
+															<ErrorMessage
+																key={"error_message" + index}>
+																{errorMessage}
+															</ErrorMessage>)
+													}
+													)
+												}
+											</>
+											:
+											<ErrorMessage>
+												{password.errorMessage}
+											</ErrorMessage>
 									}
-									</>
-									:
-									<ErrorMessage>
-										{password.errorMessage}
-									</ErrorMessage>
-								}
 								</>
 								:
 								<div style={{ height: "15px" }} />
-							}
-							<Button
-								onClick={() => setShowPassword(!showPassword)}
-								type="button"
-								fontSize={18}
-								alt="Show password button"
-								title={showPassword ? "Hide password" : "Show password"}
-								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
-								{
-									showPassword ?
-										"Hide password"
-										:
-										"Show password"
-								}
-							</Button>
-						</Setting>
-						<Setting>
-							E-mail
-							<InputText
-								onChange={handleInputEmailChange}
-								type="text" value={email.value as string}
-								width={231}
-								fontSize={25}
-								$error={email.error} />
-							<ErrorMessage>
-								{email.error && email.errorMessage}
-							</ErrorMessage>
-						</Setting>
-						<Setting>
-							Phone number
-							<InputText
-								onChange={handleInputPhoneNumberChange}
-								type="text" value={phoneNumber.value as string}
-								width={231}
-								fontSize={25}
-								$error={phoneNumber.error} />
-							<ErrorMessage>
-								{phoneNumber.error && phoneNumber.errorMessage}
-							</ErrorMessage>
-						</Setting>
-						<div style={{ marginTop: "10px" }} />
+						}
 						<Button
-							type="submit" fontSize={35}
-							alt="Continue button" title="Continue">
-							Continue
+							onClick={() => setShowPassword(!showPassword)}
+							type="button"
+							fontSize={18}
+							alt="Show password button"
+							title={showPassword ? "Hide password" : "Show password"}
+							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+							{
+								showPassword ?
+									"Hide password"
+									:
+									"Show password"
+							}
 						</Button>
-					</SettingsForm>
-					<div>
-						Already have an account ?&nbsp;
-						<StyledLink to="/signin" color={colors.button}>
-							Sign in
-						</StyledLink>
-					</div>
-					<Separator>
-						<Line />
-						<TextSeparator>
-							OR
-						</TextSeparator>
-						<Line />
-					</Separator>
-					<FTRedirectWrapper>
-						<LinkButtonImage to={`http://${url}:3333/auth/api42/login`}>
-							<img src={FTButton} style={{ paddingRight: "7px" }} />
-							Continue with 42
-						</LinkButtonImage>
-					</FTRedirectWrapper>
-				</>
-				:
-				<ErrorRequest />
-			}
+					</Setting>
+					<Setting>
+						E-mail
+						<InputText
+							onChange={handleInputEmailChange}
+							type="text" value={email.value as string}
+							width={231}
+							fontSize={25}
+							$error={email.error} />
+						<ErrorMessage>
+							{email.error && email.errorMessage}
+						</ErrorMessage>
+					</Setting>
+					<Setting>
+						Phone number
+						<InputText
+							onChange={handleInputPhoneNumberChange}
+							type="text" value={phoneNumber.value as string}
+							width={231}
+							fontSize={25}
+							$error={phoneNumber.error} />
+						<ErrorMessage>
+							{phoneNumber.error && phoneNumber.errorMessage}
+						</ErrorMessage>
+					</Setting>
+					<div style={{ height: "10px" }} />
+					<Button
+						type="submit" fontSize={35}
+						alt="Continue button" title="Continue">
+						Continue
+					</Button>
+				</SettingsForm>
+				<div>
+					Already have an account ?&nbsp;
+					<StyledLink to="/signin" color={colors.button}>
+						Sign in
+					</StyledLink>
+				</div>
+				<div style={{ height: "15px" }} />
 			</CentralWindow>
-		</SignupPage>
+		</Page>
 	)
 }
 
