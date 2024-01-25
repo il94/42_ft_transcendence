@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Patch, HttpCode, HttpStatus, Req, Res, Bad
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, Jwt2faAuthGuard  } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto } from "../dto/";
-import { Public, getUser } from "../decorators/users.decorator";
+import { getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
 import { Response, Request } from 'express';
 import { User, UserStatus } from '@prisma/client';
