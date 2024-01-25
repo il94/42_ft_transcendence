@@ -8,9 +8,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { Jwt2faStrategy, JwtStrategy, Api42Strategy } from './strategy';
 import { SessionSerializer } from "./Serializer";
 import { UsersController } from "./controllers/users.controller";
-import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
-import { APP_GUARD } from '@nestjs/core';
+import { Api42AuthGuard, JwtGuard, Jwt2faAuthGuard } from "./guards/auth.guard";
 import { HttpModule } from "@nestjs/axios";
+import { AppGateway } from "src/app.gateway";
 
 @Module ({
 	imports: [
@@ -32,6 +32,8 @@ import { HttpModule } from "@nestjs/axios";
 		SessionSerializer, 
 		Api42AuthGuard,
 		JwtGuard,
+		Jwt2faAuthGuard,
+		AppGateway
 	],
 		
 	controllers: [AuthController, UsersController],

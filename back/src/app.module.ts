@@ -7,6 +7,8 @@ import { ChatsModule } from './channels/channels.module';
 import { FriendsModule } from './friends/friends.module';
 import { BlockedsModule } from './blockeds/blockeds.module';
 import { PongModule } from './pong/pong.module';
+import { AppGateway } from './app.gateway';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -17,7 +19,11 @@ import { PongModule } from './pong/pong.module';
     ChatsModule,
     FriendsModule,
     BlockedsModule,
-	PongModule,
+	  PongModule,
   ],
+  providers: [
+    AppGateway,
+    AppService
+  ]
 })
 export class AppModule {}

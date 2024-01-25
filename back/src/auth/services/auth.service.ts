@@ -8,6 +8,7 @@ import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
 import { authenticator } from "otplib";
 import { generate } from "generate-password";
+import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
 
 @Injectable()
@@ -15,18 +16,21 @@ export class AuthService {
 	constructor(
 		private prisma: PrismaService, 
 		private jwt: JwtService, 
-		private userService: UsersService) {}
+		private userService: UsersService,
+		private appGateway: AppGateway
+		) {}
 
-	
-	//*********************** General Authentication ******************************************/
-
-	async signup(dto: CreateUserDto) {
-		const newUser = await this.userService.createUser(dto);
-		delete newUser.hash;
-		return this.signToken(newUser.id, newUser.username);
+	async signup(dto: CreateUserDto): Promise<{ access_token: string }>{
+		try {
+			const newUser = await this.userService.createUser(dto);
+			delete newUser.hash;
+			return this.signToken(newUser.id, newUser.username);
+		} catch (error) {
+            throw new BadRequestException(error.message)
+        }	
 	}
 
-	async validateUser(dto: AuthDto): Promise<string | { access_token: string } | { twoFA: boolean } > {
+	async validateUser(dto: AuthDto): Promise<{ access_token: string } | { twoFA: boolean } > {
 		try {
 			const user = await this.prisma.user.findUnique({
 					where: { username: dto.username, },
@@ -35,19 +39,18 @@ export class AuthService {
 				throw new BadRequestException('user not found');
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
-				throw new ForbiddenException('incorrect password');			
+				throw new ForbiddenException('incorrect password');
+			const token: { access_token: string } = await this.signToken(user.id, user.username)
 			if(user.twoFA === false) {
-				await this.prisma.user.update({ 
-					where: { username: dto.username },
-					data: { status: UserStatus.ONLINE }})
-				return this.signToken(user.id, user.username)
-			}
-			else
-			{
-				return {
-					twoFA: true
+				await this.prisma.user.update({
+						where: { id: user.id },
+						data: { status: UserStatus.ONLINE }
+				})
+				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
+				return token;
+				} else {
+					return { twoFA: true }
 				}
-			}
 			// else : return nulll to login with 2FA
 			// return `User ${user.username} must login with 2FA`
 		} catch (error) {
@@ -63,10 +66,12 @@ export class AuthService {
 			username
 		};
 		const token =  await this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET })
+		if (!token)
+			throw new BadRequestException("Failed to generate access_token")
 		return { access_token: token, }
 	}
 
-	async verifyToken(token: string): Promise<any> {
+	async verifyToken(token: string): Promise<object> {
 		try {
 		  return await this.jwt.verify(token);
 		} catch (error) {
@@ -74,7 +79,7 @@ export class AuthService {
 		}
 	}
 
-	async logout(userId: number) {
+	async logout(userId: number): Promise<User> {
 		const user = this.prisma.user.update({
 			where: { id: userId, status: UserStatus.ONLINE },
 			data: { status: UserStatus.OFFLINE }
@@ -84,9 +89,28 @@ export class AuthService {
 		return user;
 	}
 
+	async disconnect(userId: number) {
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userId
+				},
+				data: {
+					status: UserStatus.OFFLINE
+				}
+			})
+			this.appGateway.server.emit("updateUserStatus", userId, UserStatus.OFFLINE);
+
+		} catch (error) {
+			const err = error as Error;
+            console.log("Validate 42 user error: ", err.message);
+            throw new BadRequestException(err.message)
+		}
+	}
+
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any) {
+	async validate42User(profile: any): Promise<string | User> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { username: profile.username, },

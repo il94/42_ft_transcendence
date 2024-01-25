@@ -6,12 +6,12 @@ import { AuthDto } from "../dto/auth.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
-export class Jwt2faStrategy /*extends PassportStrategy(Strategy, 'jwt-2fa') */{
+export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
   constructor(private readonly prisma: PrismaService) {
-    // super({
-    //   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    //   secretOrKey: 'secret',
-    // });
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: 'secret',
+    });
   }
 
   async validate(payload: any) {

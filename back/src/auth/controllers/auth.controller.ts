@@ -17,14 +17,31 @@ export class AuthController {
 
 	@Post('signup')
 	@HttpCode(HttpStatus.OK)
-	async signup(@Body() dto: CreateUserDto): Promise<string | { access_token: string }> {
-		return this.authService.signup(dto);
+	async signup(@Body() dto: CreateUserDto, @Res({ passthrough: true }) res: Response): Promise<string> {
+		try {
+			const token = await this.authService.signup(dto);
+			res.cookie('access_token', token.access_token, { httpOnly: true });
+			return "New user authenticated"; 
+		} catch (error) {
+			throw new BadRequestException(error.message)
+		}
 	}
 
 	@Post('signin')
 	@HttpCode(HttpStatus.OK)
-	async signin(@Body() dto: AuthDto): Promise<string | { access_token: string } | { twoFA: boolean } > {
-		return this.authService.validateUser(dto);
+	async signin(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response): 
+	Promise<string | {access_token: string} | {twoFA: boolean}> {
+		try {
+			type token = { twoFA: boolean } | { access_token: string }
+			const tok: token  = await this.authService.validateUser(dto);
+			if ('access_token' in tok) {
+				res.cookie('access_token', tok.access_token, { httpOnly: true });
+				return "New user authenticated"; 
+			}
+			return tok;
+		} catch (error) {
+			throw new BadRequestException(error.message)
+		}
 	}
 
 	@Get('logout')
@@ -39,20 +56,21 @@ export class AuthController {
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
 	async get42User(@getUser() user: User): Promise<User> {
+		console.log("user est : ", user);
 		return user;
 	}
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@getUser() user: User, 
-	@Res({ passthrough: true }) res: Response,
+	async handle42Redirect(@getUser() user: User, @Res({ passthrough: true }) res: Response,
 	): Promise<void> {
+		console.log("user est dans callback : ", user);
 		if (user) {
 			const token = await this.authService.signToken(user.id, user.username);
 			res.clearCookie('token', { httpOnly: true })
 
-			res.cookie("access_token", token.access_token);
-			res.redirect("http://localhost:5173")		 
+			res.cookie("access_token", token.access_token, { httpOnly: true });
+			res.redirect("http://localhost:5173")
 		}
 		else
 			throw new BadRequestException("Can't find user from 42 intra");
@@ -61,18 +79,15 @@ export class AuthController {
 	/*********************** 2FA routes *************************************/
 
 	@Get('2fa/generate')  // cree le service de 2FA en creeant le twoFASecret du user et en generant un QRcode 
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtGuard, Jwt2faAuthGuard)
 	async register(@getUser() user: User) {
-		console.log("HERE")
-		const { otpAuthURL } = await this.authService.generateTwoFASecret(user);
-		
-		const QRcode = await this.authService.generateQrCodeDataURL(otpAuthURL) 
-
-	  return (QRcode) ;
+		const { otpAuthURL } = await this.authService.generateTwoFASecret(user);	
+		const QRcode = await this.authService.generateQrCodeDataURL(otpAuthURL);
+		return (QRcode);
 	}
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtGuard, Jwt2faAuthGuard)
 	async turnOnTwoFA(@getUser() user: User, @Body() body) {
 		try {
 			if (!body.twoFACode)
@@ -88,16 +103,20 @@ export class AuthController {
   	@UseGuards(Jwt2faAuthGuard)
   	async authenticate(@getUser() user: User, @Body() body) {
 		console.log("C'EST GOOD")
-    	if (user.status === UserStatus.ONLINE)
-			throw new BadRequestException('User is already authenticated');
-		if (!body.twoFACode)
-			throw new BadRequestException('Empty 2FA code');
-    	return this.authService.loginWith2fa(user, body.twoFACode);
+		try {
+			if (user.status === UserStatus.ONLINE)
+				throw new BadRequestException('User is already authenticated');
+			if (!body.twoFACode)
+				throw new BadRequestException('Empty 2FA code');
+			return this.authService.loginWith2fa(user, body.twoFACode);
+		} catch (error) {
+			throw new BadRequestException(error.message);
+		}
   	}
 
 	@Patch('2fa/disable')
 	@HttpCode(200)
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtGuard, Jwt2faAuthGuard)
 	async disable(@getUser() user: User, @Body() body, @Req() req) {
 		return this.userService.disableTwoFA(user, body.twoFACode) //il faut envoyer un code dans le body pour disable la 2FA
 	}
