@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-const Setting = styled.form`
+const Setting = styled.div`
 
 	display: flex;
 	flex-direction: column;
