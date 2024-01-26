@@ -48,15 +48,10 @@ export class AuthService {
 				})
 				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
 				return token;
-				} else {
-					return { twoFA: true }
-				}
-			// else : return nulll to login with 2FA
-			// return `User ${user.username} must login with 2FA`
+			} else
+				return { twoFA: true }
 		} catch (error) {
-            const err = error as Error;
-            console.log("Validate user error: ", err.message);
-            throw new BadRequestException(err.message)
+            throw new BadRequestException(error.message)
         }
 	}
 
@@ -71,46 +66,24 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
-	async verifyToken(token: string): Promise<object> {
-		try {
-		  return await this.jwt.verify(token);
-		} catch (error) {
-		  return null;
-		}
-	}
-
 	async logout(userId: number): Promise<User> {
-		const user = this.prisma.user.update({
-			where: { id: userId, status: UserStatus.ONLINE },
-			data: { status: UserStatus.OFFLINE }
-		})
-		if (!user)
-			throw new BadRequestException(`User with od ${userId}, not found or offline`)
-		return user;
-	}
-
-	async disconnect(userId: number) {
 		try {
-			await this.prisma.user.update({
-				where: {
-					id: userId
-				},
-				data: {
-					status: UserStatus.OFFLINE
-				}
+			const user = this.prisma.user.update({
+				where: { id: userId, status: UserStatus.ONLINE },
+				data: { status: UserStatus.OFFLINE }
 			})
+			if (!user)
+				throw new BadRequestException(`Failed to disconnect User with id ${userId}`)
 			this.appGateway.server.emit("updateUserStatus", userId, UserStatus.OFFLINE);
-
+			return user;
 		} catch (error) {
-			const err = error as Error;
-            console.log("Validate 42 user error: ", err.message);
-            throw new BadRequestException(err.message)
+            throw new BadRequestException(error.message)
 		}
 	}
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<string | User> {
+	async validate42User(profile: any): Promise<User | { twoFA: boolean }> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { username: profile.username, },
@@ -122,7 +95,7 @@ export class AuthService {
 						data: { status: UserStatus.ONLINE }})
 					return user;
 				}
-				return `42 User must login with 2FA`;
+				return { twoFA: true };
 			}
 			console.log ("jai pas trouve le user");
 			profile.hash = generate({ length: 6, numbers: true });
@@ -131,35 +104,31 @@ export class AuthService {
 				throw new ForbiddenException('Failed to create new 42 user');
 			return newUser;
 		} catch (error) {
-			const err = error as Error;
-            console.log("Validate 42 user error: ", err.message);
-            throw new BadRequestException(err.message)
+            throw new BadRequestException(error.message)
 		}
 	}
 
 	/*********************** TwoFA Authentication ******************************************/
 
-	async generateQrCodeDataURL(otpAuthUrl: string) {
+	async generateQrCodeDataURL(otpAuthUrl: string): Promise<string> {
 		return toDataURL(otpAuthUrl);
 	}
 
-	async generateTwoFASecret(user: User) {
-
+	async generateTwoFASecret(user: User): Promise <{ secret:string, otpAuthURL: string}> {
 		const secret = authenticator.generateSecret();
-
 		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
 		await this.userService.setTwoFASecret(secret, user.id);
 		return { secret, otpAuthURL };
 	}
 
-	async verifyCode(user: User, twoFACode: string) {
+	async verifyCode(user: User, twoFACode: string): Promise <boolean> {
 		return authenticator.verify({
 			token: twoFACode,
 			secret: user.twoFASecret,
 		  });
 	}
 
-	async loginWith2fa(user: User, twoFACode: string) {
+	async loginWith2fa(user: User, twoFACode: string): Promise <{access_token: string}> {
 		if (!await this.verifyCode(user, twoFACode))
 			throw new ForbiddenException('Wrong secret code')	
 		return this.signToken(user.id, user.username)

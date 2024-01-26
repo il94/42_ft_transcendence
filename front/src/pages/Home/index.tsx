@@ -25,29 +25,23 @@ function Home() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-
 		const access_token = Cookies.get('access_token')
-		console.log("JAI UN TOKEN :", access_token)
-
-		if (access_token)
-		{
-			localStorage.setItem('token', access_token)
+		if (access_token) {
+			localStorage.setItem('access_token', access_token)
 			setToken(access_token)
 		}		
 	}, [])
 
 	async function handleDeconnexionClickText() {
 		try {
-
 			await axios.get(`http://${url}:3333/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			}) 
-			
 			Cookies.remove('access_token')
-
 			localStorage.removeItem('token')
+			localStorage.clear();
 			setToken('')
 			navigate("/")
 		}

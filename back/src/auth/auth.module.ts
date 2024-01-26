@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { Jwt2faStrategy, JwtStrategy, Api42Strategy } from './strategy';
 import { SessionSerializer } from "./Serializer";
 import { UsersController } from "./controllers/users.controller";
-import { Api42AuthGuard, JwtGuard, Jwt2faAuthGuard } from "./guards/auth.guard";
+import { Api42AuthGuard, JwtGuard, TwoFAGuard } from "./guards/auth.guard";
 import { HttpModule } from "@nestjs/axios";
 import { AppGateway } from "src/app.gateway";
 
@@ -32,7 +32,7 @@ import { AppGateway } from "src/app.gateway";
 		SessionSerializer, 
 		Api42AuthGuard,
 		JwtGuard,
-		Jwt2faAuthGuard,
+		TwoFAGuard,
 		AppGateway
 	],
 		

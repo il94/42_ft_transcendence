@@ -75,30 +75,23 @@ function Signin() {
 			}
 			
 			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
-			console.log("REPONSE : ", response.status);
-			// temporaire
-			// if (response.data.twoFA)
-			// 	navigate("/twofa")
-			if (response.status == 200)
-			{
-				const access_token = Cookies.get()
-				console.log("LACCESS : ", access_token)
-
-
-				if (access_token)
-				{
-					// localStorage.setItem('token', access_token)
-					// setToken(access_token)
+			if (response.data.twoFA)
+				navigate("/twofa")
+			else {
+				const access_token: string = response.data.access_token;
+				if (access_token) {
+					localStorage.setItem('token', access_token)
+					setToken(access_token)
 				}
-				setToken(response.data.access_token)
-				localStorage.setItem('token', response.data.access_token)
-				
+				else { 
+					console.log("pas de token dans response.data : ", response.data)
+					throw new AxiosError("Failed to retrieve access_token")
+				}
 				navigate("/")
 			}
 		}
 		catch (error) {
 			const axiosError = error as AxiosError
-
 			console.log("SIGNIN ERROR", error)
 
 			// if (axiosError.response?.status === 404)
@@ -116,38 +109,19 @@ function Signin() {
 			// else if (axiosError.response?.status === 401)
 			
 			// temporaire
-			else if ((axiosError.response?.data as any)?.message === "incorrect password")
-			{
+			else if ((axiosError.response?.data as any)?.message === "incorrect password") {
 				setPassword((prevState) => ({
 					...prevState,
 					error: true,
 					errorMessage: "Incorrect password",
 				}))
 			}
-			else
-			{
+			else {
 				setErrorRequest(true)
 				localStorage.removeItem('token')
 			}
 		}
 	}
-
-	// async function connectionBy42() {
-	// 	try {
-
-	// 		const test = await axios.get(`http://${url}:3333/auth/api42`)
-			
-	// 		console.log(test)
-			
-	// 		setToken(test.data.access_token)
-	// 		localStorage.setItem('token', test.data.access_token)
-			
-	// 		navigate("/game")
-	// 	}
-	// 	catch (error) {
-	// 		console.log(error)
-	// 	}
-	// }
 
 /* ================================ LOGIN =================================== */
 
