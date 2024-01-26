@@ -1,4 +1,5 @@
 import { useContext, useEffect } from 'react'
+import Cookies from "js-cookie"
 
 import {
 	HomePage,
@@ -11,6 +12,8 @@ import {
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
+import axios from 'axios'
+import { useNavigate } from 'react-router'
 
 import AuthContext from '../../contexts/AuthContext'
 
@@ -18,29 +21,33 @@ import colors from '../../utils/colors'
 
 function Home() {
 
-	const { token, setToken } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
+	const navigate = useNavigate();
 
 	useEffect(() => {
-
-			// Extraire la partie après "access_token="
-			// const tokenString: string = document.cookie.indexOf("access_token")
-			const index = document.cookie.indexOf("access_token=")
-
-			const accessTokenString = document.cookie.slice(index + "access_token=".length);
-			
-			// console.log("LOL = ", accessTokenString)
-
-			if (!localStorage.getItem('token'))
-			{
-				setToken(accessTokenString)
-				localStorage.setItem('token', accessTokenString)
-			}
-
+		const access_token = Cookies.get('access_token')
+		if (access_token) {
+			localStorage.setItem('access_token', access_token)
+			setToken(access_token)
+		}		
 	}, [])
 
 	async function handleDeconnexionClickText() {
-		localStorage.removeItem('token')
-		setToken('')
+		try {
+			await axios.get(`http://${url}:3333/auth/logout`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}) 
+			Cookies.remove('access_token')
+			localStorage.removeItem('token')
+			localStorage.clear();
+			setToken('')
+			navigate("/")
+		}
+		catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (

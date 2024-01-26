@@ -33,11 +33,10 @@ async function bootstrap() {
 		  cookie: { maxAge: 60000, }
 		}),
 	  );
-
-
 	  
 	app.enableCors({
-		origin: '*'
+		origin: '*',
+		credentials: true,
 	})
 
 	app.use(passport.initialize());

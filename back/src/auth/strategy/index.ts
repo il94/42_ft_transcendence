@@ -1,3 +1,3 @@
 export * from './jwt.strategy'
 export * from './api42.strategy'
-export * from './local.strategy'
+export * from './2FA.strategy'

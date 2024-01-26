@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
 
 import {
@@ -21,7 +21,7 @@ import Button from '../../componentsLibrary/Button'
 import LinkButtonImage from '../../componentsLibrary/LinkButtonImage'
 import InputText from '../../componentsLibrary/InputText'
 import ErrorRequest from '../../componentsLibrary/ErrorRequest'
-
+import Cookies from 'js-cookie';
 import AuthContext from '../../contexts/AuthContext'
 
 import { getRandomDefaultAvatar } from '../../utils/functions'
@@ -88,16 +88,20 @@ function Signup() {
 			}
 
 			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
-
-			setToken(response.data.access_token)
-			localStorage.setItem('token', response.data.access_token)
-
+			const access_token: string = response.data.access_token;
+			if (access_token) {
+				localStorage.setItem('token', access_token)
+				setToken(access_token)
+			}
+			else { 
+				console.log("pas de token dans response.data : ", response.data)
+				throw new AxiosError("Failed to get new access_token")
+			}
 			navigate("/")
 		}
 		catch (error) {
-			// temporaire
-			// Gestion d'erreurs utilisateur a faire
-			console.log(error)
+			const err = error as AxiosError
+			console.log("SIGNUP ERROR", err)
 			setErrorRequest(true)
 			localStorage.removeItem('token')
 		}
@@ -305,7 +309,7 @@ function Signup() {
 						<Line />
 					</Separator>
 					<FTRedirectWrapper>
-						<LinkButtonImage to={`http://${url}:3333/auth/api42/login`}>
+						<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

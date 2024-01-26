@@ -61,6 +61,13 @@ import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 import breakpoints from '../../utils/breakpoints'
 
 import { TempContext, userSomeone } from '../../temp/temp'
+import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu';
+
+
+
+
+
+
 
 function Game() {
 
@@ -154,19 +161,17 @@ function Game() {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
-				})
-
+				})			
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
-
 				const socket = io(`http://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
 						id: responseMe.data.id,
 					}
-				});
-		
+					});	
+        
 				socket.on('connect_error', (error) => {
 					console.error('Erreur de connexion à la socket :', error.message);
 					throw new Error;
@@ -224,6 +229,8 @@ function Game() {
 	const [searchBarResults, displaySearchBarResults] = useState<boolean>(false)
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
+	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
+	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
 	/* ============================ DISPLAY STATES ============================== */
 
@@ -470,7 +477,14 @@ async function refreshUserStatus(userId: number, newStatus: userStatus) {
 													url={url}
 													userAuthenticate={userAuthenticate}
 													setUserAuthenticate={setUserAuthenticate}
-													displaySettingsMenu={displaySettingsMenu} />
+													displaySettingsMenu={displaySettingsMenu}
+													displayTwoFAMenu={displayTwoFAMenu}
+													setTwoFACodeQR={setTwoFACodeQR} />
+											}
+											{
+												twoFAMenu &&
+												<TwoFaMenu
+													twoFAcodeQR={twoFAcodeQR} />
 											}
 											<TestsBack />
 											{

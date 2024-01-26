@@ -29,10 +29,11 @@ import { SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
+import axios from 'axios'
 
 function TwoFA() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { token /*, setToken */ } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -50,20 +51,27 @@ function TwoFA() {
 
 			/* ============ Temporaire ============== */
 			
-			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`, code)
+			const response = await axios.post(`http://${url}:3333/auth/2fa/authenticate`, {
+				twoFACode: code
+			},)
 	
-			// setToken(response.data.access_token)
-			// localStorage.setItem('token', response.data.access_token)
+			console.log("RESPONSE TWOFA PAGE", response.data)
+
+			setToken(response.data.access_token)
+			localStorage.setItem('token', response.data.access_token)
 
 			/* ====================================== */
 			
-			navigate("/game")
+			navigate("/")
 		}
 		catch (error) {
+
+			console.log("ERROR", error)
+
 			//temporaire
 			// checker si l'erreur vient d'un code invalide ou du serveur
-			setErrorRequest(true)
-			localStorage.removeItem('token')
+			// setErrorRequest(true)
+			// localStorage.removeItem('token')
 		}
 	}
 
@@ -81,26 +89,29 @@ function TwoFA() {
 
 /* ========================================================================== */
 
-	useEffect(() => {
-		async function sendCode() {
-			try {
+	// useEffect(() => {
+	// 	async function sendCode() {
+	// 		try {
 				
-				/* ============ Temporaire ============== */
+	// 			/* ============ Temporaire ============== */
 				
-				// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
+	// 			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
 	
-				/* ====================================== */
-			}
-			catch (error) {
-				setErrorRequest(true)
-			}
-		}
-		sendCode()
-	}, [])
+	// 			/* ====================================== */
+	// 		}
+	// 		catch (error) {
+	// 			setErrorRequest(true)
+	// 		}
+	// 	}
+	// 	sendCode()
+	// }, [])
 
 	useEffect(() => {
 		if (token)
+		{
+			console.log("TOKEN", token)
 			setErrorRequest(true)
+		}
 	}, [])
 
 	return (

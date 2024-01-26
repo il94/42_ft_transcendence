@@ -4,7 +4,9 @@ import {
 	useContext
 } from "react"
 import { useNavigate } from "react-router"
+import Cookies from "js-cookie"
 import axios from "axios"
+
 
 import {
 	Style,
@@ -22,6 +24,7 @@ import { User, UserAuthenticate } from "../../utils/types"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
+import axios from "axios"
 
 type PropsProfile = {
 	userAuthenticate: UserAuthenticate,
@@ -55,16 +58,23 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	}
 
 	async function handleDeconnexionClickButton() {
-		
-		await axios.patch(`http://${url}:3333/auth/logout`, {}, {
-			headers: {
-				'Authorization': `Bearer ${token}`
-			}
-		})
+		try {
 
-		localStorage.removeItem('token')
-		setToken('')
-		navigate("/")
+			await axios.get(`http://${url}:3333/auth/logout`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}) 
+			
+			Cookies.remove('access_token')
+			localStorage.removeItem('token')
+			localStorage.clear();
+			setToken('')
+			navigate("/")
+		}
+		catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (
