@@ -18,6 +18,13 @@ import {
 	RightGameWrapper
 } from './style'
 
+import {
+	recieveChannelMP,
+	refreshDeleteChannel,
+	refreshUpdateChannel,
+	refreshUserStatus
+} from './sockets'
+
 import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
@@ -40,21 +47,16 @@ import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
 import {
-	updateUserInChannel,
-	userIsFriend,
-	userIsInChannel
-} from '../../utils/functions';
-
-import {
 	Channel,
 	User,
 	UserAuthenticate
 } from '../../utils/types'
+
 import {
 	chatWindowStatus,
-	contextualMenuStatus,
-	userStatus
+	contextualMenuStatus
 } from '../../utils/status'
+
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
@@ -170,16 +172,7 @@ function Game() {
 				});
 
 				setUserAuthenticate({
-					id: meResponse.data.id,
-					username: meResponse.data.username,
-					avatar: meResponse.data.avatar,
-					status: userStatus.ONLINE,
-					wins: meResponse.data.wins,
-					draws: meResponse.data.draws,
-					losses: meResponse.data.losses,
-					email: meResponse.data.email,
-					phoneNumber: meResponse.data.phoneNumber,
-					twoFA: meResponse.data.twoFA,
+					...meResponse.data,
 					friends: friends,
 					blockedUsers: blockedUsers,
 					channels: channels,
@@ -224,7 +217,7 @@ function Game() {
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 
-	/* ============================ DISPLAY STATES ============================== */
+	/* =============================== DISPLAY ================================== */
 
 	const GameWrapperRef = useRef(null)
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
@@ -257,116 +250,27 @@ function Game() {
 		}
 	}, [])
 
-	/* ========================================================================== */
-
-	async function refreshUserStatus(userId: number, newStatus: userStatus) {
-
-		if (userId === userAuthenticate.id) {
-			setUserAuthenticate((prevState: UserAuthenticate) => {
-				return {
-					...prevState,
-					status: newStatus
-				}
-			})
-		}
-		else if (userIsFriend(userAuthenticate, userId)) {
-			setUserAuthenticate((prevState: UserAuthenticate) => {
-				return {
-					...prevState,
-					friends: prevState.friends.map((friend) => {
-						if (friend.id === userId) {
-							return {
-								...friend,
-								status: newStatus
-							}
-						}
-						else
-							return (friend)
-					})
-				}
-			})
-
-			if (channelTarget && userIsInChannel(channelTarget, userId)) {
-				setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-						return updateUserInChannel(prevState, userId, newStatus)
-				})
-			}
-		}
-	}
-
-
-	async function refreshUpdateChannel(channelId: number, newDatas: any) {
-		setChannelTarget((prevState: Channel | undefined) => {
-			if (prevState) {
-				return {
-					...prevState,
-					...newDatas
-				}
-			}
-			else
-				return (undefined)
-
-		});
-
-		setUserAuthenticate((prevState) => ({
-			...prevState,
-			channels: prevState.channels.map((channel) => {
-				if (channel.id === channelId) {
-					return {
-						...channel,
-						...newDatas
-					}
-				}
-				else
-					return channel
-			})
-		}))
-	}
-
-	async function refreshDeleteChannel(channelId: number) {
-		setUserAuthenticate((prevState) => ({
-			...prevState,
-			channels: prevState.channels.filter((channel) => channel.id !== channelId)
-		}))
-
-		setChannelTarget(undefined)
-	}
-
-	async function recieveChannelMP(channelId: number) {
-
-		const channelMPResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
-			headers: {
-				'Authorization': `Bearer ${token}`
-			}
-		})
-
-		setChannelTarget(channelMPResponse.data)
-
-		setUserAuthenticate((prevState) => ({
-			...prevState,
-			channels: [
-				...prevState.channels,
-				channelMPResponse.data
-			]
-		}))
-	}
+	/* ========================= DISPLAY WITH SOCKETS =========================== */
 
 	useEffect(() => {
-
-		userAuthenticate.socket?.on("updateUserStatus", refreshUserStatus);
-
-		userAuthenticate.socket?.on("updateChannel", refreshUpdateChannel);
-		userAuthenticate.socket?.on("deleteChannel", refreshDeleteChannel);
-		userAuthenticate.socket?.on("createChannelMP", recieveChannelMP);
+		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
+			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, setChannelTarget }))
+		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
+			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("createChannelMP", (channelId: number) =>
+			recieveChannelMP({ channelId, token, url, setUserAuthenticate, setChannelTarget }))
 
 		return () => {
-
-			userAuthenticate.socket?.off("updateUserStatus", refreshUserStatus);
-
-			userAuthenticate.socket?.off("updateChannel", refreshUpdateChannel);
-			userAuthenticate.socket?.off("deleteChannel", refreshDeleteChannel);
-			userAuthenticate.socket?.off("createChannelMP", recieveChannelMP);
+			userAuthenticate.socket?.off("updateUserStatus", (userId, newStatus) => 
+				refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+			userAuthenticate.socket?.off("updateChannel", (channelId: number, newDatas: number) => 
+				refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, setChannelTarget }))
+			userAuthenticate.socket?.off("deleteChannel", (channelId: number) =>
+				refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
+			userAuthenticate.socket?.off("createChannelMP", (channelId: number) =>
+				recieveChannelMP({ channelId, token, url, setUserAuthenticate, setChannelTarget }))
 		}
 
 	}, [userAuthenticate.socket])
