@@ -80,6 +80,14 @@ export class UsersService {
 		return user;
 	}
 
+	async findUser(id: number): Promise<User>  {
+		const user = await this.prisma.user.findUnique({
+			where: { id: id },})
+		if (!user)
+			throw new NotFoundException(`User with ${id} does not exist.`);
+		return user;
+	}
+
 	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User>  {
 		const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
 
@@ -121,55 +129,49 @@ export class UsersService {
 	/*********************** TwoFA settings ******************************************/
 
 	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
-		const setUser = await this.prisma.user.findUnique({ where: {id: user.id}});
-		if (!setUser)
+		const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
+		if (!getUser)
 			throw new NotFoundException('User not found');
-		if (setUser.twoFA)
+		if (getUser.twoFA)
 			throw new BadRequestException('2FA already enabled');
 
 		const isCodeValid = authenticator.verify({
 			token: twoFACode,
-			secret: setUser.twoFASecret,
+			secret: getUser.twoFASecret,
 		});
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
-		await this.prisma.user.update({
+		const setUser = await this.prisma.user.update({
 			where: { id: user.id, },
 			data: { twoFA: true, },
 		});
-		return user;
-
+		return setUser;
 	}
 
 	async setTwoFASecret(secret: string, userId: number): Promise<User | string> {
 		try {
 		const user = await this.prisma.user.update({
-			where: {
-				id: userId,
-				// twoFA: true
-			},
-			data: {
-				twoFASecret: secret
-			},
+			where: { id: userId,},
+			data: { twoFASecret: secret },
 		});
-
-
 		if (!user)
 			throw new NotFoundException(`User with ${userId} does not exist.`);
 		return "user";
 		} catch (error) { throw error; }
 	}
 
-	async disableTwoFA(user: User, code: string): Promise<void> {
+	async disableTwoFA(user: User, code: string): Promise<boolean> {
 		try {
-
 			const otpCode = await this.prisma.user.findUnique({
 				where: { id: user.id, twoFASecret:  code }
 			})
-			await this.prisma.user.update({
+			if (!otpCode)
+				throw new NotFoundException(`Failed to disable TwoFA`);
+			const setUser = await this.prisma.user.update({
 				where: { id: user.id },
 				data: { twoFA: false },
 			});
+			return setUser.twoFA;
 		} catch (error) { throw error; }
 	}
 

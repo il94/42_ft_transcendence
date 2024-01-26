@@ -53,10 +53,9 @@ function TwoFA() {
 			
 			const response = await axios.post(`http://${url}:3333/auth/2fa/authenticate`, {
 				twoFACode: code
-			},
-)
+			},)
 	
-			console.log("RESPONSE TWOFA PAGE", response)
+			console.log("RESPONSE TWOFA PAGE", response.data)
 
 			setToken(response.data.access_token)
 			localStorage.setItem('token', response.data.access_token)

@@ -75,8 +75,10 @@ function Signin() {
 			}
 			
 			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
-			if (response.data.twoFA)
+			if (response.data.twoFA) {
+				console.log("res /signin twoFA")
 				navigate("/twofa")
+			}
 			else {
 				const access_token: string = response.data.access_token;
 				if (access_token) {

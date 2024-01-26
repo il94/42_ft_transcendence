@@ -7,6 +7,5 @@ export const getUser = createParamDecorator(
 		if (data) {
 			return request.user[data];
 		}
-        console.log("getUser: ", request.user);
         return request.user;
     },);

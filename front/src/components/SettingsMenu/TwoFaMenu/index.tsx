@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useContext, useState } from "react"
 import { Style } from "./style"
 import axios from "axios"
 import AuthContext from "../../../contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 type PropsTwoFaMenu = {
 	twoFAcodeQR: string
@@ -10,14 +11,12 @@ type PropsTwoFaMenu = {
 function TwoFaMenu({ twoFAcodeQR } : PropsTwoFaMenu) {
 
 	const { token, url } = useContext(AuthContext)!
+	const navigate = useNavigate()
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			console.log("TWOFA SUBMIT")
-			console.log("VALUE", code)
-
-
+			// empecher cette requete si 2fa deja enable 
 			const response = await axios.patch(`http://${url}:3333/auth/2fa/enable`, {
 				twoFACode: code
 			},
@@ -26,8 +25,8 @@ function TwoFaMenu({ twoFAcodeQR } : PropsTwoFaMenu) {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
-			console.log("RESPONSE = ", response)
+			console.log("/2fa/enable response = ", response.data)
+			navigate("/game")
 
 		}
 		catch (error) {
