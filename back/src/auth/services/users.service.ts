@@ -98,11 +98,10 @@ export class UsersService {
 			email: updateUserDto.email,
 			phoneNumber: updateUserDto.phoneNumber,
 			avatar: updateUserDto.avatar,
+			status: updateUserDto.status
 			},
 			where: { id: id },
 		});
-
-
 		return updateUser;
 	}
 

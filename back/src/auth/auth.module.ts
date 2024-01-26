@@ -22,7 +22,7 @@ import { AppGateway } from "src/app.gateway";
 			}),
 		}),
 		PassportModule.register({ defaultStrategy: '42' }),
-		HttpModule,
+		HttpModule
 	],
 	providers: [JwtStrategy, 
 		Api42Strategy,

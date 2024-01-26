@@ -135,4 +135,9 @@ export class AuthController {
 		}
 	}
 
+	@Patch('logout')
+  	@UseGuards(JwtGuard)
+	async logout(@getUser('id') userId: number) {
+		return this.authService.disconnect(userId);
+	}
 }

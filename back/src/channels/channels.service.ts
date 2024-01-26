@@ -5,8 +5,7 @@ import { Channel, User, ChannelStatus, Role, Prisma, messageStatus, challengeSta
 import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
-
-export const connectedUsers: Map<string, Socket> = new Map();
+import { AppService } from 'src/app.service';
 
 @UseGuards(JwtGuard)
 @Injectable()
@@ -37,8 +36,7 @@ export class ChannelsService {
         data: { password: await argon.hash(createChannelDto.password) } 
       })
     }
-
-    console.log(`Channel ${newChannel.id} was created`)
+    //console.log(`Channel ${newChannel.id} was created`)
     return newChannel;
   }
 
@@ -273,7 +271,7 @@ export class ChannelsService {
         };
       }
 
-    }))
+    })) 
 
     console.log("RESULT", cleanedMessages)
 
@@ -318,11 +316,18 @@ export class ChannelsService {
       },
       select: {
         userId: true,
+
       },
     });
-    const sockets = usersOnChannels.map((userOnChannel) => connectedUsers.get(userOnChannel.userId.toString()).id)
 
-    // console.log(`Sockets channel ${chanId} :`, sockets)
+    const sockets = usersOnChannels.map((userOnChannel) => {
+      const socket = AppService.connectedUsers.get(userOnChannel.userId?.toString())
+      if (socket)
+        return socket.id
+      else
+        return undefined
+    })
+
     return sockets;
   }
 
@@ -536,7 +541,7 @@ export class ChannelsService {
             type: msgStatus,
           },
         });
-        //console.log(newMessage.content);
+        return newMessage.id;
       }
   
     async addContentInvitation(id: number, userId : number, targetId : number, msgStatus : messageStatus) {
@@ -550,7 +555,7 @@ export class ChannelsService {
           type: msgStatus,
         },
       });
-      console.log(newMessage.content);
+      return newMessage.id;
     }
 
     async getAllMessage(id: number) {
@@ -581,13 +586,27 @@ export class ChannelsService {
       }
     }
 
+
+    async updateMessageStatus(idMsg: number, newStatus: challengeStatus)
+    { 
+      try {
+        const updatedMessage = await this.prisma.message.update({
+          where: { id: idMsg },
+          data: { status: newStatus },
+        });
+        return updatedMessage;
+      } catch (error) { 
+        throw error;
+    }
+  }
+
 /* =============================== UTILS ==================================== */
 
     // Emit a tout les users d'un channel
     async emitToChannel(route: string, ...args: any[]) {
       const channelId = args[0]
       const sockets = await this.getAllSockets(channelId)
-      connectedUsers.forEach((socket) => {
+      AppService.connectedUsers.forEach((socket) => {
         const socketToEmit = sockets.includes(socket.id)
 
         if (socketToEmit)

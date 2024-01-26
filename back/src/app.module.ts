@@ -12,7 +12,7 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
-    AuthModule, 
+    AuthModule,
     PrismaModule, 
     ConfigModule.forRoot({ isGlobal: true}),
     PassportModule.register({ session: true }),

@@ -73,6 +73,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 	avatar: string;
 
 	@IsOptional()
+	@IsString()
+	@ApiProperty()
+	status: UserStatus;
+
+	@IsOptional()
 	@IsBoolean()
 	@ApiProperty()
 	twoFA: boolean;

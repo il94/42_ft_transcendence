@@ -1,5 +1,5 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer } from '@nestjs/websockets';
-import { ChannelsService, connectedUsers } from './channels.service';
+import { ChannelsService } from './channels.service';
 import { CreateChannelDto, UpdateChannelDto, MessageDto } from './dto';
 import { OnModuleInit, Request } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -18,35 +18,10 @@ import { User, Channel } from "@prisma/client";
 // send request tu a user
 
 @WebSocketGateway()
-export class ChannelsGateway implements OnModuleInit {
+export class ChannelsGateway {
   constructor(private readonly channelsService: ChannelsService) {}
 
   @WebSocketServer() server: Server;
-
-  // Gestion de la map userConnected (ajoute/supprime des sockets)
-  onModuleInit() { 
-    this.server.on('connection', (socket: Socket) => {
-      const userid = socket.handshake.query.id;
-      //console.log("Connected id =", userid);
-
-      // Vérifier le type de userid
-      if (typeof userid === 'string') {
-        connectedUsers.set(userid, socket);
-
-        // Écouter le débranchement du socket
-        socket.on('disconnect', () => {
-          console.log("deleted user = ", userid);
-          connectedUsers.delete(userid);
-        });
-      } else {
-        console.log('Invalid userid type:', typeof userid);
-      }
-    });
-  } 
-    getSocketByUserId(userid: string): Socket | undefined {
-    return connectedUsers.get(userid);
-  }
-
 
    /*
     args[0] tableau de sockets des users channel
@@ -58,7 +33,7 @@ export class ChannelsGateway implements OnModuleInit {
   @SubscribeMessage('sendDiscussion')
   async handleUpdateDiscussion(client: Socket, args: string[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3]);
+      this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3], args[4]);
     }
   }
 
@@ -100,6 +75,20 @@ export class ChannelsGateway implements OnModuleInit {
     const argsToSend = args.slice(1)
     for (const socket of args[0]) {
       this.server.to(socket).emit("updateChannel", ...argsToSend);
+    }
+  }
+
+    /*
+    args[0] tableau de sockets des users channel
+    args[1] id du message
+    args[2] nouveau status
+   */
+
+  @SubscribeMessage('updateChallenge')
+  async handleUpdateChallengel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("updateStatusChallenge", ...argsToSend);
     }
   }
 

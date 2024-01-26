@@ -5,6 +5,8 @@ import {
 } from "react"
 import { useNavigate } from "react-router"
 import Cookies from "js-cookie"
+import axios from "axios"
+
 
 import {
 	Style,
@@ -56,7 +58,6 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	}
 
 	async function handleDeconnexionClickButton() {
-
 		try {
 
 			await axios.get(`http://${url}:3333/auth/logout`, {
@@ -66,7 +67,6 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 			}) 
 			
 			Cookies.remove('access_token')
-
 			localStorage.removeItem('token')
 			localStorage.clear();
 			setToken('')
@@ -75,7 +75,6 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 		catch (error) {
 			console.log(error)
 		}
-
 	}
 
 	return (
