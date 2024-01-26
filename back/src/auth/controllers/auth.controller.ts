@@ -20,7 +20,8 @@ export class AuthController {
 	async signup(@Body() dto: CreateUserDto, @Res({ passthrough: true }) res: Response): Promise<{ access_token: string }> {
 		try {
 			const token = await this.authService.signup(dto);
-			res.cookie('access_token', token.access_token, { httpOnly: true });
+			res.cookie('access_token', token.access_token, { httpOnly: true })
+				.send({ status: 'New user authenticated'});
 			return token; 
 		} catch (error) {
 			throw new BadRequestException(error.message)
@@ -34,8 +35,11 @@ export class AuthController {
 		try {
 			type token = { twoFA: boolean } | { access_token: string }
 			const tok: token  = await this.authService.validateUser(dto);
-			if ('access_token' in tok) 
-				res.cookie('access_token', tok.access_token, { httpOnly: true });
+			if ('access_token' in tok) {
+				res.cookie('access_token', tok.access_token, { httpOnly: true })
+					.send({ status: 'User authenticated'});
+
+			}
 			return tok;
 		} catch (error) {
 			throw new BadRequestException(error.message)
