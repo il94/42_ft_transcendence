@@ -86,12 +86,12 @@ export class AuthService {
 	async validate42User(profile: any): Promise<User | { twoFA: boolean }> {
 		try {
 			const user = await this.prisma.user.findUnique({
-				where: { username: profile.username, },
+				where: { email: profile.email, },
 			});
 			if (user) {
 				if (!user.twoFA) {
 					await this.prisma.user.update({ 
-						where: { username: profile.username },
+						where: { email: profile.email },
 						data: { status: UserStatus.ONLINE }})
 					return user;
 				}
