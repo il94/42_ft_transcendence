@@ -27,6 +27,7 @@ import {
 
 import {
 	Channel,
+	ChannelDatas,
 	UserAuthenticate
 } from "../../../utils/types"
 
@@ -63,11 +64,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, userTarget, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
+	/* ====================== SECONDARY CONTEXTUAL MENU ========================= */
+	
 	function showSecondaryContextualMenu(event: MouseEvent<HTMLButtonElement>) {
 
 		const inviteSectionContainer = event.target as HTMLElement
 
-		if (inviteSectionContainer) {
+		if (inviteSectionContainer)
+		{
 			const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - secondaryContextualMenuHeight // valeur max avant que le menu ne depasse par le bas
 			const { x: leftMenu, y: topMenu } = inviteSectionContainer.getBoundingClientRect() // position du menu principal
@@ -83,7 +87,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				right: contextualMenuPosition.right && contextualMenuPosition.right + offsetX,
 				top: contextualMenuPosition.top && contextualMenuPosition.top + offsetY,
 				bottom: contextualMenuPosition.bottom && contextualMenuPosition.bottom + offsetY
-
 			})
 			displaySecondaryContextualMenu(true)
 		}
@@ -104,19 +107,18 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 			else
 			{
-				const MPDatas: any = {
+				const MPDatas = {
 					name: '',
 					avatar: '',
 					type: channelStatus.MP
-				}		
+				}
 
-				const newChannelMPResponse: AxiosResponse = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
+				const newChannelMPResponse: AxiosResponse<ChannelDatas> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				console.log("newChannelMPResponse", newChannelMPResponse)
 
 				const newChannelMP = {
 					...newChannelMPResponse.data,

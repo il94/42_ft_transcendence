@@ -27,13 +27,16 @@ export type UserAuthenticate = User & {
 	channels: Channel[]
 }
 
-export type Channel = {
+export type ChannelDatas = {
 	id: number,
 	createdAt?: string,
 	name: string,
 	avatar: string,
 	type: channelStatus,
-	password?: string,
+	password?: string
+}
+
+export type Channel = ChannelDatas & {
 	messages: (MessageText | MessageInvitation)[],
 	members: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],

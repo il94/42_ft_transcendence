@@ -83,7 +83,7 @@ export class ChannelsService {
       avatar: recipientDatas.avatar
     }
 
-    await this.emitToChannel("createChannelMP", channelMP.id)
+    await this.emitToChannel("createChannelMP", channelMP.id, recipientId)
 
     console.log(`Channel MP ${channelMP.id} was created`)
 

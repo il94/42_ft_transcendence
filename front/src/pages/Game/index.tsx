@@ -265,8 +265,8 @@ function Game() {
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("createChannelMP", (channelId: number) =>
-			recieveChannelMP({ channelId, token, url, setUserAuthenticate, setChannelTarget }))
+		userAuthenticate.socket?.on("createChannelMP", (channelId: number, recipientId: number) =>
+			recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget }))
 
 		return () => {
 			userAuthenticate.socket?.off("updateUserStatus", (userId, newStatus) => 
@@ -275,8 +275,8 @@ function Game() {
 				refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, setChannelTarget }))
 			userAuthenticate.socket?.off("deleteChannel", (channelId: number) =>
 				refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-			userAuthenticate.socket?.off("createChannelMP", (channelId: number) =>
-				recieveChannelMP({ channelId, token, url, setUserAuthenticate, setChannelTarget }))
+			userAuthenticate.socket?.off("createChannelMP", (channelId: number, recipientId: number) =>
+				recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget }))
 		}
 
 	}, [userAuthenticate.socket])

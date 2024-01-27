@@ -117,9 +117,11 @@ export function refreshDeleteChannel(props: PropsRefreshDeleteChannel) {
 
 type PropsRecieveChannelMP = {
 	channelId: number,
+	recipientId: number,
 
 	token: string,
 	url: string,
+	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 }
@@ -141,5 +143,6 @@ export async function recieveChannelMP(props: PropsRecieveChannelMP) {
 		]
 	}))
 
-	props.setChannelTarget(channelMPResponse.data)
+	if (props.userAuthenticate.id !== props.recipientId)
+		props.setChannelTarget(channelMPResponse.data)
 }

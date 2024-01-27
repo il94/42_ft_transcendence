@@ -40,6 +40,7 @@ export class ChannelsGateway {
   /*
     args[0] tableau de sockets des users channel
     args[1] id du channel MP cree
+    args[2] id du destinataire
    */
 
     @SubscribeMessage('createChannelMP')
