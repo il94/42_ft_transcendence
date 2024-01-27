@@ -19,7 +19,7 @@ import {
 } from "./style"
 
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
-import ErrorRequest from "../../../componentsLibrary/ErrorRequest"
+import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
@@ -284,7 +284,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 				}
 				</>
 				:
-				<ErrorRequest />
+				<ErrorRequestMessage />
 			}
 		</Style>
 	)

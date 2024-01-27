@@ -2,10 +2,8 @@ import { useContext, useEffect } from 'react'
 import Cookies from "js-cookie"
 
 import {
-	HomePage,
 	MainTitle,
 	CentralWindow,
-	StyledTitle,
 	ButtonsWrapper
 } from './style'
 
@@ -18,6 +16,21 @@ import { useNavigate } from 'react-router'
 import AuthContext from '../../contexts/AuthContext'
 
 import colors from '../../utils/colors'
+import Page from '../../componentsLibrary/Page'
+import MainTitle from '../../componentsLibrary/MainTitle'
+import CentralWindow from '../../componentsLibrary/CentralWindow'
+import WindowTitle from '../../componentsLibrary/WindowTitle'
+
+const ButtonsWrapper = styled.div`
+
+	display: flex;
+	justify-content: space-evenly;
+
+	width: 100%;
+
+	padding-bottom: 15px;
+
+`
 
 function Home() {
 
@@ -51,16 +64,16 @@ function Home() {
 	}
 
 	return (
-		<HomePage>
+		<Page>
 			<MainTitle>
 				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
 			<CentralWindow>
-				<StyledTitle>
+				<WindowTitle>
 					Welcome
-				</StyledTitle>
+				</WindowTitle>
 				{
 					token ?
 						<>
@@ -90,7 +103,7 @@ function Home() {
 						</ButtonsWrapper>
 				}
 			</CentralWindow>
-		</HomePage>
+		</Page>
 	)
 }
 

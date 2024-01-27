@@ -86,9 +86,9 @@ export const ErrorMessage = styled.p`
 
 `
 
-export const TwoFAValue = styled.p<{ $error: boolean }>`
+export const TwoFAValue = styled.p`
 
-	border-bottom: 1px solid ${(props) => props.$error && colors.textError};
+	border-bottom: 1px solid;
 	text-align: center;
 
 	background-color: inherit;

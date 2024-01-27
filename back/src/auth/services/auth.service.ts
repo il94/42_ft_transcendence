@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -32,13 +32,86 @@ export class AuthService {
 
 	async validateUser(dto: AuthDto): Promise<{ access_token: string } | { twoFA: boolean } > {
 		try {
-			const user = await this.prisma.user.findUnique({
-					where: { username: dto.username, },
-				});
+			let user = await this.prisma.user.findUnique({
+				where: {
+					email: dto.email
+				},
+			});
 			if (!user)
-				throw new BadRequestException('user not found');
+				throw new NotFoundException();
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
+				throw new ForbiddenException();
+			const token: { access_token: string } = await this.signToken(user.id, user.username)
+			if(user.twoFA === false) {
+				await this.prisma.user.update({
+						where: { id: user.id },
+						data: { status: UserStatus.ONLINE }
+				})
+				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
+				return token;
+			} else
+				return { twoFA: true }
+		} catch (error) {
+            throw new BadRequestException(error.message)
+        }
+	}
+
+	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
+		const payload = {
+			sub: userId,
+			username
+		};
+		const token =  await this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET })
+		if (!token)
+			throw new BadRequestException("Failed to generate access_token")
+		return { access_token: token, }
+	}
+
+	async logout(userId: number): Promise<User> {
+		try {
+			const user = this.prisma.user.update({
+				where: { id: userId, status: UserStatus.ONLINE },
+				data: { status: UserStatus.OFFLINE }
+			})
+			if (!user)
+				throw new BadRequestException(`Failed to disconnect User with id ${userId}`)
+			this.appGateway.server.emit("updateUserStatus", userId, UserStatus.OFFLINE);
+			return user;
+		} catch (error) {
+            throw new BadRequestException(error.message)
+		}
+	}
+
+	async validate42User(profile: any) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: { username: profile.username, },
+			});
+			if (user) {
+				if (!user.twoFA) {
+					await this.prisma.user.update({ 
+						where: { username: profile.username },
+						data: { status: UserStatus.ONLINE }})
+					return user;
+				}
+				return { twoFA: true };
+			}
+			console.log ("jai pas trouve le user");
+			profile.hash = generate({ length: 6, numbers: true });
+			const newUser = await this.userService.createUser(profile as CreateUserDto)
+			if (!newUser)
+				throw new ForbiddenException('Failed to create new 42 user');
+			return user;
+
+		} catch (error) {
+			const err = error as Error;
+            console.log("Validate 42 user error: ", err.message);
+            throw new BadRequestException(err.message)
+		}
+	}
+
+=======
 				throw new ForbiddenException('incorrect password');
 			const token: { access_token: string } = await this.signToken(user.id, user.username)
 			if(user.twoFA === false) {
@@ -55,6 +128,7 @@ export class AuthService {
         }
 	}
 
+>>>>>>> main
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,

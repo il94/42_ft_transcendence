@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus, Invitation, ChannelStatus } from '@prisma/client';
@@ -15,23 +15,23 @@ export class UsersService {
 	async createUser(createUserDto: CreateUserDto): Promise<User> {
 		console.log("BACK PRISMA")
 		try {
-			const userExists = await this.prisma.user.findMany({
-				where: { OR: [
-					{ email: createUserDto.email }, 
-					{ username: createUserDto.username }
-				],}
+			const userExists = await this.prisma.user.findFirst({
+				where: {
+					email: createUserDto.email
+				}
 			})
-			if (userExists[0])
-				throw new BadRequestException("User already exists");
-			console.log("creating user")
+			if (userExists)
+				throw new ConflictException();
+			else if (createUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException("42 emails are forbidden");
 			const hash = await argon.hash(createUserDto.hash);
+			const userDatas = {
+				...createUserDto,
+				hash: hash
+			}
 			const user = await this.prisma.user.create({
 				data: {
-					username: createUserDto.username,
-					hash,
-					email: createUserDto.email,
-					phoneNumber: createUserDto.phoneNumber || '',
-					avatar: createUserDto.avatar || '',
+					...userDatas,
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,
@@ -42,12 +42,8 @@ export class UsersService {
 			});
             console.log(`User ${user.username} with id ${user.id} created successfully`);
 			return user;
-		} catch (error) {
-			console.log("ERROR PRISMA")
-			if (error instanceof PrismaClientKnownRequestError) {
-				if (error.code === 'P2002')
-					throw new ForbiddenException('Failed to create new user');
-			}
+		}
+		catch (error) {
 			throw error;
 		}
 	}
@@ -89,20 +85,42 @@ export class UsersService {
 	}
 
 	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User>  {
-		const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
+		try {
+			const userExists = await this.prisma.user.findFirst({
+				where: {
+					email: updateUserDto.email,
+					AND: {
+						id: {
+							not: id
+						}
+					}
+				}
+			})
+			if (userExists)
+				throw new ConflictException();
+			else if (updateUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException("42 emails are forbidden");
+			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
 
+			const userNewDatas = hash ? {
+				...updateUserDto,
+				hash: hash
+			} : updateUserDto
+
+	
 		const updateUser = await this.prisma.user.update({
-			data: { 
-			username: updateUserDto.username,
-			hash: hash,
-			email: updateUserDto.email,
-			phoneNumber: updateUserDto.phoneNumber,
-			avatar: updateUserDto.avatar,
-			status: updateUserDto.status
-			},
-			where: { id: id },
-		});
-		return updateUser;
+				where: {
+					id: id
+				},
+				data: {
+					...userNewDatas
+				}
+			});
+			return updateUser;
+		}
+		catch (error) {
+			throw error
+		}
 	}
 
 	async remove(id: number): Promise<User> {
