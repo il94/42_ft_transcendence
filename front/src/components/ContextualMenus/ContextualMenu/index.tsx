@@ -16,7 +16,14 @@ import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { userIsBanned, userIsInChannel } from "../../../utils/functions"
+import {
+	userIsAdministrator,
+	userIsBanned,
+	userIsBlocked,
+	userIsFriend,
+	userIsInChannel,
+	userIsOwner
+} from "../../../utils/functions"
 
 import {
 	Channel,
@@ -82,21 +89,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
-	const [adminSections, displayAdminSections] = useState<boolean>(false)
-
-	useEffect(() => {
-		if (channelTarget &&
-			type === contextualMenuStatus.CHAT &&
-			(channelTarget.owner?.id === userAuthenticate.id ||
-			(channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
-				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) &&
-			(channelTarget.owner?.id !== userTarget.id &&
-				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))) {
-			displayAdminSections(true)
-		}
-		else
-			displayAdminSections(false)
-	}, [])
+	/* ============================== MP SECTION ================================ */
 
 	async function handleContactClickEvent() {
 		try {
@@ -146,6 +139,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
+	/* ========================== CHALLENGE SECTION ============================= */
+
 	async function handleChallengeClickEvent() {
 		try {
 			console.log(userTarget.id);
@@ -188,31 +183,31 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	} 
 
+	/* ============================ FRIEND SECTION ============================== */
+
 	async function handleManageFriendClickEvent() {
 		try {
-			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
+			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id))
+			{
 				await axios.post(`http://${url}:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
 				setUserAuthenticate((prevState: UserAuthenticate) => ({
 					...prevState,
 					friends: [ ...prevState.friends, userTarget]
 				}))
 			}
-			else {
+			else
+			{
 				await axios.delete(`http://${url}:3333/friends/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
 				setUserAuthenticate((prevState: UserAuthenticate) => {
-
 					const { friends, ...rest } = prevState
-
 					return {
 						...rest,
 						friends: friends.filter((friend) => friend.id !== userTarget.id)
@@ -226,9 +221,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
+	/* ============================= BLOCK SECTION ============================== */
+
 	async function handleBlockClickEvent() {
 		try {
-			if (!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id)) {
+			if (!userAuthenticate.blockeds.some((blockedUser) => blockedUser.id === userTarget.id))
+			{
 				await axios.post(`http://${url}:3333/blockeds/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -238,11 +236,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				setUserAuthenticate((prevState: UserAuthenticate) => {
 					return {
 						...prevState,
-						blockedUsers: [ ...prevState.blockedUsers, userTarget ]
+						blockeds: [ ...prevState.blockeds, userTarget ]
 					}
 				})
 			}
-			else {
+			else
+			{
 				await axios.delete(`http://${url}:3333/blockeds/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -251,11 +250,11 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 				setUserAuthenticate((prevState: UserAuthenticate) => {
 
-					const { blockedUsers, ...rest } = prevState
+					const { blockeds, ...rest } = prevState
 
 					return {
 						...rest,
-						blockedUsers: blockedUsers.filter((blockedUser) => blockedUser.id !== userTarget.id)
+						blockeds: blockeds.filter((blockedUser) => blockedUser.id !== userTarget.id)
 					}
 				})
 			}
@@ -265,12 +264,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
+	/* ============================ GRADE SECTION =============================== */
+
 	async function handleGradeClickEvent() {
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) {
-
+			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id))
+			{
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.ADMIN
 				},
@@ -280,7 +281,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					}
 				})
 			}
-			else {
+			else
+			{
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.MEMBER
 				},
@@ -295,6 +297,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayErrorContextualMenu(true)
 		}
 	}
+
+	/* ============================= MUTE SECTION =============================== */
 
 	async function handleMuteClickEvent() {
 		try {
@@ -315,6 +319,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
+	/* ============================= KICK SECTION =============================== */
+
 	async function handleKickClickEvent() {
 		try {
 			if (!channelTarget)
@@ -330,12 +336,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
+	/* ============================== BAN SECTION =============================== */
+
 	async function handleBanClickEvent() {
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id)) {
-
+			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id))
+			{
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.BANNED
 				},
@@ -345,7 +353,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					}
 				})
 			}
-			else {
+			else
+			{
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.UNBANNED
 				},
@@ -360,6 +369,25 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			displayErrorContextualMenu(true)
 		}
 	}
+
+	/* ========================================================================== */
+
+	const [adminSections, displayAdminSections] = useState<boolean>(false)
+	useEffect(() => {
+		if (channelTarget &&
+			type === contextualMenuStatus.CHAT &&
+			(userIsOwner(channelTarget, userAuthenticate.id) ||
+			(userIsAdministrator(channelTarget, userAuthenticate.id) &&
+				!userIsAdministrator(channelTarget, userTarget.id)) &&
+			(userIsOwner(channelTarget, userTarget.id) &&
+				!userIsAdministrator(channelTarget, userTarget.id)))) {
+			displayAdminSections(true)
+		}
+		else
+			displayAdminSections(false)
+	}, [])
+
+	/* ========================================================================== */
 
 	return (
 		<Style
@@ -403,7 +431,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleManageFriendClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.friends.some((friend) => friend.id === userTarget.id) ?
+										!userIsFriend(userAuthenticate, userTarget.id) ?
 											"Add"
 											:
 											"Delete"
@@ -413,7 +441,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 							<Section onClick={handleBlockClickEvent}>
 								<SectionName>
 									{
-										!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id) ?
+										!userIsBlocked(userAuthenticate, userTarget.id) ?
 											"Block"
 											:
 											"Unblock"
@@ -437,7 +465,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 																	<Section onClick={handleGradeClickEvent}>
 																		<SectionName>
 																			{
-																				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
+																				!userIsAdministrator(channelTarget, userTarget.id) ?
 																					"Upgrade"
 																					:
 																					"Downgrade"

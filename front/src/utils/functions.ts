@@ -129,7 +129,15 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 }
 
 export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number): boolean {
-	return (!!userAuthenticate.friends.some((friend) => friend.id === userId))
+	return (
+		!!userAuthenticate.friends.some((friend) => friend.id === userId)
+	)
+}
+
+export function userIsBlocked(userAuthenticate: UserAuthenticate, userId: number): boolean {
+	return (
+		!!userAuthenticate.blockeds.some((friend) => friend.id === userId)
+	)
 }
 
 export function userIsInChannel(channel: Channel, userId: number): boolean {
@@ -142,13 +150,13 @@ export function userIsInChannel(channel: Channel, userId: number): boolean {
 
 export function userIsMember(channel: Channel, userId: number): boolean {
 	return (
-		channel.members.some((member) => member.id === userId)
+		!!channel.members.some((member) => member.id === userId)
 	)
 }
 
 export function userIsAdministrator(channel: Channel, userId: number): boolean {
 	return (
-		channel.administrators.some((administrator) => administrator.id === userId)
+		!!channel.administrators.some((administrator) => administrator.id === userId)
 	)
 }
 
@@ -160,7 +168,7 @@ export function userIsOwner(channel: Channel, userId: number): boolean {
 
 export function userIsBanned(channel: Channel, userId: number): boolean {
 	return (
-		channel.banneds.some((banned) => banned.id === userId)
+		!!channel.banneds.some((banned) => banned.id === userId)
 	)
 }
 
