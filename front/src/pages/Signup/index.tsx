@@ -5,7 +5,7 @@ import {
 	useEffect,
 	useState
 } from 'react'
-import axios, { AxiosError, AxiosResponse }, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { useNavigate } from 'react-router'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'

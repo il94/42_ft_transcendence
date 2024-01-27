@@ -1,11 +1,6 @@
 import { useContext, useEffect } from 'react'
+import styled from 'styled-components'
 import Cookies from "js-cookie"
-
-import {
-	MainTitle,
-	CentralWindow,
-	ButtonsWrapper
-} from './style'
 
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'

@@ -23,7 +23,6 @@ import AuthContext from '../../contexts/AuthContext'
 
 import { ErrorResponse, SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
-import axios from 'axios'
 
 function TwoFA() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)

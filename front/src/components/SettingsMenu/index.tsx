@@ -83,10 +83,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-
 		try {
-
-			console.log("SUBMIT")
 
 			event.preventDefault()
 			if (username.value.length === 0 ||
@@ -114,10 +111,6 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						errorMessage: "Insert phone number",
 					})
 				}
-				return
-			}
-
-			if (username.error || password.error || email.error || phoneNumber.error)
 				return
 			}
 
