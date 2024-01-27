@@ -97,7 +97,7 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 		event.preventDefault();
 	}
 
-	const isBlocked = userAuthenticate.blockedUsers.some((blockedUsers) => blockedUsers.id === friend.id)
+	const isBlocked = userAuthenticate.blockeds.some((blockeds) => blockeds.id === friend.id)
 
 	return (
 		<Style

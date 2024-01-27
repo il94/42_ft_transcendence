@@ -23,7 +23,7 @@ export type UserAuthenticate = User & {
 	phoneNumber: string,
 	twoFA: boolean,
 	friends: User[],
-	blockedUsers: User[],
+	blockeds: User[],
 	channels: Channel[]
 }
 

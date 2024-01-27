@@ -157,7 +157,7 @@ function Game() {
 					}
 				})			
 				const friends: User[] = await fetchFriends()
-				const blockedUsers: User[] = await fetchBlockedUsers()
+				const blockeds: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
 				const socket = io(`http://${url}:3333`, {
 					transports: ["websocket"],
@@ -174,7 +174,7 @@ function Game() {
 				setUserAuthenticate({
 					...meResponse.data,
 					friends: friends,
-					blockedUsers: blockedUsers,
+					blockeds: blockeds,
 					channels: channels,
 					socket: socket
 				})

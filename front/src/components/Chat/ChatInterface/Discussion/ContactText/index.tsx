@@ -83,7 +83,7 @@ function ContactText({ sender, content }: PropsContactText) {
 	}
 
 	const [showMessage, setShowMessage] = useState(true)
-	const senderIsBlocked = userAuthenticate.blockedUsers.includes(sender)
+	const senderIsBlocked = userAuthenticate.blockeds.includes(sender)
 
 	function handleClickEvent() {
 		if (senderIsBlocked)
