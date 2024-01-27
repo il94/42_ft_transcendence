@@ -7,7 +7,6 @@ import { useNavigate } from "react-router"
 import Cookies from "js-cookie"
 import axios from "axios"
 
-
 import {
 	Style,
 	ProfileWrapper,
@@ -24,7 +23,6 @@ import { User, UserAuthenticate } from "../../utils/types"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
-import axios from "axios"
 
 type PropsProfile = {
 	userAuthenticate: UserAuthenticate,
