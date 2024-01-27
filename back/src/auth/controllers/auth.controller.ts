@@ -23,7 +23,7 @@ export class AuthController {
 			// 	.send({ status: 'New user authenticated'});
 			return token; 
 		} catch (error) {
-			throw new BadRequestException(error.message)
+			throw error
 		}
 	}
 

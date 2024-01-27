@@ -26,7 +26,7 @@ export class AuthService {
 			delete newUser.hash;
 			return this.signToken(newUser.id, newUser.username);
 		} catch (error) {
-            throw new BadRequestException(error.message)
+            throw error
         }	
 	}
 
