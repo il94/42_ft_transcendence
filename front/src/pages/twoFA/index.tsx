@@ -6,7 +6,7 @@ import {
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -24,9 +24,12 @@ import AuthContext from '../../contexts/AuthContext'
 import { ErrorResponse, SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
 
+type PropsTwoFAResponse = {
+	access_token: string
+}
+
 function TwoFA() {
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { token /*, setToken */ } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -46,15 +49,11 @@ function TwoFA() {
 				return
 			}
 
-			/* ============ Temporaire ============== */
-			
-			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`, code)
+			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate`, {
+				twoFACode: code
+			})
 	
-			// setToken(response.data.access_token)
-			// localStorage.setItem('token', response.data.access_token)
-
-			/* ====================================== */
-
+			localStorage.setItem("access_token", twoFAResponse.data.access_token)
 			navigate("/")
 		}
 		catch (error) {
@@ -87,25 +86,6 @@ function TwoFA() {
 			error: false
 		})
 	}
-
-	/* ========================================================================== */
-
-	// useEffect(() => {
-	// 	async function sendCode() {
-	// 		try {
-
-	// 			/* ============ Temporaire ============== */
-
-	// 			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
-
-	// 			/* ====================================== */
-	// 		}
-	// 		catch (error) {
-	// 			navigate("/error");
-	// 		}
-	// 	}
-	// 	sendCode()
-	// }, [])
 
 	/* ========================================================================== */
 

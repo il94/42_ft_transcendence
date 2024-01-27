@@ -8,6 +8,7 @@ const Setting = styled.div`
 
 	width: 100%;
 
+	text-align: center;
 	font-size: 20px;
 
 `

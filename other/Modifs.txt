@@ -1,6 +1,4 @@
-Signin/ :
-	Codes d'erreur a recuperer
-	Recuperer le boolean twofa du user pour savoir si on redirige vers Game ou pas
+(Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
-Signup/ :
-	Verifier si user existe deja : mail ou username ?
+TwoFA/ :
+	Gestion d'erreur à faire
