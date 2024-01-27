@@ -81,6 +81,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
 			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
+		userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
 
 		return () => {
 			userAuthenticate.socket?.off("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
@@ -91,6 +92,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 				refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 			userAuthenticate.socket?.off("updateUserRole", (channelId: number, userId: number, newRole: any) =>
 				refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
+			userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
 		}
 	}
 

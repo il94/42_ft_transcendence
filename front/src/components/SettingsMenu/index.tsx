@@ -42,16 +42,52 @@ type PropsSettingsMenu = {
 	url: string,
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
-	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
+	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
+	setTwoFACodeQR: Dispatch<SetStateAction<string>>
 }
 
-function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
+
+function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
 
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
+
+
+	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
+		try {
+
+			console.log("SUBMIT")
+
+			event.preventDefault()
+
+			await axios.patch(`http://${url}:3333/auth/2fa/enable`, {
+				twoFACode: QRcodeValue
+			},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+		}
+		catch (error) {
+
+			// afficher correctement la gestion d'erreur
+
+			console.log(error)
+		}
+	}
+
+
+
+
+
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 
 		try {
+
+			console.log("SUBMIT")
+
 			event.preventDefault()
 			if (username.value.length === 0 ||
 				email.value.length === 0 ||
@@ -78,6 +114,10 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						errorMessage: "Insert phone number",
 					})
 				}
+				return
+			}
+
+			if (username.error || password.error || email.error || phoneNumber.error)
 				return
 			}
 
@@ -321,20 +361,28 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	const [twoFA, setTwoFA] = useState<boolean>(userAuthenticate.twoFA)
 
-	function handleClickTwoFAChange() {
-		// if (email.error) {
-		// 	setTwoFA({
-		// 		value: false,
-		// 		error: true,
-		// 		errorMessage: "No valid email"
-		// 	})
-		// }
-		// else {
-		// 	setTwoFA({
-		// 		value: !twoFA.value,
-		// 		error: false
-		// 	})
-		// }
+	const [QRcode, setQRcode] = useState<string>('')
+	const [QRcodeValue, setQRcodeValue] = useState<string>('')
+
+	function handleInputQRcodeChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setQRcodeValue(value)
+	}
+
+	async function handleClickTwoFAChange() {
+		try {
+			const responseQRcode = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			displayTwoFAMenu(true)
+			setTwoFACodeQR(responseQRcode.data)
+		}
+		catch (error) {
+			console.log(error)
+		}
 	}
 
 	/* =============================== AVATAR ================================== */
@@ -486,6 +534,14 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 							}
 						</Button>
 					</Setting>
+
+							{/* <img src={QRcode} />
+							<InputText
+								onSubmit={handleSubmitTWOfa}
+								onChange={handleInputQRcodeChange}
+								type="text" value={QRcodeValue}
+								fontSize={16} /> */}
+
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />

@@ -1,0 +1,18 @@
+42 profile :  {
+	"id":108965,
+"email":"cchapon@student.42.fr",
+"login":"cchapon",
+"first_name":"Claire",
+"last_name":"Chapon",
+"usual_full_name":"Claire Chapon",
+"usual_first_name":null,
+"url":"https://api.intra.42.fr/v2/users/cchapon",
+"phone":"hidden",
+"displayname":"Claire Chapon",
+"kind":"student",
+"image":
+{"link":"https://cdn.intra.42.fr/users/276007bc25a3da47cf1c780db9576059/cchapon.JPG",
+"versions":{"large":"https://cdn.intra.42.fr/users/a3090cabc5f1a7f46868ad92bfc968b0/large_cchapon.JPG",
+"medium":"https://cdn.intra.42.fr/users/9012fb16173cb3efe3d51bc8ebfdbda7/medium_cchapon.JPG",
+"small":"https://cdn.intra.42.fr/users/3b87ebb97205cf95dff3213e3e57eea8/small_cchapon.JPG",
+"micro":"https://cdn.intra.42.fr/users/f5ca518b90df5aa0e8e21071625b225f/micro_cchapon.JPG"}},

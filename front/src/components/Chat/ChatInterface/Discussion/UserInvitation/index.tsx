@@ -8,19 +8,44 @@ import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
 import { challengeStatus } from "../../../../../utils/status"
 
-import { User } from "../../../../../utils/types"
+import { User, UserAuthenticate } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import axios from "axios"
+
+import AuthContext from "../../../../../contexts/AuthContext"
+import InteractionContext from "../../../../../contexts/InteractionContext"
 
 type PropsUserInvitation = {
-	target: User,
+	target: User | UserAuthenticate,
 	initialStatus: challengeStatus
+	idMsg : number,
+	idChan : number
 }
 
-function UserInvitation({ target, initialStatus }: PropsUserInvitation) {
+function UserInvitation({target, initialStatus, idMsg, idChan }: PropsUserInvitation) {
 
-	const [status, setStatus] = useState<challengeStatus>(initialStatus)
+	// const [status, setStatus] = useState<challengeStatus>(initialStatus)
+	const { token, url } = useContext(AuthContext)!
+	const {userAuthenticate} = useContext(InteractionContext)!
+	
+	async function handleClickChallengeStatus(status : challengeStatus, idMsg: number, idChan : number) {
+		const sockets = await axios.get(`http://${url}:3333/channel/${idChan}/sockets`, {
+				headers: {
+						'Authorization': `Bearer ${token}`
+					} 
+				})
+		await axios.patch(`http://${url}:3333/channel/message/${idMsg}`, 
+		{ idMsg: idMsg , msgStatus : status},
+		{
+		headers: {
+			'Authorization': `Bearer ${token}`
+				}
+			}
+		);
+		userAuthenticate.socket?.emit('updateChallenge', sockets.data, idMsg, status, idChan);
+	}
 
 	return (
 		<Style>
@@ -28,17 +53,17 @@ function UserInvitation({ target, initialStatus }: PropsUserInvitation) {
 				You challenge {target.username} to a duel !
 			</Text>
 			{
-				status === challengeStatus.PENDING &&
+				initialStatus === challengeStatus.PENDING &&
 				<ButtonsWrapper>
 					<ButtonChallenge
-						onClick={() => setStatus(challengeStatus.CANCELLED)}
+						onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan)}
 						color={colors.buttonRed}>
 						Cancel
 					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 			{
-				status === challengeStatus.ACCEPTED &&
+				initialStatus === challengeStatus.ACCEPTED &&
 				<ButtonsWrapper>
 					<ButtonChallenge
 						color={colors.buttonGreen}>
@@ -47,7 +72,7 @@ function UserInvitation({ target, initialStatus }: PropsUserInvitation) {
 				</ButtonsWrapper>
 			}
 			{
-				status === challengeStatus.CANCELLED &&
+				initialStatus === challengeStatus.CANCELLED &&
 				<ButtonsWrapper>
 					<ButtonChallenge
 						color={colors.buttonGray}>
@@ -56,7 +81,7 @@ function UserInvitation({ target, initialStatus }: PropsUserInvitation) {
 				</ButtonsWrapper>
 			}
 			{
-				status === challengeStatus.IN_PROGRESS &&
+				initialStatus === challengeStatus.IN_PROGRESS &&
 				<ButtonsWrapper>
 					<ButtonChallenge
 						color={colors.button}>
@@ -65,7 +90,7 @@ function UserInvitation({ target, initialStatus }: PropsUserInvitation) {
 				</ButtonsWrapper>
 			}
 			{
-				status === challengeStatus.FINISHED &&
+				initialStatus === challengeStatus.FINISHED &&
 				<ButtonsWrapper>
 					<ButtonChallenge
 						color={colors.button}>

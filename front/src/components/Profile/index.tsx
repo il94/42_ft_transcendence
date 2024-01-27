@@ -4,6 +4,7 @@ import {
 	useContext
 } from "react"
 import { useNavigate } from "react-router"
+import Cookies from "js-cookie"
 import axios from "axios"
 
 import {
@@ -55,16 +56,23 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 	}
 
 	async function handleDeconnexionClickButton() {
-		
-		await axios.patch(`http://${url}:3333/auth/logout`, {}, {
-			headers: {
-				'Authorization': `Bearer ${token}`
-			}
-		})
+		try {
 
-		localStorage.removeItem("access_token")
-		setToken('')
-		navigate("/")
+			await axios.get(`http://${url}:3333/auth/logout`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}) 
+			
+			Cookies.remove('access_token')
+			localStorage.removeItem('token')
+			localStorage.clear();
+			setToken('')
+			navigate("/")
+		}
+		catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (

@@ -33,7 +33,7 @@ export class ChannelsGateway {
   @SubscribeMessage('sendDiscussion')
   async handleUpdateDiscussion(client: Socket, args: string[]) {
     for (const socket of args[0]) {
-      this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3]);
+      this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3], args[4]);
     }
   }
 
@@ -75,6 +75,20 @@ export class ChannelsGateway {
     const argsToSend = args.slice(1)
     for (const socket of args[0]) {
       this.server.to(socket).emit("updateChannel", ...argsToSend);
+    }
+  }
+
+    /*
+    args[0] tableau de sockets des users channel
+    args[1] id du message
+    args[2] nouveau status
+   */
+
+  @SubscribeMessage('updateChallenge')
+  async handleUpdateChallengel(client: Socket, args: any[]) {
+    const argsToSend = args.slice(1)
+    for (const socket of args[0]) {
+      this.server.to(socket).emit("updateStatusChallenge", ...argsToSend);
     }
   }
 

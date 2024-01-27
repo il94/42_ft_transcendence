@@ -47,6 +47,8 @@ function Discussion({ channel } : PropsDiscussion) {
 										key={"message" + index} // a definir
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}
+										idMsg={(message as MessageInvitation).id}
+										idChan={(channel.id)}
 									/>
 								:
 
@@ -63,6 +65,8 @@ function Discussion({ channel } : PropsDiscussion) {
 											sender={message.sender}
 											target={(message as MessageInvitation).target}
 											initialStatus={(message as MessageInvitation).status}
+											idMsg={(message as MessageInvitation).id}
+											idChan={(channel.id)}
 										/>
 									// :
 									// 	<OtherInvitation

@@ -23,9 +23,11 @@ import AuthContext from '../../contexts/AuthContext'
 
 import { ErrorResponse, SettingData } from '../../utils/types'
 import { emptySetting } from '../../utils/emptyObjects'
+import axios from 'axios'
 
 function TwoFA() {
-	const { token, setToken } = useContext(AuthContext)!
+	const [errorRequest, setErrorRequest] = useState<boolean>(false)
+	const { token /*, setToken */ } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -46,15 +48,15 @@ function TwoFA() {
 			}
 
 			/* ============ Temporaire ============== */
-
+			
 			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`, code)
-
+	
 			// setToken(response.data.access_token)
-			// localStorage.setItem("access_token", response.data.access_token)
+			// localStorage.setItem('token', response.data.access_token)
 
 			/* ====================================== */
 
-			navigate("/game")
+			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
@@ -89,22 +91,22 @@ function TwoFA() {
 
 	/* ========================================================================== */
 
-	useEffect(() => {
-		async function sendCode() {
-			try {
+	// useEffect(() => {
+	// 	async function sendCode() {
+	// 		try {
 
-				/* ============ Temporaire ============== */
+	// 			/* ============ Temporaire ============== */
 
-				// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
+	// 			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
 
-				/* ====================================== */
-			}
-			catch (error) {
-				navigate("/error");
-			}
-		}
-		sendCode()
-	}, [])
+	// 			/* ====================================== */
+	// 		}
+	// 		catch (error) {
+	// 			navigate("/error");
+	// 		}
+	// 	}
+	// 	sendCode()
+	// }, [])
 
 	/* ========================================================================== */
 

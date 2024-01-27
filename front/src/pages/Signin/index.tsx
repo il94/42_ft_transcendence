@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 import axios, { AxiosError } from 'axios'
+import Cookies from "js-cookie"
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -85,10 +86,17 @@ function Signin() {
 			//temporaire
 			if (signinResponse.data.twoFA)
 				navigate("/twofa")
+			}
 			else {
-				setToken(signinResponse.data.access_token)
-				localStorage.setItem("access_token", signinResponse.data.access_token)
-
+				const access_token: string = response.data.access_token;
+				if (access_token) {
+					localStorage.setItem('token', access_token)
+					setToken(access_token)
+				}
+				else { 
+					console.log("pas de token dans response.data : ", response.data)
+					throw new AxiosError("Failed to retrieve access_token")
+				}
 				navigate("/")
 			}
 		}

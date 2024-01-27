@@ -6,7 +6,7 @@ services:
     image: postgres:16.0
     restart: always
     env_file: ./back/.env
-    expose :
+    expose:
       - '5432'
     networks:
       - transcendence

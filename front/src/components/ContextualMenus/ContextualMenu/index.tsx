@@ -167,7 +167,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 			if (type === contextualMenuStatus.SOCIAL)
 			{
-				console.log("here")
 				const channelMP = await handleContactClickEvent()
 				
 				channel = channelMP
@@ -177,7 +176,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			else
 				throw new Error
 
-			await axios.post(`http://localhost:3333/channel/${channel.id}/invitation`, 
+			const idMsg = await axios.post(`http://localhost:3333/channel/${channel.id}/invitation`, 
 			{ msgStatus : messageStatus.INVITATION, targetId : userTarget.id},
 				{
 					headers: {
@@ -190,13 +189,13 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					'Authorization': `Bearer ${token}`
 				}
 			})
-			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id);													 
+			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id, idMsg.data);													 
 		}
 		catch (error) {
 			console.log(error);
 			displayErrorContextualMenu(true)
 		}
-	}
+	} 
 
 	async function handleManageFriendClickEvent() {
 		try {

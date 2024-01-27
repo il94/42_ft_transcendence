@@ -5,7 +5,7 @@ import {
 	useEffect,
 	useState
 } from 'react'
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import axios, { AxiosError, AxiosResponse }, { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -86,10 +86,10 @@ function Signup() {
 				avatar: getRandomDefaultAvatar()
 			}
 
-			const signupResponse: AxiosResponse = await axios.post(`http://${url}:3333/auth/signup`, newUser)
+			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
-			setToken(signupResponse.data.access_token)
-			localStorage.setItem("access_token", signupResponse.data.access_token)
+			setToken(response.data.access_token)
+			localStorage.setItem('token', response.data.access_token)
 
 			navigate("/")
 		}

@@ -60,6 +60,13 @@ import {
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
+import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu';
+
+
+
+
+
+
 
 function Game() {
 
@@ -153,12 +160,10 @@ function Game() {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
-				})
-
+				})			
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
-
 				const socket = io(`http://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
@@ -216,6 +221,8 @@ function Game() {
 	const [searchBarResults, displaySearchBarResults] = useState<boolean>(false)
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
+	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
+	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
 	/* =============================== DISPLAY ================================== */
 
@@ -356,7 +363,14 @@ function Game() {
 										url={url}
 										userAuthenticate={userAuthenticate}
 										setUserAuthenticate={setUserAuthenticate}
-										displaySettingsMenu={displaySettingsMenu} />
+										displaySettingsMenu={displaySettingsMenu}
+													displayTwoFAMenu={displayTwoFAMenu}
+													setTwoFACodeQR={setTwoFACodeQR} />
+											}
+											{
+												twoFAMenu &&
+												<TwoFaMenu
+													twoFAcodeQR={twoFAcodeQR} />
 								}
 								<TestsBack />
 								{
