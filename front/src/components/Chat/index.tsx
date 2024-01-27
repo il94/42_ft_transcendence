@@ -34,12 +34,11 @@ import DisplayContext from "../../contexts/DisplayContext"
 import AuthContext from "../../contexts/AuthContext"
 
 import {
-	Channel,
-	UserAuthenticate
+	Channel
 } from "../../utils/types"
 import {
 	channelStatus,
-	chatWindowStatus,
+	chatWindowStatus
 } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
@@ -171,9 +170,9 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 									{valueChannelCreateButton}
 								</ChannelCreateButton>
 								<Banner
+									bannerName={bannerName}
 									chatWindowState={chatWindowState}
 									setChatWindowState={setChatWindowState}
-									bannerName={bannerName}
 									setErrorRequest={setErrorRequest} />
 							</TopChatWrapper>
 							<BottomChatWrapper>
@@ -181,29 +180,22 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 									chatWindowState === chatWindowStatus.UPDATE_CHANNEL ||
 										chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
 										<ChannelInterface
-											channel={channelTarget}
+											setBannerName={setBannerName}
 											chatWindowState={chatWindowState}
-											setChatWindowState={setChatWindowState}
-											setBannerName={setBannerName} />
+											setChatWindowState={setChatWindowState} />
 										:
 										<>
 											<ChannelList
 												channels={channels}
-												setChannelTarget={setChannelTarget}
 												setErrorRequest={setErrorRequest} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?
 													<HomeInterface />
 													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
-														<LockedInterface
-															channel={channelTarget}
-															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}
-															setErrorRequest={setErrorRequest} />
+														<LockedInterface setErrorRequest={setErrorRequest} />
 														:
-														<ChatInterface
-															channel={channelTarget}
-															setChannel={setChannelTarget as Dispatch<SetStateAction<Channel>>}/>
+														<ChatInterface />
 											}
 										</>
 								}

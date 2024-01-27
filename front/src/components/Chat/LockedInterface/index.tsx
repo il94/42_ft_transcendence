@@ -20,17 +20,18 @@ import Button from "../../../componentsLibrary/Button"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { Channel, UserAuthenticate } from "../../../utils/types"
+import {
+	UserAuthenticate
+} from "../../../utils/types"
 
 type PropsLockedInterface = {
-	channel: Channel,
-	setChannel: Dispatch<SetStateAction<Channel>>,
 	setErrorRequest: Dispatch<SetStateAction<boolean>>
 }
 
-function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedInterface) {
+function LockedInterface({ setErrorRequest }: PropsLockedInterface) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	type PropsSetting = {
 		value: string,
@@ -52,11 +53,12 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 		})
 	}
 
-	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
-
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
+			if (!channelTarget)
+				throw new Error
+
 			if (password.value.length === 0) {
 				setPassword({
 					value: '',
@@ -66,7 +68,7 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 				return
 			}
 
-			await axios.post(`http://${url}:3333/channel/join/${channel.id}`, {
+			await axios.post(`http://${url}:3333/channel/join/${channelTarget.id}`, {
 				password: password.value
 			},
 			{
@@ -77,12 +79,12 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 
 			setUserAuthenticate((prevState: UserAuthenticate) => ({
 				...prevState,
-				channels: [ ...prevState.channels, channel]
+				channels: [ ...prevState.channels, channelTarget]
 			}))
 
-			setChannel(() => ({
-				...channel,
-				members: [...channel.members, userAuthenticate],
+			setChannelTarget(() => ({
+				...channelTarget,
+				members: [...channelTarget.members, userAuthenticate],
 			}))
 		}
 		catch (error) {

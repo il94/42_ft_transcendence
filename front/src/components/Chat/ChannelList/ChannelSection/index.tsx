@@ -12,19 +12,20 @@ import {
 } from "./style"
 
 import AuthContext from "../../../../contexts/AuthContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
 
 import { Channel } from "../../../../utils/types"
 
 type PropsChannel = {
 	channel: Channel,
-	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 	setErrorRequest: Dispatch<SetStateAction<boolean>>,
 	backgroundColor: string
 }
 
-function ChannelSection({ channel, setChannelTarget, setErrorRequest, backgroundColor }: PropsChannel) {
+function ChannelSection({ channel, setErrorRequest, backgroundColor }: PropsChannel) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { setChannelTarget } = useContext(InteractionContext)!
 	
 	async function handleClickEvent() {
 		try {

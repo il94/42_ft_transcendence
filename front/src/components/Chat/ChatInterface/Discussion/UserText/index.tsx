@@ -1,4 +1,7 @@
-import { Style, Text } from "./style"
+import {
+	Style,
+	Text
+} from "./style"
 
 type PropsUserText = {
 	content: string

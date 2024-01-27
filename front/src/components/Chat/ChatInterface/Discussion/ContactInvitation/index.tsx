@@ -1,4 +1,8 @@
-import { MouseEvent, useContext, useState } from "react"
+import {
+	MouseEvent,
+	useContext
+} from "react"
+import axios from "axios"
 
 import {
 	Avatar,
@@ -14,15 +18,20 @@ import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext
 import CardContext from "../../../../../contexts/CardContext"
 import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
+import AuthContext from "../../../../../contexts/AuthContext"
 
 import { getContextualMenuHeight } from "../../../../../utils/functions"
 
-import { challengeStatus, contextualMenuStatus, messageStatus } from "../../../../../utils/status"
-import { MessageInvitation, User, UserAuthenticate } from "../../../../../utils/types"
+import {
+	challengeStatus,
+	contextualMenuStatus
+} from "../../../../../utils/status"
+import {
+	User,
+	UserAuthenticate
+} from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
-import axios from "axios"
-import AuthContext from "../../../../../contexts/AuthContext"
 
 type PropsContactInvitation = {
 	sender: User,

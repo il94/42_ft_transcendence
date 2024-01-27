@@ -12,19 +12,17 @@ import UserInvitation from "./UserInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { Channel, MessageInvitation, MessageText } from "../../../../utils/types"
+import {
+	MessageInvitation,
+	MessageText
+} from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
-import OtherInvitation from "./ContactInvitation copy"
 
-type PropsDiscussion = {
-	channel: Channel
-}
+function Discussion() {
 
-function Discussion({ channel } : PropsDiscussion) {
-
-	const { userAuthenticate } = useContext(InteractionContext)!
-
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 	const { chatRender, setChatRender } = useContext(ChatContext)!
+
 	return (
 		<Style>
 			{
@@ -35,7 +33,7 @@ function Discussion({ channel } : PropsDiscussion) {
 					}}
 					activeState>
 					{
-						channel.messages.map((message, index) => (
+						channelTarget.messages.map((message, index) => (
 							message.sender.id === userAuthenticate.id ?
 								message.type === messageStatus.TEXT ?
 									<UserText
@@ -48,7 +46,7 @@ function Discussion({ channel } : PropsDiscussion) {
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}
 										idMsg={(message as MessageInvitation).id}
-										idChan={(channel.id)}
+										idChan={(channelTarget.id)}
 									/>
 								:
 
@@ -66,7 +64,7 @@ function Discussion({ channel } : PropsDiscussion) {
 											target={(message as MessageInvitation).target}
 											initialStatus={(message as MessageInvitation).status}
 											idMsg={(message as MessageInvitation).id}
-											idChan={(channel.id)}
+											idChan={(channelTarget.id)}
 										/>
 									// :
 									// 	<OtherInvitation

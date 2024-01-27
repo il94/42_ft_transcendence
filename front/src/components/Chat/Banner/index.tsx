@@ -18,10 +18,14 @@ import ChatContext from "../../../contexts/ChatContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
-import { channelIsEmpty } from "../../../utils/functions"
-
-import { channelStatus, chatWindowStatus } from "../../../utils/status"
-import { Channel, User } from "../../../utils/types"
+import {
+	channelStatus,
+	chatWindowStatus
+} from "../../../utils/status"
+import {
+	Channel,
+	User
+} from "../../../utils/types"
 
 import DeleteIcon from "../../../assets/close.png"
 import LeaveIcon from "../../../assets/deconnexion.png"
@@ -29,13 +33,16 @@ import ReduceIcon from "../../../assets/reduce.png"
 import SettingsIcon from "../../../assets/settings.png"
 
 type PropsBanner = {
+	bannerName: string,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
-	bannerName: string,
 	setErrorRequest: Dispatch<SetStateAction<boolean>>
 }
 
-function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorRequest }: PropsBanner) {
+function Banner({ bannerName, chatWindowState, setChatWindowState, setErrorRequest }: PropsBanner) {
+
+	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	function getNewOwner(channel: Channel): User | undefined {
 		const adminFind: User | undefined = channel.administrators.find((administrator) => administrator.id !== channel.owner?.id)
@@ -46,9 +53,6 @@ function Banner({ chatWindowState, setChatWindowState, bannerName, setErrorReque
 			return (memberFind)
 		return (undefined)
 	}
-
-	const { token, url } = useContext(AuthContext)!
-	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function deleteChannelMP() {
 		try {

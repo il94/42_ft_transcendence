@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom"
 import { LogoFull, LogoReduced, Style } from "./style"
 import HomeIcon from "../../assets/home.png"
 
-type LogoProps = {
+type PropsLogo = {
 	social: boolean
 }
 
-function Logo({ social }: LogoProps) {
+function Logo({ social }: PropsLogo) {
 
 	const navigate = useNavigate()
 

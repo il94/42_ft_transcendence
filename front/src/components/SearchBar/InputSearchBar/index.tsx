@@ -1,5 +1,15 @@
-import { Dispatch, SetStateAction } from "react"
-import { ArrowButton, ImageButton, InputText, Style } from "./style"
+import {
+	Dispatch,
+	SetStateAction
+} from "react"
+
+import {
+	ArrowButton,
+	ImageButton,
+	InputText,
+	Style
+} from "./style"
+
 import ArrowIcon from "../../../assets/down_arrow.png"
 
 type PropsInputSearchBar = {

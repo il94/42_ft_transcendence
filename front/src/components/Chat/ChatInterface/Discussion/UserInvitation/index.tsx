@@ -1,3 +1,6 @@
+import { useContext } from "react"
+import axios from "axios"
+
 import {
 	Style,
 	Text,
@@ -6,16 +9,17 @@ import {
 
 import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
-import { challengeStatus } from "../../../../../utils/status"
-
-import { User, UserAuthenticate } from "../../../../../utils/types"
-
-import colors from "../../../../../utils/colors"
-import { useContext, useState } from "react"
-import axios from "axios"
-
 import AuthContext from "../../../../../contexts/AuthContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
+
+import {
+	User,
+	UserAuthenticate
+} from "../../../../../utils/types"
+import { challengeStatus } from "../../../../../utils/status"
+
+import colors from "../../../../../utils/colors"
+
 
 type PropsUserInvitation = {
 	target: User | UserAuthenticate,
@@ -24,7 +28,7 @@ type PropsUserInvitation = {
 	idChan : number
 }
 
-function UserInvitation({target, initialStatus, idMsg, idChan }: PropsUserInvitation) {
+function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvitation) {
 
 	// const [status, setStatus] = useState<challengeStatus>(initialStatus)
 	const { token, url } = useContext(AuthContext)!

@@ -35,6 +35,7 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
+import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
 import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
@@ -60,15 +61,10 @@ import {
 import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
-import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu';
-
-
-
-
-
-
 
 function Game() {
+
+	const { token, url } = useContext(AuthContext)!
 
 	function getSecondaryContextualMenuHeight(numberOfChannels: number) {
 		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
@@ -92,7 +88,6 @@ function Game() {
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
-	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -185,7 +180,11 @@ function Game() {
 				})
 			}
 			catch (error) {
-				navigate("/error")
+				navigate("/error", {
+					state: {
+						disconnect: true
+					}
+				})
 			}
 		}
 		if (!token)
@@ -294,9 +293,7 @@ function Game() {
 							contextualMenu.display &&
 							<ContextualMenu
 								type={contextualMenu.type}
-								displayContextualMenu={displayContextualMenu}
 								contextualMenuPosition={contextualMenuPosition}
-								userTarget={userTarget}
 								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
 								setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
 								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
@@ -307,7 +304,6 @@ function Game() {
 							secondaryContextualMenu &&
 							<SecondaryContextualMenu
 								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-								userTarget={userTarget}
 								secondaryContextualMenuPosition={secondaryContextualMenuPosition}
 								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
 								channels={userAuthenticate.channels}
@@ -337,10 +333,7 @@ function Game() {
 									displaySearchBarResults={displaySearchBarResults}
 									displayChat={displayChat} />
 								<Profile
-									userAuthenticate={userAuthenticate}
 									card={card}
-									userTarget={userTarget}
-									setUserTarget={setUserTarget}
 									displayCard={displayCard}
 									setCardPosition={setCardPosition}
 									settings={settings}
@@ -353,24 +346,19 @@ function Game() {
 									card &&
 									<Card
 										cardPosition={cardPosition}
-										displayCard={displayCard}
-										userTarget={userTarget} />
+										displayCard={displayCard} />
 								}
 								{
 									settings &&
 									<SettingsMenu
-										token={token}
-										url={url}
-										userAuthenticate={userAuthenticate}
-										setUserAuthenticate={setUserAuthenticate}
 										displaySettingsMenu={displaySettingsMenu}
-													displayTwoFAMenu={displayTwoFAMenu}
-													setTwoFACodeQR={setTwoFACodeQR} />
-											}
-											{
-												twoFAMenu &&
-												<TwoFaMenu
-													twoFAcodeQR={twoFAcodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu}
+										setTwoFACodeQR={setTwoFACodeQR} />
+								}
+								{
+									twoFAMenu &&
+									<TwoFaMenu
+										twoFAcodeQR={twoFAcodeQR} />
 								}
 								<TestsBack />
 								{
@@ -381,12 +369,8 @@ function Game() {
 													chat={chat}
 													displayChat={displayChat}
 													channels={userAuthenticate.channels}
-													setUserAuthenticate={setUserAuthenticate}
-													channelTarget={channelTarget}
-													setChannelTarget={setChannelTarget}
 													chatWindowState={chatWindowState}
-													setChatWindowState={setChatWindowState}
-													userAuthenticate={userAuthenticate} />
+													setChatWindowState={setChatWindowState} />
 											</ChatContext.Provider>
 										</CardContext.Provider>
 									</ContextualMenuContext.Provider>

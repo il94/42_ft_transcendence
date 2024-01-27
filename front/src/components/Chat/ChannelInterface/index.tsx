@@ -6,7 +6,7 @@ import {
 	useContext,
 	useState
 } from "react"
-import axios, { AxiosResponse } from "axios"
+import axios from "axios"
 
 import {
 	Avatar,
@@ -38,19 +38,17 @@ import RemoveIcon from "../../../assets/close.png"
 import DefaultChannelIcon from "../../../assets/default_channel.png"
 
 type PropsChannelInterface = {
-	channel: Channel | undefined,
+	setBannerName: Dispatch<SetStateAction<string>>,
 	chatWindowState: chatWindowStatus,
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
-	setBannerName: Dispatch<SetStateAction<string>>
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
 }
 
-function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBannerName }: PropsChannelInterface) {
+function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }: PropsChannelInterface) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	const [error, setError] = useState<boolean>(false)
-
-	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 
@@ -68,15 +66,15 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 
 		try {
 			if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL) {
-				if (channel) {
+				if (channelTarget) {
 					const newDatas: any = {
-						name: name.value !== channel.name ? name.value : channel.name,
-						type: channelType !== channel.type ? channelType : channel.type,
-						password: password !== channel.password ? password : channel.password,
-						avatar: avatar !== channel.avatar ? avatar : channel.avatar
+						name: name.value !== channelTarget.name ? name.value : channelTarget.name,
+						type: channelType !== channelTarget.type ? channelType : channelTarget.type,
+						password: password !== channelTarget.password ? password : channelTarget.password,
+						avatar: avatar !== channelTarget.avatar ? avatar : channelTarget.avatar
 					}		
 
-					await axios.patch(`http://${url}:3333/channel/${channel.id}`, newDatas,
+					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, newDatas,
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
@@ -139,7 +137,7 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 	}
 
 	const [name, setName] = useState<PropsName>({
-		value: channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channel.name : '',
+		value: channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ? channelTarget.name : '',
 		error: false,
 		errorMessage: ''
 	})
@@ -190,8 +188,8 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 	/* =========================== CHANNEL TYPE ================================= */
 
 	const [channelType, setChannelType] = useState<channelStatus>(
-		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
-			channel.type
+		channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+			channelTarget.type
 			:
 			channelStatus.PUBLIC
 	)
@@ -207,9 +205,9 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 	/* ============================== PASSWORD ================================== */
 
 	const [password, setPassword] = useState<string | undefined>(
-		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
-			channel.password ?
-			channel.password :
+		channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+			channelTarget.password ?
+			channelTarget.password :
 			''
 			:
 			''
@@ -221,8 +219,8 @@ function ChannelInterface({ channel, chatWindowState, setChatWindowState, setBan
 	/* =============================== AVATAR =================================== */
 
 	const [avatar, setAvatar] = useState<string>(
-		channel && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
-			channel.avatar
+		channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+			channelTarget.avatar
 			:
 			DefaultChannelIcon
 	)

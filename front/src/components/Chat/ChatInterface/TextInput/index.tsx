@@ -7,26 +7,24 @@ import {
 } from "react"
 import axios from "axios"
 
-import { Input, Style } from "./style"
+import {
+	Input,
+	Style
+} from "./style"
 
 import ErrorRequestMessage from "../../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
 
-import { Channel } from "../../../../utils/types"
 import { messageStatus } from "../../../../utils/status"
-
-type PropsTextInput = {
-	channel: Channel,
-}
  
+function TextInput() {
 
-function TextInput({ channel }: PropsTextInput) {
 	const { token, url } = useContext(AuthContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
-	const { userAuthenticate } = useContext(InteractionContext)!
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	/*
 
@@ -41,14 +39,14 @@ function TextInput({ channel }: PropsTextInput) {
 			return
 			try {
 
-				const sockets = await axios.get(`http://${url}:3333/channel/${channel.id}/sockets`, {
+				const sockets = await axios.get(`http://${url}:3333/channel/${channelTarget.id}/sockets`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
 					} 
 				})
 
 				/* post le meesage dans le back */
-				const idMsg = await axios.post(`http://${url}:3333/channel/${channel.id}/message`, 
+				const idMsg = await axios.post(`http://${url}:3333/channel/${channelTarget.id}/message`, 
 				{ msg: message , msgStatus : messageStatus.TEXT},
 					{
 						headers: {
@@ -56,7 +54,7 @@ function TextInput({ channel }: PropsTextInput) {
 						}
 					}
 				);
-				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, message, idMsg.data);
+				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channelTarget.id, message, idMsg.data);
 				
 				setMessage("");
 			  } catch (error) {

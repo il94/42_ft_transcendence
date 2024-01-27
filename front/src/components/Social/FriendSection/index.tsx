@@ -41,8 +41,8 @@ type PropsFriendSection = {
 
 function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
-	const { card, displayCard, setCardPosition } = useContext(CardContext)!
 	const { userTarget, setUserTarget, userAuthenticate } = useContext(InteractionContext)!
+	const { card, displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 

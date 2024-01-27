@@ -20,13 +20,10 @@ import { userIsBanned, userIsInChannel } from "../../../utils/functions"
 
 import {
 	Channel,
-	MessageInvitation,
-	User,
 	UserAuthenticate
 } from "../../../utils/types"
 
 import {
-	challengeStatus,
 	channelRole,
 	channelStatus,
 	contextualMenuStatus,
@@ -36,11 +33,6 @@ import {
 
 type PropsContextualMenu = {
 	type: contextualMenuStatus | undefined,
-	displayContextualMenu: Dispatch<SetStateAction<{
-		display: boolean,
-		type: contextualMenuStatus | undefined
-	}>>,
-	userTarget: User,
 	contextualMenuPosition: {
 		left?: number,
 		right?: number,
@@ -59,9 +51,10 @@ type PropsContextualMenu = {
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, userTarget, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
+function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, userTarget, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	function showSecondaryContextualMenu(event: MouseEvent<HTMLButtonElement>) {
 
@@ -104,8 +97,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		else
 			displayAdminSections(false)
 	}, [])
-
-	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	async function handleContactClickEvent() {
 		try {

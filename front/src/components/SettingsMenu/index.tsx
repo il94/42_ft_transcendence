@@ -27,31 +27,28 @@ import ScrollBar from "../../componentsLibrary/ScrollBar"
 import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
+import InteractionContext from "../../contexts/InteractionContext"
+import AuthContext from "../../contexts/AuthContext"
 
 import {
 	ErrorResponse,
-	SettingData,
-	UserAuthenticate
+	SettingData
 } from "../../utils/types"
 import { emptySetting } from "../../utils/emptyObjects"
 
 import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
-	token: string,
-	url: string,
-	userAuthenticate: UserAuthenticate,
-	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
 	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
 	setTwoFACodeQR: Dispatch<SetStateAction<string>>
 }
 
+function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
 
-function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
-
+	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-
 
 	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -76,11 +73,6 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 			console.log(error)
 		}
 	}
-
-
-
-
-
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {

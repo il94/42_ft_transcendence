@@ -31,7 +31,11 @@ import {
 	userIsBanned
 } from "../../../utils/functions"
 
-import { Channel, User, UserAuthenticate } from "../../../utils/types"
+import {
+	Channel,
+	User,
+	UserAuthenticate
+} from "../../../utils/types"
 import { channelStatus } from "../../../utils/status"
 
 type PropsSearchBar = {
@@ -42,6 +46,7 @@ type PropsSearchBar = {
 function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 
 	function generateResults(results: User[] | Channel[], type: string) {
 		return (
@@ -135,7 +140,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 	const [channels, setChannels] = useState<Channel[]>([])
 	const [channelsFound, setChannelsFound] = useState<Channel[]>([])
 
-	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	async function addUserToFriendList(user: User) {

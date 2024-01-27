@@ -1,4 +1,8 @@
-import { Dispatch, SetStateAction } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext
+} from "react"
 // import axios from "axios"
 
 import { Style } from "./style"
@@ -7,11 +11,12 @@ import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
-import { Channel, User, UserAuthenticate } from "../../../utils/types"
+import InteractionContext from "../../../contexts/InteractionContext"
+
+import { Channel } from "../../../utils/types"
 
 type PropsSecondaryContextualMenu = {
 	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
-	userTarget: User | UserAuthenticate,
 	secondaryContextualMenuPosition: {
 		left?: number,
 		right?: number,
@@ -23,7 +28,9 @@ type PropsSecondaryContextualMenu = {
 	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu }: PropsSecondaryContextualMenu) {
+function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu }: PropsSecondaryContextualMenu) {
+
+	const { userTarget } = useContext(InteractionContext)!
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
@@ -54,7 +61,9 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 					<ScrollBar visible>
 						{
 							channels.map((channel, index) => (
-								<Section key={"channelSection" + index} onClick={() => handleInviteClickEvent(channel)}>
+								<Section
+									key={"channelSection" + index}
+									onClick={() => handleInviteClickEvent(channel)}>
 									<SectionName>
 										{channel.name}
 									</SectionName>
