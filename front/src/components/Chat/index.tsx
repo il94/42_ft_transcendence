@@ -5,7 +5,6 @@ import {
 	useEffect,
 	useState
 } from "react"
-import axios, { AxiosResponse } from "axios"
 
 import {
 	Style,
@@ -15,266 +14,49 @@ import {
 	ChannelCreateButton
 } from "./style"
 
+import {
+	refreshJoinChannel,
+	refreshLeaveChannel,
+	refreshUserRole,
+	updateDiscussion
+} from "./sockets"
+
 import ChannelList from "./ChannelList"
 import ChatInterface from "./ChatInterface"
 import ChannelInterface from "./ChannelInterface"
 import Banner from "./Banner"
-import Icon from "../../componentsLibrary/Icon"
 import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
+import Icon from "../../componentsLibrary/Icon"
 import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import AuthContext from "../../contexts/AuthContext"
 
-import { findUserInChannel } from "../../utils/functions"
-
 import {
 	Channel,
-	Message,
-	MessageInvitation,
-	MessageText,
-	User,
 	UserAuthenticate
 } from "../../utils/types"
 import {
-	challengeStatus,
-	channelRole,
 	channelStatus,
 	chatWindowStatus,
-	messageStatus
 } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
+import InteractionContext from "../../contexts/InteractionContext"
 
 type PropsChat = {
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
 	channels: Channel[],
-	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
-	channelTarget: Channel | undefined,
-	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
-	userAuthenticate: UserAuthenticate
 }
 
-function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget, setChannelTarget, chatWindowState, setChatWindowState, userAuthenticate }: PropsChat) {
+function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState }: PropsChat) {
 
 	const { token, url } = useContext(AuthContext)!
-
-	function updateDiscussion(idSend: number, idChannel: number, idTargetOrMsg: number | string) {
-		if (channelTarget)
-		{
-			console.log("here");
-			let messageContent: Message;
-			const userSend = findUserInChannel(channelTarget, idSend);
-			if (!userSend)
-				throw new Error
-			if (typeof idTargetOrMsg === 'number')
-			{
-
-				const userTarget = findUserInChannel(channelTarget , idTargetOrMsg);
-				if (!userTarget)
-				throw new Error
-				messageContent = {
-					sender: userSend,
-					type: messageStatus.INVITATION,
-					target: userTarget,
-					status: challengeStatus.PENDING
-				} as MessageInvitation
-			
-			}
-			else {
-				messageContent ={
-					sender: userSend,
-					type: messageStatus.TEXT,
-					content: idTargetOrMsg
-				} as MessageText
-			}
-			if (idChannel === channelTarget.id)
-			{
-				setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						messages: [
-							...prevState.messages,
-							messageContent
-						]
-					}
-				}
-				else
-					return (undefined)
-				});
-			};
-		}
-	};
-
-	async function refreshJoinChannel(channelId: number, userId: number) {
-		if (channelTarget?.id === channelId)
-		{
-			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${userId}`, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
-			setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						members: [
-							...prevState.members,
-							userResponse.data
-						]
-					}
-				}
-				else
-					return (undefined)
-			})
-		}
-	}
-
-	async function refreshLeaveChannel(channelId: number, userId: number) {
-		if (userId === userAuthenticate.id)
-		{
-			setUserAuthenticate((prevState: UserAuthenticate) => {
-				return {
-					...prevState,
-					channels: prevState.channels.filter((channel) => channel.id !== channelId)
-				}
-			})
-			if (channelTarget?.id === channelId)
-				setChannelTarget(undefined)
-		}
-		else if (channelTarget?.id === channelId)
-		{
-			setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						members: prevState.members.filter((member) => member.id !== userId),
-						administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId),
-						owner: prevState.owner?.id === userId ? undefined : prevState.owner
-					}
-				}
-				else
-					return (undefined)
-			})	
-		}
-	}
-
-	async function refreshUserRole(channelId: number, userId: number, newRole: any) {
-
-		const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${userId}`, {
-			headers: {
-				'Authorization': `Bearer ${token}`
-			}
-		})
-
-
-		if (newRole === channelRole.BANNED)
-		{
-			if (userAuthenticate.id === userId)
-			{
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-					return {
-						...prevState,
-						channels: prevState.channels.filter((channel) => channel.id !== channelId)
-					}
-				})
-				setChannelTarget(undefined)
-			}
-			else if (channelTarget)
-			{
-				setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-					{
-						return {
-							...prevState,
-							members: channelTarget.members.filter((member) => member.id !== userId),
-							administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId),
-							banneds: [
-								...prevState.banneds,
-								userResponse.data
-							]
-						}
-					}
-					else
-						return (undefined)
-				})
-			}
-		}
-		else if (newRole === channelRole.UNBANNED)
-		{
-			if (userAuthenticate.id === userId)
-			{
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-					return {
-						...prevState,
-						channels: prevState.channels.filter((channel) => channel.id !== channelId)
-					}
-				})
-			}
-			if (channelTarget?.id === channelId)
-			{
-				setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-					{
-						return {
-							...prevState,
-							banneds: prevState.banneds.filter((banned) => banned.id !== userId)
-						}
-					}
-					else
-				return (undefined)
-			})
-			}
-		}
-		else if (channelTarget?.id === channelId)
-		{
-			if (newRole === channelRole.MEMBER)
-			{
-				const isAlreadyMember = channelTarget.members.find((member) => member.id === userId)
-				const members = isAlreadyMember ? channelTarget.members : [ ...channelTarget.members, userResponse.data ]
-
-				setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-					{
-						return {
-							...channelTarget,
-							members: members,
-							administrators: channelTarget.administrators.filter((administrator) => administrator.id !== userId)
-						}
-					}
-					else
-						return (undefined)
-				})
-			}
-			else if (newRole === channelRole.ADMIN)
-			{
-				const isAlreadyAdministrator = channelTarget.administrators.find((administrator) => administrator.id === userId)
-				const administrators = isAlreadyAdministrator ? channelTarget.administrators : [ ...channelTarget.administrators, userResponse.data ]
-
-				setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-					{
-						return {
-							...prevState,
-							members: prevState.members.filter((member) => member.id !== userId),
-							administrators: administrators
-						}
-					}
-					else
-						return (undefined)
-				})
-			}			
-		}
-	}
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
 
 	function handleChangeChatWindowState() {
 		if (channelTarget)
@@ -291,16 +73,24 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 	}
 
 	function handleListenSockets() {
-		userAuthenticate.socket?.on("updateDiscussion", updateDiscussion);
-		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
-		userAuthenticate.socket?.on("leaveChannel", refreshLeaveChannel);
-		userAuthenticate.socket?.on("updateUserRole", refreshUserRole);
+		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
+			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
+			refreshJoinChannel({ channelId, userId, channelTarget, setChannelTarget, token, url }))
+		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
+			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
+			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
 
 		return () => {
-			userAuthenticate.socket?.off("updateDiscussion", updateDiscussion);
-			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
-			userAuthenticate.socket?.off("leaveChannel", refreshLeaveChannel);
-			userAuthenticate.socket?.off("updateUserRole", refreshUserRole);
+			userAuthenticate.socket?.off("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
+				updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
+			userAuthenticate.socket?.off("joinChannel", (channelId: number, userId: number) =>
+				refreshJoinChannel({ channelId, userId, channelTarget, setChannelTarget, token, url }))
+			userAuthenticate.socket?.off("leaveChannel", (channelId: number, userId: number) => 
+				refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+			userAuthenticate.socket?.off("updateUserRole", (channelId: number, userId: number, newRole: any) =>
+				refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
 		}
 	}
 
