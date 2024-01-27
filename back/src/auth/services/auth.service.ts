@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -32,26 +32,38 @@ export class AuthService {
 
 	async validateUser(dto: AuthDto): Promise<{ access_token: string } | { twoFA: boolean } > {
 		try {
+			if (dto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException();
 			const user = await this.prisma.user.findUnique({
-					where: { email: dto.email, },
-				});
+				where: {
+					email: dto.email
+				}
+			});
 			if (!user)
-				throw new BadRequestException('user not found');
+				throw new NotFoundException();
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
-				throw new ForbiddenException('incorrect password');
-			const token: { access_token: string } = await this.signToken(user.id, user.username)
-			if(user.twoFA === false) {
+				throw new ForbiddenException();
+
+			const token: { access_token: string } = await this.signToken(user.id, user.email)
+			if (user.twoFA === false)
+			{
 				await this.prisma.user.update({
-						where: { id: user.id },
-						data: { status: UserStatus.ONLINE }
+					where: {
+						id: user.id
+					},
+					data: {
+						status: UserStatus.ONLINE
+					}
 				})
+
 				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
 				return token;
-			} else
+			}
+			else
 				return { twoFA: true }
 		} catch (error) {
-            throw new BadRequestException(error.message)
+            throw error
         }
 	}
 

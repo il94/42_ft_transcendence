@@ -16,9 +16,9 @@ export class AuthController {
 
 	@Post('signup')
 	@HttpCode(HttpStatus.OK)
-	async signup(@Body() dto: CreateUserDto, @Res({ passthrough: true }) res: Response): Promise<{access_token: string}> {
+	async signup(@Body() dto: CreateUserDto, @Res({ passthrough: true }) res: Response): Promise<{ access_token: string }> {
 		try {
-			const token = await this.authService.signup(dto);
+			const token: { access_token: string } = await this.authService.signup(dto);
 			// res.cookie('access_token', token.access_token, { httpOnly: true })
 			// 	.send({ status: 'New user authenticated'});
 			return token; 
@@ -36,7 +36,7 @@ export class AuthController {
 			const tok: token  = await this.authService.validateUser(dto);
 			return tok;
 		} catch (error) {
-			throw new BadRequestException(error.message)
+			throw error
 		}
 	}
 

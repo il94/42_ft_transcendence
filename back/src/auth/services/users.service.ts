@@ -15,6 +15,8 @@ export class UsersService {
 	async createUser(createUserDto: CreateUserDto): Promise<User> {
 		console.log("BACK PRISMA")
 		try {
+			if (createUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException();
 			const userExists = await this.prisma.user.findFirst({
 				where: {
 					email: createUserDto.email
@@ -22,8 +24,6 @@ export class UsersService {
 			})
 			if (userExists)
 				throw new ConflictException();
-			else if (createUserDto.email.endsWith("@student.42.fr"))
-				throw new ForbiddenException("42 emails are forbidden");
 			const hash = await argon.hash(createUserDto.hash);
 			const userDatas = {
 				...createUserDto,

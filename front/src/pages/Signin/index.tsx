@@ -6,8 +6,7 @@ import {
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
-import Cookies from "js-cookie"
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -43,8 +42,14 @@ const FTRedirectWrapper = styled.div`
 
 `
 
+type PropsSigninResponse = {
+	access_token: string
+} | {
+	twoFA: boolean
+}
+
 function Signin() {
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -81,22 +86,13 @@ function Signin() {
 				hash: password.value
 			}
 
-			const signinResponse = await axios.post(`http://${url}:3333/auth/signin`, user)
+			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
 
-			//temporaire
-			if (signinResponse.data.twoFA)
+			if ('twoFA' in signinResponse.data)
 				navigate("/twofa")
-			
-			else {
-				const access_token: string = response.data.access_token;
-				if (access_token) {
-					localStorage.setItem('token', access_token)
-					setToken(access_token)
-				}
-				else { 
-					console.log("pas de token dans response.data : ", response.data)
-					throw new AxiosError("Failed to retrieve access_token")
-				}
+			else
+			{
+				localStorage.setItem('access_token', signinResponse.data.access_token)
 				navigate("/")
 			}
 		}
@@ -125,10 +121,20 @@ function Signin() {
 
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setEmail({
-			value: value,
-			error: false
-		})
+
+		if (value.endsWith("@student.42.fr")) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Cannot signin with 42 email"
+			})
+		}
+		else {	
+			setEmail({
+				value: value,
+				error: false
+			})
+		}
 	}
 
 	/* ============================== PASSWORD ================================== */
