@@ -1,7 +1,7 @@
 # compiled output
 dist
 node_modules
-prisma/migrations
+back/prisma/migrations
 
 # Logs
 logs
