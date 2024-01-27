@@ -1,4 +1,94 @@
 (Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
+DISPLAY/ :
+	Checker le responsive de toutes les pages
+
+GLOBAL/ : A faire sur tout les fichiers un par un
+	Vérifier les key dans les maps
+	Set corectement tout les titles et alts
+	Fix les erreurs ts
+	Checker les contextes
+	Créer un composant Avatar pour la library
+	Checker les enums/types pour les noms
+	Créer des fichiers fonctions si necessaire
+	Shift + Alt + F
+
 TwoFA/ :
 	Gestion d'erreur à faire
+
+ContextualMenu/ :
+-pas_regardé:
+
+SecondaryContextualMenu/ :
+	Appeler la route pour ajouter quelqu'un à un channel
+	Gestion d'erreur
+
+ErrorContextualMenu/ :
+	Verifier si la popup s'affiche correctement
+	Faire en sorte qu'elle disparaisse on blur
+
+FriendSection/ :
+	Clean showCard et peut-être showContextualMenu
+
+ResultsSearchBar/ :
+	Créer un enum pour le type (user ou channel)
+	Gestion d'erreur
+
+Profile/ :
+	Gérer la déconnexion
+	Gestion d'erreur
+
+ScoreResume/ :
+	Virer scoreResume attribut pour mettre direct win ...
+
+ScoreResume/ : à voir quand le Pong aura avancé
+-pas_regardé:
+
+SettingsMenu/ :
+	Faire select Avatar si le temps
+	Gérer le twoFA
+	Gestion d'erreur ( + voir signin/signup)
+
+TwoFaMenu/ :
+	A faire
+
+Chat/ :
+	Compartimenter le code
+	refreshStatusChallenge à retrouver (fonction de soso github)
+	Gestion d'erreur
+
+Banner/ :
+	Peut-être virer getNewOwner
+	Enlever le + possible de setter après les routes pour mettre dans les sockets
+	Gestion d'erreur
+
+ChannelInterface/ :
+	Revoir le form pour faire comme signin up settings
+	Corriger envoi d'avatar socket
+	Gestion d'erreur
+
+ChannelSection/ :
+	Gestion d'erreur
+
+LockedInterface/ :
+	Revérifier les setters (+ avec socekts)
+	Gestion d'erreur
+
+Discussion/ :
+	Gérer channel target si undefined
+
+UserInvitation/ :
+-pas_regardé:
+
+ContactText/ :
+-pas_regardé:
+
+ContactInvitation/ :
+-pas_regardé:
+
+ContactInvitation/ :
+-pas_regardé:
+	Gérer channel target si undefined
+
+
+	
