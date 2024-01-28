@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useState
 } from "react"
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 import { Style } from "./style"
 
@@ -15,6 +15,7 @@ import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
 	findChannelMP,
@@ -29,6 +30,7 @@ import {
 import {
 	Channel,
 	ChannelDatas,
+	ErrorResponse,
 	UserAuthenticate
 } from "../../../utils/types"
 
@@ -56,14 +58,14 @@ type PropsContextualMenu = {
 		bottom?: number
 	}>>,
 	secondaryContextualMenuHeight: number,
-	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
+function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayChat }: PropsContextualMenu) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, userTarget, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	/* ====================== SECONDARY CONTEXTUAL MENU ========================= */
 	
@@ -135,7 +137,16 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 			return (undefined)
 		}
 	}
@@ -180,7 +191,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 		catch (error) {
 			console.log(error);
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	} 
 
@@ -216,7 +227,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
 
@@ -252,7 +263,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
 
@@ -286,7 +297,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
 
@@ -307,7 +318,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
 
@@ -324,7 +335,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			})
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
 
@@ -358,7 +369,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
 

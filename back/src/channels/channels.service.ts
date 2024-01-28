@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto/';
 import { Channel, User, ChannelStatus, Role, Prisma, messageStatus, challengeStatus  } from '@prisma/client';
@@ -40,55 +40,71 @@ export class ChannelsService {
     return newChannel;
   }
 
-  // Cree un channel MP
-  async createChannelMP(recipientId: number, creatorId: number, channelDatas: CreateChannelDto) {
+	// Cree un channel MP
+	async createChannelMP(recipientId: number, creatorId: number) {
+		try {
+			const channelMPAlreadyExist = await this.findChannelMP(recipientId, creatorId)
+			if (channelMPAlreadyExist)
+				throw new ConflictException("MP canal already exist")
 
-    const channelMPAlreadyExist = await this.findChannelMP(recipientId, creatorId)
-    if (channelMPAlreadyExist)
-     throw new BadRequestException('MP canal already exist')
+			const newChannelMP = await this.prisma.channel.create({
+				data: {
+					name: '',
+					avatar: '',
+					type: ChannelStatus.MP,
+					users: { 
+						create: [
+							{
+								role: Role.MEMBER,
+								user: {
+									connect: {
+										id: creatorId
+									}
+								}
+							},
+							{
+								role: Role.MEMBER,
+								user: {
+									connect: {
+										id: recipientId
+									}
+								}
+							},
+						]  
+					},
+				}
+			})
 
-    const newChannelMP = await this.prisma.channel.create({
-      data: {
-        name: '',
-        avatar: '',
-        type: ChannelStatus.MP,
-        users: { 
-          create: [
-            {
-              role: 'MEMBER',
-              user: {connect: { id: creatorId }}
-            },
-            {
-              role: 'MEMBER',
-              user: {connect: { id: recipientId }}
-            },
-          ]  
-        },
-      }
-    })
+			const recipientDatas = await this.prisma.user.findUnique({
+				where: {
+					id: recipientId
+				},
+				select: {
+					username: true,
+					avatar: true
+				}
+			})
 
-    const recipientDatas = await this.prisma.user.findUnique({
-      where: {
-        id: recipientId
-      },
-      select: {
-        username: true,
-        avatar: true
-      }
-    })
+			const channelMP = {
+				...newChannelMP,
+				name: recipientDatas.username,
+				avatar: recipientDatas.avatar
+			}
 
-    const channelMP = {
-      ...newChannelMP,
-      name: recipientDatas.username,
-      avatar: recipientDatas.avatar
-    }
+			await this.emitToChannel("createChannelMP", channelMP.id, recipientId)
 
-    await this.emitToChannel("createChannelMP", channelMP.id, recipientId)
-
-    console.log(`Channel MP ${channelMP.id} was created`)
-
-    return channelMP;
-  }
+			console.log(`Channel MP ${channelMP.id} was created`)
+			return channelMP
+		}
+		catch (error) {
+			if (error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
   // Ajoute un user dans un channel
   async joinChannel(joinChannelDatas: AuthChannelDto, channelId: number, userId: number) {
