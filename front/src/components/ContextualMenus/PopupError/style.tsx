@@ -15,6 +15,7 @@ export const Style = styled.div`
 	transform: translate(-50%, -50%);
 
 	width: 315.5px;
+	min-height: 35px;
 	border: 5px solid ${colors.sectionContextualMenu};
 	clip-path: ${effects.pixelateWindow};
 
@@ -36,6 +37,9 @@ export const CloseButton = styled.div`
 `
 
 export const MessageError = styled.p`
+	
+	margin-top: auto;
+	margin-bottom: auto;
 	
 	text-align: center;
 
