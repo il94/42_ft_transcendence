@@ -23,7 +23,7 @@ export class ChannelController {
   createMP(@Param('id', ParseIntPipe) recipientId: number,
     @Body() channelDatas: CreateChannelDto,
     @getUser('id') creatorId: number) {
-	  return this.channelsService.createChannelMP(recipientId, creatorId, channelDatas);
+	  return this.channelsService.createChannelMP(recipientId, creatorId);
   }
 
   // Ajoute un user dans un channel
