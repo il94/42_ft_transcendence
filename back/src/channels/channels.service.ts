@@ -380,66 +380,84 @@ export class ChannelsService {
     } catch (error) { }    
   }
 
-  // Change le role d'un user du channel
-  async updateUserRole(channelId: number, userTargetId: number, userAuthId: number, newRole: UpdateRoleDto) {
-    try {
-      const userAuthRole = await this.prisma.usersOnChannels.findUnique({
-        where: {
-          userId_channelId: {
-            userId: userAuthId,
-            channelId: channelId
-          }
-        },
-        select: {
-          role: true
-        }
-      })
+	// Change le role d'un user du channel
+	async updateUserRole(channelId: number, userAuthId: number, userTargetId: number, newRole: Role) {
+		try {
+			if (userAuthId === userTargetId)
+				throw new ForbiddenException("It is not possible to update your own role")
 
-      let response: any
+			const userTarget = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true
+				}
+			})
+			if (!userTarget)
+				throw new NotFoundException("User not found")
 
-      if (newRole.role === Role.UNBANNED)
-      {
-        if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
-         throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
-        const unbannedUser = await this.prisma.usersOnChannels.delete({
-          where: {
-            userId_channelId: {
-              userId: userTargetId,
-              channelId: channelId
-            }
-          }
-        })
 
-        response = unbannedUser
-      }
-      else
-      {
-        if (((newRole.role === Role.ADMIN || newRole.role === Role.MEMBER)
-            && userAuthRole.role !== Role.OWNER)
-            || newRole.role === Role.BANNED && userAuthRole.role !== Role.OWNER && userAuthRole.role !== Role.ADMIN)
-          throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userAuthId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
 
-        const updateRole = await this.prisma.usersOnChannels.update({
-          where: {
-            userId_channelId: {
-              userId: userTargetId,
-              channelId: channelId
-            }
-          },
-          data: {
-            role: newRole.role
-          }
-        })
+			let response: any
 
-        response = updateRole
-      }
+			if (newRole === Role.UNBANNED)
+			{
+				if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
+					throw new ForbiddenException(`User ${userAuthId} has not required role for this action`)
+				const unbannedUser = await this.prisma.usersOnChannels.delete({
+					where: {
+						userId_channelId: {
+							userId: userTargetId,
+							channelId: channelId
+						}
+					}
+				})
 
-      await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole.role)
+				response = unbannedUser
+			}
+			else
+			{
+				if (((newRole === Role.ADMIN || newRole === Role.MEMBER)
+					&& userAuthRole.role !== Role.OWNER) ||
+						newRole === Role.BANNED && userAuthRole.role !== Role.OWNER && userAuthRole.role !== Role.ADMIN)
+				throw new ForbiddenException(`User ${userAuthId} has not required role for this action`)
 
-      console.log(`User ${userTargetId} is now ${newRole.role} on channel ${channelId}`)
-      return (response)
+				const updateRole = await this.prisma.usersOnChannels.update({
+					where: {
+						userId_channelId: {
+							userId: userTargetId,
+							channelId: channelId
+						}
+					},
+					data: {
+						role: newRole
+					}
+				})
 
-    } catch (error) { }    
+				response = updateRole
+			}
+
+			await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole)
+
+			console.log(`User ${userTargetId} is now ${newRole} on channel ${channelId}`)
+			return (response)
+
+		}
+		catch (error) {
+
+		}    
   }
 
   // Supprime un channel

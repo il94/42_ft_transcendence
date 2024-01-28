@@ -88,14 +88,14 @@ export class ChannelController {
     return this.channelsService.updateChannel(channelId, newChannelDatas, userId);
   }
 
-  // Change le role d'un user du channel
-  @Patch(':channelId/role/:userTargetId')
-  updateRole(@Param('channelId', ParseIntPipe) channelId: number,
-    @Param('userTargetId', ParseIntPipe) userTargetId: number,
-    @getUser('id') userAuthId: number,
-    @Body() newRole: UpdateRoleDto) {
-    return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
-  }
+	// Change le role d'un user du channel
+	@Patch(':channelId/role/:userTargetId')
+	updateRole(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number,
+	@Body() { role: newRole }: UpdateRoleDto) {
+		return this.channelsService.updateUserRole(channelId, userAuthId, userTargetId, newRole)
+	}
 
   // Change le challenge status d'un channel par son id
 
