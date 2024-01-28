@@ -267,6 +267,8 @@ function Game() {
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("createChannelMP", (channelId: number, recipientId: number) =>
 			recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget, displayChat }))
+		// userAuthenticate.socket?.on("updateUserRole", async (channelId: number, userId: number, newRole: any) =>
+		// 	await refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
 
 		return () => {
 			userAuthenticate.socket?.off("updateUserStatus", (userId, newStatus) => 
@@ -277,6 +279,8 @@ function Game() {
 				refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
 			userAuthenticate.socket?.off("createChannelMP", (channelId: number, recipientId: number) =>
 				recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget, displayChat }))
+			// userAuthenticate.socket?.off("updateUserRole", async (channelId: number, userId: number, newRole: any) =>
+			// 	await refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
 		}
 
 	}, [userAuthenticate.socket])

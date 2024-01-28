@@ -18,7 +18,7 @@ TwoFA/ :
 
 ContextualMenu/ :
 -pas_regardé:
-	Checker handleChallengeClickEvent avec soso
+	Checker handleChallengeClickEvent et mute avec soso
 
 SecondaryContextualMenu/ :
 	Appeler la route pour ajouter quelqu'un à un channel

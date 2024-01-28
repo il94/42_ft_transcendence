@@ -170,7 +170,6 @@ type PropsRefreshUserRole = {
 
 	token: string,
 	url: string
-
 }
 
 export async function refreshUserRole(props : PropsRefreshUserRole) {
@@ -181,67 +180,43 @@ export async function refreshUserRole(props : PropsRefreshUserRole) {
 		}
 	})
 
+	console.log("================================")
+	console.log("CHANN ID = ", props.channelId)
+	console.log("TARGE ID = ", props.channelTarget?.id)
+	console.log("================================")
 
-	if (props.newRole === channelRole.BANNED)
+
+	if (props.newRole === channelRole.BANNED && props.userAuthenticate.id === props.userId)
 	{
-		if (props.userAuthenticate.id === props.userId)
-		{
-			props.setUserAuthenticate((prevState: UserAuthenticate) => {
-				return {
-					...prevState,
-					channels: prevState.channels.filter((channel) => channel.id !== props.channelId)
-				}
-			})
-			props.setChannelTarget(undefined)
-		}
-		else if (props.channelTarget)
-		{
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						members: prevState.members.filter((member) => member.id !== props.userId),
-						administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
-						banneds: [
-							...prevState.banneds,
-							userResponse.data
-						]
-					}
-				}
-				else
-					return (undefined)
-			})
-		}
-	}
-	else if (props.newRole === channelRole.UNBANNED)
-	{
-		if (props.userAuthenticate.id === props.userId)
-		{
-			props.setUserAuthenticate((prevState: UserAuthenticate) => {
-				return {
-					...prevState,
-					channels: prevState.channels.filter((channel) => channel.id !== props.channelId)
-				}
-			})
-		}
+
+		console.log("IF")
+
+
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				channels: prevState.channels.filter((channel) => channel.id !== props.channelId)
+			}
+		})
 		if (props.channelTarget?.id === props.channelId)
 		{
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						banneds: prevState.banneds.filter((banned) => banned.id !== props.userId)
-					}
-				}
-				else
-			return (undefined)
-		})
+			console.log("IF CHANNEL TARGET")
+
+
+			// console.log("================================")
+			// console.log("HERE BAN")
+			// console.log("CHANN ID = ", props.channelId)
+			// console.log("TARGE ID = ", props.channelTarget?.id)
+			// console.log("================================")
+		
+			props.setChannelTarget(undefined)
 		}
 	}
 	else if (props.channelTarget?.id === props.channelId)
 	{
+
+		console.log("ELSE IF")
+
 		if (props.newRole === channelRole.MEMBER)
 		{
 			const isAlreadyMember = props.channelTarget.members.find((member) => member.id === props.userId)
@@ -277,6 +252,49 @@ export async function refreshUserRole(props : PropsRefreshUserRole) {
 				else
 					return (undefined)
 			})
-		}			
+		}
+		else if (props.newRole === channelRole.BANNED)
+		{
+
+			console.log("ELSE IF BAN")
+
+			const userToBan = findUserInChannel(props.channelTarget, props.userId)
+			if (userToBan)
+			{
+				props.setChannelTarget((prevState: Channel | undefined) => {
+					if (prevState)
+					{
+						return {
+							...prevState,
+							members: prevState.members.filter((member) => member.id !== props.userId),
+							administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
+							banneds: [
+								...prevState.banneds,
+								userToBan
+							]
+						}
+					}
+					else
+					{
+						console.log("HERE CAKE")
+						return (undefined)
+					}
+				})
+			}
+		}
+		else if (props.newRole === channelRole.UNBANNED)
+		{
+			props.setChannelTarget((prevState: Channel | undefined) => {
+				if (prevState)
+				{
+					return {
+						...prevState,
+						banneds: prevState.banneds.filter((banned) => banned.id !== props.userId)
+					}
+				}
+				else
+					return (undefined)
+			})
+		}
 	}
 }

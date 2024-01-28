@@ -188,7 +188,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleManageFriendClickEvent() {
 		try {
-			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id))
+			if (!userIsFriend(userAuthenticate, userTarget.id))
 			{
 				await axios.post(`http://${url}:3333/friends/${userTarget.id}`, {}, {
 					headers: {
@@ -208,16 +208,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					}
 				})
 				setUserAuthenticate((prevState: UserAuthenticate) => {
-					const { friends, ...rest } = prevState
 					return {
-						...rest,
-						friends: friends.filter((friend) => friend.id !== userTarget.id)
+						...prevState,
+						friends: prevState.friends.filter((friend) => friend.id !== userTarget.id)
 					}
 				})
 			}
 		}
 		catch (error) {
-			console.log(error)
 			displayErrorContextualMenu(true)
 		}
 	}
@@ -226,20 +224,17 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleBlockClickEvent() {
 		try {
-			if (!userAuthenticate.blockeds.some((blockedUser) => blockedUser.id === userTarget.id))
+			if (!userIsBlocked(userAuthenticate, userTarget.id))
 			{
 				await axios.post(`http://${url}:3333/blockeds/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-					return {
-						...prevState,
-						blockeds: [ ...prevState.blockeds, userTarget ]
-					}
-				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					blockeds: [ ...prevState.blockeds, userTarget ]
+				}))
 			}
 			else
 			{
@@ -248,14 +243,10 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
 				setUserAuthenticate((prevState: UserAuthenticate) => {
-
-					const { blockeds, ...rest } = prevState
-
 					return {
-						...rest,
-						blockeds: blockeds.filter((blockedUser) => blockedUser.id !== userTarget.id)
+						...prevState,
+						blockeds: prevState.blockeds.filter((friend) => friend.id !== userTarget.id)
 					}
 				})
 			}
@@ -271,7 +262,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id))
+			if (!userIsAdministrator(channelTarget, userTarget.id))
 			{
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.ADMIN

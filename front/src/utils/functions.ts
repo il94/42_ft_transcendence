@@ -137,6 +137,13 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
+export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | undefined {
+	return (
+		userAuthenticate.channels.find((channel) => (
+		channel.name === recipientName && channel.type === channelStatus.MP))
+	)
+}
+
 export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number): boolean {
 	return (
 		!!userAuthenticate.friends.some((friend) => friend.id === userId)
@@ -146,13 +153,6 @@ export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number)
 export function userIsBlocked(userAuthenticate: UserAuthenticate, userId: number): boolean {
 	return (
 		!!userAuthenticate.blockeds.some((friend) => friend.id === userId)
-	)
-}
-
-export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | undefined {
-	return (
-		userAuthenticate.channels.find((channel) => (
-		channel.name === recipientName && channel.type === channelStatus.MP))
 	)
 }
 

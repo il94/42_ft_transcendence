@@ -72,6 +72,9 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 	}
 
 	function handleListenSockets() {
+
+		console.log("SOCKET CALL")
+
 		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
 			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
