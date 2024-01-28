@@ -1,5 +1,14 @@
-import { contextualMenuStatus, userStatus } from "./status"
-import { Channel, User, UserAuthenticate } from "./types"
+import {
+	channelStatus,
+	contextualMenuStatus,
+	userStatus
+} from "./status"
+
+import {
+	Channel,
+	User,
+	UserAuthenticate
+} from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -137,6 +146,13 @@ export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number)
 export function userIsBlocked(userAuthenticate: UserAuthenticate, userId: number): boolean {
 	return (
 		!!userAuthenticate.blockeds.some((friend) => friend.id === userId)
+	)
+}
+
+export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | undefined {
+	return (
+		userAuthenticate.channels.find((channel) => (
+		channel.name === recipientName && channel.type === channelStatus.MP))
 	)
 }
 

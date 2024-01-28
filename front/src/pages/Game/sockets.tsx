@@ -124,6 +124,7 @@ type PropsRecieveChannelMP = {
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	displayChat: Dispatch<SetStateAction<boolean>>,
 }
 
 // Crée un channel MP
@@ -144,5 +145,8 @@ export async function recieveChannelMP(props: PropsRecieveChannelMP) {
 	}))
 
 	if (props.userAuthenticate.id !== props.recipientId)
+	{
 		props.setChannelTarget(channelMPResponse.data)
+		props.displayChat(true)
+	}
 }

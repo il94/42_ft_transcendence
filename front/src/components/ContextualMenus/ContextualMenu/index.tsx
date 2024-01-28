@@ -17,6 +17,7 @@ import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
 
 import {
+	findChannelMP,
 	userIsAdministrator,
 	userIsBanned,
 	userIsBlocked,
@@ -94,16 +95,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	/* ============================== MP SECTION ================================ */
 
-	async function handleContactClickEvent() {
+	async function handleContactClickEvent() : Promise<Channel | undefined> {
 		try {
-			const findChannelMP = userAuthenticate.channels.find((channel) => (
-				channel.name === userTarget.username && channel.type === channelStatus.MP
-			))
-			if (findChannelMP)
+			const channelMP = findChannelMP(userAuthenticate, userTarget.username)
+			if (channelMP)
 			{
-				setChannelTarget(findChannelMP)
+				setChannelTarget(channelMP)
 				displayChat(true)
-				return (findChannelMP)
+				return (channelMP)
 			}
 			else
 			{
@@ -132,12 +131,12 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					mutedUsers: [],
 					banneds: []
 				}
-				displayChat(true)
 				return (newChannelMP)
 			}
 		}
 		catch (error) {
 			displayErrorContextualMenu(true)
+			return (undefined)
 		}
 	}
 
