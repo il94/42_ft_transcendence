@@ -45,7 +45,7 @@ export class ChannelsService {
 		try {
 			const channelMPAlreadyExist = await this.findChannelMP(recipientId, creatorId)
 			if (channelMPAlreadyExist)
-				throw new ConflictException("MP canal already exist")
+				throw new ConflictException("MP channel already exist")
 
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
@@ -99,7 +99,7 @@ export class ChannelsService {
 		catch (error) {
 			if (error instanceof ConflictException)
 				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
 			else
 				throw new BadRequestException()
