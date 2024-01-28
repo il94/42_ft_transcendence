@@ -17,6 +17,8 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Créer des fichiers fonctions si necessaire
 	Shift + Alt + F
 	Styliser le focus
+	Checker les noms de routes (s pas s)
+	Corriger l'anglais du bled
 
 TwoFA/ :
 	Gestion d'erreur à faire
