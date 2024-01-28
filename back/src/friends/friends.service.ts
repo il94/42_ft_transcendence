@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 // import { RelationDto } from './dto/friends.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus } from '@prisma/client';
@@ -6,48 +6,58 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class FriendsService {
-  constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService) {}
 
-	async addFriend(userId: number, friendId: number) 
-	{
-		if (userId === friendId) 
-			return { error: 'It is not possible to add yourself!' };
-		
-		try {
-			const friend: User = await this.prisma.user.findUnique({where: { id: friendId }});
+	async addFriend(userAuthId: number, userTargetId: number) {
+		try {		
+			if (userAuthId === userTargetId)
+				throw new ForbiddenException("It is not possible to add yourself as a friend")
+
+			const friend: User = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				}
+			})
 			if (!friend)
-				throw new NotFoundException(`User with id ${friendId} does not exist.`);
-		
-			const isFriend  =  await this.prisma.friend.findUnique({
+				throw new NotFoundException("User does not exist")
+
+			const isFriend = await this.prisma.friend.findUnique({
 				where: {
 					userId_friendId:
 					{
-						userId: userId,
-						friendId: friendId
+						userId: userAuthId,
+						friendId: userTargetId
+					}
+				}
+			})
+			if (isFriend)
+				throw new ConflictException(`${friend.username} is already your friend`)
+
+			const newFriend = await this.prisma.user.update({
+				where: {
+					id: userAuthId
+				},
+				data: {
+					friends: {
+						create: [{
+							friendId: userTargetId
+						}]
 					}
 				}
 			})
 
-			const newFriend = await this.prisma.user.update(
-				{
-					where: {
-						id: userId
-					},
-					data: {
-						friends: {
-							create: [{
-								friendId: friendId
-							}]
-						}
-					}
-				}
-			)
-			return newFriend;
-
-		} catch (error) {
-			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				return { error: 'An error occurred while addind friend' };
-			throw error;
+			console.log(`User ${userAuthId} added user ${userTargetId} in friend`)
+			return newFriend
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException
+				|| error instanceof NotFoundException
+				|| error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
 		}
 	}
 

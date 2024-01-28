@@ -227,7 +227,17 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 		}
 		catch (error) {
-			// displayPopupError(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+			return (undefined)
 		}
 	}
 

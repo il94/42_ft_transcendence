@@ -13,26 +13,36 @@ import { CreateUserDto } from 'src/auth/dto';
 @UseGuards(JwtGuard)
 @Controller('friends')
 export class FriendsController {
-  constructor(private readonly friendsService: FriendsService) {}
+	constructor(private readonly friendsService: FriendsService) {}
 
-  @Post(':id')
-  addNewFriend(@getUser() user: User,
-  @Param('id', ParseIntPipe) id: number) {
-      console.log("taget id: ", id);
-      return this.friendsService.addFriend(user.id, id);
-  }
+	// Ajoute un user en ami
+	@Post(':id')
+	addNewFriend(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) userTargetId: number) {
+		return this.friendsService.addFriend(userAuthId, userTargetId);
+	}
   
+  @Get()
+  async getUserFriends(@getUser() user: User ) {
+    return await this.friendsService.getUserFriends(user.id);
+  }
+
+
+  @Delete(':id')
+  async removeFriend(@getUser() user: User,
+  @Param('id', ParseIntPipe) friendId: number) {
+        return this.friendsService.removeFriend(user.id, friendId);
+    }
+
+
+/* =========================== PAS UTILISEES ================================ */
+
   // @Post('request/:isFriendId')
   // sendFriendRequest(
   //   @Param('isFriendId', ParseIntPipe) isFriendId: number,
   //   @Request() user: User) {
   //   return this.friendsService.sendFriendRequest(isFriendId, user);
   // }
-
-  @Get()
-  async getUserFriends(@getUser() user: User ) {
-    return await this.friendsService.getUserFriends(user.id);
-  }
 
   // @Get('request/status/:isFriendId')
   // async getFriendRequestStatus(
@@ -48,10 +58,5 @@ export class FriendsController {
   //       return this.friendsService.updateRelation(id, dto);
   //   }
 
-  @Delete(':id')
-  async removeFriend(@getUser() user: User,
-  @Param('id', ParseIntPipe) friendId: number) {
-        return this.friendsService.removeFriend(user.id, friendId);
-    }
 
 }
