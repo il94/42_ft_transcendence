@@ -19,7 +19,7 @@ export class FriendsController {
 	@Post(':id')
 	addNewFriend(@getUser('id') userAuthId: number,
 	@Param('id', ParseIntPipe) userTargetId: number) {
-		return this.friendsService.addFriend(userAuthId, userTargetId);
+		return this.friendsService.addFriend(userAuthId, userTargetId)
 	}
   
   @Get()
@@ -27,13 +27,12 @@ export class FriendsController {
     return await this.friendsService.getUserFriends(user.id);
   }
 
-
-  @Delete(':id')
-  async removeFriend(@getUser() user: User,
-  @Param('id', ParseIntPipe) friendId: number) {
-        return this.friendsService.removeFriend(user.id, friendId);
+	// Supprime un ami
+	@Delete(':id')
+	removeFriend(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) userTargetId: number) {
+		return this.friendsService.removeFriend(userAuthId, userTargetId)
     }
-
 
 /* =========================== PAS UTILISEES ================================ */
 

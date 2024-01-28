@@ -13,15 +13,18 @@ export class FriendsService {
 			if (userAuthId === userTargetId)
 				throw new ForbiddenException("It is not possible to add yourself as a friend")
 
-			const friend: User = await this.prisma.user.findUnique({
+			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
+				},
+				select: {
+					username: true
 				}
 			})
-			if (!friend)
-				throw new NotFoundException("User does not exist")
+			if (!userTarget)
+				throw new NotFoundException("User not found")
 
-			const isFriend = await this.prisma.friend.findUnique({
+			const isFriend = !!await this.prisma.friend.findUnique({
 				where: {
 					userId_friendId:
 					{
@@ -31,7 +34,7 @@ export class FriendsService {
 				}
 			})
 			if (isFriend)
-				throw new ConflictException(`${friend.username} is already your friend`)
+				throw new ConflictException(`${userTarget.username} is already your friend`)
 
 			const newFriend = await this.prisma.user.update({
 				where: {
@@ -43,6 +46,15 @@ export class FriendsService {
 							friendId: userTargetId
 						}]
 					}
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					wins: true,
+					draws: true,
+					losses: true,
+					status: true
 				}
 			})
 
@@ -119,57 +131,88 @@ export class FriendsService {
 		return friendsMapped;
 	}
 
-	async getNonFriends(UserId: number) {
-		//TODO ?
-	}
 
-	// OK de passer RelationDTO en parametre ?
-	// async updateRelation(userId: number, dto: RelationDto) {
-	// 	if (userId === dto.isInRelationsId)
-	// 		return { error: 'user has same id as friend' };
-	// 	try {
-	// 		const change = await this.prisma.user.update({
-	// 			where: { id: userId },
-	// 			data: { hasRelations: 
-	// 				{ update: [{
-	// 					data: { relationType: dto.relationType },
-	// 					where: { hasRelationsId_isInRelationsId: 
-	// 						{ hasRelationsId: userId,
-	// 						isInRelationsId: dto.isInRelationsId, }
-	// 					}
-	// 				}]
-	// 			}}
-	// 		})
-	// 		return change;
-	// 	} catch (error) {
-	// 		if (error instanceof Prisma.PrismaClientKnownRequestError)
-	// 			return { error: 'An error occurred while removing friend' };
-	// 		throw error;
-	// 	}
-	// }
-
-	async removeFriend(userId: number, friendId: number) {
-		if (userId === friendId)
-			return { error: 'user has same id as friend' };
+	async removeFriend(userAuthId: number, userTargetId: number) {
 		try {
+			if (userAuthId === userTargetId)
+				throw new ForbiddenException("It is not possible to remove yourself as a friend")
 
-			const deleteFriend = await this.prisma.friend.delete({
+			const userTarget = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true
+				}
+			})
+			if (!userTarget)
+				throw new NotFoundException("User not found")
+	
+			const isFriend = !!await this.prisma.friend.findUnique({
+				where: {
+					userId_friendId:
+					{
+						userId: userAuthId,
+						friendId: userTargetId
+					}
+				}
+			})
+			if (!isFriend)
+				throw new NotFoundException(`${userTarget.username} is not your friend`)
+	
+			await this.prisma.friend.delete({
 				where: {
 					userId_friendId: {
-						userId: userId,
-						friendId: friendId
+						userId: userAuthId,
+						friendId: userTargetId
 					}
 				}
 			})
 
-			return deleteFriend;
-
-		} catch (error) {
-			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				return { error: 'An error occurred while removing friend' };
-			throw error;
+			console.log(`User ${userAuthId} removed user ${userTargetId} from his friends`)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
 		}
 	}
+
+/* =========================== PAS UTILISEES ================================ */
+
+
+
+async getNonFriends(UserId: number) {
+	//TODO ?
+}
+
+// OK de passer RelationDTO en parametre ?
+// async updateRelation(userId: number, dto: RelationDto) {
+// 	if (userId === dto.isInRelationsId)
+// 		return { error: 'user has same id as friend' };
+// 	try {
+// 		const change = await this.prisma.user.update({
+// 			where: { id: userId },
+// 			data: { hasRelations: 
+// 				{ update: [{
+// 					data: { relationType: dto.relationType },
+// 					where: { hasRelationsId_isInRelationsId: 
+// 						{ hasRelationsId: userId,
+// 						isInRelationsId: dto.isInRelationsId, }
+// 					}
+// 				}]
+// 			}}
+// 		})
+// 		return change;
+// 	} catch (error) {
+// 		if (error instanceof Prisma.PrismaClientKnownRequestError)
+// 			return { error: 'An error occurred while removing friend' };
+// 		throw error;
+// 	}
+// }
 
 	// async isSent(sender: User, receiver: User) {
 	// 	const request = await this.prisma.relations.findUnique({
