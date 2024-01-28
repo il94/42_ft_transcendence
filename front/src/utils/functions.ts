@@ -68,7 +68,7 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 
 	if (type === contextualMenuStatus.CHAT && channel)
 	{
-		if (channel.owner?.id === userAuthenticate.id)
+		if (userIsOwner(channel, userAuthenticate.id))
 		{
 			// Upgrade / Downgrade section
 			// Mute / Unmute section
@@ -88,6 +88,10 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 			// Ban section
 			if (userIsMember(channel, userTarget.id))
 				size += sectionSize * 3
+
+			// Unban section
+			else if (userIsBanned(channel, userTarget.id))
+				size += sectionSize
 		}
 	}
 

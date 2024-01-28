@@ -16,14 +16,17 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Checker les enums/types pour les noms
 	Créer des fichiers fonctions si necessaire
 	Shift + Alt + F
+	Styliser le focus
 
 TwoFA/ :
 	Gestion d'erreur à faire
 
+Home/ :
+	Focus sur le bouton Game
+
 ContextualMenu/ :
--pas_regardé:
 	Checker handleChallengeClickEvent et mute avec soso
-	Fix le useEffect des droits
+	Gestion d'erreur
 
 SecondaryContextualMenu/ :
 	Appeler la route pour ajouter quelqu'un à un channel
