@@ -13,6 +13,7 @@ export const DisplayContext = createContext<{
 	setZSettingsIndex: Dispatch<SetStateAction<number>>,
 	zMaxIndex: number,
 	setZMaxIndex: Dispatch<SetStateAction<number>>,
+	displayPopupError: Dispatch<SetStateAction<{ display: boolean, message?: string }>>,
 	GameWrapperRef: any
 } | undefined>(undefined)
 

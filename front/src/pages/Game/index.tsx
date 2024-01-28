@@ -38,7 +38,7 @@ import SettingsMenu from '../../components/SettingsMenu'
 import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
-import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
+import PopupError from '../../components/ContextualMenus/PopupError'
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
@@ -78,8 +78,8 @@ function Game() {
 	function closeContextualMenus() {
 		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)
-		if (errorContextualMenu)
-			displayErrorContextualMenu(false)
+		if (popupError.display)
+			displayPopupError({ display: false, message: undefined })
 		if (searchBarResults)
 			displaySearchBarResults(false)
 	}
@@ -217,7 +217,8 @@ function Game() {
 	const [secondaryContextualMenu, displaySecondaryContextualMenu] = useState<boolean>(false)
 	const [secondaryContextualMenuPosition, setSecondaryContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [secondaryContextualMenuHeight, setSecondaryContextualMenuHeight] = useState<number>(0)
-	const [errorContextualMenu, displayErrorContextualMenu] = useState<boolean>(false)
+	
+	const [popupError, displayPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
 
 	const [searchBarResults, displaySearchBarResults] = useState<boolean>(false)
 
@@ -289,7 +290,7 @@ function Game() {
 		<GamePage
 			onClick={closeContextualMenus}>
 			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
+				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, displayPopupError, GameWrapperRef }}>
 					<GameWrapper ref={GameWrapperRef}>
 						{
 							contextualMenu.display &&
@@ -299,7 +300,6 @@ function Game() {
 								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
 								setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
 								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-								displayErrorContextualMenu={displayErrorContextualMenu}
 								displayChat={displayChat} />
 						}
 						{
@@ -308,13 +308,11 @@ function Game() {
 								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
 								secondaryContextualMenuPosition={secondaryContextualMenuPosition}
 								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-								channels={userAuthenticate.channels}
-								displayErrorContextualMenu={displayErrorContextualMenu} />
+								channels={userAuthenticate.channels} />
 						}
 						{
-							errorContextualMenu &&
-							<ErrorContextualMenu
-								displayErrorContextualMenu={displayErrorContextualMenu} />
+							popupError.display &&
+							<PopupError message={popupError.message}/>
 						}
 						<LeftGameWrapper $social={social}>
 							<Logo social={social} />

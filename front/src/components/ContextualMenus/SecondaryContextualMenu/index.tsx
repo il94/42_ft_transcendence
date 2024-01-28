@@ -12,6 +12,7 @@ import Section, { SectionName } from "../../../componentsLibrary/Section"
 import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 import { Channel } from "../../../utils/types"
 
@@ -24,13 +25,13 @@ type PropsSecondaryContextualMenu = {
 		bottom?: number
 	},
 	secondaryContextualMenuHeight: number,
-	channels: Channel[] | undefined,
-	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
+	channels: Channel[] | undefined
 }
 
-function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu }: PropsSecondaryContextualMenu) {
+function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels }: PropsSecondaryContextualMenu) {
 
 	const { userTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
@@ -44,7 +45,7 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			displayPopupError({ display: true })
 		}
 	}
 

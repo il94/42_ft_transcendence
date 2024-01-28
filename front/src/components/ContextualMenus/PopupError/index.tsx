@@ -1,6 +1,5 @@
 import {
-	Dispatch,
-	SetStateAction,
+	useContext,
 	useEffect,
 	useState
 } from "react"
@@ -14,15 +13,19 @@ import {
 import Icon from "../../../componentsLibrary/Icon"
 import ActiveText from "../../../componentsLibrary/ActiveText/Index"
 
+import DisplayContext from "../../../contexts/DisplayContext"
+
 import CloseIcon from "../../../assets/close.png"
 
 import colors from "../../../utils/colors"
 
-type PropsErrorContextualMenu = {
-	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
+type PropsPopupError = {
+	message?: string
 }
 
-function ErrorContextualMenu({ displayErrorContextualMenu }: PropsErrorContextualMenu) {
+function PopupError({ message } : PropsPopupError) {
+
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	const [timer, setTimer] = useState<number>(0)
 
@@ -38,7 +41,7 @@ function ErrorContextualMenu({ displayErrorContextualMenu }: PropsErrorContextua
 
 	useEffect(() => {
 		if (timer >= 5) {
-			displayErrorContextualMenu(false)
+			displayPopupError({ display: false, message: undefined })
 		}
 	}, [timer])
 
@@ -49,21 +52,30 @@ function ErrorContextualMenu({ displayErrorContextualMenu }: PropsErrorContextua
 	return (
 		<Style>
 			<CloseButton>
-				<Icon onClick={() => displayErrorContextualMenu(false)}
+				<Icon onClick={() => displayPopupError({ display: false, message: undefined })}
 					src={CloseIcon} size={22}
 					alt="Close button" title="Close" />
 			</CloseButton>
-			<MessageError>
-				An error has occurred. <br />
-				Please try again or reload your browser.
-			</MessageError>
-			<ActiveText
-				onClick={handleReloadClickText}
-				color={colors.button}>
-				Reload
-			</ActiveText>
+			{
+				message ?
+				<MessageError>
+					{message}
+				</MessageError>
+				:
+				<>
+					<MessageError>
+						An error has occurred. <br />
+						Please try again or reload your browser.
+					</MessageError>
+					<ActiveText
+						onClick={handleReloadClickText}
+						color={colors.button}>
+						Reload
+					</ActiveText>
+				</>
+			}
 		</Style>
 	)
 }
 
-export default ErrorContextualMenu
+export default PopupError
