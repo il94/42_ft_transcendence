@@ -368,15 +368,15 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	useEffect(() => {
 		if (channelTarget &&
 			type === contextualMenuStatus.CHAT &&
-			(channelTarget.owner?.id === userAuthenticate.id ||
-			(channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
-				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) &&
-			(channelTarget.owner?.id !== userTarget.id &&
-				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))) {
+			(userIsOwner(channelTarget, userAuthenticate.id) ||
+				(userIsAdministrator(channelTarget, userAuthenticate.id) &&
+				!userIsAdministrator(channelTarget, userTarget.id) &&
+				!userIsOwner(channelTarget, userTarget.id)))) {
 			displayAdminSections(true)
 		}
-		else
+		else {
 			displayAdminSections(false)
+		}
 	}, [])
 
 	/* ========================================================================== */
@@ -453,7 +453,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 															userIsInChannel(channelTarget, userTarget.id) &&
 															<>
 																{
-																channelTarget.owner?.id === userAuthenticate.id &&
+																userIsOwner(channelTarget, userAuthenticate.id) &&
 																	<Section onClick={handleGradeClickEvent}>
 																		<SectionName>
 																			{
