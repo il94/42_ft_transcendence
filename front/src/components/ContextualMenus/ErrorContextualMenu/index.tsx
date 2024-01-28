@@ -1,65 +1,67 @@
 import {
 	Dispatch,
 	SetStateAction,
-	useEffect
+	useEffect,
+	useState
 } from "react"
 
-import styled from "styled-components"
+import {
+	CloseButton,
+	MessageError,
+	Style
+} from "./style"
 
-import Error from "../../../componentsLibrary/ErrorRequestMessage"
+import Icon from "../../../componentsLibrary/Icon"
+import ActiveText from "../../../componentsLibrary/ActiveText/Index"
 
-import effects from "../../../utils/effects"
+import CloseIcon from "../../../assets/close.png"
+
 import colors from "../../../utils/colors"
 
-export const Style = styled.div<{ $left?: number, $right?: number, $bottom?: number, $top?: number }>`
-
-	display: flex;
-	flex-direction: column;
-
-	position: absolute;
-	left: ${(props) => props.$left ? props.$left + "px" : "auto"};
-	right: ${(props) => props.$right ? props.$right + "px" : "auto"};
-	top: ${(props) => props.$top ? props.$top + "px" : "auto"};
-	bottom: ${(props) => props.$bottom ? props.$bottom + "px" : "auto"};
-	z-index: 999;
-
-	width: 180px;
-
-	clip-path: ${effects.pixelateWindow};
-
-	background-color: ${colors.sectionContextualMenu};
-
-	&:focus {
-		outline: none;
-	}
-
-`
-
 type PropsErrorContextualMenu = {
-	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>,
-	errorContextualMenuPosition: {
-		left?: number,
-		right?: number,
-		top?: number,
-		bottom?: number
-	}
+	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function ErrorContextualMenu({ displayErrorContextualMenu, errorContextualMenuPosition }: PropsErrorContextualMenu) {
+function ErrorContextualMenu({ displayErrorContextualMenu }: PropsErrorContextualMenu) {
+
+	const [timer, setTimer] = useState<number>(0)
 
 	useEffect(() => {
-		setTimeout(() => {
-			displayErrorContextualMenu(false)
-		}, 5000)
+		const interval = setInterval(() => {
+			setTimer((prevState) => prevState + 1)
+		}, 1000)
+
+		return () => {
+			clearInterval(interval)
+		}
 	}, [])
 
+	useEffect(() => {
+		if (timer >= 5) {
+			displayErrorContextualMenu(false)
+		}
+	}, [timer])
+
+	function handleReloadClickText() {
+		window.location.reload()
+	}
+
 	return (
-		<Style
-			$left={errorContextualMenuPosition.left}
-			$right={errorContextualMenuPosition.right}
-			$top={errorContextualMenuPosition.top}
-			$bottom={errorContextualMenuPosition.bottom}>
-			<Error />
+		<Style>
+			<CloseButton>
+				<Icon onClick={() => displayErrorContextualMenu(false)}
+					src={CloseIcon} size={22}
+					alt="Close button" title="Close" />
+			</CloseButton>
+			<MessageError>
+				An error has occurred. <br />
+				Please try again or reload your browser.
+			</MessageError>
+			<ActiveText
+				onClick={handleReloadClickText}
+				color={colors.button}>
+				Reload
+			</ActiveText>
 		</Style>
 	)
 }

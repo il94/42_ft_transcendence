@@ -78,6 +78,8 @@ function Game() {
 	function closeContextualMenus() {
 		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)
+		if (errorContextualMenu)
+			displayErrorContextualMenu(false)
 		if (searchBarResults)
 			displaySearchBarResults(false)
 	}
@@ -312,8 +314,7 @@ function Game() {
 						{
 							errorContextualMenu &&
 							<ErrorContextualMenu
-								displayErrorContextualMenu={displayErrorContextualMenu}
-								errorContextualMenuPosition={contextualMenuPosition} />
+								displayErrorContextualMenu={displayErrorContextualMenu} />
 						}
 						<LeftGameWrapper $social={social}>
 							<Logo social={social} />
