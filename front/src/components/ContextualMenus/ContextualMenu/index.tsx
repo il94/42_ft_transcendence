@@ -218,12 +218,10 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-					return {
-						...prevState,
-						friends: prevState.friends.filter((friend) => friend.id !== userTarget.id)
-					}
-				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					friends: prevState.friends.filter((friend) => friend.id !== userTarget.id)
+				}))
 			}
 		}
 		catch (error) {
@@ -237,7 +235,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 			else
 				displayPopupError({ display: true })
-			return (undefined)
 		}
 	}
 
@@ -264,16 +261,23 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-					return {
-						...prevState,
-						blockeds: prevState.blockeds.filter((friend) => friend.id !== userTarget.id)
-					}
-				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					blockeds: prevState.blockeds.filter((friend) => friend.id !== userTarget.id)
+				}))
 			}
 		}
 		catch (error) {
-			// displayPopupError(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 

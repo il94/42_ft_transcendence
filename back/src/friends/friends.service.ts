@@ -8,6 +8,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export class FriendsService {
 	constructor(private prisma: PrismaService) {}
 
+	// Ajoute un user en ami
 	async addFriend(userAuthId: number, userTargetId: number) {
 		try {		
 			if (userAuthId === userTargetId)
@@ -132,6 +133,7 @@ export class FriendsService {
 	}
 
 
+	// Supprime un ami
 	async removeFriend(userAuthId: number, userTargetId: number) {
 		try {
 			if (userAuthId === userTargetId)
