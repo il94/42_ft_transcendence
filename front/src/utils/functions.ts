@@ -226,3 +226,48 @@ export function updateUserInChannel(channel: Channel, userId: number, newStatus:
 		}
 	}
 }
+
+
+export function setUserToMember(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyMember = userIsMember(channel, user.id)
+	const members = isAlreadyMember ? channel.members : [ ...channel.members, user ]
+
+	return {
+		...channel,
+		members: members,
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id)
+	}
+}
+
+export function setUserToAdministrator(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyAdministrator = userIsAdministrator(channel, user.id)
+	const administrators = isAlreadyAdministrator ? channel.administrators : [ ...channel.administrators, user ]
+
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== user.id),
+		administrators: administrators
+	}
+}
+
+export function setUserToBanned(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyBanned = userIsBanned(channel, user.id)
+	const banneds = isAlreadyBanned ? channel.banneds : [ ...channel.banneds, user ]
+
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== user.id),
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
+		banneds: banneds
+	}
+}
+
+export function removeUserInChannel(channel: Channel, userId: number): Channel {
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== userId),
+		administrators: channel.members.filter((member) => member.id !== userId),
+		owner: channel.owner?.id === userId ? undefined : channel.owner,
+		banneds: channel.banneds.filter((banned) => banned.id !== userId),
+	}
+}

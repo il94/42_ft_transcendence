@@ -1,5 +1,9 @@
 (Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
+CAS/ :
+	Si le dernier membre d'un channel leave, le supprimer (deja fait) et penser a virer les users bannis (et peut etre mute)
+	Afficher la section unban pour les admins
+
 DISPLAY/ :
 	Checker le responsive de toutes les pages
 
@@ -19,6 +23,7 @@ TwoFA/ :
 ContextualMenu/ :
 -pas_regardé:
 	Checker handleChallengeClickEvent et mute avec soso
+	Fix le useEffect des droits
 
 SecondaryContextualMenu/ :
 	Appeler la route pour ajouter quelqu'un à un channel

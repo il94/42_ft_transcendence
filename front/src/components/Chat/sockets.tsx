@@ -1,7 +1,16 @@
-import { Dispatch, SetStateAction } from "react"
+import {
+	Dispatch,
+	SetStateAction
+} from "react"
 import axios, { AxiosResponse } from "axios"
 
-import { findUserInChannel } from "../../utils/functions"
+import {
+	findUserInChannel,
+	removeUserInChannel,
+	setUserToAdministrator,
+	setUserToBanned,
+	setUserToMember
+} from "../../utils/functions"
 
 import {
 	Channel,
@@ -157,7 +166,6 @@ export async function refreshLeaveChannel(props: PropsRefreshLeaveChannel) {
 	}
 }
 
-
 type PropsRefreshUserRole = {
 	channelId: number,
 	userId: number,
@@ -166,135 +174,57 @@ type PropsRefreshUserRole = {
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	channelTarget: Channel | undefined,
-	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
-
-	token: string,
-	url: string
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
 }
 
 export async function refreshUserRole(props : PropsRefreshUserRole) {
-
-	const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${props.userId}`, {
-		headers: {
-			'Authorization': `Bearer ${props.token}`
-		}
-	})
-
-	console.log("================================")
-	console.log("CHANN ID = ", props.channelId)
-	console.log("TARGE ID = ", props.channelTarget?.id)
-	console.log("================================")
-
-
-	if (props.newRole === channelRole.BANNED && props.userAuthenticate.id === props.userId)
-	{
-
-		console.log("IF")
-
-
-		props.setUserAuthenticate((prevState: UserAuthenticate) => {
-			return {
-				...prevState,
-				channels: prevState.channels.filter((channel) => channel.id !== props.channelId)
-			}
-		})
-		if (props.channelTarget?.id === props.channelId)
+	try {
+		if (props.newRole === channelRole.BANNED && props.userAuthenticate.id === props.userId)
 		{
-			console.log("IF CHANNEL TARGET")
-
-
-			// console.log("================================")
-			// console.log("HERE BAN")
-			// console.log("CHANN ID = ", props.channelId)
-			// console.log("TARGE ID = ", props.channelTarget?.id)
-			// console.log("================================")
-		
-			props.setChannelTarget(undefined)
-		}
-	}
-	else if (props.channelTarget?.id === props.channelId)
-	{
-
-		console.log("ELSE IF")
-
-		if (props.newRole === channelRole.MEMBER)
-		{
-			const isAlreadyMember = props.channelTarget.members.find((member) => member.id === props.userId)
-			const members = isAlreadyMember ? props.channelTarget.members : [ ...props.channelTarget.members, userResponse.data ]
-
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						members: members,
-						administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId)
-					}
-				}
-				else
-					return (undefined)
+			await refreshLeaveChannel({
+				channelId: props.channelId,
+				userId: props.userId,
+				userAuthenticate: props.userAuthenticate,
+				setUserAuthenticate: props.setUserAuthenticate,
+				channelTarget: props.channelTarget,
+				setChannelTarget: props.setChannelTarget
 			})
 		}
-		else if (props.newRole === channelRole.ADMIN)
+		else if (props.channelTarget?.id === props.channelId)
 		{
-			const isAlreadyAdministrator = props.channelTarget.administrators.find((administrator) => administrator.id === props.userId)
-			const administrators = isAlreadyAdministrator ? props.channelTarget.administrators : [ ...props.channelTarget.administrators, userResponse.data ]
+			const setChannel = props.setChannelTarget as Dispatch<SetStateAction<Channel>> 
 
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						members: prevState.members.filter((member) => member.id !== props.userId),
-						administrators: administrators
-					}
-				}
-				else
-					return (undefined)
-			})
-		}
-		else if (props.newRole === channelRole.BANNED)
-		{
-
-			console.log("ELSE IF BAN")
-
-			const userToBan = findUserInChannel(props.channelTarget, props.userId)
-			if (userToBan)
-			{
-				props.setChannelTarget((prevState: Channel | undefined) => {
-					if (prevState)
-					{
-						return {
-							...prevState,
-							members: prevState.members.filter((member) => member.id !== props.userId),
-							administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
-							banneds: [
-								...prevState.banneds,
-								userToBan
-							]
-						}
-					}
-					else
-					{
-						console.log("HERE CAKE")
-						return (undefined)
-					}
+			if (props.newRole === channelRole.UNBANNED) {
+				setChannel((prevState: Channel) => {
+					return (removeUserInChannel(prevState, props.userId))
 				})
 			}
-		}
-		else if (props.newRole === channelRole.UNBANNED)
-		{
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-				{
-					return {
-						...prevState,
-						banneds: prevState.banneds.filter((banned) => banned.id !== props.userId)
-					}
+			else
+			{
+				const userTarget = findUserInChannel(props.channelTarget, props.userId)
+				if (!userTarget)
+					throw new Error
+
+				if (props.newRole === channelRole.MEMBER) {
+					setChannel((prevState: Channel) => {
+						return (setUserToMember(prevState, userTarget))
+					})
 				}
-				else
-					return (undefined)
-			})
+				else if (props.newRole === channelRole.ADMIN) {	
+					setChannel((prevState: Channel) => {
+						return (setUserToAdministrator(prevState, userTarget))
+					})
+				}
+				else if (props.newRole === channelRole.BANNED) {	
+					setChannel((prevState: Channel) => {
+						return (setUserToBanned(prevState, userTarget))
+					})
+				}
+			}
 		}
 	}
+	catch (error) {
+		console.log(error)
+	}
+
 }

@@ -72,9 +72,6 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 	}
 
 	function handleListenSockets() {
-
-		console.log("SOCKET CALL")
-
 		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
 			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
@@ -82,18 +79,14 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
-			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
+			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
 		// userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
 
 		return () => {
-			userAuthenticate.socket?.off("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
-				updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
-			userAuthenticate.socket?.off("joinChannel", (channelId: number, userId: number) =>
-				refreshJoinChannel({ channelId, userId, channelTarget, setChannelTarget, token, url }))
-			userAuthenticate.socket?.off("leaveChannel", (channelId: number, userId: number) => 
-				refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-			userAuthenticate.socket?.off("updateUserRole", (channelId: number, userId: number, newRole: any) =>
-				refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }));
+			userAuthenticate.socket?.off("updateDiscussion")
+			userAuthenticate.socket?.off("joinChannel")
+			userAuthenticate.socket?.off("leaveChannel")
+			userAuthenticate.socket?.off("updateUserRole")
 			// userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
 		}
 	}
