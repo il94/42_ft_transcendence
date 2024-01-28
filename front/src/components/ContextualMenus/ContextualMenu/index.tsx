@@ -108,14 +108,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			}
 			else
 			{
-				const MPDatas = {
-					name: '',
-					avatar: '',
-					type: channelStatus.MP
-				}
-
-				const newChannelMPResponse: AxiosResponse<ChannelDatas> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
-				{
+				const newChannelMPResponse: AxiosResponse<ChannelDatas> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -140,7 +133,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!
-				if (statusCode === 403 || statusCode === 409)
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
 					displayPopupError({ display: true, message: message })
 				else
 					displayPopupError({ display: true })

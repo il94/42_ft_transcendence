@@ -40,12 +40,24 @@ export class ChannelsService {
     return newChannel;
   }
 
-	// Cree un channel MP
-	async createChannelMP(recipientId: number, creatorId: number) {
+	// Cree un channel MP et y ajoute un user
+	async createChannelMP(userAuthId: number, userTargetId: number) {
 		try {
-			const channelMPAlreadyExist = await this.findChannelMP(recipientId, creatorId)
+			const channelMPAlreadyExist = await this.findChannelMP(userTargetId, userAuthId)
 			if (channelMPAlreadyExist)
 				throw new ConflictException("MP channel already exist")
+
+			const userTarget = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true,
+					avatar: true
+				}
+			})
+			if (!userTarget)
+				throw new NotFoundException("User not found")
 
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
@@ -58,7 +70,7 @@ export class ChannelsService {
 								role: Role.MEMBER,
 								user: {
 									connect: {
-										id: creatorId
+										id: userAuthId
 									}
 								}
 							},
@@ -66,7 +78,7 @@ export class ChannelsService {
 								role: Role.MEMBER,
 								user: {
 									connect: {
-										id: recipientId
+										id: userTargetId
 									}
 								}
 							},
@@ -75,29 +87,18 @@ export class ChannelsService {
 				}
 			})
 
-			const recipientDatas = await this.prisma.user.findUnique({
-				where: {
-					id: recipientId
-				},
-				select: {
-					username: true,
-					avatar: true
-				}
-			})
-
 			const channelMP = {
 				...newChannelMP,
-				name: recipientDatas.username,
-				avatar: recipientDatas.avatar
+				...userTarget
 			}
 
-			await this.emitToChannel("createChannelMP", channelMP.id, recipientId)
+			await this.emitToChannel("createChannelMP", channelMP.id, userTargetId)
 
 			console.log(`Channel MP ${channelMP.id} was created`)
 			return channelMP
 		}
 		catch (error) {
-			if (error instanceof ConflictException)
+			if (error instanceof ConflictException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")

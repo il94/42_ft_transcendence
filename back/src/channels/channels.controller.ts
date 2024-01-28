@@ -18,13 +18,12 @@ export class ChannelController {
 	  return this.channelsService.createChannel(dto, req.user.id);
   }
 
-  // Cree un channel MP et y ajoute un user
-  @Post('mp/:id')
-  createMP(@Param('id', ParseIntPipe) recipientId: number,
-    @Body() channelDatas: CreateChannelDto,
-    @getUser('id') creatorId: number) {
-	  return this.channelsService.createChannelMP(recipientId, creatorId);
-  }
+	// Cree un channel MP et y ajoute un user
+	@Post('mp/:id')
+	createMP(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.createChannelMP(userAuthId, userTargetId)
+	}
 
   // Ajoute un user dans un channel
   @Post('join/:id')
