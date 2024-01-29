@@ -86,17 +86,19 @@ function Signup() {
 				avatar: getRandomDefaultAvatar()
 			}
 
-			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
+			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 			setToken(response.data.access_token)
 			localStorage.setItem('token', response.data.access_token)
-
+			
 			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
+				//console.log("ERROR :", error.)
+				// TODO : GESTION d'erreur si nom ou mail deja pris
 				if (statusCode === 403 || statusCode === 409) {
 					setEmail((prevState) => ({
 						...prevState,

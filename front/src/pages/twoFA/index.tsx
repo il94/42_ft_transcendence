@@ -18,6 +18,7 @@ import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
 import Setting from '../../componentsLibrary/Setting/Index'
+import Cookies from "js-cookie"
 
 import AuthContext from '../../contexts/AuthContext'
 
@@ -26,12 +27,17 @@ import { emptySetting } from '../../utils/emptyObjects'
 
 function TwoFA() {
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { token /*, setToken */ } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (token)
-			navigate("/error")
+		const access_token: string | null | undefined = Cookies.get('2FA_token') ? Cookies.get('2FA_token'): localStorage.getItem('2FA_token')
+		
+		if (access_token)
+		{
+			//localStorage.setItem('2FA_token', access_token)
+			setToken(access_token)
+		}
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -48,10 +54,14 @@ function TwoFA() {
 
 			/* ============ Temporaire ============== */
 			
-			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`, code)
-	
-			// setToken(response.data.access_token)
-			// localStorage.setItem('token', response.data.access_token)
+			const response = await axios.post(`http://${url}:3333/auth/2fa/authenticate/`, code, {
+				headers: {
+					'Authorization': `Bearer ${token}` }
+				})
+			 console.log("TOKEN pour login 2FA : ", token)
+			 localStorage.clear();
+			 setToken(response.data.access_token)
+			 localStorage.setItem('token', response.data.access_token)
 
 			/* ====================================== */
 

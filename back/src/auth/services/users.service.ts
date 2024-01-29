@@ -13,15 +13,15 @@ export class UsersService {
 	/*********************** General CRUD ******************************************/
 
 	async createUser(createUserDto: CreateUserDto): Promise<User> {
-		console.log("BACK PRISMA")
+		console.log("back create user")
 		try {
 			const userExists = await this.prisma.user.findFirst({
 				where: {
-					email: createUserDto.email
+					OR: [ {email: createUserDto.email}, {username: createUserDto.username} ]
 				}
 			})
 			if (userExists)
-				throw new ConflictException();
+				throw new ConflictException('credential already taken');
 			else if (createUserDto.email.endsWith("@student.42.fr"))
 				throw new ForbiddenException("42 emails are forbidden");
 			const hash = await argon.hash(createUserDto.hash);

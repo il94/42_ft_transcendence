@@ -1,5 +1,4 @@
-import { SetMetadata, createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Role, UserStatus } from '@prisma/client';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const getUser = createParamDecorator(
     (data: string | undefined, ctx: ExecutionContext) => {

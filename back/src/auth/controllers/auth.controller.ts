@@ -36,6 +36,7 @@ export class AuthController {
 			const tok: token  = await this.authService.validateUser(dto);
 			return tok;
 		} catch (error) {
+			console.log("ERROR : ", error.message)
 			throw new BadRequestException(error.message)
 		}
 	}
@@ -58,17 +59,17 @@ export class AuthController {
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
 	async handle42Redirect(@getUser() user: User, @Res({ passthrough: true }) res: Response,
-	): Promise<void | { twoFA: boolean }> {
+	): Promise<void> {
 		try {
-			console.log("user: ", user)
 			if (!user)
 				throw new BadRequestException("Can't find user from 42 intra");
+			const token = await this.authService.signToken(user.id, user.username);
 			if (!user.twoFA) {
-				const token = await this.authService.signToken(user.id, user.username);
 				res.clearCookie('token', { httpOnly: true })
 				res.cookie("access_token", token.access_token);
 				res.redirect("http://localhost:5173")
 			}
+			res.cookie("2FA_token", token.access_token);
 			res.redirect(`http://localhost:5173/twofa`)	
 		} catch (error) {
 			throw new BadRequestException(error.message)
@@ -106,7 +107,7 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
   	@HttpCode(200)
-  	//@UseGuards(TwoFAGuard)
+  	@UseGuards(TwoFAGuard)
   	async authenticate(@getUser() user: User, @Body() body): Promise <{access_token: string}> {
 		// find le user par son id
 		console.log("TODO")
@@ -134,10 +135,5 @@ export class AuthController {
 			throw new BadRequestException(error.message);
 		}
 	}
-
-	// @Patch('logout')
-  	// @UseGuards(JwtGuard)
-	// async logout(@getUser('id') userId: number) {
-	// 	return this.authService.disconnect(userId);
-	// }
+	
 }

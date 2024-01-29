@@ -95,7 +95,8 @@ export class AuthService {
 						data: { status: UserStatus.ONLINE }})
 					return user;
 				}
-				return { twoFA: true };
+				//return { twoFA: true };
+				return user;
 			}
 			console.log ("jai pas trouve le user");
 			profile.hash = generate({ length: 6, numbers: true });
