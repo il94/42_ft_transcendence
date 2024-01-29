@@ -415,7 +415,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			type === contextualMenuStatus.CHAT &&
 			(userIsOwner(channelTarget, userAuthenticate.id) ||
 				(userIsAdministrator(channelTarget, userAuthenticate.id) &&
-				!userIsAdministrator(channelTarget, userTarget.id) &&
 				!userIsOwner(channelTarget, userTarget.id)))) {
 			displayAdminSections(true)
 		}

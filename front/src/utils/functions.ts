@@ -86,7 +86,8 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 			// Mute / Unmute section
 			// Kick section
 			// Ban section
-			if (userIsMember(channel, userTarget.id))
+			if (userIsMember(channel, userTarget.id)
+				|| userIsAdministrator(channel, userTarget.id))
 				size += sectionSize * 3
 
 			// Unban section
