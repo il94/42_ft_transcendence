@@ -113,12 +113,12 @@ export class ChannelController {
     return this.channelsService.remove(channelId);
 	}
 
-  // Retire un user d'un channel
-  @Delete(':channelId/leave/:userTargetId')
-  leave(@Param('channelId', ParseIntPipe) channelId: number,
-    @Param('userTargetId', ParseIntPipe) userTargetId: number,
-    @getUser('id') userAuthId: number) {
-    return this.channelsService.leaveChannel(channelId, userTargetId, userAuthId);
+	// Retire un user d'un channel
+	@Delete(':channelId/leave/:userTargetId')
+	leave(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.leaveChannel(channelId, userAuthId, userTargetId)
 	}
 
 

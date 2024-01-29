@@ -471,9 +471,9 @@ export class ChannelsService {
 		}
   }
 
-  // Supprime un channel
-  async remove(channelId: number) {
-  
+	// Supprime un channel
+	async remove(channelId: number) {
+
     // Informe les autres users de la suppression du channel
     await this.emitToChannel("deleteChannel", channelId)
 
@@ -503,59 +503,100 @@ export class ChannelsService {
 		return deleteChannel;
 	}
 
-  // Retire un user d'un channel
-  // Si le user etait owner, set un nouvel owner
-  // Si le user etait le dernier, supprime le channel
-  async leaveChannel(channelId: number, userTargetId: number, userAuthId: number) {
+	// Retire un user d'un channel
+	// Si le user etait owner, set un nouvel owner
+	// Si le user etait le dernier, supprime le channel
+	async leaveChannel(channelId: number, userAuthId: number, userTargetId: number) {
+		try {
 
-    if (userTargetId !== userAuthId)
-    {
-      const userAuthRole = await this.prisma.usersOnChannels.findUnique({
-        where: {
-          userId_channelId: {
-            userId: userAuthId,
-            channelId: channelId
-          }
-        },
-        select: {
-          role: true
-        }
-      })
+			const userTarget = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true
+				}
+			})
+			if (!userTarget)
+				throw new NotFoundException("User not found")
+			const userTargetRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userTargetId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (!userTargetRole)
+				throw new NotFoundException("User not found")
 
-      if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
-       throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
-    }
 
-    await this.emitToChannel("leaveChannel", channelId, userTargetId)
+				const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+					where: {
+						userId_channelId: {
+							userId: userAuthId,
+							channelId: channelId
+						}
+					},
+					select: {
+						role: true
+					}
+				})
 
-    const userLeave = await this.prisma.usersOnChannels.delete({
-      where: {
-        userId_channelId: {
-          userId: userTargetId,
-          channelId: channelId
-        }
-      }
-    })
+				if (userTargetId !== userAuthId &&
+					(userAuthRole.role !== Role.OWNER &&
+						userAuthRole.role !== Role.ADMIN) ||
+							userTargetRole.role === Role.OWNER ||
+								(userTargetRole.role === Role.ADMIN &&
+								(userAuthRole.role !== Role.OWNER ||
+									userAuthRole.role !== Role.ADMIN)) )
+				{
+					if ()
+						throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+				}
 
-    console.log(`User ${userTargetId} left channel ${channelId}`)
+			await this.emitToChannel("leaveChannel", channelId, userTargetId)
 
-    const numberOfMembers: number = await this.countMembersInChannel(channelId)
-  
-    // Supprime le channel
-    if (numberOfMembers === 0)
-    {
-      const removeChannel = await this.remove(channelId)
-      return ([ userLeave, removeChannel ])
-    }
-    // Set un nouvel owner
-    else if (userLeave.role === "OWNER")
-    {
-      const newOwner = await this.setNewOwner(channelId)
-      return ([ userLeave, newOwner ])
-    }
+			const userLeave = await this.prisma.usersOnChannels.delete({
+				where: {
+					userId_channelId: {
+						userId: userTargetId,
+						channelId: channelId
+					}
+				}
+			})
 
-    return (userLeave)
-  }
+			console.log(`User ${userTargetId} left channel ${channelId}`)
+
+			const numberOfMembers: number = await this.countMembersInChannel(channelId)
+		
+			// Supprime le channel
+			if (numberOfMembers === 0)
+			{
+				const removeChannel = await this.remove(channelId)
+				return ([ userLeave, removeChannel ])
+			}
+			// Set un nouvel owner
+			else if (userLeave.role === "OWNER")
+			{
+				const newOwner = await this.setNewOwner(channelId)
+				return ([ userLeave, newOwner ])
+			}
+
+			return (userLeave)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
     /****************************** gestion message ***********************/
 
