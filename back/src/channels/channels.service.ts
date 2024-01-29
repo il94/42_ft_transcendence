@@ -98,7 +98,7 @@ export class ChannelsService {
 			return channelMP
 		}
 		catch (error) {
-			if (error instanceof ConflictException || error instanceof NotFoundException)
+			if (error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
@@ -396,7 +396,21 @@ export class ChannelsService {
 			})
 			if (!userTarget)
 				throw new NotFoundException("User not found")
-
+			const userTargetRole = await this.prisma.usersOnChannels.findUnique({
+					where: {
+						userId_channelId: {
+							userId: userTargetId,
+							channelId: channelId
+						}
+					},
+					select: {
+						role: true
+					}
+			})
+			if (!userTargetRole)
+				throw new NotFoundException("User not found")
+			else if (userTargetRole.role === newRole)
+				throw new ConflictException(`User is already ${newRole.toLowerCase()}`)
 
 			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
 				where: {
@@ -410,13 +424,11 @@ export class ChannelsService {
 				}
 			})
 
-			let response: any
-
 			if (newRole === Role.UNBANNED)
 			{
 				if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
-					throw new ForbiddenException(`User ${userAuthId} has not required role for this action`)
-				const unbannedUser = await this.prisma.usersOnChannels.delete({
+					throw new ForbiddenException("You dont have permissions for this action")
+				await this.prisma.usersOnChannels.delete({
 					where: {
 						userId_channelId: {
 							userId: userTargetId,
@@ -424,17 +436,15 @@ export class ChannelsService {
 						}
 					}
 				})
-
-				response = unbannedUser
 			}
 			else
 			{
 				if (((newRole === Role.ADMIN || newRole === Role.MEMBER)
 					&& userAuthRole.role !== Role.OWNER) ||
 						newRole === Role.BANNED && userAuthRole.role !== Role.OWNER && userAuthRole.role !== Role.ADMIN)
-				throw new ForbiddenException(`User ${userAuthId} has not required role for this action`)
+				throw new ForbiddenException("You dont have permissions for this action")
 
-				const updateRole = await this.prisma.usersOnChannels.update({
+				await this.prisma.usersOnChannels.update({
 					where: {
 						userId_channelId: {
 							userId: userTargetId,
@@ -445,19 +455,20 @@ export class ChannelsService {
 						role: newRole
 					}
 				})
-
-				response = updateRole
 			}
 
 			await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole)
 
 			console.log(`User ${userTargetId} is now ${newRole} on channel ${channelId}`)
-			return (response)
-
 		}
 		catch (error) {
-
-		}    
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
   }
 
   // Supprime un channel
