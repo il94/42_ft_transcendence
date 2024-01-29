@@ -473,42 +473,67 @@ export class ChannelsService {
 
 	// Supprime un channel
 	async remove(channelId: number) {
+		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
 
-    // Informe les autres users de la suppression du channel
-    await this.emitToChannel("deleteChannel", channelId)
+			// Emit
+			await this.emitToChannel("deleteChannel", channelId)
 
-    // Supprime les relations user - channel
-    await this.prisma.usersOnChannels.deleteMany({
-      where: {
-        channelId: channelId
-      }
-    })
+			// Supprime les relations user - channel
+			await this.prisma.usersOnChannels.deleteMany({
+				where: {
+					channelId: channelId
+				}
+			})
 
-    // Supprime les relations message - channel
-    await this.prisma.message.deleteMany({
-      where: {
-        channelId: channelId
-      }
-    })
+			// Supprime les relations message - channel
+			await this.prisma.message.deleteMany({
+				where: {
+					channelId: channelId
+				}
+			})
 
-    // Supprime le channel
-		const deleteChannel = await this.prisma.channel.delete({
-      where: {
-        id: channelId
-      }
-    });
+			// Supprime le channel
+			await this.prisma.channel.delete({
+				where: {
+					id: channelId
+				}
+			})
 
-
-    console.log(`Channel ${channelId} has been deleted`)
-		return deleteChannel;
+			console.log(`Channel ${channelId} has been deleted`)
+		}
+		catch (error) {
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	// Retire un user d'un channel
 	// Si le user etait owner, set un nouvel owner
 	// Si le user etait le dernier, supprime le channel
-	async leaveChannel(channelId: number, userAuthId: number, userTargetId: number) {
+	async leaveChannel(channelId: number, userAuthId: number, userTargetId: number): Promise<{ userId: number }> | undefined {
 		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
 
+			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
@@ -519,6 +544,8 @@ export class ChannelsService {
 			})
 			if (!userTarget)
 				throw new NotFoundException("User not found")
+
+			// Verifie si le user target est dans le channel et recupere son role
 			const userTargetRole = await this.prisma.usersOnChannels.findUnique({
 				where: {
 					userId_channelId: {
@@ -533,34 +560,31 @@ export class ChannelsService {
 			if (!userTargetRole)
 				throw new NotFoundException("User not found")
 
-
-				const userAuthRole = await this.prisma.usersOnChannels.findUnique({
-					where: {
-						userId_channelId: {
-							userId: userAuthId,
-							channelId: channelId
-						}
-					},
-					select: {
-						role: true
+			// Recupere le role du user authentifie
+			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userAuthId,
+						channelId: channelId
 					}
-				})
-
-				if (userTargetId !== userAuthId &&
-					(userAuthRole.role !== Role.OWNER &&
-						userAuthRole.role !== Role.ADMIN) ||
-							userTargetRole.role === Role.OWNER ||
-								(userTargetRole.role === Role.ADMIN &&
-								(userAuthRole.role !== Role.OWNER ||
-									userAuthRole.role !== Role.ADMIN)) )
-				{
-					if ()
-						throw new ForbiddenException(`User ${userAuthId} has not required role for this action`);
+				},
+				select: {
+					role: true
 				}
+			})
 
+			// Pour les kicks uniquement, vérifie si le user authentifie a les permissions necessaires
+			if (userTargetId !== userAuthId &&
+				userTargetRole.role === Role.OWNER ||
+					(userAuthRole.role !== Role.OWNER &&
+					userAuthRole.role !== Role.ADMIN))
+				throw new ForbiddenException("You dont have permissions for this action")
+
+			// Emit
 			await this.emitToChannel("leaveChannel", channelId, userTargetId)
 
-			const userLeave = await this.prisma.usersOnChannels.delete({
+			// Supprime le user target du channel
+			await this.prisma.usersOnChannels.delete({
 				where: {
 					userId_channelId: {
 						userId: userTargetId,
@@ -571,22 +595,24 @@ export class ChannelsService {
 
 			console.log(`User ${userTargetId} left channel ${channelId}`)
 
-			const numberOfMembers: number = await this.countMembersInChannel(channelId)
-		
-			// Supprime le channel
-			if (numberOfMembers === 0)
-			{
-				const removeChannel = await this.remove(channelId)
-				return ([ userLeave, removeChannel ])
-			}
-			// Set un nouvel owner
-			else if (userLeave.role === "OWNER")
-			{
-				const newOwner = await this.setNewOwner(channelId)
-				return ([ userLeave, newOwner ])
-			}
+			// Compte le nombre de users restant non bannis dans le channel
+			const countMembers: number = await this.prisma.usersOnChannels.count({
+				where: {
+					channelId: channelId,
+					role: {
+						notIn: [Role.BANNED, Role.UNBANNED]
+					}
+				}
+			})
 
-			return (userLeave)
+			// Supprime le channel si le dernier membre est parti
+			if (countMembers === 0)
+				await this.remove(channelId)
+
+			// Set un nouvel owner si l'owner est parti
+			else if (userTargetRole.role === "OWNER")
+				return await this.setNewOwner(channelId)
+
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
@@ -755,48 +781,93 @@ async countMembersInChannel(chanId: number): Promise<number> {
   return (result)
 }
 
-async setNewOwner(channelId: number) {
-  
-  const administratorFound = await this.prisma.usersOnChannels.findFirst({
-    where: {
-      channelId: channelId,
-      role: "ADMIN"
-    },
-    select: {
-      userId: true,
-      role: true
-    }
-  })
-  const memberFound = await this.prisma.usersOnChannels.findFirst({
-    where: {
-      channelId: channelId,
-      role: "MEMBER"
-    },
-    select: {
-      userId: true,
-      role: true
-    }
-  })
+	// Set un nouvel owner
+	// Choisit le premier admin trouvé
+	// Si pas d'admins, choisit le premier membre trouvé
+	async setNewOwner(channelId: number): Promise<{ userId: number }> {
+		try {
+			// Vérifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
 
-  const newOwner = administratorFound ? administratorFound : memberFound
+			// Compte le nombre de users non bannis dans le channel
+			const countMembers: number = await this.prisma.usersOnChannels.count({
+				where: {
+					channelId: channelId,
+					role: {
+						notIn: [Role.BANNED, Role.UNBANNED]
+					}
+				}
+			})
+			if (countMembers === 0)
+				throw new NotFoundException("User not found")
 
-  await this.prisma.usersOnChannels.update({
-    where: {
-      userId_channelId: {
-        userId: newOwner.userId,
-        channelId: channelId
-      }
-    },
-    data: {
-      role: "OWNER"
-    },
-    select: {
-      userId: true,
-      role: true
-    }
-  })
+			// Vérifie qu'il n'y ait pas déjà d'owner dans le channel
+			const ownerFound = !!await this.prisma.usersOnChannels.findFirst({
+				where: {
+					channelId: channelId,
+					role: Role.OWNER
+				}
+			})
+			if (ownerFound)
+				throw new ConflictException("There is already an owner in the channel")
 
-  console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
+			// Cherche un admin dans le channel
+			const administratorFound = await this.prisma.usersOnChannels.findFirst({
+				where: {
+					channelId: channelId,
+					role: Role.ADMIN
+				},
+				select: {
+					userId: true
+				}
+			})
+
+			// Cherche un membre dans le channel
+			const memberFound = await this.prisma.usersOnChannels.findFirst({
+				where: {
+					channelId: channelId,
+					role: Role.MEMBER
+				},
+				select: {
+					userId: true
+				}
+			})
+
+			// S'assure qu'un admin ou un membre ait bien été trouvé
+			const newOwner = administratorFound ?? memberFound ?? null
+			if (!newOwner)
+				throw new NotFoundException("User not found")
+
+			// Set le nouvel owner
+			await this.prisma.usersOnChannels.update({
+				where: {
+					userId_channelId: {
+						userId: newOwner.userId,
+						channelId: channelId
+					}
+				},
+				data: {
+					role: Role.OWNER
+				}
+			})
+
+			console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
+			return (newOwner)
+	}
+	catch (error) {
+		if (error instanceof NotFoundException || error instanceof ConflictException)
+			throw error
+		else if (error instanceof Prisma.PrismaClientKnownRequestError)
+			throw new ForbiddenException("The provided user data is not allowed")
+		else
+			throw new BadRequestException()
+	}
 }
 
 /* =========================== PAS UTILISEES ================================ */

@@ -8,6 +8,7 @@ DISPLAY/ :
 	Checker le responsive de toutes les pages
 
 GLOBAL/ : A faire sur tout les fichiers un par un
+	Gérer instantanément la présence du token
 	Vérifier les key dans les maps
 	Set corectement tout les titles et alts
 	Fix les erreurs ts
@@ -70,6 +71,7 @@ Chat/ :
 
 Banner/ :
 	Peut-être virer getNewOwner
+	Verifier comportement si le owner se barre
 	Enlever le + possible de setter après les routes pour mettre dans les sockets
 	Gestion d'erreur
 
