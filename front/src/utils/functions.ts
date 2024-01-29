@@ -255,6 +255,18 @@ export function setUserToAdministrator(channel: Channel, user: User | UserAuthen
 	}
 }
 
+export function setUserToOwner(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyOwner = userIsOwner(channel, user.id)
+	const owner = isAlreadyOwner ? channel.owner : user
+
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== user.id),
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
+		owner: owner
+	}
+}
+
 export function setUserToBanned(channel: Channel, user: User | UserAuthenticate): Channel {
 	const isAlreadyBanned = userIsBanned(channel, user.id)
 	const banneds = isAlreadyBanned ? channel.banneds : [ ...channel.banneds, user ]

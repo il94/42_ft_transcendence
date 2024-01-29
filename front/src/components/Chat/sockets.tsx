@@ -9,7 +9,8 @@ import {
 	removeUserInChannel,
 	setUserToAdministrator,
 	setUserToBanned,
-	setUserToMember
+	setUserToMember,
+	setUserToOwner
 } from "../../utils/functions"
 
 import {
@@ -137,6 +138,8 @@ type PropsRefreshLeaveChannel = {
 
 
 export async function refreshLeaveChannel(props: PropsRefreshLeaveChannel) {
+
+
 	if (props.userId === props.userAuthenticate.id)
 	{
 		props.setUserAuthenticate((prevState: UserAuthenticate) => {
@@ -227,4 +230,43 @@ export async function refreshUserRole(props : PropsRefreshUserRole) {
 		console.log(error)
 	}
 
+}
+
+type PropsRefreshNewOwner = {
+	channelId: number,
+	userId: number,
+
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+export async function refreshNewOwner(props: PropsRefreshNewOwner) {
+	if (props.userId === props.userAuthenticate.id)
+	{
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				channels: prevState.channels.map((channel: Channel) => {
+					if (channel.id === props.channelId)
+						return (setUserToOwner(channel, prevState))
+					else
+						return (channel)
+				})
+			}
+		})
+	}
+	if (props.channelTarget?.id === props.channelId)
+	{
+		const userTarget = findUserInChannel(props.channelTarget, props.userId)
+		if (!userTarget)
+			throw new Error
+		props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+				return (setUserToOwner(prevState, userTarget))
+			else
+				return (undefined)
+		})	
+	}
 }

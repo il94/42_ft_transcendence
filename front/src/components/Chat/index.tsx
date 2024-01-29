@@ -17,6 +17,7 @@ import {
 import {
 	refreshJoinChannel,
 	refreshLeaveChannel,
+	refreshNewOwner,
 	refreshUserRole,
 	updateDiscussion
 } from "./sockets"
@@ -80,6 +81,8 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
 			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
+			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
 		// userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
 
 		return () => {
@@ -87,6 +90,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 			userAuthenticate.socket?.off("joinChannel")
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
+			userAuthenticate.socket?.off("setNewOwner")
 			// userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
 		}
 	}
