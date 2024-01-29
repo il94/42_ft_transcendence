@@ -20,6 +20,7 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Styliser le focus
 	Checker les noms de routes (s pas s)
 	Corriger l'anglais du bled
+	Set durée d'expiration du token à 1 day
 
 TwoFA/ :
 	Gestion d'erreur à faire
@@ -28,8 +29,7 @@ Home/ :
 	Focus sur le bouton Game
 
 ContextualMenu/ :
-	Checker handleChallengeClickEvent et mute avec soso
-	Gestion d'erreur
+	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
 
 SecondaryContextualMenu/ :
 	Appeler la route pour ajouter quelqu'un à un channel
