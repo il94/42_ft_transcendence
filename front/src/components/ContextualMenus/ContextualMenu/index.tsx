@@ -370,7 +370,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id))
+			if (!userIsBanned(channelTarget, userTarget.id))
 			{
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.BANNED

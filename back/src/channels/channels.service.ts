@@ -7,6 +7,15 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
 import { AppService } from 'src/app.service';
 
+type ChannelMP = {
+	id: number,
+    createdAt: Date,
+    name: string,
+    avatar: string,
+    type: ChannelStatus,
+    password: string
+}
+
 @UseGuards(JwtGuard)
 @Injectable()
 export class ChannelsService {
@@ -36,17 +45,41 @@ export class ChannelsService {
         data: { password: await argon.hash(createChannelDto.password) } 
       })
     }
-    //console.log(`Channel ${newChannel.id} was created`)
+	
+    console.log(`Channel ${newChannel.id} was created`, newChannel)
     return newChannel;
   }
 
+
+
 	// Cree un channel MP et y ajoute un user
-	async createChannelMP(userAuthId: number, userTargetId: number) {
+	async createChannelMP(userAuthId: number, userTargetId: number): Promise<ChannelMP> {
 		try {
-			const channelMPAlreadyExist = await this.findChannelMP(userTargetId, userAuthId)
+			// Verifie si le channel MP n'existe pas déjà
+			const channelMPAlreadyExist = !!await this.prisma.channel.findFirst({
+				where: {
+					type: ChannelStatus.MP,
+					users: {
+						every: {
+							OR: [{
+									user: {
+										id: userAuthId
+									}
+								},
+								{
+									user: {
+										id: userTargetId
+									}
+								}
+							]
+						}
+					}
+				}
+			})
 			if (channelMPAlreadyExist)
 				throw new ConflictException("MP channel already exist")
 
+			// Verifie si le user target existe et retourne son username et son avatar
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
@@ -59,6 +92,7 @@ export class ChannelsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 
+			// Crée le nouveau channel MP sans nom ni avatar
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
 					name: '',
@@ -87,11 +121,14 @@ export class ChannelsService {
 				}
 			})
 
-			const channelMP = {
-				...newChannelMP,
-				...userTarget
+			// Ajoute les données du user target pour le front
+			const channelMP: ChannelMP = {
+				name: userTarget.username,
+				avatar: userTarget.avatar,
+				...newChannelMP
 			}
 
+			// Emit
 			await this.emitToChannel("createChannelMP", channelMP.id, userTargetId)
 
 			console.log(`Channel MP ${channelMP.id} was created`)
@@ -383,9 +420,20 @@ export class ChannelsService {
 	// Change le role d'un user du channel
 	async updateUserRole(channelId: number, userAuthId: number, userTargetId: number, newRole: Role) {
 		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
+
+			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
 				throw new ForbiddenException("It is not possible to update your own role")
 
+			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
@@ -396,6 +444,23 @@ export class ChannelsService {
 			})
 			if (!userTarget)
 				throw new NotFoundException("User not found")
+
+			// Verifie si le user auth est dans le channel et recupere son role
+			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userAuthId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (!userAuthRole)
+				throw new NotFoundException("User not found")
+
+			// Verifie si le user target est dans le channel, recupere son role et verifie qu'il ne le possede pas deja
 			const userTargetRole = await this.prisma.usersOnChannels.findUnique({
 					where: {
 						userId_channelId: {
@@ -412,18 +477,7 @@ export class ChannelsService {
 			else if (userTargetRole.role === newRole)
 				throw new ConflictException(`User is already ${newRole.toLowerCase()}`)
 
-			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
-				where: {
-					userId_channelId: {
-						userId: userAuthId,
-						channelId: channelId
-					}
-				},
-				select: {
-					role: true
-				}
-			})
-
+			// Pour un déban uniquement, vérifie si les permissions sont bonnes et supprime la relation member - channel du user target
 			if (newRole === Role.UNBANNED)
 			{
 				if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
@@ -437,6 +491,7 @@ export class ChannelsService {
 					}
 				})
 			}
+			// Pour les autres rôles, vérifie si les permissions sont bonnes et patch la relation member - channel du user target
 			else
 			{
 				if (((newRole === Role.ADMIN || newRole === Role.MEMBER)
@@ -457,6 +512,7 @@ export class ChannelsService {
 				})
 			}
 
+			// Emit
 			await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole)
 
 			console.log(`User ${userTargetId} is now ${newRole} on channel ${channelId}`)
@@ -782,8 +838,8 @@ async countMembersInChannel(chanId: number): Promise<number> {
 }
 
 	// Set un nouvel owner
-	// Choisit le premier admin trouvé
-	// Si pas d'admins, choisit le premier membre trouvé
+	// Choisit le premier admin trouvé (par ordre d'ancienneté (à vérifier))
+	// Si pas d'admins, choisit le premier membre trouvé (par ordre d'ancienneté (à vérifier))
 	async setNewOwner(channelId: number): Promise<{ userId: number }> {
 		try {
 			// Vérifie si le channel existe
@@ -856,6 +912,9 @@ async countMembersInChannel(chanId: number): Promise<number> {
 					role: Role.OWNER
 				}
 			})
+
+			// Emit
+			await this.emitToChannel("setNewOwner", channelId, newOwner.userId)
 
 			console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
 			return (newOwner)

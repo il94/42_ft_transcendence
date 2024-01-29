@@ -11,9 +11,11 @@ export class FriendsService {
 	// Ajoute un user en ami
 	async addFriend(userAuthId: number, userTargetId: number) {
 		try {		
+			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
 				throw new ForbiddenException("It is not possible to add yourself as a friend")
 
+			// Verifie si le user target existe et récupère son username
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
@@ -25,6 +27,7 @@ export class FriendsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 
+			// Verifie si le user target n'est pas déjà un ami
 			const isFriend = !!await this.prisma.friend.findUnique({
 				where: {
 					userId_friendId:
@@ -37,6 +40,7 @@ export class FriendsService {
 			if (isFriend)
 				throw new ConflictException(`${userTarget.username} is already your friend`)
 
+			// Ajoute le user target en ami
 			const newFriend = await this.prisma.user.update({
 				where: {
 					id: userAuthId
@@ -136,9 +140,11 @@ export class FriendsService {
 	// Supprime un ami
 	async removeFriend(userAuthId: number, userTargetId: number) {
 		try {
+			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
 				throw new ForbiddenException("It is not possible to remove yourself as a friend")
 
+			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
@@ -150,6 +156,7 @@ export class FriendsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 	
+			// Verifie si le user target n'est pas déjà un ami
 			const isFriend = !!await this.prisma.friend.findUnique({
 				where: {
 					userId_friendId:
@@ -162,6 +169,7 @@ export class FriendsService {
 			if (!isFriend)
 				throw new NotFoundException(`${userTarget.username} is not your friend`)
 	
+			// Supprime le user target des amis
 			await this.prisma.friend.delete({
 				where: {
 					userId_friendId: {

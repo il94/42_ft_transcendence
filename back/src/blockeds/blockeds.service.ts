@@ -11,68 +11,72 @@ export class BlockedsService {
 	// Bloque un user
 	async addBlocked(userAuthId: number, userTargetId: number) {
 		try {
+			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
 				throw new ForbiddenException("It is not possible to block yourself")
 			
-				const userTarget = await this.prisma.user.findUnique({
-					where: {
-						id: userTargetId
-					},
-					select: {
-						username: true
+			// Verifie si le user target existe et récupère son username
+			const userTarget = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true
+				}
+			})
+			if (!userTarget)
+				throw new NotFoundException("User not found")
+
+			// Verifie si le user target n'est pas déjà bloqué
+			const isBlocked = !!await this.prisma.blocked.findUnique({
+				where: {
+					userId_blockedId:
+					{
+						userId: userAuthId,
+						blockedId: userTargetId
 					}
-				})
-				if (!userTarget)
-					throw new NotFoundException("User not found")
-	
-				const isBlocked = !!await this.prisma.blocked.findUnique({
-					where: {
-						userId_blockedId:
-						{
-							userId: userAuthId,
+				}
+			})
+			if (isBlocked)
+				throw new ConflictException(`${userTarget.username} is already blocked`)
+
+			// Bloque le user target
+			const newBlocked = await this.prisma.user.update({
+				where: {
+					id: userAuthId
+				},
+				data: {
+					blockeds: {
+						create: [{
 							blockedId: userTargetId
-						}
+						}]
 					}
-				})
-				if (isBlocked)
-					throw new ConflictException(`${userTarget.username} is already blocked`)
-	
-				const newBlocked = await this.prisma.user.update({
-					where: {
-						id: userAuthId
-					},
-					data: {
-						blockeds: {
-							create: [{
-								blockedId: userTargetId
-							}]
-						}
-					},
-					select: {
-						id: true,
-						username: true,
-						avatar: true,
-						wins: true,
-						draws: true,
-						losses: true,
-						status: true
-					}
-				})
-	
-				console.log(`User ${userAuthId} blocked user ${userTargetId}`)
-				return newBlocked
-			}
-			catch (error) {
-				if (error instanceof ForbiddenException
-					|| error instanceof NotFoundException
-					|| error instanceof ConflictException)
-					throw error
-				else if (error instanceof Prisma.PrismaClientKnownRequestError)
-					throw new ForbiddenException("The provided user data is not allowed")
-				else
-					throw new BadRequestException()
-			}
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					wins: true,
+					draws: true,
+					losses: true,
+					status: true
+				}
+			})
+
+			console.log(`User ${userAuthId} blocked user ${userTargetId}`)
+			return newBlocked
 		}
+		catch (error) {
+			if (error instanceof ForbiddenException
+				|| error instanceof NotFoundException
+				|| error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 	
 	async getBlockeds(userId: number) {
 		const user = await this.prisma.user.findFirst({ 
@@ -135,9 +139,11 @@ export class BlockedsService {
 	// Debloque un user
 	async removeBlocked(userAuthId: number, userTargetId: number) {
 		try {
+			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
 				throw new ForbiddenException("It is not possible to unblock yourself")
 
+			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
@@ -149,6 +155,7 @@ export class BlockedsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 	
+			// Verifie si le user target n'est pas déjà bloqué
 			const isBlocked = !!await this.prisma.blocked.findUnique({
 				where: {
 					userId_blockedId:
@@ -161,6 +168,7 @@ export class BlockedsService {
 			if (!isBlocked)
 				throw new NotFoundException(`${userTarget.username} is not blocked`)
 	
+			// Débloque le user target
 			await this.prisma.blocked.delete({
 				where: {
 					userId_blockedId: {

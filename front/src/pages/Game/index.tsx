@@ -136,9 +136,9 @@ function Game() {
 					return {
 						...channel,
 						messages: [],
-						owner: undefined,
+						members: [],
 						administrators: [],
-						users: [],
+						owner: undefined,
 						mutedUsers: [],
 						banneds: []
 					}
