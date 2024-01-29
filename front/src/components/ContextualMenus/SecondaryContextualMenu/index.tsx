@@ -9,7 +9,6 @@ import { Style } from "./style"
 
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import DisplayContext from "../../../contexts/DisplayContext"
@@ -57,8 +56,6 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			$top={secondaryContextualMenuPosition.top}
 			$bottom={secondaryContextualMenuPosition.bottom}
 			$height={secondaryContextualMenuHeight}>
-			{
-				channels ?
 					<ScrollBar visible>
 						{
 							channels.map((channel, index) => (
@@ -72,9 +69,6 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 							))
 						}
 					</ScrollBar>
-					:
-					<ErrorRequestMessage />
-			}
 		</Style>
 	)
 }

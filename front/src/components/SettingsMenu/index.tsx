@@ -24,7 +24,6 @@ import Icon from "../../componentsLibrary/Icon"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
-import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
@@ -48,7 +47,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 
 	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -154,11 +152,11 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						errorMessage: "Invalid email"
 					}))
 				}
-				else
-					setErrorRequest(true)
+				// else
+					// setErrorRequest(true)
 			}
-			else
-				setErrorRequest(true)
+			// else
+				// setErrorRequest(true)
 		}
 	}
 
@@ -386,8 +384,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 		<Style
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
-		{
-			!errorRequest ?
 			<ScrollBar visible>
 				<CloseButtonWrapper>
 					<Icon src={CloseIcon} size={24}
@@ -538,9 +534,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 					</Button>
 				</SettingsForm>
 			</ScrollBar>
-			:
-			<ErrorRequestMessage />
-		}
 		</Style>
 	)
 }

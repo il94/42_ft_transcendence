@@ -18,11 +18,10 @@ import { Channel } from "../../../../utils/types"
 
 type PropsChannel = {
 	channel: Channel,
-	setErrorRequest: Dispatch<SetStateAction<boolean>>,
 	backgroundColor: string
 }
 
-function ChannelSection({ channel, setErrorRequest, backgroundColor }: PropsChannel) {
+function ChannelSection({ channel, backgroundColor }: PropsChannel) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { setChannelTarget } = useContext(InteractionContext)!
@@ -37,7 +36,7 @@ function ChannelSection({ channel, setErrorRequest, backgroundColor }: PropsChan
 			setChannelTarget(channelWithRelationsResponse.data)
 		}
 		catch (error) {
-			setErrorRequest(true)
+			// setErrorRequest(true)
 		}
 	}
 

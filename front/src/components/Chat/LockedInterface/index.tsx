@@ -24,11 +24,7 @@ import {
 	UserAuthenticate
 } from "../../../utils/types"
 
-type PropsLockedInterface = {
-	setErrorRequest: Dispatch<SetStateAction<boolean>>
-}
-
-function LockedInterface({ setErrorRequest }: PropsLockedInterface) {
+function LockedInterface() {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
@@ -99,8 +95,8 @@ function LockedInterface({ setErrorRequest }: PropsLockedInterface) {
 					errorMessage: "Invalid password",
 				}))
 			}
-			else
-				setErrorRequest(true)
+			// else
+			// 	setErrorRequest(true)
 		}
 	}
 

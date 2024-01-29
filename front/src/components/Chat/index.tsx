@@ -29,7 +29,6 @@ import Banner from "./Banner"
 import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
 import Icon from "../../componentsLibrary/Icon"
-import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import AuthContext from "../../contexts/AuthContext"
@@ -120,8 +119,6 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 
 	const { zChatIndex, setZChatIndex, zMaxIndex } = useContext(DisplayContext)!
 
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-
 	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
 	const [bannerName, setBannerName] = useState<string>("Welcome")
 
@@ -162,9 +159,6 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 				onContextMenu={(event) => event.preventDefault()}
 				onClick={() => { setZChatIndex(zMaxIndex + 1) }}
 				$zIndex={zChatIndex}>
-				{
-					!errorRequest ?
-						<>
 							<TopChatWrapper>
 								<ChannelCreateButton onClick={handleClickCreateButton}>
 									{valueChannelCreateButton}
@@ -172,8 +166,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 								<Banner
 									bannerName={bannerName}
 									chatWindowState={chatWindowState}
-									setChatWindowState={setChatWindowState}
-									setErrorRequest={setErrorRequest} />
+									setChatWindowState={setChatWindowState} />
 							</TopChatWrapper>
 							<BottomChatWrapper>
 								{
@@ -186,24 +179,19 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 										:
 										<>
 											<ChannelList
-												channels={channels}
-												setErrorRequest={setErrorRequest} />
+												channels={channels} />
 											{
 												chatWindowState === chatWindowStatus.HOME ||
 													!channelTarget ?
 													<HomeInterface />
 													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
-														<LockedInterface setErrorRequest={setErrorRequest} />
+														<LockedInterface />
 														:
 														<ChatInterface />
 											}
 										</>
 								}
 							</BottomChatWrapper>
-						</>
-						:
-						<ErrorRequestMessage />
-				}
 			</Style>
 			:
 			<ChatButton $zIndex={zChatIndex + 1}>

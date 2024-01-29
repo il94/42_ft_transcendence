@@ -5,7 +5,6 @@ import { Style } from "./style"
 
 import Match from "./Match"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import { MatchData, User, UserAuthenticate } from "../../../utils/types"
 import { matchResultStatus } from "../../../utils/status"
@@ -66,25 +65,20 @@ function MatchHistory({ userTarget }: PropsMatchHistory) {
 
 	return (
 		<Style>
-			{
-				matchs ?
-					<ScrollBar>
-						{
-							matchs.map((match, index) => (
-								<Match
-									key={"match" + index} // a definir
-									username={match.user.username}
-									opponent={match.opponent.username}
-									result={match.result}
-									scoreUser={match.scoreUser}
-									scoreOpponent={match.scoreOpponent}
-								/>
-							))
-						}
-					</ScrollBar>
-					:
-					<ErrorRequestMessage />
-			}
+			<ScrollBar>
+				{
+					matchs.map((match, index) => (
+						<Match
+							key={"match" + index} // a definir
+							username={match.user.username}
+							opponent={match.opponent.username}
+							result={match.result}
+							scoreUser={match.scoreUser}
+							scoreOpponent={match.scoreOpponent}
+						/>
+					))
+				}
+			</ScrollBar>
 		</Style>
 	)
 }

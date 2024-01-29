@@ -19,7 +19,6 @@ import {
 } from "./style"
 
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
@@ -140,8 +139,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 	const [channels, setChannels] = useState<Channel[]>([])
 	const [channelsFound, setChannelsFound] = useState<Channel[]>([])
 
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-
 	async function addUserToFriendList(user: User) {
 		try {
 			if (!userAuthenticate.friends.some((friend) => friend.id === user.id))
@@ -159,7 +156,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 			}
 		}
 		catch (error) {
-			setErrorRequest(true)
+			// setErrorRequest(true)
 		}
 	}
 
@@ -203,7 +200,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		}
 		catch (error) {
 			console.log(error)
-			setErrorRequest(true)
+			// setErrorRequest(true)
 		}
 	}
 
@@ -229,7 +226,7 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 				setChannels(accessiblesChannelsResponse.data.sort(sortChannelByName))
 			}
 			catch (error) {
-				setErrorRequest(true)
+				// setErrorRequest(true)
 			}
 		}
 		fetchUsersAndChannels()
@@ -261,9 +258,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 
 	return (
 		<Style ref={resultsSearchBarRef}>
-			{
-				!errorRequest ?
-				<>
 				{
 					usersFound.length > 0 &&
 					<>
@@ -286,10 +280,6 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 						No result found
 					</NoResult>
 				}
-				</>
-				:
-				<ErrorRequestMessage />
-			}
 		</Style>
 	)
 }

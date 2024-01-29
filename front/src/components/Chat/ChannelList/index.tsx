@@ -24,11 +24,10 @@ const Style = styled.div`
 `
 
 type PropsChannelList = {
-	channels: Channel[],
-	setErrorRequest: Dispatch<SetStateAction<boolean>>
+	channels: Channel[]
 }
 
-function ChannelList({ channels, setErrorRequest }: PropsChannelList) {
+function ChannelList({ channels }: PropsChannelList) {
 
 	return (
 		<Style>
@@ -38,7 +37,6 @@ function ChannelList({ channels, setErrorRequest }: PropsChannelList) {
 						<ChannelSection
 							key={"channel" + index} // a definir
 							channel={channel}
-							setErrorRequest={setErrorRequest}
 							backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 						/>
 					))

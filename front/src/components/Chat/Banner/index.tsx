@@ -35,11 +35,10 @@ import SettingsIcon from "../../../assets/settings.png"
 type PropsBanner = {
 	bannerName: string,
 	chatWindowState: chatWindowStatus,
-	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
-	setErrorRequest: Dispatch<SetStateAction<boolean>>
+	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>
 }
 
-function Banner({ bannerName, chatWindowState, setChatWindowState, setErrorRequest }: PropsBanner) {
+function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
@@ -100,7 +99,7 @@ function Banner({ bannerName, chatWindowState, setChatWindowState, setErrorReque
 				throw new Error
 		}
 		catch (error) {
-			setErrorRequest(true)
+			// setErrorRequest(true)
 		}
 	}
 

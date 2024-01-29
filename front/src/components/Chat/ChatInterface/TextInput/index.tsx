@@ -12,8 +12,6 @@ import {
 	Style
 } from "./style"
 
-import ErrorRequestMessage from "../../../../componentsLibrary/ErrorRequestMessage"
-
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
 
@@ -22,7 +20,6 @@ import { messageStatus } from "../../../../utils/status"
 function TextInput() {
 
 	const { token, url } = useContext(AuthContext)!
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
@@ -59,7 +56,7 @@ function TextInput() {
 				setMessage("");
 			  } catch (error) {
 				console.log(error);
-				setErrorRequest(true);
+				// setErrorRequest(true);
 			  }
 			};
 
@@ -81,17 +78,12 @@ function TextInput() {
 			onSubmit={handleSubmit}
 			autoComplete="off"
 			spellCheck="false"> 
-			{
-				!errorRequest ?
 					<Input
 						onFocus={removePlaceHolder}
 						onBlur={setPlaceHolder}
 						onChange={handleInputChange}
 						value={message}
 						placeholder="Type here..." />
-					:
-					<ErrorRequestMessage />
-			}
 		</Style>
 	)
 }

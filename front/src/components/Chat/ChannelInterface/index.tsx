@@ -24,7 +24,6 @@ import {
 import Button from "../../../componentsLibrary/Button"
 import Icon from "../../../componentsLibrary/Icon"
 import IconUploadFile, { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
@@ -245,8 +244,6 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 	return (
 		<Style>
-			{
-				!error ?
 					<CreateChannelForm
 						onSubmit={handleSubmit}
 						autoComplete="off"
@@ -343,9 +340,6 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							</Button>
 						</ButtonsWrapper>
 					</CreateChannelForm>
-					:
-					<ErrorRequestMessage />
-			}
 		</Style>
 	)
 }
