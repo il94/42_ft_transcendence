@@ -85,12 +85,11 @@ function Signin() {
 
 			//temporaire
 			if (signinResponse.data.twoFA)
-				navigate("/twofa")
-			
+				navigate("/twofa")	
 			else {
 				const access_token: string = signinResponse.data.access_token;
 				if (access_token) {
-					localStorage.setItem('token', access_token)
+					localStorage.setItem('access_token', access_token)
 					setToken(access_token)
 				}
 				else { 

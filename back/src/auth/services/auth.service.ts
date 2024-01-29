@@ -30,7 +30,7 @@ export class AuthService {
         }	
 	}
 
-	async validateUser(dto: AuthDto): Promise<{ access_token: string } | { twoFA: boolean } > {
+	async validateUser(dto: AuthDto): Promise<{ access_token: string } | Partial<User>> {
 		try {
 			const user = await this.prisma.user.findUnique({
 					where: { email: dto.email, },
@@ -49,7 +49,7 @@ export class AuthService {
 				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
 				return token;
 			} else
-				return { twoFA: true }
+				return { id: user.id, twoFA: user.twoFA };
 		} catch (error) {
             throw new BadRequestException(error.message)
         }
@@ -68,8 +68,11 @@ export class AuthService {
 
 	async logout(userId: number): Promise<User> {
 		try {
-			const user = this.prisma.user.update({
-				where: { id: userId, status: UserStatus.ONLINE },
+			const findUser = await this.userService.findUser(userId);
+			if (findUser.status === UserStatus.OFFLINE)
+				throw new BadRequestException(`User already logout`)
+			const user = await this.prisma.user.update({
+				where: { id: userId },
 				data: { status: UserStatus.OFFLINE }
 			})
 			if (!user)
@@ -83,20 +86,19 @@ export class AuthService {
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<User | { twoFA: boolean }> {
+	async validate42User(profile: any): Promise<User | Partial<User>> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { email: profile.email, },
 			});
 			if (user) {
 				if (!user.twoFA) {
-					await this.prisma.user.update({ 
+					const logUser = await this.prisma.user.update({ 
 						where: { email: profile.email },
 						data: { status: UserStatus.ONLINE }})
-					return user;
+					return logUser;
 				}
-				//return { twoFA: true };
-				return user;
+				return { id: user.id, twoFA: user.twoFA };
 			}
 			console.log ("jai pas trouve le user");
 			profile.hash = generate({ length: 6, numbers: true });
@@ -131,7 +133,12 @@ export class AuthService {
 
 	async loginWith2fa(user: User, twoFACode: string): Promise <{access_token: string}> {
 		if (!await this.verifyCode(user, twoFACode))
-			throw new ForbiddenException('Wrong secret code')	
+			throw new ForbiddenException('Wrong secret code')
+		const logUser = await this.prisma.user.update({ 
+				where: { id: user.id },
+				data: { status: UserStatus.ONLINE }})
+		if (!logUser)
+			throw new BadRequestException('Failed to log user with 2FA')
 		return this.signToken(user.id, user.username)
 	}
 
