@@ -23,7 +23,7 @@ export class AuthController {
 			const token = await this.authService.signup(dto);
 			return token; 
 		} catch (error) {
-			throw new UnauthorizedException(error.message)
+			throw error.message
 		}
 	}
 
@@ -32,16 +32,13 @@ export class AuthController {
 	async signin(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response): 
 	Promise<{ access_token: string} | Partial<User>> {
 		try {
+			res.cookie("mon cookie", 'balbla')
 			type token = Partial<User> | { access_token: string }
 			const tok: token  = await this.authService.validateUser(dto);
-			if ('id' in tok) {
-				res.cookie('two_FA', true).cookie('id', tok.id)
-				console.log('tok: ', tok);
-
-			}
+			if ('id' in tok)
+				res.clearCookie('id').clearCookie('two_FA')
 			return tok;
 		} catch (error) {
-			console.log("ERROR : ", error.message)
 			throw new BadRequestException(error.message)
 		}
 	}
@@ -116,7 +113,6 @@ export class AuthController {
   	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body): Promise <{access_token: string}> {
 		try {
 			const user = await this.userService.findUser(id);
-			console.log("body contente: ", body)
 			if (user.status === UserStatus.ONLINE)
 				throw new BadRequestException('User is already authenticated');
 			if (!body.value)
