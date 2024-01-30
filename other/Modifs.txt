@@ -31,35 +31,26 @@ Home/ :
 ContextualMenu/ :
 	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
 
-
-Profile/ :
+Profile/ : à faire après merge
 	Gérer la déconnexion
 	Gestion d'erreur
-
-ScoreResume/ :
-	Virer scoreResume attribut pour mettre direct win ...
 
 ScoreResume/ : à voir quand le Pong aura avancé
 -pas_regardé:
 
-SettingsMenu/ :
+SettingsMenu/ : à faire après merge
 	Faire select Avatar si le temps
 	Gérer le twoFA
 	Gestion d'erreur ( + voir signin/signup)
 
-TwoFaMenu/ :
+TwoFaMenu/ : à faire après merge
 	A faire
 
-Chat/ :
-	Compartimenter le code
+Chat/ : 
 	refreshStatusChallenge à retrouver (fonction de soso github)
-	Gestion d'erreur
 
 Banner/ :
-	Peut-être virer getNewOwner
-	Verifier comportement si le owner se barre
-	Enlever le + possible de setter après les routes pour mettre dans les sockets
-	Gestion d'erreur
+	Mettre une icone poubelle pour delete mp
 
 ChannelInterface/ :
 	Revoir le form pour faire comme signin up settings
