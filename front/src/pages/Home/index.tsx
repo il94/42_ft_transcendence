@@ -50,7 +50,7 @@ function Home() {
 				}
 			}) 
 			Cookies.remove('access_token')
-			localStorage.removeItem('token')
+			localStorage.removeItem('access_token')
 			localStorage.clear();
 			setToken('')
 			navigate("/")

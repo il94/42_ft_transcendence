@@ -89,7 +89,7 @@ function Signup() {
 
 			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 			setToken(response.data.access_token)
-			localStorage.setItem('token', response.data.access_token)
+			localStorage.setItem('access_token', response.data.access_token)
 			
 			navigate("/")
 		}
