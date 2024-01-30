@@ -3,7 +3,7 @@ import {
 	SetStateAction,
 	useContext
 } from "react"
-// import axios from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 import { Style } from "./style"
 
@@ -12,8 +12,17 @@ import Section, { SectionName } from "../../../componentsLibrary/Section"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import DisplayContext from "../../../contexts/DisplayContext"
+import AuthContext from "../../../contexts/AuthContext"
 
-import { Channel } from "../../../utils/types"
+import {
+	userIsBanned,
+	userIsInChannel
+} from "../../../utils/functions"
+
+import {
+	Channel,
+	ErrorResponse
+} from "../../../utils/types"
 
 type PropsSecondaryContextualMenu = {
 	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
@@ -24,27 +33,34 @@ type PropsSecondaryContextualMenu = {
 		bottom?: number
 	},
 	secondaryContextualMenuHeight: number,
-	channels: Channel[] | undefined
+	channels: Channel[]
 }
 
 function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels }: PropsSecondaryContextualMenu) {
 
+	const { token, url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
 	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
-			if (!channel.members.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.post(`http://${url}:3333/channel/${channel.id}/users/${userTarget.id}`, userTarget)
-
-				/* ====================================== */
-				channel.members.push(userTarget)
-			}
+			await axios.post(`http://${url}:3333/channel/${channel.id}/add/${userTarget.id}`, {}, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 		}
 		catch (error) {
-			displayPopupError({ display: true })
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
@@ -56,19 +72,19 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			$top={secondaryContextualMenuPosition.top}
 			$bottom={secondaryContextualMenuPosition.bottom}
 			$height={secondaryContextualMenuHeight}>
-					<ScrollBar visible>
-						{
-							channels.map((channel, index) => (
-								<Section
-									key={"channelSection" + index}
-									onClick={() => handleInviteClickEvent(channel)}>
-									<SectionName>
-										{channel.name}
-									</SectionName>
-								</Section>
-							))
-						}
-					</ScrollBar>
+			<ScrollBar visible>
+				{
+					channels.map((channel, index) => (
+						<Section
+							key={"channelSection" + index}
+							onClick={() => handleInviteClickEvent(channel)}>
+							<SectionName>
+								{channel.name}
+							</SectionName>
+						</Section>
+					))
+				}
+			</ScrollBar>
 		</Style>
 	)
 }

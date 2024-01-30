@@ -64,7 +64,7 @@ function LockedInterface() {
 				return
 			}
 
-			await axios.post(`http://${url}:3333/channel/join/${channelTarget.id}`, {
+			await axios.post(`http://${url}:3333/channel/${channelTarget.id}/join`, {
 				password: password.value
 			},
 			{

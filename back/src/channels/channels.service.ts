@@ -92,7 +92,7 @@ export class ChannelsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 
-			// Crée le nouveau channel MP sans nom ni avatar
+			// Crée le nouveau channel MP sans nom ni avatar et y inclut le user target
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
 					name: '',
@@ -144,50 +144,106 @@ export class ChannelsService {
 		}
 	}
 
-  // Ajoute un user dans un channel
-  async joinChannel(joinChannelDatas: AuthChannelDto, channelId: number, userId: number) {
-    try {
-      const channelToJoin = await this.findChannel(channelId, userId);
-      
-      const inChan = await this.isInChannel(userId, channelToJoin.id);
+	// Ajoute un user dans un channel
+	async joinChannel(channelId: number, userId: number, password?: string, inviterId?: number) {
+		try {
+			// Verifie si le channel existe et le retourne
+			const channelToJoin = await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelToJoin)
+				throw new NotFoundException("Channel not found")
 
-      if (inChan)
-      {
-        if (inChan.role === Role.BANNED)
-          throw new ForbiddenException(`User ${userId} is banned from channel ${channelToJoin.id}'`);
-        throw new BadRequestException(`User ${userId} is already in channel ${channelToJoin.id}`);
-      }
+			// Verifie si le user qui aurait lancé l'invitation est dans le channel
+			if (inviterId)
+			{
+				const inviter = !!await this.prisma.usersOnChannels.findUnique({
+					where: {
+						userId_channelId: {
+							userId: inviterId,
+							channelId: channelId
+						}
+					}
+				})
+				if (!inviter)
+					throw new NotFoundException("User not found")
+			}
 
-      if (channelToJoin.password) {
-        const pwdMatch = await argon.verify(channelToJoin.password, joinChannelDatas.password);
-			if (!pwdMatch)
-				throw new ForbiddenException('Incorrect password');
-      }
+			// Verifie si le user existe et récupère son username
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId
+				},
+				select: {
+					username: true
+				}
+			})
+			if (!user)
+				throw new NotFoundException("User not found")
 
-      const joinChannel = await this.prisma.channel.update({ where: { id: channelToJoin.id}, 
-        data: {
-          users: { 
-            create: [
-              {
-                role: 'MEMBER',
-                user: {connect: { id: userId }}
-              }
-            ]  
-          }
-        }})
+			// Verifie si le user n'est pas déjà dans le channel 
+			const isInChannel = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (isInChannel)
+			{
+				if (isInChannel.role === Role.BANNED)
+					throw new ConflictException(`${user.username} is banned from this channel`)
+				else
+					throw new ConflictException(`${user.username} is already in channel`)
+			}
 
-      await this.emitToChannel("joinChannel", channelId, userId)
+			// Si il y a un mot de passe et que le user n'a pas été invité, vérifie que le mot de passe fourni soit correct
+			if (channelToJoin.password && !inviterId)
+			{
+				const pwdMatch = await argon.verify(channelToJoin.password, password);
+				if (!pwdMatch)
+					throw new ForbiddenException("Incorrect password");
+			}
 
-      console.log(`User ${userId} joined channel ${channelId}`)
+			// Ajoute le user au channel
+			await this.prisma.channel.update({
+				where: {
+					id: channelToJoin.id
+				}, 
+				data: {
+					users: { 
+						create: [
+							{
+								role: Role.MEMBER,
+								user: {
+									connect: {
+										id: userId
+									}
+								}
+							}
+						]  
+					}
+				}})
 
-      return joinChannel;
-
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError)
-        return { error: 'An error occurred while addind other user in channel' };
-      throw error;
-    }
-  }
+				// Emit
+				await this.emitToChannel("joinChannel", channelId, userId)
+				console.log(`User ${userId} joined channel ${channelId}`)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
   // Retourne tout les channels
   async findAllChannels() {
@@ -381,6 +437,9 @@ export class ChannelsService {
       else
         return undefined
     })
+
+	console.log("usersOnChannels", usersOnChannels)
+	console.log("sockets", sockets)
 
     return sockets;
   }
@@ -931,37 +990,37 @@ async countMembersInChannel(chanId: number): Promise<number> {
 
 /* =========================== PAS UTILISEES ================================ */
 
-async addUserInChannel(friendId: number, member: User, chanId: number) {
-  if (friendId === member.id)
-    return { error: 'Cannot add your self in channel'}
+// async addUserInChannel(friendId: number, member: User, chanId: number) {
+//   if (friendId === member.id)
+//     return { error: 'Cannot add your self in channel'}
 
-  try {
-    this.findChannel(chanId, member.id);
+//   try {
+//     this.findChannel(chanId, member.id);
     
-    if (await this.isInChannel(friendId, chanId))
-      throw new NotFoundException(`User ${friendId} is already in channel ${chanId}`);
+//     if (await this.isInChannel(friendId, chanId))
+//       throw new NotFoundException(`User ${friendId} is already in channel ${chanId}`);
 
-    const userInchannel = await this.isInChannel(member.id, chanId);
-    if (!userInchannel)
-      throw new NotFoundException(`User id ${member.id} is not in channel id ${chanId}`);
+//     const userInchannel = await this.isInChannel(member.id, chanId);
+//     if (!userInchannel)
+//       throw new NotFoundException(`User id ${member.id} is not in channel id ${chanId}`);
     
-      if (userInchannel.role ===  Role.MEMBER || !userInchannel.role)
-        throw new ForbiddenException(`User ${member.id} has not required role for this action`);
+//       if (userInchannel.role ===  Role.MEMBER || !userInchannel.role)
+//         throw new ForbiddenException(`User ${member.id} has not required role for this action`);
     
-      const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
-      data: {
-        users: {
-          connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
-          create: [{ userId: friendId, role: Role.MEMBER }]
-        }
-      }})
-      return addInChannel;
-  } catch (error) { 
-    if (error instanceof Prisma.PrismaClientKnownRequestError)
-      return { error: 'An error occurred while addind other user in channel' };
-    throw error;
-  }   
-}
+//       const addInChannel = await this.prisma.channel.update({ where: { id: chanId}, 
+//       data: {
+//         users: {
+//           connect: [{ userId_channelId: { userId: friendId, channelId: chanId }}],
+//           create: [{ userId: friendId, role: Role.MEMBER }]
+//         }
+//       }})
+//       return addInChannel;
+//   } catch (error) { 
+//     if (error instanceof Prisma.PrismaClientKnownRequestError)
+//       return { error: 'An error occurred while addind other user in channel' };
+//     throw error;
+//   }   
+// }
 
 
 

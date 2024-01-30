@@ -25,13 +25,21 @@ export class ChannelController {
 		return this.channelsService.createChannelMP(userAuthId, userTargetId)
 	}
 
-  // Ajoute un user dans un channel
-  @Post('join/:id')
-  join(@Param('id', ParseIntPipe) channelId: number,
-    @Body() joinChannelDatas: AuthChannelDto,
-    @getUser('id') userId: number) {
-    return this.channelsService.joinChannel(joinChannelDatas, channelId, userId);
-  }
+	// Ajoute le user auth dans un channel
+	@Post(':id/join')
+	join(@getUser('id') userId: number,
+	@Param('id', ParseIntPipe) channelId: number,
+	@Body() { password }: AuthChannelDto) {
+		return this.channelsService.joinChannel(channelId, userId, password)
+	}
+
+	// Ajoute un user dans un channel
+	@Post(':channelId/add/:userTargetId')
+	addUser(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.joinChannel(channelId, userTargetId, undefined, userAuthId)
+	}
 
     /* ajout de message  avec l'id du channel  */
 
@@ -145,12 +153,12 @@ async addInvitation(
 
 /* =========================== PAS UTILISEES ================================ */
 
-  @Patch('add/:user/in/:chan')
-  addUser(@Param('user', ParseIntPipe) user: number,
-  @Param('chan', ParseIntPipe) chan: number,
-  @Request() member: User) {
-    return this.channelsService.addUserInChannel(user, member, chan);
-  }
+//   @Patch('add/:user/in/:chan')
+//   addUser(@Param('user', ParseIntPipe) user: number,
+//   @Param('chan', ParseIntPipe) chan: number,
+//   @Request() member: User) {
+//     return this.channelsService.addUserInChannel(user, member, chan);
+//   }
 
 
 }

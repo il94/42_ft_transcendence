@@ -75,7 +75,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
 			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
-			refreshJoinChannel({ channelId, userId, channelTarget, setChannelTarget, token, url }))
+			refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>

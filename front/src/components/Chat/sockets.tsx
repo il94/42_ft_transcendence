@@ -15,6 +15,7 @@ import {
 
 import {
 	Channel,
+	ChannelDatas,
 	Message,
 	MessageInvitation,
 	MessageText,
@@ -91,6 +92,8 @@ type PropsRefreshJoinChannel = {
 	channelId: number,
 	userId: number,
 
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 
@@ -100,6 +103,35 @@ type PropsRefreshJoinChannel = {
 }
 
 export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
+
+
+	console.log("PROPS", props)
+
+	if (props.userId === props.userAuthenticate.id)
+	{
+		console.log("IS USER ID")
+	
+		const newChannelResponse: AxiosResponse<ChannelDatas> = await axios.get(`http://${props.url}:3333/channel/${props.channelId}`, {
+			headers: {
+				'Authorization': `Bearer ${props.token}`
+			}
+		})
+		
+		const newChannel: Channel = {
+			...newChannelResponse.data,
+			messages: [],
+			members: [],
+			administrators: [],
+			owner: undefined,
+			mutedUsers: [],
+			banneds: []
+		}
+
+		props.setUserAuthenticate((prevState: UserAuthenticate) => ({
+			...prevState,
+			channels: [ ...prevState.channels, newChannel ]
+		}))
+	}
 	if (props.channelTarget?.id === props.channelId)
 	{
 		const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${props.userId}`, {
