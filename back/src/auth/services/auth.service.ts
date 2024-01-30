@@ -66,7 +66,7 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
-	async logout(userId: number): Promise<User> {
+	async logout(userId: number): Promise<{success: boolean}> {
 		try {
 			const findUser = await this.userService.findUser(userId);
 			if (findUser.status === UserStatus.OFFLINE)
@@ -78,7 +78,7 @@ export class AuthService {
 			if (!user)
 				throw new BadRequestException(`Failed to disconnect User with id ${userId}`)
 			this.appGateway.server.emit("updateUserStatus", userId, UserStatus.OFFLINE);
-			return user;
+			return { success: true };
 		} catch (error) {
             throw new BadRequestException(error.message)
 		}

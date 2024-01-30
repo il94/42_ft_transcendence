@@ -65,7 +65,9 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 			}) 
 			
 			Cookies.remove('access_token')
-			localStorage.removeItem('token')
+			Cookies.remove('id')
+			Cookies.remove('two_FA')
+			//localStorage.removeItem('token')
 			localStorage.clear();
 			setToken('')
 			navigate("/")

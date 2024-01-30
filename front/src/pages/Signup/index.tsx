@@ -88,6 +88,7 @@ function Signup() {
 
 
 			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
+			
 			setToken(response.data.access_token)
 			localStorage.setItem('access_token', response.data.access_token)
 			
@@ -97,7 +98,6 @@ function Signup() {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
-				//console.log("ERROR :", error.)
 				// TODO : GESTION d'erreur si nom ou mail deja pris
 				if (statusCode === 403 || statusCode === 409) {
 					setEmail((prevState) => ({

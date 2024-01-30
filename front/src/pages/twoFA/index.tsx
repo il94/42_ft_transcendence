@@ -31,13 +31,7 @@ function TwoFA() {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		//const access_token: string | null | undefined = Cookies.get('2FA_token') ? Cookies.get('2FA_token'): localStorage.getItem('2FA_token')
 		const id: string | undefined = Cookies.get('id')
-		//if (access_token)
-		//{
-			//localStorage.setItem('2FA_token', access_token)
-			//setToken(access_token)
-		//}
 		if (id)
 			setToken(id);
 	}, [])
@@ -57,10 +51,10 @@ function TwoFA() {
 			/* ============ Temporaire ============== */
 			
 			const response = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
-			 console.log("TOKEN pour login 2FA : ", token)
-			 localStorage.clear();
-			 setToken(response.data.access_token)
-			 localStorage.setItem('access_token', response.data.access_token)
+			 
+			localStorage.clear();
+			setToken(response.data.access_token)
+			localStorage.setItem('access_token', response.data.access_token)
 
 			/* ====================================== */
 

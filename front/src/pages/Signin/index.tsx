@@ -83,9 +83,11 @@ function Signin() {
 
 			const signinResponse = await axios.post(`http://${url}:3333/auth/signin`, user)
 
-			//temporaire
-			if (signinResponse.data.twoFA)
+			if (signinResponse.data.twoFA) {
+				Cookies.remove('id');
+				Cookies.set("id", signinResponse.data.id);
 				navigate("/twofa")	
+			}
 			else {
 				const access_token: string = signinResponse.data.access_token;
 				if (access_token) {
@@ -93,7 +95,6 @@ function Signin() {
 					setToken(access_token)
 				}
 				else { 
-					console.log("pas de token dans response.data : ", signinResponse.data)
 					throw new AxiosError("Failed to retrieve access_token")
 				}
 				navigate("/")
