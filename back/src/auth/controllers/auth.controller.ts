@@ -63,6 +63,7 @@ export class AuthController {
 	async handle42Redirect(@getUser() user: User, @Res({ passthrough: true }) res: Response,
 	): Promise<void> {
 		try {
+			console.log("42 user: ", user)
 			if (!user)
 				throw new BadRequestException("Can't find user from 42 intra");
 			const token = await this.authService.signToken(user.id, user.username);
