@@ -193,6 +193,30 @@ export function userIsBanned(channel: Channel, userId: number): boolean {
 	)
 }
 
+export function channelIsPublic(channel: Channel): boolean {
+	return (
+		channel.type === channelStatus.PUBLIC
+	)
+}
+
+export function channelIsProtected(channel: Channel): boolean {
+	return (
+		channel.type === channelStatus.PROTECTED
+	)
+}
+
+export function channelIsPrivate(channel: Channel): boolean {
+	return (
+		channel.type === channelStatus.PRIVATE
+	)
+}
+
+export function channelIsMP(channel: Channel): boolean {
+	return (
+		channel.type === channelStatus.MP
+	)
+}
+
 export function channelIsEmpty(channel: Channel): boolean {
 	return (
 		channel.members.length === 0 &&
