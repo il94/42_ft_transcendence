@@ -10,14 +10,14 @@ import {
 	Style
 } from "./style"
 
-import Icon from "../../../componentsLibrary/Icon"
-import ActiveText from "../../../componentsLibrary/ActiveText/Index"
+import Icon from "../../componentsLibrary/Icon"
+import ActiveText from "../../componentsLibrary/ActiveText/Index"
 
-import DisplayContext from "../../../contexts/DisplayContext"
+import DisplayContext from "../../contexts/DisplayContext"
 
-import CloseIcon from "../../../assets/close.png"
+import colors from "../../utils/colors"
 
-import colors from "../../../utils/colors"
+import CloseIcon from "../../assets/close.png"
 
 type PropsPopupError = {
 	message?: string

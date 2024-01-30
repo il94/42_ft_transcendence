@@ -43,7 +43,7 @@ import SettingsMenu from '../../components/SettingsMenu'
 import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
-import PopupError from '../../components/ContextualMenus/PopupError'
+import PopupError from '../../components/PopupError'
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'

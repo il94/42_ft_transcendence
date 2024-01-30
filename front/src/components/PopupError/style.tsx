@@ -1,12 +1,13 @@
 import styled from "styled-components"
 
-import colors from "../../../utils/colors"
-import effects from "../../../utils/effects"
+import colors from "../../utils/colors"
+import effects from "../../utils/effects"
 
 export const Style = styled.div`
 
 	display: flex;
-	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 
 	position: absolute;
 	left: 50%;
@@ -14,9 +15,8 @@ export const Style = styled.div`
 	z-index: 999;
 	transform: translate(-50%, -50%);
 
-	width: 315.5px;
-	min-height: 35px;
-	border: 5px solid ${colors.sectionContextualMenu};
+	width: 325.5px;
+	min-height: 55px;
 	clip-path: ${effects.pixelateWindow};
 
 	text-align: center;
@@ -32,15 +32,15 @@ export const Style = styled.div`
 export const CloseButton = styled.div`
 
 	position: absolute;
-	right: 1.5px;
+	top: 3.5px;
+	right: 6.5px;
 
 `
 
 export const MessageError = styled.p`
 	
-	margin-top: auto;
-	margin-bottom: auto;
-	
+	width: 275.5px;
+
 	text-align: center;
 
 `
