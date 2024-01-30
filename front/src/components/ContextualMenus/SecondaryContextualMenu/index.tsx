@@ -44,11 +44,24 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
-			await axios.post(`http://${url}:3333/channel/${channel.id}/add/${userTarget.id}`, {}, {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channel.id}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
+			
+			if (userIsInChannel(channelWithRelationsResponse.data, userTarget.id))
+				displayPopupError({ display: true, message: `${userTarget.username} is already in channel` })
+			else if (userIsBanned(channelWithRelationsResponse.data, userTarget.id))
+				displayPopupError({ display: true, message: `${userTarget.username} is banned from this channel` })
+			else
+			{
+				await axios.post(`http://${url}:3333/channel/${channel.id}/add/${userTarget.id}`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+			}
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {

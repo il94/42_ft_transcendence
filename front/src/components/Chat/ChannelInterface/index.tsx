@@ -103,12 +103,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					id: postChannelResponse.data.id,
 					...newDatas,
 					messages: [],
-					members: [
-						userAuthenticate
-					],
-					administrators: [
-						userAuthenticate
-					],
+					members: [],
+					administrators: [],
 					owner: userAuthenticate,
 					mutedUsers: [],
 					banneds: []
