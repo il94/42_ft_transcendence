@@ -48,17 +48,29 @@ export class UsersService {
 		}
 	}
 
+	// Renvoie tout les users
 	findAll() {
-		const users = this.prisma.user.findMany({ 
-			select: { id: true,
-				username: true,
-				avatar: true,
-				status: true,
-				wins: true,
-				draws: true,
-				losses: true,
-			},});
-		return users;
+		try {
+			// Récupère tout les users
+			const users = this.prisma.user.findMany({
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
+				}
+			})
+			return users
+		}
+		catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	async findById(id: number): Promise<Partial<User>>  {

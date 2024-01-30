@@ -259,18 +259,30 @@ export class ChannelsService {
     return channels;
   }
 
-  // Retourne tout les channels PUBLIC et PROTECTED
-  async findAllChannelsAccessibles() {
-    const accessibleChannels = await this.prisma.channel.findMany({
-      where: { type: {
-        in: ['PUBLIC', 'PROTECTED']
-      }
-    },
-    })
+	// Retourne tout les channels PUBLIC et PROTECTED
+	async findAllChannelsAccessibles() {
+		try {
+			// Récupère tout les channels publics et protecteds
+			const accessibleChannels = await this.prisma.channel.findMany({
+				where: {
+					type: {
+						in: ['PUBLIC', 'PROTECTED']
+					}
+				},
+			})
 
-    // console.log("Accessibles channels :", accessibleChannels)
-    return accessibleChannels;
-  }
+			// console.log("Accessibles channels :", accessibleChannels)
+			return accessibleChannels
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
   // Retourne un channel
   async findChannel(chanId: number, userId: number) {

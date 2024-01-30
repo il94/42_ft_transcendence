@@ -60,12 +60,11 @@ export class ChannelController {
     return channels;
   }
 
-  // Retourne tout les channels PUBLIC et PROTECTED
-  @Get('accessibles')
-  async findAllAccessibles() {
-    const channels = await this.channelsService.findAllChannelsAccessibles();
-    return channels;
-  }
+	// Retourne tout les channels PUBLIC et PROTECTED
+	@Get('accessibles')
+	async findAllAccessibles() {
+		return await this.channelsService.findAllChannelsAccessibles()
+	}
 
   // Retourne un channel
   @Get(':id')

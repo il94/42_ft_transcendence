@@ -31,20 +31,6 @@ Home/ :
 ContextualMenu/ :
 	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
 
-SecondaryContextualMenu/ :
-	Appeler la route pour ajouter quelqu'un à un channel
-	Gestion d'erreur
-
-ErrorContextualMenu/ :
-	Verifier si la popup s'affiche correctement
-	Faire en sorte qu'elle disparaisse on blur
-
-FriendSection/ :
-	Clean showCard et peut-être showContextualMenu
-
-ResultsSearchBar/ :
-	Créer un enum pour le type (user ou channel)
-	Gestion d'erreur
 
 Profile/ :
 	Gérer la déconnexion

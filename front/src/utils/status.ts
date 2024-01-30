@@ -52,3 +52,8 @@ export enum contextualMenuStatus {
 	SOCIAL,
 	CHAT
 }
+
+export enum resultSearchBarType {
+	USER = "USER",
+	CHANNEL = "CHANNEL"
+}
