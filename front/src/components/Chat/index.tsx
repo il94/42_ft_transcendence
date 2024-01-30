@@ -14,14 +14,6 @@ import {
 	ChannelCreateButton
 } from "./style"
 
-import {
-	refreshJoinChannel,
-	refreshLeaveChannel,
-	refreshNewOwner,
-	refreshUserRole,
-	updateDiscussion
-} from "./sockets"
-
 import ChannelList from "./ChannelList"
 import ChatInterface from "./ChatInterface"
 import ChannelInterface from "./ChannelInterface"
@@ -69,29 +61,6 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 		}
 		else
 			setChatWindowState(chatWindowStatus.HOME)
-	}
-
-	function handleListenSockets() {
-		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
-			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
-			refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
-		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
-			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
-			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
-		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
-			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
-		// userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
-
-		return () => {
-			userAuthenticate.socket?.off("updateDiscussion")
-			userAuthenticate.socket?.off("joinChannel")
-			userAuthenticate.socket?.off("leaveChannel")
-			userAuthenticate.socket?.off("updateUserRole")
-			userAuthenticate.socket?.off("setNewOwner")
-			// userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
-		}
 	}
 
 	function handleClickCreateButton() {
@@ -150,7 +119,6 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 
 	useEffect(() => {
 		handleChangeChatWindowState()
-		return (handleListenSockets())
 	}, [channelTarget])
 
 	return (

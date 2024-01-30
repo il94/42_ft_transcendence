@@ -129,7 +129,7 @@ export class ChannelsService {
 			}
 
 			// Emit
-			await this.emitToChannel("createChannelMP", channelMP.id, userTargetId)
+			await this.emitOnChannel("createChannelMP", channelMP.id, userTargetId)
 
 			console.log(`Channel MP ${channelMP.id} was created`)
 			return channelMP
@@ -231,8 +231,14 @@ export class ChannelsService {
 					}
 				}})
 
-				// Emit
-				await this.emitToChannel("joinChannel", channelId, userId)
+				// Si le user a été invité dans le channel, emit à tout les users du channel 
+				if (inviterId)
+					await this.emitOnChannel("joinChannel", channelId, userId)
+
+				// Si le user a rejoint le channel de lui même, emit à tout les users du channel sauf lui
+				else
+					await this.emitOnChannelExceptUser("joinChannel", userId, channelId, userId)
+
 				console.log(`User ${userId} joined channel ${channelId}`)
 		}
 		catch (error) {
@@ -359,7 +365,7 @@ export class ChannelsService {
     const cleanedMessages = await Promise.all(content.map(async (message) => {
       if (message.type === "TEXT") {
         const { status, author, ...rest } = message;
-        console.log("TEXT = ", message);
+        // console.log("TEXT = ", message);
         return {
           ...rest,
           sender: author
@@ -368,7 +374,7 @@ export class ChannelsService {
 
       else {
         const { author, targetId, ...rest } = message;
-        console.log("INVITATION = ", message);
+        // console.log("INVITATION = ", message);
         const target = await this.prisma.user.findUnique({
           where: {
             id: targetId
@@ -417,8 +423,8 @@ export class ChannelsService {
     return channelWithRelations;
   }
 
-  // Retourne les sockets (string) des users
-  async getAllSockets(id: number)
+  // Retourne les sockets (string) des users du channel
+  async getAllSocketsChannel(id: number)
   {
     const usersOnChannels = await this.prisma.usersOnChannels.findMany({
       where: {
@@ -438,11 +444,42 @@ export class ChannelsService {
         return undefined
     })
 
-	console.log("usersOnChannels", usersOnChannels)
-	console.log("sockets", sockets)
+	// console.log("usersOnChannels", usersOnChannels)
+	// console.log("sockets", sockets)
 
     return sockets;
   }
+
+  // Retourne les sockets (string) des users du channel sauf celui du user
+  async getAllSocketsChannelExceptUser(channelId: number, userId: number)
+  {
+    const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+      where: {
+        channelId: channelId,
+		NOT: {
+			userId: userId
+		}
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const sockets = usersOnChannels.map((userOnChannel) => {
+      const socket = AppService.connectedUsers.get(userOnChannel.userId?.toString())
+      if (socket)
+        return socket.id
+      else
+        return undefined
+    })
+
+	// console.log("usersOnChannels", usersOnChannels)
+	// console.log("sockets", sockets)
+
+    return sockets;
+  }
+
+
 
   // Modifie un channel
   async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
@@ -459,7 +496,7 @@ export class ChannelsService {
       if (inChan.role !== Role.OWNER || !inChan.role)
         throw new ForbiddenException(`User ${userId} has not required role for this action`);
       
-      await this.emitToChannel("updateChannel", channelId, newChannelDatas)
+      await this.emitOnChannel("updateChannel", channelId, newChannelDatas)
 
       const updateChannel = await this.prisma.channel.update({ where: { id: channelToUpdate.id}, 
         data: {
@@ -572,7 +609,7 @@ export class ChannelsService {
 			}
 
 			// Emit
-			await this.emitToChannel("updateUserRole", channelId, userTargetId, newRole)
+			await this.emitOnChannel("updateUserRole", channelId, userTargetId, newRole)
 
 			console.log(`User ${userTargetId} is now ${newRole} on channel ${channelId}`)
 		}
@@ -599,7 +636,7 @@ export class ChannelsService {
 				throw new NotFoundException("Channel not found")
 
 			// Emit
-			await this.emitToChannel("deleteChannel", channelId)
+			await this.emitOnChannel("deleteChannel", channelId)
 
 			// Supprime les relations user - channel
 			await this.prisma.usersOnChannels.deleteMany({
@@ -696,7 +733,7 @@ export class ChannelsService {
 				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Emit
-			await this.emitToChannel("leaveChannel", channelId, userTargetId)
+			await this.emitOnChannel("leaveChannel", channelId, userTargetId)
 
 			// Supprime le user target du channel
 			await this.prisma.usersOnChannels.delete({
@@ -831,9 +868,9 @@ export class ChannelsService {
 /* =============================== UTILS ==================================== */
 
     // Emit a tout les users d'un channel
-    async emitToChannel(route: string, ...args: any[]) {
+    async emitOnChannel(route: string, ...args: any[]) {
       const channelId = args[0]
-      const sockets = await this.getAllSockets(channelId)
+      const sockets = await this.getAllSocketsChannel(channelId)
       AppService.connectedUsers.forEach((socket) => {
         const socketToEmit = sockets.includes(socket.id)
 
@@ -841,6 +878,20 @@ export class ChannelsService {
           socket.emit(route, ...args);
       })
     }
+
+    // Emit a tout les users d'un channel sauf le user target
+    async emitOnChannelExceptUser(route: string, userTargetId: number, ...args: any[]) {
+		const channelId = args[0]
+		const sockets = await this.getAllSocketsChannelExceptUser(channelId, userTargetId)
+		AppService.connectedUsers.forEach((socket) => {
+		  const socketToEmit = sockets.includes(socket.id)
+  
+		  if (socketToEmit)
+			socket.emit(route, ...args);
+		})
+	  }
+  
+  
 
     // cherche un channel de type MP qui contient les 2 users
     async findChannelMP(recipientId: number, creatorId: number) {
@@ -973,7 +1024,7 @@ async countMembersInChannel(chanId: number): Promise<number> {
 			})
 
 			// Emit
-			await this.emitToChannel("setNewOwner", channelId, newOwner.userId)
+			await this.emitOnChannel("setNewOwner", channelId, newOwner.userId)
 
 			console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
 			return (newOwner)

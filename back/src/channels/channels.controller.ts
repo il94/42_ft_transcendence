@@ -85,7 +85,7 @@ export class ChannelController {
   @Get(':id/sockets')
   async findSockets(
     @Param('id', ParseIntPipe) id: number) {
-    return await this.channelsService.getAllSockets(id);
+    return await this.channelsService.getAllSocketsChannel(id);
   }
 
   // Modifie un channel
