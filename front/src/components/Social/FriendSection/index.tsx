@@ -19,10 +19,17 @@ import CardContext from "../../../contexts/CardContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import DisplayContext from "../../../contexts/DisplayContext"
 
-import { capitalize, getContextualMenuHeight } from "../../../utils/functions"
+import {
+	capitalize,
+	getContextualMenuHeight,
+	userIsBlocked
+} from "../../../utils/functions"
 
 import { User } from "../../../utils/types"
-import { contextualMenuStatus, userStatus } from "../../../utils/status"
+import {
+	contextualMenuStatus,
+	userStatus
+} from "../../../utils/status"
 
 type PropsFriendSection = {
 	friend: User,
@@ -97,15 +104,13 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 		event.preventDefault();
 	}
 
-	const isBlocked = userAuthenticate.blockeds.some((blockeds) => blockeds.id === friend.id)
-
 	return (
 		<Style
 			onClick={showCard}
 			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
 			$backgroundColor={backgroundColor}
-			$isBlocked={isBlocked}
+			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
 			<Avatar src={friend.avatar} />
 			{
