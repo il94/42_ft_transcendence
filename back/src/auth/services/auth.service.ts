@@ -86,7 +86,7 @@ export class AuthService {
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<{user: User, newUser: boolean} | { tfaUser: Partial<User>, newUser: boolean} > {
+	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | Partial<User> | User> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { email: profile.email, },
@@ -96,16 +96,16 @@ export class AuthService {
 					const logUser = await this.prisma.user.update({ 
 						where: { email: profile.email },
 						data: { status: UserStatus.ONLINE }})
-					return { user: logUser, newUser: false }
+					return logUser
 				}
-				return { tfaUser: { id: user.id, twoFA: user.twoFA }, newUser: false };
+				return { id: user.id, twoFA: user.twoFA };
 			}
 			console.log ("jai pas trouve le user");
 			profile.hash = generate({ length: 6, numbers: true });
 			const newUser = await this.userService.createUser(profile as CreateUserDto)
 			if (!newUser)
 				throw new ForbiddenException('Failed to create new 42 user');
-			return { user: newUser, newUser: true }
+			return { user: newUser, isNew: true }
 		} catch (error) {
             throw new BadRequestException(error.message)
 		}

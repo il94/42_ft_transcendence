@@ -40,6 +40,10 @@ function Home() {
 			setToken(access_token)
 		}
 		else	setToken('')
+		const isNew: string | undefined = Cookies.get('isNew');
+		if (isNew) {
+			// TODO 
+		}
 	}, [])
 
 	async function handleDeconnexionClickText() {
@@ -52,6 +56,7 @@ function Home() {
 			Cookies.remove('access_token')
 			Cookies.remove('id')
 			Cookies.remove('two_FA')
+			Cookies.remove('isNew')
 			//localStorage.removeItem('access_token')
 			localStorage.clear();
 			setToken('')
@@ -74,6 +79,7 @@ function Home() {
 					Welcome
 				</WindowTitle>
 				{
+					// TODO : isNew ? prompt settings form
 					token ?
 						<>
 							<LinkButton

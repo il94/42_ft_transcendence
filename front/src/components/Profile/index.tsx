@@ -67,6 +67,7 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 			Cookies.remove('access_token')
 			Cookies.remove('id')
 			Cookies.remove('two_FA')
+			Cookies.remove('isNew')
 			//localStorage.removeItem('token')
 			localStorage.clear();
 			setToken('')
