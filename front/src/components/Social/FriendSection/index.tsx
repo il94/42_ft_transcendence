@@ -25,7 +25,10 @@ import {
 	userIsBlocked
 } from "../../../utils/functions"
 
-import { User } from "../../../utils/types"
+import {
+	User
+} from "../../../utils/types"
+
 import {
 	contextualMenuStatus,
 	userStatus

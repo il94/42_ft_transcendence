@@ -41,12 +41,6 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 		setZCardIndex(zMaxIndex + 1)
 	}, [])
 
-	const scoreResume = {
-		wins: userTarget.wins,
-		draws: userTarget.draws,
-		losses: userTarget.losses
-	}
-
 	return (
 		<Style
 			onClick={() => { setZCardIndex(zMaxIndex + 1) }}
@@ -66,7 +60,10 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			<UserName>
 				{userTarget.username}
 			</UserName>
-			<ScoreResume scoreResume={scoreResume} />
+			<ScoreResume
+				wins={userTarget.wins}
+				draws={userTarget.draws}
+				losses={userTarget.losses} />
 			<MatchHistory userTarget={userTarget} />
 		</Style>
 	)

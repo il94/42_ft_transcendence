@@ -23,18 +23,22 @@ import LockedInterface from "./LockedInterface"
 import Icon from "../../componentsLibrary/Icon"
 
 import DisplayContext from "../../contexts/DisplayContext"
-import AuthContext from "../../contexts/AuthContext"
+import InteractionContext from "../../contexts/InteractionContext"
+
+import {
+	channelIsProtected,
+	userIsInChannel
+} from "../../utils/functions"
 
 import {
 	Channel
 } from "../../utils/types"
+
 import {
-	channelStatus,
 	chatWindowStatus
 } from "../../utils/status"
 
 import ChatIcon from "../../assets/chat.png"
-import InteractionContext from "../../contexts/InteractionContext"
 
 type PropsChat = {
 	chat: boolean,
@@ -46,23 +50,12 @@ type PropsChat = {
 
 function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState }: PropsChat) {
 
-	const { token, url } = useContext(AuthContext)!
-	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
+	const { zChatIndex, setZChatIndex, zMaxIndex } = useContext(DisplayContext)!
 
-	function handleChangeChatWindowState() {
-		if (channelTarget)
-		{
-			if (channelTarget.type === channelStatus.PROTECTED &&
-				!channelTarget.members.some((member) => member.id === userAuthenticate.id) &&
-				channelTarget.owner?.id !== userAuthenticate.id)
-				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
-			else
-				setChatWindowState(chatWindowStatus.CHANNEL)
-		}
-		else
-			setChatWindowState(chatWindowStatus.HOME)
-	}
+	/* ============================ CHAT STATE ================================== */
 
+	// Au clic sur le bouton create, définit le bon state pour afficher la fenêtre désirée
 	function handleClickCreateButton() {
 
 		if (chatWindowState === chatWindowStatus.HOME)
@@ -81,20 +74,36 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 		}
 	}
 
+	// Aux changements de channel, définit le bon state pour afficher la fenêtre désirée
+	useEffect(() => {
+		if (channelTarget) {
+			if (channelIsProtected(channelTarget) &&
+				!userIsInChannel(channelTarget, userAuthenticate.id))
+				setChatWindowState(chatWindowStatus.LOCKED_CHANNEL)
+			else
+				setChatWindowState(chatWindowStatus.CHANNEL)
+		}
+		else
+			setChatWindowState(chatWindowStatus.HOME)
+	}, [channelTarget])
+
+	/* ============================== DISPLAY =================================== */
+
+	// Ouvre le chat et le place devant les autres fenêtres du site
 	function handleCickChatButton() {
 		displayChat(true)
 		setZChatIndex(zChatIndex + 1)
 	}
 
-	const { zChatIndex, setZChatIndex, zMaxIndex } = useContext(DisplayContext)!
-
 	const [valueChannelCreateButton, setValueChannelCreateButton] = useState<string>("Create")
 	const [bannerName, setBannerName] = useState<string>("Welcome")
 
+	// A l'ouverture du chat, le place devant les autres fenêtres du site
 	useEffect(() => {
 		setZChatIndex(zMaxIndex + 1)
 	}, [])
 
+	// Aux changements de channel ou d'état, affiche le bon titre pour la bannière et change la valeur du bouton de channel list
 	useEffect(() => {
 		if (chatWindowState === chatWindowStatus.HOME) {
 			setValueChannelCreateButton("Create")
@@ -104,7 +113,8 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 			setValueChannelCreateButton("Create")
 			setBannerName(channelTarget.name)
 		}
-		else if (channelTarget && (chatWindowState === chatWindowStatus.UPDATE_CHANNEL || chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
+		else if (channelTarget && (chatWindowState === chatWindowStatus.UPDATE_CHANNEL
+			|| chatWindowState === chatWindowStatus.LOCKED_CHANNEL)) {
 			setValueChannelCreateButton("<<")
 			setBannerName(channelTarget.name)
 		}
@@ -117,9 +127,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 
 	}, [chatWindowState, channelTarget])
 
-	useEffect(() => {
-		handleChangeChatWindowState()
-	}, [channelTarget])
+	/* ========================================================================== */
 
 	return (
 		chat ?
@@ -127,39 +135,39 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 				onContextMenu={(event) => event.preventDefault()}
 				onClick={() => { setZChatIndex(zMaxIndex + 1) }}
 				$zIndex={zChatIndex}>
-							<TopChatWrapper>
-								<ChannelCreateButton onClick={handleClickCreateButton}>
-									{valueChannelCreateButton}
-								</ChannelCreateButton>
-								<Banner
-									bannerName={bannerName}
-									chatWindowState={chatWindowState}
-									setChatWindowState={setChatWindowState} />
-							</TopChatWrapper>
-							<BottomChatWrapper>
+				<TopChatWrapper>
+					<ChannelCreateButton onClick={handleClickCreateButton}>
+						{valueChannelCreateButton}
+					</ChannelCreateButton>
+					<Banner
+						bannerName={bannerName}
+						chatWindowState={chatWindowState}
+						setChatWindowState={setChatWindowState} />
+				</TopChatWrapper>
+				<BottomChatWrapper>
+					{
+						chatWindowState === chatWindowStatus.UPDATE_CHANNEL ||
+							chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
+							<ChannelInterface
+								setBannerName={setBannerName}
+								chatWindowState={chatWindowState}
+								setChatWindowState={setChatWindowState} />
+							:
+							<>
+								<ChannelList
+									channels={channels} />
 								{
-									chatWindowState === chatWindowStatus.UPDATE_CHANNEL ||
-										chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
-										<ChannelInterface
-											setBannerName={setBannerName}
-											chatWindowState={chatWindowState}
-											setChatWindowState={setChatWindowState} />
-										:
-										<>
-											<ChannelList
-												channels={channels} />
-											{
-												chatWindowState === chatWindowStatus.HOME ||
-													!channelTarget ?
-													<HomeInterface />
-													: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
-														<LockedInterface />
-														:
-														<ChatInterface />
-											}
-										</>
+									chatWindowState === chatWindowStatus.HOME ||
+										!channelTarget ?
+										<HomeInterface />
+										: chatWindowState === chatWindowStatus.LOCKED_CHANNEL ?
+											<LockedInterface />
+											:
+											<ChatInterface />
 								}
-							</BottomChatWrapper>
+							</>
+					}
+				</BottomChatWrapper>
 			</Style>
 			:
 			<ChatButton $zIndex={zChatIndex + 1}>
