@@ -114,10 +114,10 @@ export class ChannelController {
   return this.channelsService.updateMessageStatus(idMsg, newStatus);
 }
 
-  // Supprime un channel
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) channelId: number) {
-    return this.channelsService.remove(channelId);
+	// Supprime un channel
+	@Delete(':id')
+	remove(@Param('id', ParseIntPipe) channelId: number) {
+		return this.channelsService.remove(channelId)
 	}
 
 	// Retire un user d'un channel

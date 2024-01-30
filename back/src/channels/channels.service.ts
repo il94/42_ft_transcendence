@@ -739,9 +739,9 @@ export class ChannelsService {
 
 			// Pour les kicks uniquement, vérifie si le user authentifie a les permissions necessaires
 			if (userTargetId !== userAuthId &&
-				userTargetRole.role === Role.OWNER ||
-					(userAuthRole.role !== Role.OWNER &&
-					userAuthRole.role !== Role.ADMIN))
+				(userTargetRole.role === Role.OWNER ||
+					(userAuthRole.role !== Role.OWNER
+					&& userAuthRole.role !== Role.ADMIN)))
 				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Emit

@@ -280,8 +280,6 @@ function Game() {
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("createChannelMP", (channelId: number, recipientId: number) =>
-			recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget, displayChat }))
 
 
 			
@@ -309,7 +307,6 @@ function Game() {
 
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
-			userAuthenticate.socket?.off("createChannelMP")
 
 
 

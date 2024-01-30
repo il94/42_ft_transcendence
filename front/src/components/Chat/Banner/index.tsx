@@ -3,7 +3,7 @@ import {
 	SetStateAction,
 	useContext
 } from "react"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 import {
 	ChannelName,
@@ -17,17 +17,22 @@ import Icon from "../../../componentsLibrary/Icon"
 import ChatContext from "../../../contexts/ChatContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
-	channelStatus,
+	channelIsMP,
+	userIsOwner
+} from "../../../utils/functions"
+
+import {
 	chatWindowStatus
 } from "../../../utils/status"
+
 import {
-	Channel,
-	User
+	ErrorResponse
 } from "../../../utils/types"
 
-import DeleteIcon from "../../../assets/close.png"
+import DeleteIcon from "../../../assets/trash.png"
 import LeaveIcon from "../../../assets/deconnexion.png"
 import ReduceIcon from "../../../assets/reduce.png"
 import SettingsIcon from "../../../assets/settings.png"
@@ -41,23 +46,14 @@ type PropsBanner = {
 function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner) {
 
 	const { token, url } = useContext(AuthContext)!
-	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
-
-	function getNewOwner(channel: Channel): User | undefined {
-		const adminFind: User | undefined = channel.administrators.find((administrator) => administrator.id !== channel.owner?.id)
-		if (adminFind)
-			return (adminFind)
-		const memberFind: User | undefined = channel.members.find((member) => member.id !== channel.owner?.id)
-		if (memberFind)
-			return (memberFind)
-		return (undefined)
-	}
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function deleteChannelMP() {
 		try {
 			if (!channelTarget)
 				throw new Error
-		
+
 			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
@@ -65,41 +61,40 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 			})
 		}
 		catch (error) {
-			throw error
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
 	async function leaveChannel() {
-
-		async function memberLeaveChannel(channelId: number) {
-			try {
-				await axios.delete(`http://${url}:3333/channel/${channelId}/leave/${userAuthenticate.id}`, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
-					
-				setUserAuthenticate((prevState) => ({
-					...prevState,
-					channels: prevState.channels.filter((channel) => channel.id !== channelId)
-				}))
-
-				setChannelTarget(undefined)
-			}
-			catch (error) {
-				console.log(error)
-				throw error
-			}
-		}
-
 		try {
-			if (channelTarget)
-				await memberLeaveChannel(channelTarget.id)
-			else
+			if (!channelTarget)
 				throw new Error
+			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}/leave/${userAuthenticate.id}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 		}
 		catch (error) {
-			// setErrorRequest(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
@@ -110,18 +105,18 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 			<LeaveButtonWrapper>
 				{
 					chatWindowState === chatWindowStatus.CHANNEL ?
-					channelTarget?.type === channelStatus.MP ?
-					<Icon
-						onClick={deleteChannelMP}
-						src={DeleteIcon} size={24}
-						alt="Leave button" title="Leave channel" />
-					:
-					<Icon
-						onClick={leaveChannel}
-						src={LeaveIcon} size={24}
-						alt="Leave button" title="Leave channel" />
-					:
-					<div style={{ width: "26.5px" }} />
+						channelTarget && channelIsMP(channelTarget) ?
+							<Icon
+								onClick={deleteChannelMP}
+								src={DeleteIcon} size={24}
+								alt="Leave button" title="Leave channel" />
+							:
+							<Icon
+								onClick={leaveChannel}
+								src={LeaveIcon} size={24}
+								alt="Leave button" title="Leave channel" />
+						:
+						<div style={{ width: "26.5px" }} />
 				}
 			</LeaveButtonWrapper>
 			<ChannelName>
@@ -134,15 +129,15 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 					alt="Reduce button" title="Reduce" />
 				{
 					(channelTarget &&
-					channelTarget.owner?.id === userAuthenticate.id &&
-					channelTarget.type !== channelStatus.MP &&
-					chatWindowState === chatWindowStatus.CHANNEL) ?
-					<Icon
-						onClick={() => setChatWindowState(chatWindowStatus.UPDATE_CHANNEL)}
-						src={SettingsIcon} size={24}
-						alt="Settings button" title="Settings" />
-					:
-					<div style={{ width: "24px" }} />
+						userIsOwner(channelTarget, userAuthenticate.id) &&
+						!channelIsMP(channelTarget) &&
+						chatWindowState === chatWindowStatus.CHANNEL) ?
+						<Icon
+							onClick={() => setChatWindowState(chatWindowStatus.UPDATE_CHANNEL)}
+							src={SettingsIcon} size={24}
+							alt="Settings button" title="Settings" />
+						:
+						<div style={{ width: "24px" }} />
 				}
 			</ButtonsWrapper>
 		</Style>
