@@ -21,7 +21,8 @@ import Separator from '../../componentsLibrary/Separator/Index'
 import {
 	HorizontalSettingsForm,
 	HorizontalSetting,
-	ErrorMessage
+	ErrorMessage,
+	VerticalSettingWrapper
 } from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
@@ -98,8 +99,7 @@ function Signin() {
 
 			if ('twoFA' in signinResponse.data)
 				navigate("/twofa")
-			else
-			{
+			else {
 				localStorage.setItem('access_token', signinResponse.data.access_token)
 				navigate("/")
 			}
@@ -137,7 +137,7 @@ function Signin() {
 				errorMessage: "Cannot signin with 42 email"
 			})
 		}
-		else {	
+		else {
 			setEmail({
 				value: value,
 				error: false
@@ -178,42 +178,47 @@ function Signin() {
 					spellCheck="false">
 					<HorizontalSetting>
 						Email
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email.value}
-							width={231}
-							fontSize={25}
-							$error={email.error} />
-						<ErrorMessage>
-							{email.error && email.errorMessage}
-						</ErrorMessage>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputEmailChange}
+								type="text" value={email.value}
+								width={231}
+								fontSize={25}
+								$error={email.error} />
+							<ErrorMessage>
+								{email.error && email.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
 					</HorizontalSetting>
 					<HorizontalSetting>
 						Password
-						<InputText
-							onChange={handleInputPasswordChange}
-							type={showPassword ? "text" : "password"}
-							value={password.value as string}
-							width={231}
-							fontSize={25}
-							$error={password.error} />
-						<ErrorMessage>
-							{password.error && password.errorMessage}
-						</ErrorMessage>
-						<Button
-							onClick={() => setShowPassword(!showPassword)}
-							type="button"
-							fontSize={18}
-							alt="Show password button"
-							title={showPassword ? "Hide password" : "Show password"}
-							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
-							{
-								showPassword ?
-									"Hide password"
-									:
-									"Show password"
-							}
-						</Button>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputPasswordChange}
+								type={showPassword ? "text" : "password"}
+								value={password.value as string}
+								width={231}
+								fontSize={25}
+								$error={password.error} />
+							<ErrorMessage>
+								{password.error && password.errorMessage}
+							</ErrorMessage>
+							<Button
+								onClick={() => setShowPassword(!showPassword)}
+								type="button"
+								fontSize={18}
+								width={231}
+								alt="Show password button"
+								title={showPassword ? "Hide password" : "Show password"}
+								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+								{
+									showPassword ?
+										"Hide password"
+										:
+										"Show password"
+								}
+							</Button>
+						</VerticalSettingWrapper>
 					</HorizontalSetting>
 					<div style={{ marginTop: "10px" }} />
 					<Button

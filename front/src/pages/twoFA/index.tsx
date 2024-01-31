@@ -18,7 +18,8 @@ import CentralWindow from '../../componentsLibrary/CentralWindow'
 import {
 	HorizontalSettingsForm,
 	HorizontalSetting,
-	ErrorMessage
+	ErrorMessage,
+	VerticalSettingWrapper
 } from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
@@ -60,7 +61,7 @@ function TwoFA() {
 			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate`, {
 				twoFACode: code
 			})
-	
+
 			localStorage.setItem("access_token", twoFAResponse.data.access_token)
 			navigate("/")
 		}
@@ -113,16 +114,18 @@ function TwoFA() {
 					autoComplete="off"
 					spellCheck="false">
 					<HorizontalSetting>
-						Enter the six-digit code from Google Authenticator to secure your authentication
-						<InputText
-							onChange={handleInputCodeChange}
-							type="text" value={code.value}
-							width={231}
-							fontSize={25}
-							$error={code.error} />
-						<ErrorMessage>
-							{code.error && code.errorMessage}
-						</ErrorMessage>
+						<VerticalSettingWrapper>
+							Enter the six-digit code from Google Authenticator to secure your authentication
+							<InputText
+								onChange={handleInputCodeChange}
+								type="text" value={code.value}
+								width={231}
+								fontSize={25}
+								$error={code.error} />
+							<ErrorMessage>
+								{code.error && code.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
 					</HorizontalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
