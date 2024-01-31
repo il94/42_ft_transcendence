@@ -111,7 +111,7 @@ model Channel {
   name        String
   avatar      String
   type        ChannelStatus
-  password    String?
+  hash		  String?
   invitation  Invitation[]
 
   users       UsersOnChannels[]

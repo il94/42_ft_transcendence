@@ -12,11 +12,12 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 export class ChannelController {
   constructor(private readonly channelsService: ChannelsService) {}
 
-  // Cree un channel
-  @Post()
-  create(@Body() dto: CreateChannelDto, @Request() req) {
-	  return this.channelsService.createChannel(dto, req.user.id);
-  }
+	// Cree un channel
+	@Post()
+	create(@getUser('id') userId: number,
+	@Body() newChannel: CreateChannelDto) {
+		return this.channelsService.createChannel(newChannel, userId)
+	}
 
 	// Cree un channel MP et y ajoute un user
 	@Post('mp/:id')
@@ -29,8 +30,8 @@ export class ChannelController {
 	@Post(':id/join')
 	join(@getUser('id') userId: number,
 	@Param('id', ParseIntPipe) channelId: number,
-	@Body() { password }: AuthChannelDto) {
-		return this.channelsService.joinChannel(channelId, userId, password)
+	@Body() { hash }: AuthChannelDto) {
+		return this.channelsService.joinChannel(channelId, userId, hash)
 	}
 
 	// Ajoute un user dans un channel
@@ -87,13 +88,13 @@ export class ChannelController {
     return await this.channelsService.getAllSocketsChannel(id);
   }
 
-  // Modifie un channel
-  @Patch(':id')
-  update(@Param('id', ParseIntPipe) channelId: number, 
-  @Body() newChannelDatas: UpdateChannelDto, 
-  @getUser('id') userId: number) {
-    return this.channelsService.updateChannel(channelId, newChannelDatas, userId);
-  }
+	// Modifie un channel
+	@Patch(':id')
+	update(@getUser('id') userId: number,
+	@Param('id', ParseIntPipe) channelId: number, 
+	@Body() newChannelDatas: UpdateChannelDto) {
+		return this.channelsService.updateChannel(channelId, newChannelDatas, userId)
+	}
 
 	// Change le role d'un user du channel
 	@Patch(':channelId/role/:userTargetId')
