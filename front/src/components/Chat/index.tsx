@@ -96,6 +96,8 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 		}
 	}
 
+	function refreshStatusChallenge() {}
+	
 	function handleClickCreateButton() {
 
 		if (chatWindowState === chatWindowStatus.HOME)

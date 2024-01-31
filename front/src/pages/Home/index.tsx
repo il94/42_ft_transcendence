@@ -5,8 +5,9 @@ import Cookies from "js-cookie"
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
+import { ErrorResponse } from '../../utils/types'
 
 import AuthContext from '../../contexts/AuthContext'
 
@@ -57,13 +58,19 @@ function Home() {
 			Cookies.remove('id')
 			Cookies.remove('two_FA')
 			Cookies.remove('isNew')
-			//localStorage.removeItem('access_token')
 			localStorage.clear();
 			setToken('')
 			navigate("/")
 		}
 		catch (error) {
-			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				console.log(error.message)
+				console.log(statusCode)
+			}
+			else
+				navigate("/error");
 		}
 	}
 
