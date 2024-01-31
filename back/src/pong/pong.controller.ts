@@ -12,8 +12,8 @@ export class PongController {
     constructor(private readonly pongService: PongService) {}
 
     @Post()
-    create(@getUser() user: User, @Body() dto: CreatePongDto) {
-        return this.pongService.createGame(dto, user.id)
+    create(@getUser() user: User, /*@Body() dto: CreatePongDto*/) {
+        return this.pongService.createGame(user.id)
     }
 
     @Post('join/:id')

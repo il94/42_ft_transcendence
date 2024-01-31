@@ -13,10 +13,10 @@ import { ESLint } from 'eslint';
 export class PongService {
   constructor(private prisma: PrismaService) {}
 
-  async createGame(dto: CreatePongDto, creatorId: number): Promise<Game> {
+  async createGame(creatorId: number): Promise<Game> {
     const tmp = await this.prisma.game.create({
         data: {
-            level: dto.level,
+            level: 1,
             status: GameStatus.PENDING,
         }
     })
