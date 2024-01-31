@@ -13,44 +13,67 @@ type ChannelMP = {
     name: string,
     avatar: string,
     type: ChannelStatus,
-    password: string
+    hash: string
 }
 
 @UseGuards(JwtGuard)
 @Injectable()
 export class ChannelsService {
-  constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService) {}
 
-  // Cree un channel
-  async createChannel(createChannelDto: CreateChannelDto, creatorId: number) {
-    const newChannel = await this.prisma.channel.create({
-      data: {
-        name: createChannelDto.name,
-        avatar: createChannelDto.avatar,
-        type: createChannelDto.type,
-        users: { 
-          create: [
-            {
-              role: 'OWNER',
-              user: {connect: { id: creatorId }}
-            }
-          ]  
-        },
-      }
-    })
-    // setting password
-    if (newChannel.type === ChannelStatus.PROTECTED)
-    {
-      await this.prisma.channel.update({ where: { id: newChannel.id },
-        data: { password: await argon.hash(createChannelDto.password) } 
-      })
-    }
-	
-    console.log(`Channel ${newChannel.id} was created`, newChannel)
-    return newChannel;
-  }
+	// Cree un channel
+	async createChannel(newChannel: CreateChannelDto, userId: number): Promise<{ id: number }> {
+		try {
+			// Si le channel est de type protected
+			if (newChannel.type === ChannelStatus.PROTECTED)
+			{
+				// Si aucun mot de passe n'est fourni
+				if (!newChannel.hash)
+					throw new ForbiddenException("Protected channels must have a password")
+				
+				// Hashe le nouveau mot de passe
+				else
+					newChannel.hash = await argon.hash(newChannel.hash)
+			}
 
+			// Retire le mot de passe (si il y en avait un ou pas)
+			else
+				newChannel.hash = undefined
 
+			// Crée le channel et renvoie son id
+			const newChannelId = await this.prisma.channel.create({
+				data: {
+					...newChannel,
+					users: { 
+						create: [
+							{
+								role: Role.OWNER,
+								user: {
+									connect: {
+										id: userId
+									}
+								}
+							}
+						]  
+					},
+				},
+				select: {
+					id: true
+				}
+			})
+
+			console.log(`Channel ${newChannelId.id} was created`, newChannel)
+			return newChannelId
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
 	// Cree un channel MP et y ajoute un user
 	async createChannelMP(userAuthId: number, userTargetId: number): Promise<ChannelMP> {
@@ -145,7 +168,7 @@ export class ChannelsService {
 	}
 
 	// Ajoute un user dans un channel
-	async joinChannel(channelId: number, userId: number, password?: string, inviterId?: number) {
+	async joinChannel(channelId: number, userId: number, hash?: string, inviterId?: number) {
 		try {
 			// Verifie si le channel existe et le retourne
 			const channelToJoin = await this.prisma.channel.findUnique({
@@ -183,7 +206,7 @@ export class ChannelsService {
 			if (!user)
 				throw new NotFoundException("User not found")
 
-			// Verifie si le user n'est pas déjà dans le channel 
+			// Verifie si le user n'est pas déjà dans le channel et retourne son role
 			const isInChannel = await this.prisma.usersOnChannels.findUnique({
 				where: {
 					userId_channelId: {
@@ -204,9 +227,9 @@ export class ChannelsService {
 			}
 
 			// Si il y a un mot de passe et que le user n'a pas été invité, vérifie que le mot de passe fourni soit correct
-			if (channelToJoin.password && !inviterId)
+			if (channelToJoin.hash && !inviterId)
 			{
-				const pwdMatch = await argon.verify(channelToJoin.password, password);
+				const pwdMatch = await argon.verify(channelToJoin.hash, hash);
 				if (!pwdMatch)
 					throw new ForbiddenException("Incorrect password");
 			}
@@ -491,39 +514,83 @@ export class ChannelsService {
     return sockets;
   }
 
+	// Modifie un channel
+	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
+		try {
+			// Verifie si le channel existe et le retourne
+			const channelToUpdate = await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelToUpdate)
+				throw new NotFoundException("Channel not found")
 
+			// Verifie si le user est dans le channel et retourne son role
+			const userRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (!userRole)
+				throw new NotFoundException("User not found")
+			else if (userRole.role !== Role.OWNER)
+				throw new ForbiddenException("You dont have permissions for this action")
 
-  // Modifie un channel
-  async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
-    try {
-      const channelToUpdate = await this.findChannel(channelId, userId);
-      const inChan = await this.isInChannel(userId, channelToUpdate.id)
-      if (!inChan)
-        throw new NotFoundException(`User ${userId} is not in channel ${channelToUpdate.id}`);
-      if (channelToUpdate.password) {
-        const pwdMatch = await argon.verify(channelToUpdate.password, newChannelDatas.password);
-			if (!pwdMatch)
-				throw new ForbiddenException('Incorrect password');
-      }
-      if (inChan.role !== Role.OWNER || !inChan.role)
-        throw new ForbiddenException(`User ${userId} has not required role for this action`);
-      
-      await this.emitOnChannel("updateChannel", channelId, newChannelDatas)
+			// Si le channel n'est pas de type protected
+			if (channelToUpdate.type !== ChannelStatus.PROTECTED &&
+				newChannelDatas.type !== ChannelStatus.PROTECTED)
+			{
+				// Si un mot de passe est fourni
+				if (newChannelDatas.hash)
+					throw new ForbiddenException("Only protecteds channels can have a password")
 
-      const updateChannel = await this.prisma.channel.update({ where: { id: channelToUpdate.id}, 
-        data: {
-          name: newChannelDatas.name,
-          type: newChannelDatas.type,
-          password:	newChannelDatas.password,
-          avatar: newChannelDatas.avatar
-        }
-      })
-      
-      console.log(`Channel ${channelId} has been updated`)
-      return updateChannel;
+				// Retire le mot de passe (si il y en avait un ou pas)
+				else
+					newChannelDatas.hash = '' // chaîne vide et pas undefined pour mettre à jour la db
+			}
+		
+			// Si le channel est de type protected
+			else
+			{
+				// Si aucun mot de passe n'est fourni, garde l'ancien
+				if (!newChannelDatas.hash)
+					newChannelDatas.hash = undefined
 
-    } catch (error) { }    
-  }
+				// Hashe le nouveau mot de passe
+				else
+					newChannelDatas.hash = await argon.hash(newChannelDatas.hash)
+			}
+
+			// Update le channel
+			await this.prisma.channel.update({
+				where: {
+					id: channelToUpdate.id
+				}, 
+				data: {
+					...newChannelDatas
+				}
+			})
+
+			// Emit
+			await this.emitOnChannel("updateChannel", channelId, newChannelDatas)
+			console.log(`Channel ${channelId} has been updated`)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
 	// Change le role d'un user du channel
 	async updateUserRole(channelId: number, userAuthId: number, userTargetId: number, newRole: Role) {
