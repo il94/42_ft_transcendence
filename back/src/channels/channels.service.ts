@@ -349,114 +349,143 @@ export class ChannelsService {
       return channel;
   }
 
-  // Retourne un channel avec ses relations
-  async findChannelWithRelations(chanId: number, userId: number) {
-    const channelDatas = await this.prisma.channel.findUnique({ 
-      where: { 
-        id: chanId
-      },
-      include: {
-        users: {
-          select: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                avatar: true,
-                status: true,
-                wins: true,
-                draws: true,
-                losses : true     
-              }
-            },
-            role: true
-          }
-        },
-        content: {
-          select: {
-            id: true,
-            author: {
-              select: {
-                id: true,
-                username: true,
-                avatar: true,
-                status: true,
-                wins: true,
-                draws: true,
-                losses : true 
-              }
-            },
-            targetId: true,
-            type: true,
-            content: true,
-            status: true
-          }
-        }
-      }
-    })
-    if (!channelDatas)
-      throw new NotFoundException(`Channel ${chanId} not found`);
-    const { users, content, ...rest } = channelDatas
-    const cleanedMessages = await Promise.all(content.map(async (message) => {
-      if (message.type === "TEXT") {
-        const { status, author, ...rest } = message;
-        // console.log("TEXT = ", message);
-        return {
-          ...rest,
-          sender: author
-        };
-      }
+	// Retourne un channel avec ses relations
+	async findChannelWithRelations(chanId: number, userId: number) {
+		try {
+			// Récupère le channel avec toutes ses users et messages
+			const channelDatas = await this.prisma.channel.findUnique({ 
+				where: { 
+					id: chanId
+				},
+				include: {
+					users: {
+						select: {
+							user: {
+								select: {
+									id: true,
+									username: true,
+									avatar: true,
+									status: true,
+									wins: true,
+									draws: true,
+									losses : true     
+								}
+							},
+							role: true
+						}
+					},
+					content: {
+						select: {
+							id: true,
+							author: {
+								select: {
+									id: true,
+									username: true,
+									avatar: true,
+									status: true,
+									wins: true,
+									draws: true,
+									losses : true 
+								}
+							},
+							targetId: true,
+							type: true,
+							content: true,
+							status: true
+						}
+					}
+				}
+			})
+			if (!channelDatas)
+				throw new NotFoundException("Channel not found")
 
-      else {
-        const { author, targetId, ...rest } = message;
-        // console.log("INVITATION = ", message);
-        const target = await this.prisma.user.findUnique({
-          where: {
-            id: targetId
-          }
-        });
-        return {
-          ...rest,
-          sender: author,
-          target: target
-        };
-      }
+			// Déstructure le channel afin de mapper les relations pour le front
+			const { users, content, ...rest } = channelDatas
 
-    })) 
+			// Récupère les relations de chaque messages du channel
+			const cleanedMessages = await Promise.all(content.map(async (message) => {
+				if (message.type === "TEXT") {
+					const { status, author, ...rest } = message;
+					// console.log("TEXT = ", message);
+					return {
+						...rest,
+						sender: author
+					};
+				}
 
-    console.log("RESULT", cleanedMessages)
+				else {
+					const { author, targetId, ...rest } = message;
+					// console.log("INVITATION = ", message);
+					const target = await this.prisma.user.findUnique({
+						where: {
+							id: targetId
+						}
+					});
+					return {
+						...rest,
+						sender: author,
+						target: target
+					};
+				}
+			})) 
 
-    function getMPData() {
-      return {
-        name: channelDatas.users.find((user) => user.user.id !== userId).user.username,
-        avatar: channelDatas.users.find((user) => user.user.id !== userId).user.avatar,
-      }
-    }
+			// Pour un channel MP, ajoute les données du user qui n'est pas l'auth pour le front
+			function getMPData() {
+				return {
+					name: channelDatas.users.find((user) => user.user.id !== userId).user.username,
+					avatar: channelDatas.users.find((user) => user.user.id !== userId).user.avatar
+				}
+			}
 
-    const channelWithRelations = {
-      ...rest,
-      name: rest.type === ChannelStatus.MP ? getMPData().name : rest.name,
-      avatar: rest.type === ChannelStatus.MP ? getMPData().avatar : rest.avatar,
-      messages: cleanedMessages,
-      members: channelDatas.users.map((user) => {
-        if (user.role === Role.MEMBER)
-          return (user.user)
-      }).filter(Boolean),
-      administrators: channelDatas.users.map((user) => {
-        if (user.role === Role.ADMIN)
-          return (user.user)
-      }).filter(Boolean),
-      owner: channelDatas.users.find((user) => user.role === Role.OWNER)?.user,
-      mutedUsers: [], // en attendant de pouvoir recup les users mutes
-      banneds: channelDatas.users.map((user) => {
-        if (user.role === Role.BANNED)
-          return (user.user)
-      }).filter(Boolean)
-    }
+			// Objet contenant les données du channel avec ses relations
+			const channelWithRelations = {
 
-    // console.log(`Channel ${chanId} with relations :`, channelWithRelations)
-    return channelWithRelations;
-  }
+				// Données du channel
+				...rest,
+
+				// Données du channel en settant les bonnes si c'est un MP
+				name: rest.type === ChannelStatus.MP ? getMPData().name : rest.name,
+				avatar: rest.type === ChannelStatus.MP ? getMPData().avatar : rest.avatar,
+
+				// Messages mappés
+				messages: cleanedMessages,
+
+				// Membres mappés
+				members: channelDatas.users.map((user) => {
+					if (user.role === Role.MEMBER)
+					return (user.user)
+				}).filter(Boolean),
+
+				// Administrateurs mappés
+				administrators: channelDatas.users.map((user) => {
+					if (user.role === Role.ADMIN)
+					return (user.user)
+				}).filter(Boolean),
+				
+				// Owner mappé
+				owner: channelDatas.users.find((user) => user.role === Role.OWNER)?.user,
+
+				mutedUsers: [], // en attendant de pouvoir recup les users mutes
+
+				// Users bannis mappés
+				banneds: channelDatas.users.map((user) => {
+					if (user.role === Role.BANNED)
+					return (user.user)
+				}).filter(Boolean)
+			}
+
+			// console.log(`Channel ${chanId} with relations :`, channelWithRelations)
+			return channelWithRelations
+		}
+		catch (error) {
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
   // Retourne les sockets (string) des users du channel
   async getAllSocketsChannel(id: number)

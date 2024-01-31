@@ -1,9 +1,7 @@
 import {
-	Dispatch,
-	SetStateAction,
 	useContext
 } from "react"
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 import {
 	Style,
@@ -13,8 +11,11 @@ import {
 
 import AuthContext from "../../../../contexts/AuthContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
+import DisplayContext from "../../../../contexts/DisplayContext"
 
-import { Channel } from "../../../../utils/types"
+import {
+	Channel, ErrorResponse
+} from "../../../../utils/types"
 
 type PropsChannel = {
 	channel: Channel,
@@ -25,6 +26,7 @@ function ChannelSection({ channel, backgroundColor }: PropsChannel) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { setChannelTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 	
 	async function handleClickEvent() {
 		try {
@@ -33,10 +35,20 @@ function ChannelSection({ channel, backgroundColor }: PropsChannel) {
 					'Authorization': `Bearer ${token}`
 				}
 			})
+
 			setChannelTarget(channelWithRelationsResponse.data)
 		}
 		catch (error) {
-			// setErrorRequest(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
