@@ -18,14 +18,22 @@ import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 import Separator from '../../componentsLibrary/Separator/Index'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
 
@@ -164,11 +172,11 @@ function Signin() {
 				<WindowTitle>
 					Sign in
 				</WindowTitle>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						Email
 						<InputText
 							onChange={handleInputEmailChange}
@@ -179,8 +187,8 @@ function Signin() {
 						<ErrorMessage>
 							{email.error && email.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						Password
 						<InputText
 							onChange={handleInputPasswordChange}
@@ -206,14 +214,14 @@ function Signin() {
 									"Show password"
 							}
 						</Button>
-					</Setting>
+					</HorizontalSetting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 				<div>
 					Don't have an account?&nbsp;
 					<StyledLink to="/signup" color={colors.button}>

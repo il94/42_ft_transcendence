@@ -8,10 +8,17 @@ const InputText = styled.input<{ width?: number, fontSize?: number, $error?: boo
 	border: none;
 	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && colors.textError};
 
+	cursor: ${(props) => props.$disable && "default"};
+
 	font-size: ${(props) => props.fontSize && props.fontSize}px;
 	text-align: center;
 
+	color : ${(props) => props.$disable && colors.textBlocked};
 	background-color: inherit;
+
+	&::placeholder {
+		font-size: ${(props) => props.fontSize && props.fontSize - 2}px;
+	}
 
 	&:focus {
 		outline: none;

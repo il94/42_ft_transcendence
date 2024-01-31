@@ -14,15 +14,23 @@ import InputText from '../../componentsLibrary/InputText'
 import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
 
 type PropsTwoFAResponse = {
 	access_token: string
@@ -100,11 +108,11 @@ function TwoFA() {
 				<WindowTitle>
 					TwoFA
 				</WindowTitle>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						Enter the six-digit code from Google Authenticator to secure your authentication
 						<InputText
 							onChange={handleInputCodeChange}
@@ -115,14 +123,14 @@ function TwoFA() {
 						<ErrorMessage>
 							{code.error && code.errorMessage}
 						</ErrorMessage>
-					</Setting>
+					</HorizontalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 			</CentralWindow>
 		</Page>
 	)
