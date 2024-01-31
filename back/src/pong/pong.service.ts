@@ -20,11 +20,13 @@ export class PongService {
             status: GameStatus.PENDING,
         }
     })
-    const newGame = this.connectGame(creatorId, tmp.id)
+    console.log("NEW game: ", tmp.id);
+    const newGame = await this.connectGame(creatorId, tmp.id)
     return newGame
   }
 
   async connectGame(userId: number, gameId: number): Promise<Game> {
+    console.log("created game: ", gameId);
     const connectGame = await this.prisma.game.update({
         where: { id: gameId },
         data: {

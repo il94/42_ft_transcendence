@@ -38,7 +38,7 @@ import SettingsMenu from '../../components/SettingsMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
 import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
-
+import Cookies from 'js-cookie'
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
 import ContextualMenuContext from '../../contexts/ContextualMenuContext'
@@ -160,7 +160,7 @@ function Game() {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
-				})			
+				})
 				const friends: User[] = await fetchFriends()
 				const blockedUsers: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
@@ -250,6 +250,10 @@ function Game() {
 	}, [zCardIndex, zChatIndex, zSettingsIndex])
 
 	useEffect(() => {
+		const isNew: string | undefined = Cookies.get('isNew');
+		if (isNew === 'true') {
+			displaySettingsMenu(true);
+		}
 		window.addEventListener('resize', closeContextualMenus);
 
 		return () => {
@@ -347,7 +351,7 @@ function Game() {
 									displaySettingsMenu={displaySettingsMenu} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								{/* <PongWrapper social={social}/>  */}
+								{<PongWrapper social={social}/> }
 								<Pong />
 								{
 									card &&
@@ -372,7 +376,7 @@ function Game() {
 												<TwoFaMenu
 													twoFAcodeQR={twoFAcodeQR} />
 								}
-								<TestsBack />
+								{/* <TestsBack /> */}
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>

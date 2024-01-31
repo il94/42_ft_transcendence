@@ -41,10 +41,6 @@ function Home() {
 			setToken(access_token)
 		}
 		else	setToken('')
-		const isNew: string | undefined = Cookies.get('isNew');
-		if (isNew) {
-			// TODO 
-		}
 	}, [])
 
 	async function handleDeconnexionClickText() {
