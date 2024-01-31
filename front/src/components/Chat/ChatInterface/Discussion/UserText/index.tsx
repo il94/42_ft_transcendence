@@ -11,7 +11,7 @@ function UserText({ content }: PropsUserText) {
 	return (
 		<Style className="UserTexts">
 			<Text>
-				{(content)}
+				{content}
 			</Text>
 		</Style>
 	)

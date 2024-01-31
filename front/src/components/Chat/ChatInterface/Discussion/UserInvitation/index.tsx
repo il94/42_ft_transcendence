@@ -1,11 +1,16 @@
-import { useContext } from "react"
-import axios from "axios"
+import {
+	useContext
+} from "react"
 
 import {
 	Style,
 	Text,
 	ButtonsWrapper
 } from "./style"
+
+import {
+	handleClickChallengeStatus
+} from "../functions"
 
 import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
@@ -16,40 +21,24 @@ import {
 	User,
 	UserAuthenticate
 } from "../../../../../utils/types"
-import { challengeStatus } from "../../../../../utils/status"
+
+import {
+	challengeStatus
+} from "../../../../../utils/status"
 
 import colors from "../../../../../utils/colors"
-
 
 type PropsUserInvitation = {
 	target: User | UserAuthenticate,
 	initialStatus: challengeStatus
-	idMsg : number,
-	idChan : number
+	idMsg: number,
+	idChan: number
 }
 
 function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvitation) {
 
-	// const [status, setStatus] = useState<challengeStatus>(initialStatus)
 	const { token, url } = useContext(AuthContext)!
-	const {userAuthenticate} = useContext(InteractionContext)!
-	
-	async function handleClickChallengeStatus(status : challengeStatus, idMsg: number, idChan : number) {
-		const sockets = await axios.get(`http://${url}:3333/channel/${idChan}/sockets`, {
-				headers: {
-						'Authorization': `Bearer ${token}`
-					} 
-				})
-		await axios.patch(`http://${url}:3333/channel/message/${idMsg}`, 
-		{ idMsg: idMsg , msgStatus : status},
-		{
-		headers: {
-			'Authorization': `Bearer ${token}`
-				}
-			}
-		);
-		userAuthenticate.socket?.emit('updateChallenge', sockets.data, idMsg, status, idChan);
-	}
+	const { userAuthenticate } = useContext(InteractionContext)!
 
 	return (
 		<Style>
@@ -60,7 +49,11 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 				initialStatus === challengeStatus.PENDING &&
 				<ButtonsWrapper>
 					<ButtonChallenge
-						onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan)}
+						onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan, {
+							userAuthenticate,
+							token,
+							url
+						})}
 						color={colors.buttonRed}>
 						Cancel
 					</ButtonChallenge>
