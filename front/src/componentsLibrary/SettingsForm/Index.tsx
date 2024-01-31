@@ -5,23 +5,25 @@ export const HorizontalSettingsForm = styled.form`
 
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	align-items: center;
 
 	width: 100%;
+	height: 100%;
 
-	margin-top: 10px;
-	margin-bottom: 20px;
+	margin-top: 1%;
+	margin-bottom: 2%;
 
 `
-
 
 export const HorizontalSetting = styled.div`
 
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	justify-content: space-between;
 
 	width: 100%;
+	height: 100%;
 
 	text-align: center;
 	font-size: 20px;
@@ -62,11 +64,12 @@ export const VerticalSetting = styled.div<{ $disable?: boolean }>`
 
 `
 
-export const VerticalSettingWrapper = styled.div`
+export const VerticalSettingWrapper = styled.div<{ $alignitems?: string }>`
 
 	display: flex;
 	flex-direction: column;
-	align-items: end;
+	align-items: ${(props) => props.$alignitems ? props.$alignitems : "center" };
+
 `
 
 export const ErrorMessage = styled.p<{ width?: number, fontSize?: number }>`

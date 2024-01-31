@@ -10,7 +10,7 @@ const InputText = styled.input<{ width?: number, fontSize?: number, $error?: boo
 
 	cursor: ${(props) => props.$disable && "default"};
 
-	font-size: ${(props) => props.fontSize && props.fontSize}px;
+	font-size: ${(props) => props.fontSize ? props.fontSize : props.width && props.width / 12}px;
 	text-align: center;
 
 	color : ${(props) => props.$disable && colors.textBlocked};

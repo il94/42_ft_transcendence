@@ -294,6 +294,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 		}
 	}
 
+	/* ========================================================================== */
+
 	return (
 		<Style>
 			<VerticalSettingsForm
@@ -311,8 +313,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							fontSize={16}
 							$error={name.error} />
 						<ErrorMessage
-							fontSize={10}
-							>
+							fontSize={10}>
 							{name.error && name.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>

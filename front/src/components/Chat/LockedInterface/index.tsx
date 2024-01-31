@@ -1,26 +1,31 @@
 import {
 	ChangeEvent,
-	Dispatch,
 	FormEvent,
-	SetStateAction,
 	useContext,
 	useState
 } from "react"
 import axios, { AxiosError } from "axios"
 
 import {
-	ErrorMessage,
-	Input,
-	Style,
-	Text
+	Style
 } from "./style"
 
 import Button from "../../../componentsLibrary/Button"
+import InputText from "../../../componentsLibrary/InputText"
+import {
+	ErrorMessage,
+	HorizontalSetting,
+	HorizontalSettingsForm,
+	VerticalSettingWrapper
+} from "../../../componentsLibrary/SettingsForm/Index"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
+	ErrorResponse,
+	SettingData,
 	UserAuthenticate
 } from "../../../utils/types"
 
@@ -28,26 +33,7 @@ function LockedInterface() {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
-
-	type PropsSetting = {
-		value: string,
-		error: boolean,
-		errorMessage?: string
-	}
-
-	const [password, setPassword] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-
-	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		setPassword({
-			value: value,
-			error: false
-		})
-	}
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -64,18 +50,21 @@ function LockedInterface() {
 				return
 			}
 
+			if (password.error)
+				return
+
 			await axios.post(`http://${url}:3333/channel/${channelTarget.id}/join`, {
-				password: password.value
+				hash: password.value
 			},
-			{
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 
 			setUserAuthenticate((prevState: UserAuthenticate) => ({
 				...prevState,
-				channels: [ ...prevState.channels, channelTarget]
+				channels: [...prevState.channels, channelTarget]
 			}))
 
 			setChannelTarget(() => ({
@@ -84,42 +73,71 @@ function LockedInterface() {
 			}))
 		}
 		catch (error) {
-			const axiosError = error as AxiosError
-
-			if (axiosError.response?.status === 403)
-			{
-				setPassword((prevState) => ({
-					...prevState,
-
-					error: true,
-					errorMessage: "Invalid password",
-				}))
+			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
 			}
-			// else
-			// 	setErrorRequest(true)
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
+	/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<SettingData>({
+		value: '',
+		error: false,
+		errorMessage: ''
+	})
+
+	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setPassword({
+			value: value,
+			error: false
+		})
+	}
+
+	function handleInputPasswordBlur() {
+		setPassword((prevState: SettingData) => ({
+			...prevState,
+			error: false
+		}))
+	}
+
+	/* ========================================================================== */
+
 	return (
-		<Style
-			onSubmit={handleSubmit}
-			autoComplete="off"
-			spellCheck="false">
-			<Text>
-				Password
-			</Text>
-			<Input
-				onChange={handleInputPasswordChange}
-				value={password.value as string}
-				$error={password.error} />
-			<ErrorMessage>
-				{password.error && password.errorMessage}
-			</ErrorMessage>
-			<Button
-				type="submit" width={200}
-				alt="Submit button" title="Submit">
-				Submit
-			</Button>
+		<Style>
+			<HorizontalSettingsForm
+				onSubmit={handleSubmit}
+				autoComplete="off"
+				spellCheck="false">
+				<HorizontalSetting>
+					Password
+					<VerticalSettingWrapper>
+						<InputText
+							onChange={handleInputPasswordChange}
+							onBlur={handleInputPasswordBlur}
+							value={password.value as string}
+							width={200}
+							$error={password.error} />
+						<ErrorMessage>
+							{password.error && password.errorMessage}
+						</ErrorMessage>
+					</VerticalSettingWrapper>
+				</HorizontalSetting>
+				<Button
+					type="submit" width={200}
+					alt="Submit button" title="Submit">
+					Submit
+				</Button>
+			</HorizontalSettingsForm>
 		</Style>
 	)
 }
