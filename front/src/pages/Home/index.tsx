@@ -5,8 +5,9 @@ import Cookies from "js-cookie"
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
+import { ErrorResponse } from '../../utils/types'
 
 import AuthContext from '../../contexts/AuthContext'
 
@@ -40,6 +41,10 @@ function Home() {
 			setToken(access_token)
 		}
 		else	setToken('')
+		const isNew: string | undefined = Cookies.get('isNew');
+		if (isNew) {
+			// TODO 
+		}
 	}, [])
 
 	async function handleDeconnexionClickText() {
@@ -52,13 +57,20 @@ function Home() {
 			Cookies.remove('access_token')
 			Cookies.remove('id')
 			Cookies.remove('two_FA')
-			//localStorage.removeItem('access_token')
+			Cookies.remove('isNew')
 			localStorage.clear();
 			setToken('')
 			navigate("/")
 		}
 		catch (error) {
-			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				console.log(error.message)
+				console.log(statusCode)
+			}
+			else
+				navigate("/error");
 		}
 	}
 
@@ -74,6 +86,7 @@ function Home() {
 					Welcome
 				</WindowTitle>
 				{
+					// TODO : isNew ? prompt settings form
 					token ?
 						<>
 							<LinkButton

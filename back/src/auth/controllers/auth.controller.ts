@@ -32,7 +32,6 @@ export class AuthController {
 	async signin(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response): 
 	Promise<{ access_token: string} | Partial<User>> {
 		try {
-			res.cookie("mon cookie", 'balbla')
 			type token = Partial<User> | { access_token: string }
 			const tok: token  = await this.authService.validateUser(dto);
 			if ('id' in tok)
@@ -60,20 +59,31 @@ export class AuthController {
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@getUser() user: User, @Res({ passthrough: true }) res: Response,
+	async handle42Redirect(@getUser() user: {user: User, isNew: boolean} | Partial<User> | User, 
+	@Res({ passthrough: true }) res: Response,
 	): Promise<void> {
 		try {
 			if (!user)
 				throw new BadRequestException("Can't find user from 42 intra");
-			const token = await this.authService.signToken(user.id, user.username);
-			if (!user.twoFA) {
+			if ('id' in user) { // utilisateur 42 connu
+				const token = await this.authService.signToken(user.id, user.username);
+				if (!user.twoFA) {
+					res.clearCookie('token', { httpOnly: true })
+					.cookie('isNew', false)
+					.cookie("access_token", token.access_token)
+					.redirect("http://localhost:5173")
+				}
+				res.cookie('two_FA', true)
+				.cookie('id', user.id)
+				.redirect(`http://localhost:5173/twofa`)	
+			}
+			if ('isNew' in user) {
+				const token = await this.authService.signToken(user.user.id, user.user.username);		
 				res.clearCookie('token', { httpOnly: true })
+				.cookie('isNew', true)
 				.cookie("access_token", token.access_token)
 				.redirect("http://localhost:5173")
 			}
-			res.cookie('two_FA', true)
-			.cookie('id', user.id)
-			.redirect(`http://localhost:5173/twofa`)	
 		} catch (error) {
 			throw new BadRequestException(error.message)
 		}

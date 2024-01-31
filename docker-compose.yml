@@ -55,5 +55,6 @@ volumes:
 
 networks:
   transcendence:
+    name: ft_transcendence
 
       

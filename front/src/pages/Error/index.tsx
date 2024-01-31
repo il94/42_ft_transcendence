@@ -12,8 +12,10 @@ import WindowTitle from '../../componentsLibrary/WindowTitle'
 function Error() {
 
 	useEffect(() => {
-		localStorage.removeItem("access_token")
+		localStorage.clear()
 		Cookies.remove("access_token")
+		Cookies.remove("id")
+		Cookies.remove('isNew')
 	}, [])
 
 	return (
