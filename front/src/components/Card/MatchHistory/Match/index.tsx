@@ -1,8 +1,14 @@
-import { Opponent, Style, Username } from "./style"
+import {
+	Opponent,
+	Style,
+	Username
+} from "./style"
 
 import Score from "./Score"
 
-import { matchResultStatus } from "../../../../utils/status"
+import {
+	matchResultStatus
+} from "../../../../utils/status"
 
 import colors from "../../../../utils/colors"
 

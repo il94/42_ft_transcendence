@@ -44,7 +44,7 @@ export const CloseButton = styled.div`
 
 `
 
-export const SettingsForm = styled.form`
+export const HorizontalSettingsForm = styled.form`
 
 	display: flex;
 	flex-direction: column;
@@ -54,7 +54,7 @@ export const SettingsForm = styled.form`
 
 `
 
-export const Setting = styled.div`
+export const HorizontalSetting = styled.div`
 
 	display: flex;
 	flex-direction: column;
@@ -86,9 +86,9 @@ export const ErrorMessage = styled.p`
 
 `
 
-export const TwoFAValue = styled.p<{ $error: boolean }>`
+export const TwoFAValue = styled.p`
 
-	border-bottom: 1px solid ${(props) => props.$error && colors.textError};
+	border-bottom: 1px solid;
 	text-align: center;
 
 	background-color: inherit;

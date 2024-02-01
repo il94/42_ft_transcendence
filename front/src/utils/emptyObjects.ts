@@ -24,7 +24,7 @@ export const emptyUserAuthenticate = {
 	phoneNumber: "",
 	twoFA: false,
 	friends: [],
-	blockedUsers: [],
+	blockeds: [],
 	channels: []
 }
 

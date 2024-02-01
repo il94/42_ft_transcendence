@@ -4,6 +4,7 @@ import {
 	useRef,
 	useState
 } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useMediaQuery } from 'react-responsive'
 import axios, { AxiosResponse } from 'axios'
 import { io } from 'socket.io-client'
@@ -17,6 +18,18 @@ import {
 	RightGameWrapper
 } from './style'
 
+import {
+	recieveChannelMP,
+	refreshDeleteChannel,
+	refreshLeaveChannel,
+	refreshUpdateChannel,
+	refreshUserStatus,
+	updateDiscussion,
+	refreshUserRole,
+	refreshNewOwner,
+	refreshJoinChannel
+} from './sockets'
+
 import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
@@ -27,11 +40,10 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
+import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
-import ErrorContextualMenu from '../../components/ContextualMenus/ErrorContextualMenu'
-
-import ErrorRequest from '../../componentsLibrary/ErrorRequest'
+import PopupError from '../../components/PopupError'
 
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
@@ -41,28 +53,26 @@ import InteractionContext from '../../contexts/InteractionContext'
 import AuthContext from '../../contexts/AuthContext'
 
 import {
-	updateUserInChannel,
-	userIsFriend,
-	userIsInChannel
-} from '../../utils/functions';
-
-import {
 	Channel,
 	User,
 	UserAuthenticate
 } from '../../utils/types'
+
 import {
 	chatWindowStatus,
-	contextualMenuStatus,
-	userStatus
+	contextualMenuStatus
 } from '../../utils/status'
-import { emptyUser, emptyUserAuthenticate } from '../../utils/emptyObjects'
+
+import {
+	emptyUser,
+	emptyUserAuthenticate
+} from '../../utils/emptyObjects'
 
 import breakpoints from '../../utils/breakpoints'
 
-import { TempContext, userSomeone } from '../../temp/temp'
-
 function Game() {
+
+	const { token, url } = useContext(AuthContext)!
 
 	function getSecondaryContextualMenuHeight(numberOfChannels: number) {
 		const maxHeight = window.innerHeight * 95 / 100 // taille max possible (height de la fenetre de jeu)
@@ -76,6 +86,8 @@ function Game() {
 	function closeContextualMenus() {
 		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)
+		if (popupError.display)
+			displayPopupError({ display: false, message: undefined })
 		if (searchBarResults)
 			displaySearchBarResults(false)
 	}
@@ -86,20 +98,18 @@ function Game() {
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
 
-	const { token, url } = useContext(AuthContext)!
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
+	const navigate = useNavigate()
 
 	useEffect(() => {
 
 		async function fetchFriends(): Promise<User[]> {
 			try {
-				const friends: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/friends`, {
+				const friendsResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/friends`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				return (friends.data)
+				return (friendsResponse.data)
 			}
 			catch (error) {
 				throw (error)
@@ -108,13 +118,13 @@ function Game() {
 
 		async function fetchBlockedUsers(): Promise<User[]> {
 			try {
-				const blockedUsers: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/blockeds`, {
+				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/blockeds`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
-				return (blockedUsers.data)
+				return (blockedUsersResponse.data)
 			}
 			catch (error) {
 				throw (error)
@@ -133,9 +143,9 @@ function Game() {
 					return {
 						...channel,
 						messages: [],
-						owner: undefined,
+						members: [],
 						administrators: [],
-						users: [],
+						owner: undefined,
 						mutedUsers: [],
 						banneds: [],
 						muteInfo: []
@@ -151,51 +161,50 @@ function Game() {
 
 		async function fetchMe() {
 			try {
-				const responseMe: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
+				setLoaderFriends(true)
+				setLoaderChannels(true)
+				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
-				})
-
+				})			
 				const friends: User[] = await fetchFriends()
-				const blockedUsers: User[] = await fetchBlockedUsers()
+				const blockeds: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
-
 				const socket = io(`http://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
-						id: responseMe.data.id,
+						id: meResponse.data.id,
 					}
 				});
-		
+
 				socket.on('connect_error', (error) => {
 					console.error('Erreur de connexion à la socket :', error.message);
 					throw new Error;
-				});	
+				});
 
 				setUserAuthenticate({
-					id: responseMe.data.id,
-					username: responseMe.data.username,
-					avatar: responseMe.data.avatar,
-					status: userStatus.ONLINE,
-					wins: responseMe.data.wins,
-					draws: responseMe.data.draws,
-					losses: responseMe.data.losses,
-					email: responseMe.data.email,
-					phoneNumber: responseMe.data.phoneNumber,
-					twoFA: responseMe.data.twoFA,
+					...meResponse.data,
 					friends: friends,
-					blockedUsers: blockedUsers,
+					blockeds: blockeds,
 					channels: channels,
 					socket: socket
 				})
+				setLoaderChannels(false)
+				setLoaderFriends(false)
 			}
 			catch (error) {
-				localStorage.removeItem('token')
-				setErrorRequest(true)
+				navigate("/error", {
+					state: {
+						disconnect: true
+					}
+				})
 			}
 		}
-		fetchMe()
+		if (!token)
+			navigate("/error")
+		else
+			fetchMe()
 	}, [])
 
 	useEffect(() => {
@@ -220,13 +229,16 @@ function Game() {
 	const [secondaryContextualMenu, displaySecondaryContextualMenu] = useState<boolean>(false)
 	const [secondaryContextualMenuPosition, setSecondaryContextualMenuPosition] = useState<{ left?: number; right?: number; top?: number; bottom?: number }>({ left: 0, right: 0, top: 0, bottom: 0 })
 	const [secondaryContextualMenuHeight, setSecondaryContextualMenuHeight] = useState<number>(0)
-	const [errorContextualMenu, displayErrorContextualMenu] = useState<boolean>(false)
+	
+	const [popupError, displayPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
 
 	const [searchBarResults, displaySearchBarResults] = useState<boolean>(false)
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
+	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
+	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
-	/* ============================ DISPLAY STATES ============================== */
+	/* =============================== DISPLAY ================================== */
 
 	const GameWrapperRef = useRef(null)
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
@@ -250,7 +262,13 @@ function Game() {
 		}
 		setZMaxIndex(Math.max(zCardIndex, zChatIndex, zSettingsIndex))
 	}, [zCardIndex, zChatIndex, zSettingsIndex])
-		
+
+	const [loaderChannels, setLoaderChannels] = useState<boolean>(false)
+	const [loaderChat, setLoaderChat] = useState<boolean>(false)
+	const [loaderFriends, setLoaderFriends] = useState<boolean>(false)
+	const [loaderResultsSearchBar, setLoaderResultsSearchBar] = useState<boolean>(false)
+	const [loaderMatchsHistory, setLoaderMatchsHistory] = useState<boolean>(false)
+
 	useEffect(() => {
 		window.addEventListener('resize', closeContextualMenus);
 
@@ -258,251 +276,191 @@ function Game() {
 			window.removeEventListener('resize', closeContextualMenus);
 		}
 	}, [])
-	
 
-/* ========================================================================== */
-
-
-async function refreshUserStatus(userId: number, newStatus: userStatus) {
-
-	console.log("REFRESH USER STATUS", userId)
+	/* ========================= DISPLAY WITH SOCKETS =========================== */
 
 
-	if (userId === userAuthenticate.id)
-	{
-		console.log("IS AUTH //////////")
-		setUserAuthenticate((prevState: UserAuthenticate) => {
-			return {
-				...prevState,
-				status: newStatus
-			}
-		})
-	}
-	else if (userIsFriend(userAuthenticate, userId)) 
-	{
-		console.log("IS FRIEND")
-		setUserAuthenticate((prevState: UserAuthenticate) => {
-			return {
-				...prevState,
-				friends: prevState.friends.map((friend) => {
-					if (friend.id === userId)
-					{
-						console.log("FRIEND FIND")
-						return {
-							...friend,
-							status: newStatus
-						}
-					}
-					else
-						return (friend)
-				})
-			}
-		})
-
-		if (channelTarget && userIsInChannel(channelTarget, userId))
-		{
-			setChannelTarget((prevState: Channel| undefined) => {
-				if (prevState)
-					return updateUserInChannel(prevState, userId, newStatus)
-			})
-		}
-	}
-}
-
-
-	async function refreshUpdateChannel(channelId: number, newDatas: any) {
-		setChannelTarget((prevState: Channel | undefined) => {
-			if (prevState)
-			{
-				return {
-					...prevState,
-					...newDatas
-				}
-			}
-			else
-				return (undefined)
-
-		});
-
-		setUserAuthenticate((prevState) => ({
-			...prevState,
-			channels: prevState.channels.map((channel) => {
-				if (channel.id === channelId)
-				{
-					return {
-						...channel,
-						...newDatas
-					}
-				}
-				else
-					return channel
-			})
-		}))
-	}
-
-	async function refreshDeleteChannel(channelId: number) {
-		setUserAuthenticate((prevState) => ({
-			...prevState,
-			channels: prevState.channels.filter((channel) => channel.id !== channelId)
-		}))
-		
-		setChannelTarget(undefined)
-	}
-
-	async function recieveChannelMP(channelId: number) {
-
-		const channelMPResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
-			headers: {
-				'Authorization': `Bearer ${token}`
-			}
-		})
-
-		setChannelTarget(channelMPResponse.data)
-
-		setUserAuthenticate((prevState) => ({
-			...prevState,
-			channels: [
-				...prevState.channels,
-				channelMPResponse.data
-			]
-		}))
-	}
-
-
+	// CHAT
 	useEffect(() => {
-		
-		userAuthenticate.socket?.on("updateUserStatus", refreshUserStatus);
 
-		userAuthenticate.socket?.on("updateChannel", refreshUpdateChannel);
-		userAuthenticate.socket?.on("deleteChannel", refreshDeleteChannel);
-		userAuthenticate.socket?.on("createChannelMP", recieveChannelMP);
+		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+
+		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
+			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
+			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
+
+
+			
+
+		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
+			refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
+
+
+
+		// console.log("CHANNEL TARGET = ", channelTarget)
+
+		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
+			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
+			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
+			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
+			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+		// userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
 
 		return () => {
 
-			userAuthenticate.socket?.off("updateUserStatus", refreshUserStatus);
-		
-			userAuthenticate.socket?.off("updateChannel", refreshUpdateChannel);
-			userAuthenticate.socket?.off("deleteChannel", refreshDeleteChannel);
-			userAuthenticate.socket?.off("createChannelMP", recieveChannelMP);
+			userAuthenticate.socket?.off("updateUserStatus")
+
+			userAuthenticate.socket?.off("updateChannel")
+			userAuthenticate.socket?.off("deleteChannel")
+
+
+
+
+
+			userAuthenticate.socket?.off("joinChannel")
+
+
+
+
+
+
+			userAuthenticate.socket?.off("updateDiscussion")
+			userAuthenticate.socket?.off("leaveChannel")
+			userAuthenticate.socket?.off("updateUserRole")
+			userAuthenticate.socket?.off("setNewOwner")
+			// userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
+		}
+
+	}, [userAuthenticate.socket, channelTarget])
+
+
+	// GAME
+	useEffect(() => {
+		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+
+		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
+			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
+			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("createChannelMP", (channelId: number, recipientId: number) =>
+			recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget, displayChat }))
+
+		// userAuthenticate.socket?.on("joinChannel2", (channelId: number, userId: number) =>
+		// 	refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
+
+		return () => {
+			userAuthenticate.socket?.off("updateUserStatus")
+
+			userAuthenticate.socket?.off("updateChannel")
+			userAuthenticate.socket?.off("deleteChannel")
+			userAuthenticate.socket?.off("createChannelMP")
+			// userAuthenticate.socket?.off("joinChannel2")
 		}
 
 	}, [userAuthenticate.socket])
 
-/* ========================================================================== */
+	/* ========================================================================== */
 
 	return (
-		<TempContext.Provider value={{ userSomeone }}>
-			<GamePage
-				onClick={closeContextualMenus}>
-				{
-					!errorRequest ?
-						<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-							<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, GameWrapperRef }}>
-								<GameWrapper ref={GameWrapperRef}>
-									{
-										contextualMenu.display &&
-										<ContextualMenu
-											type={contextualMenu.type}
-											displayContextualMenu={displayContextualMenu}
-											contextualMenuPosition={contextualMenuPosition}
-											userTarget={userTarget}
-											displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-											setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
-											secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-											displayErrorContextualMenu={displayErrorContextualMenu}
-											displayChat={displayChat} />
-									}
-									{
-										secondaryContextualMenu &&
-										<SecondaryContextualMenu
-											displaySecondaryContextualMenu={displaySecondaryContextualMenu}
-											userTarget={userTarget}
-											secondaryContextualMenuPosition={secondaryContextualMenuPosition}
-											secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-											channels={userAuthenticate.channels}
-											displayErrorContextualMenu={displayErrorContextualMenu} />
-									}
-									{
-										errorContextualMenu &&
-										<ErrorContextualMenu
-											displayErrorContextualMenu={displayErrorContextualMenu}
-											errorContextualMenuPosition={contextualMenuPosition} />
-									}
-									<LeftGameWrapper $social={social}>
-										<Logo social={social} />
+		<GamePage
+			onClick={closeContextualMenus}>
+			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, loaderChat, setLoaderChat, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, loaderChannels, setLoaderChannels, loaderFriends, setLoaderFriends, loaderResultsSearchBar, setLoaderResultsSearchBar, loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError, GameWrapperRef }}>
+					<GameWrapper ref={GameWrapperRef}>
+						{
+							contextualMenu.display &&
+							<ContextualMenu
+								type={contextualMenu.type}
+								contextualMenuPosition={contextualMenuPosition}
+								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+								setSecondaryContextualMenuPosition={setSecondaryContextualMenuPosition}
+								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
+								displayChat={displayChat} />
+						}
+						{
+							secondaryContextualMenu &&
+							<SecondaryContextualMenu
+								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
+								secondaryContextualMenuPosition={secondaryContextualMenuPosition}
+								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
+								channels={userAuthenticate.channels} />
+						}
+						{
+							popupError.display &&
+							<PopupError message={popupError.message}/>
+						}
+						<LeftGameWrapper $social={social}>
+							<Logo social={social} />
+							<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
+								<Social
+									social={social}
+									displaySocial={displaySocial}
+									friends={userAuthenticate.friends}
+									displayContextualMenu={displayContextualMenu}
+									setContextualMenuPosition={setContextualMenuPosition} />
+							</CardContext.Provider>
+						</LeftGameWrapper>
+						<RightGameWrapper>
+							<TopGameWrapper>
+								<SearchBarWrapper
+									searchBarResults={searchBarResults}
+									displaySearchBarResults={displaySearchBarResults}
+									displayChat={displayChat} />
+								<Profile
+									card={card}
+									displayCard={displayCard}
+									setCardPosition={setCardPosition}
+									settings={settings}
+									displaySettingsMenu={displaySettingsMenu} />
+							</TopGameWrapper>
+							<BottomGameWrapper>
+								{/* <PongWrapper social={social}/>  */}
+								<Pong />
+								{
+									card &&
+									<Card
+										cardPosition={cardPosition}
+										displayCard={displayCard} />
+								}
+								{
+									settings &&
+									<SettingsMenu
+										displaySettingsMenu={displaySettingsMenu}
+										displayTwoFAMenu={displayTwoFAMenu}
+										setTwoFACodeQR={setTwoFACodeQR} />
+								}
+								{
+									twoFAMenu &&
+									<TwoFaMenu
+										twoFAcodeQR={twoFAcodeQR} />
+								}
+								{/* <TestsBack /> */}
+								{
+									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-											<Social
-												social={social}
-												displaySocial={displaySocial}
-												friends={userAuthenticate.friends}
-												displayContextualMenu={displayContextualMenu}
-												setContextualMenuPosition={setContextualMenuPosition} />
+											<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+												<Chat
+													chat={chat}
+													displayChat={displayChat}
+													channels={userAuthenticate.channels}
+													chatWindowState={chatWindowState}
+													setChatWindowState={setChatWindowState} />
+											</ChatContext.Provider>
 										</CardContext.Provider>
-									</LeftGameWrapper>
-									<RightGameWrapper>
-										<TopGameWrapper>
-											<SearchBarWrapper
-												searchBarResults={searchBarResults}
-												displaySearchBarResults={displaySearchBarResults}
-												displayChat={displayChat} />
-											<Profile
-												userAuthenticate={userAuthenticate}
-												card={card}
-												setUserTarget={setUserTarget}
-												displayCard={displayCard}
-												setCardPosition={setCardPosition}
-												settings={settings}
-												displaySettingsMenu={displaySettingsMenu} />
-										</TopGameWrapper>
-										<BottomGameWrapper>
-											{/* <PongWrapper social={social}/>  */}
-											<Pong/>
-											{
-												card &&
-												<Card
-													cardPosition={cardPosition}
-													displayCard={displayCard}
-													userTarget={userTarget} />
-											}
-											{
-												settings &&
-												<SettingsMenu
-													token={token}
-													url={url}
-													userAuthenticate={userAuthenticate}
-													setUserAuthenticate={setUserAuthenticate}
-													displaySettingsMenu={displaySettingsMenu} />
-											}
-											<TestsBack />
-											{
-												<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
-													<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-														<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
-															<Chat
-																chat={chat}
-																displayChat={displayChat}
-																channels={userAuthenticate.channels}
-																setUserAuthenticate={setUserAuthenticate}
-																userTarget={userTarget}
-																channelTarget={channelTarget}
-																setChannelTarget={setChannelTarget}
-																chatWindowState={chatWindowState}
-																setChatWindowState={setChatWindowState}
-																userAuthenticate={userAuthenticate} />
-														</ChatContext.Provider>
-													</CardContext.Provider>
-												</ContextualMenuContext.Provider>
-											}
-										</BottomGameWrapper>
-									</RightGameWrapper>
-								</GameWrapper>
-							</DisplayContext.Provider>
-						</InteractionContext.Provider>
-						:
-						<ErrorRequest />
-				}
-			</GamePage>
-		</TempContext.Provider>
+									</ContextualMenuContext.Provider>
+								}
+							</BottomGameWrapper>
+						</RightGameWrapper>
+					</GameWrapper>
+				</DisplayContext.Provider>
+			</InteractionContext.Provider>
+		</GamePage>
 	)
 }
 

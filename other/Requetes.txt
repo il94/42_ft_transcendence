@@ -85,13 +85,13 @@ ContextualMenu/ :
 	}
 	A implementer, doit permettre d'inviter un user a jouer
 
--POST http://localhost:3333/user/me/blockedusers/:id :
+-POST http://localhost:3333/user/me/blockeds/:id :
 	A implementer, doit permettre d'ajouter un user dans la liste d'utilisateurs bloques du user authentifie
 
 -DELETE http://localhost:3333/user/me/friends/:id :
 	A implementer, doit permettre de supprimer un user de la liste d'amis du user authentifie
 
--DELETE http://localhost:3333/user/me/blockedusers/:id :
+-DELETE http://localhost:3333/user/me/blockeds/:id :
 	A implementer, doit permettre de supprimer un user de sa liste d'utilisateurs bloques 
 
 -POST http://localhost:3333/channel/:id/administrators/:id :

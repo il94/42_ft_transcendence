@@ -1,5 +1,14 @@
-import { contextualMenuStatus, userStatus } from "./status"
-import { Channel, User, UserAuthenticate } from "./types"
+import {
+	channelType,
+	contextualMenuStatus,
+	userStatus
+} from "./status"
+
+import {
+	Channel,
+	User,
+	UserAuthenticate
+} from "./types"
 
 import DefaultBlackAvatar from "../assets/default_black.png"
 import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -59,7 +68,7 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 
 	if (type === contextualMenuStatus.CHAT && channel)
 	{
-		if (channel.owner?.id === userAuthenticate.id)
+		if (userIsOwner(channel, userAuthenticate.id))
 		{
 			// Upgrade / Downgrade section
 			// Mute / Unmute section
@@ -77,8 +86,13 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 			// Mute / Unmute section
 			// Kick section
 			// Ban section
-			if (userIsMember(channel, userTarget.id))
+			if (userIsMember(channel, userTarget.id)
+				|| userIsAdministrator(channel, userTarget.id))
 				size += sectionSize * 3
+
+			// Unban section
+			else if (userIsBanned(channel, userTarget.id))
+				size += sectionSize
 		}
 	}
 
@@ -128,8 +142,23 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
+export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | undefined {
+	return (
+		userAuthenticate.channels.find((channel) => (
+		channel.name === recipientName && channel.type === channelType.MP))
+	)
+}
+
 export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number): boolean {
-	return (!!userAuthenticate.friends.some((friend) => friend.id === userId))
+	return (
+		!!userAuthenticate.friends.some((friend) => friend.id === userId)
+	)
+}
+
+export function userIsBlocked(userAuthenticate: UserAuthenticate, userId: number): boolean {
+	return (
+		!!userAuthenticate.blockeds.some((friend) => friend.id === userId)
+	)
 }
 
 export function userIsInChannel(channel: Channel, userId: number): boolean {
@@ -142,13 +171,13 @@ export function userIsInChannel(channel: Channel, userId: number): boolean {
 
 export function userIsMember(channel: Channel, userId: number): boolean {
 	return (
-		channel.members.some((member) => member.id === userId)
+		!!channel.members.some((member) => member.id === userId)
 	)
 }
 
 export function userIsAdministrator(channel: Channel, userId: number): boolean {
 	return (
-		channel.administrators.some((administrator) => administrator.id === userId)
+		!!channel.administrators.some((administrator) => administrator.id === userId)
 	)
 }
 
@@ -160,7 +189,31 @@ export function userIsOwner(channel: Channel, userId: number): boolean {
 
 export function userIsBanned(channel: Channel, userId: number): boolean {
 	return (
-		channel.banneds.some((banned) => banned.id === userId)
+		!!channel.banneds.some((banned) => banned.id === userId)
+	)
+}
+
+export function channelIsPublic(channel: Channel): boolean {
+	return (
+		channel.type === channelType.PUBLIC
+	)
+}
+
+export function channelIsProtected(channel: Channel): boolean {
+	return (
+		channel.type === channelType.PROTECTED
+	)
+}
+
+export function channelIsPrivate(channel: Channel): boolean {
+	return (
+		channel.type === channelType.PRIVATE
+	)
+}
+
+export function channelIsMP(channel: Channel): boolean {
+	return (
+		channel.type === channelType.MP
 	)
 }
 
@@ -200,5 +253,62 @@ export function updateUserInChannel(channel: Channel, userId: number, newStatus:
 		owner: channel.owner?.id === userId ? channel.owner as User : {
 			...(channel.owner as User), status: newStatus
 		}
+	}
+}
+
+
+export function setUserToMember(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyMember = userIsMember(channel, user.id)
+	const members = isAlreadyMember ? channel.members : [ ...channel.members, user ]
+
+	return {
+		...channel,
+		members: members,
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id)
+	}
+}
+
+export function setUserToAdministrator(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyAdministrator = userIsAdministrator(channel, user.id)
+	const administrators = isAlreadyAdministrator ? channel.administrators : [ ...channel.administrators, user ]
+
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== user.id),
+		administrators: administrators
+	}
+}
+
+export function setUserToOwner(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyOwner = userIsOwner(channel, user.id)
+	const owner = isAlreadyOwner ? channel.owner : user
+
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== user.id),
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
+		owner: owner
+	}
+}
+
+export function setUserToBanned(channel: Channel, user: User | UserAuthenticate): Channel {
+	const isAlreadyBanned = userIsBanned(channel, user.id)
+	const banneds = isAlreadyBanned ? channel.banneds : [ ...channel.banneds, user ]
+
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== user.id),
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
+		banneds: banneds
+	}
+}
+
+export function removeUserInChannel(channel: Channel, userId: number): Channel {
+	return {
+		...channel,
+		members: channel.members.filter((member) => member.id !== userId),
+		administrators: channel.members.filter((member) => member.id !== userId),
+		owner: channel.owner?.id === userId ? undefined : channel.owner,
+		banneds: channel.banneds.filter((banned) => banned.id !== userId),
 	}
 }

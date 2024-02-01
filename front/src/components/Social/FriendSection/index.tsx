@@ -19,14 +19,23 @@ import CardContext from "../../../contexts/CardContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import DisplayContext from "../../../contexts/DisplayContext"
 
-import { capitalize, getContextualMenuHeight } from "../../../utils/functions"
+import {
+	capitalize,
+	getContextualMenuHeight,
+	userIsBlocked
+} from "../../../utils/functions"
 
-import { User } from "../../../utils/types"
-import { contextualMenuStatus, userStatus } from "../../../utils/status"
+import {
+	User
+} from "../../../utils/types"
+
+import {
+	contextualMenuStatus,
+	userStatus
+} from "../../../utils/status"
 
 type PropsFriendSection = {
 	friend: User,
-	backgroundColor: string,
 	social: boolean,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
@@ -39,10 +48,10 @@ type PropsFriendSection = {
 	}>>
 }
 
-function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ friend, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
-	const { card, displayCard, setCardPosition } = useContext(CardContext)!
 	const { userTarget, setUserTarget, userAuthenticate } = useContext(InteractionContext)!
+	const { card, displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
 	const friendContainerRef: RefObject<HTMLElement> = useRef(null)
 
@@ -97,15 +106,14 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 		event.preventDefault();
 	}
 
-	const isBlocked = userAuthenticate.blockedUsers.some((blockedUsers) => blockedUsers.id === friend.id)
-
 	return (
 		<Style
 			onClick={showCard}
 			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
-			$backgroundColor={backgroundColor}
-			$isBlocked={isBlocked}
+			tabIndex={0}
+			$id={friend.id}
+			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
 			<Avatar src={friend.avatar} />
 			{

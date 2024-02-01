@@ -1,7 +1,10 @@
-import { useContext, useEffect } from "react"
-// import axios from "axios"
+import {
+	useContext
+} from "react"
 
-import { Style } from "./style"
+import {
+	Style
+} from "./style"
 
 import ContactText from "./ContactText"
 import UserText from "./UserText"
@@ -12,19 +15,20 @@ import UserInvitation from "./UserInvitation"
 import ChatContext from "../../../../contexts/ChatContext"
 import InteractionContext from "../../../../contexts/InteractionContext"
 
-import { Channel, MessageInvitation, MessageText } from "../../../../utils/types"
-import { messageStatus } from "../../../../utils/status"
-import OtherInvitation from "./ContactInvitation copy"
+import {
+	MessageInvitation,
+	MessageText
+} from "../../../../utils/types"
 
-type PropsDiscussion = {
-	channel: Channel
-}
+import {
+	messageType
+} from "../../../../utils/status"
 
-function Discussion({ channel } : PropsDiscussion) {
+function Discussion() {
 
-	const { userAuthenticate } = useContext(InteractionContext)!
-
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 	const { chatRender, setChatRender } = useContext(ChatContext)!
+
 	return (
 		<Style>
 			{
@@ -35,46 +39,50 @@ function Discussion({ channel } : PropsDiscussion) {
 					}}
 					activeState>
 					{
-						channel.messages.map((message, index) => (
+						// Mappage des messages
+						channelTarget?.messages.map((message, index) => (
+
+							// Si l'auteur du message est le user auth
 							message.sender.id === userAuthenticate.id ?
-								message.type === messageStatus.TEXT ?
+
+								// Si le message est un message textuel
+								message.type === messageType.TEXT ?
 									<UserText
 										key={"message" + index} // a definir
 										content={(message as MessageText).content}
 									/>
+
+									// Si le message est une invitation
 									:
 									<UserInvitation
 										key={"message" + index} // a definir
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}
 										idMsg={(message as MessageInvitation).id}
-										idChan={(channel.id)}
+										idChan={(channelTarget.id)}
 									/>
+
+								// Si l'auteur du message n'est pas le user auth
 								:
 
-								message.type === messageStatus.TEXT ?
+								// Si le message est un message textuel
+								message.type === messageType.TEXT ?
 									<ContactText
 										key={"message" + index} // a definir
 										sender={message.sender}
 										content={(message as MessageText).content}
 									/>
+
+									// Si le message est une invitation
 									:
-									// (message as MessageInvitation).target.id === userAuthenticate.id ?
-										<ContactInvitation
-											key={"message" + index} // a definir
-											sender={message.sender}
-											target={(message as MessageInvitation).target}
-											initialStatus={(message as MessageInvitation).status}
-											idMsg={(message as MessageInvitation).id}
-											idChan={(channel.id)}
-										/>
-									// :
-									// 	<OtherInvitation
-									// 		key={"message" + index} // a definir
-									// 		sender={message.sender}
-									// 		target={(message as MessageInvitation).target}
-									// 		initialStatus={(message as MessageInvitation).status}
-									// 	/>
+									<ContactInvitation
+										key={"message" + index} // a definir
+										sender={message.sender}
+										target={(message as MessageInvitation).target}
+										initialStatus={(message as MessageInvitation).status}
+										idMsg={(message as MessageInvitation).id}
+										idChan={(channelTarget.id)}
+									/>
 						))
 					}
 					<div style={{ marginTop: "3px" }} />

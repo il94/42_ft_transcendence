@@ -26,6 +26,12 @@ enum RequestStatus {
   FINISHED
 }
 
+enum GameStatus {
+  PENDING
+  PLAYING
+  FINISHED
+}
+
 enum Role {
   MEMBER
   ADMIN
@@ -111,7 +117,7 @@ model Channel {
   name        String
   avatar      String
   type        ChannelStatus
-  password    String?
+  hash		  String?
   invitation  Invitation[]
 
   users       UsersOnChannels[]
@@ -124,6 +130,7 @@ model Game {
   players     UsersOnGames[]
   invitation  Invitation[] 
   level       Int
+  status      GameStatus
 }
 
 // relation 1-m user-invitation channel-invitation game-invitation

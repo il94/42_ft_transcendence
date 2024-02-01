@@ -6,40 +6,54 @@ import {
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
-// import axios, { AxiosError } from 'axios'
-
-import {
-	SigninPage,
-	MainTitle,
-	CentralWindow,
-	StyledTitle,
-	SettingsForm,
-	Setting,
-	ErrorMessage
-} from './style'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import Cookies from "js-cookie"
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
 import InputText from '../../componentsLibrary/InputText'
-import ErrorRequest from '../../componentsLibrary/ErrorRequest'
+import Page from '../../componentsLibrary/Page'
+import MainTitle from '../../componentsLibrary/MainTitle'
+import WindowTitle from '../../componentsLibrary/WindowTitle'
+import CentralWindow from '../../componentsLibrary/CentralWindow'
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
 
-import colors from '../../utils/colors'
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
+
+type PropsTwoFAResponse = {
+	access_token: string
+}
 
 function TwoFA() {
+
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { token /*, setToken */ } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
+      
+	useEffect(() => {
+		const id: string | undefined = Cookies.get('id')
+		if (id)
+			setToken(id);
+	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (code.value.length === 0)
-			{
+			if (code.value.length === 0) {
 				setCode({
 					value: '',
 					error: true,
@@ -47,27 +61,36 @@ function TwoFA() {
 				})
 				return
 			}
-
-			/* ============ Temporaire ============== */
 			
-			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`, code)
-	
-			// setToken(response.data.access_token)
-			// localStorage.setItem('token', response.data.access_token)
+			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
+			 
+			setToken(response.data.access_token)
 
-			/* ====================================== */
-			
-			navigate("/game")
+
+
+			localStorage.setItem("access_token", twoFAResponse.data.access_token)
+			navigate("/")
 		}
 		catch (error) {
-			//temporaire
-			// checker si l'erreur vient d'un code invalide ou du serveur
-			setErrorRequest(true)
-			localStorage.removeItem('token')
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				if (statusCode === 403) {
+					setCode((prevState: SettingData) => ({
+						...prevState,
+						error: true,
+						errorMessage: "Wrong code"
+					}))
+				}
+				else
+					navigate("/error");
+			}
+			else
+				navigate("/error");
 		}
 	}
 
-/* ================================ CODE =================================== */
+	/* ================================ CODE =================================== */
 
 	const [code, setCode] = useState<SettingData>(emptySetting)
 
@@ -79,50 +102,26 @@ function TwoFA() {
 		})
 	}
 
-/* ========================================================================== */
-
-	useEffect(() => {
-		async function sendCode() {
-			try {
-				
-				/* ============ Temporaire ============== */
-				
-				// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
-	
-				/* ====================================== */
-			}
-			catch (error) {
-				setErrorRequest(true)
-			}
-		}
-		sendCode()
-	}, [])
-
-	useEffect(() => {
-		if (token)
-			setErrorRequest(true)
-	}, [])
+	/* ========================================================================== */
 
 	return (
-		<SigninPage>
+		<Page>
 			<MainTitle>
 				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
 			<CentralWindow>
-			{
-				!errorRequest ?
-				<>
-					<StyledTitle>
-						TwoFA
-					</StyledTitle>
-					<SettingsForm
-						onSubmit={handleSubmit}
-						autoComplete="off"
-						spellCheck="false">
-						<Setting>
-							Enter the temporary code received 
+				<WindowTitle>
+					TwoFA
+				</WindowTitle>
+				<HorizontalSettingsForm
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					spellCheck="false">
+					<HorizontalSetting>
+						<VerticalSettingWrapper>
+							Enter the six-digit code from Google Authenticator to secure your authentication
 							<InputText
 								onChange={handleInputCodeChange}
 								type="text" value={code.value}
@@ -132,23 +131,17 @@ function TwoFA() {
 							<ErrorMessage>
 								{code.error && code.errorMessage}
 							</ErrorMessage>
-						</Setting>
-						<div style={{ marginTop: "10px" }} />
-						<Button
-							type="submit" fontSize={35}
-							alt="Continue button" title="Continue">
-							Continue
-						</Button>
-					</SettingsForm>
-					<StyledLink to="/signin" color={colors.button}>
-						Back
-					</StyledLink>
-				</>
-				:
-				<ErrorRequest />
-			}
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<div style={{ height: "10px" }} />
+					<Button
+						type="submit" fontSize={35}
+						alt="Continue button" title="Continue">
+						Continue
+					</Button>
+				</HorizontalSettingsForm>
 			</CentralWindow>
-		</SigninPage>
+		</Page>
 	)
 }
 

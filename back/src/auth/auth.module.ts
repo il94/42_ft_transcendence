@@ -5,12 +5,10 @@ import { UsersService } from './services/users.service';
 import { PrismaModule } from "src/prisma/prisma.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy, LocalStrategy } from './strategy';
-import { Api42Strategy } from "./strategy/api42.strategy";
+import { Jwt2faStrategy, JwtStrategy, Api42Strategy } from './strategy';
 import { SessionSerializer } from "./Serializer";
 import { UsersController } from "./controllers/users.controller";
-import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
-import { APP_GUARD } from '@nestjs/core';
+import { Api42AuthGuard, JwtGuard, TwoFAGuard } from "./guards/auth.guard";
 import { HttpModule } from "@nestjs/axios";
 import { AppGateway } from "src/app.gateway";
 
@@ -20,7 +18,7 @@ import { AppGateway } from "src/app.gateway";
 		JwtModule.registerAsync({
 			useFactory: async () => ({
 			  secret: process.env.JWT_SECRET,
-			  signOptions: { expiresIn: '1h' },
+			  signOptions: { expiresIn: '1d' },
 			}),
 		}),
 		PassportModule.register({ defaultStrategy: '42' }),
@@ -28,15 +26,14 @@ import { AppGateway } from "src/app.gateway";
 	],
 	providers: [JwtStrategy, 
 		Api42Strategy,
-		//LocalStrategy,
+		Jwt2faStrategy,
 		AuthService, 
 		UsersService, 
 		SessionSerializer, 
 		Api42AuthGuard,
 		JwtGuard,
+		TwoFAGuard,
 		AppGateway
-		//{	provide: APP_GUARD,
-		//	useClass: JwtGuard, },
 	],
 		
 	controllers: [AuthController, UsersController],

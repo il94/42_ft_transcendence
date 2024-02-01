@@ -2,61 +2,83 @@ import {
 	ChangeEvent,
 	FormEvent,
 	useContext,
+	useEffect,
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
-
-import {
-	SigninPage,
-	MainTitle,
-	CentralWindow,
-	StyledTitle,
-	SettingsForm,
-	Setting,
-	FTRedirectWrapper,
-	Separator,
-	Line,
-	TextSeparator,
-	ErrorMessage
-} from './style'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
 import LinkButtonImage from '../../componentsLibrary/LinkButtonImage'
 import InputText from '../../componentsLibrary/InputText'
-import ErrorRequest from '../../componentsLibrary/ErrorRequest'
+import Page from '../../componentsLibrary/Page'
+import MainTitle from '../../componentsLibrary/MainTitle'
+import CentralWindow from '../../componentsLibrary/CentralWindow'
+import WindowTitle from '../../componentsLibrary/WindowTitle'
+import Separator from '../../componentsLibrary/Separator/Index'
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
 
+const FTRedirectWrapper = styled.div`
+
+	display: flex;
+	align-items: center;
+
+	padding-bottom: 15px;
+
+	text-align: center;
+
+`
+
+type PropsSigninResponse = {
+	access_token: string
+} | {
+	twoFA: boolean
+}
+
 function Signin() {
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (token)
+			navigate("/error")
+	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (login.value.length === 0 ||
-				password.value.length === 0)
-			{
-				if (login.value.length === 0)
-				{
-					setLogin({
+			if (email.value.length === 0 ||
+				password.value.length === 0) {
+				if (email.value.length === 0) {
+					setEmail({
 						value: '',
 						error: true,
-						errorMessage: "Insert username or email",
+						errorMessage: "Insert email",
 					})
 				}
-				if (password.value.length === 0) 
-				{
+				if (password.value.length === 0) {
 					setPassword({
 						value: '',
 						error: true,
@@ -65,91 +87,76 @@ function Signin() {
 				}
 				return
 			}
-			if (login.error || password.error)
+			if (email.error || password.error)
 				return
 
 			const user = {
-				username: login.value,
+				email: email.value,
 				hash: password.value
 			}
-			
-			const response = await axios.post(`http://${url}:3333/auth/signin`, user)
-	
-			//temporaire
-			if (response.data.twoFA)
-				navigate("/twofa")
-			else
-			{
-				setToken(response.data.access_token)
-				localStorage.setItem('token', response.data.access_token)
-				
+
+			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
+
+
+			if ('twoFA' in signinResponse.data) {
+				Cookies.remove('id');
+				Cookies.set("id", signinResponse.data.id);
+				navigate("/twofa")	
+			}
+			else {
+				const access_token: string = signinResponse.data.access_token;
+				if (access_token) {
+					localStorage.setItem('access_token', access_token)
+					setToken(access_token)
+				}
+				else { 
+					throw new Error
+				}
 				navigate("/")
 			}
 		}
 		catch (error) {
-			const axiosError = error as AxiosError
-
-			// if (axiosError.response?.status === 404)
-
-			// temporaire
-			if ((axiosError.response?.data as any)?.message === "user not found")
-			{
-				setLogin((prevState) => ({
-					...prevState,
-					error: true,
-					errorMessage: "User not found",
-				}))
-			}
-
-			// else if (axiosError.response?.status === 401)
-			
-			// temporaire
-			else if ((axiosError.response?.data as any)?.message === "incorrect password")
-			{
-				setPassword((prevState) => ({
-					...prevState,
-					error: true,
-					errorMessage: "Incorrect password",
-				}))
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404) {
+					setEmail((prevState: SettingData) => ({
+						...prevState,
+						error: true,
+						errorMessage: "Invalid email"
+					}))
+				}
+				else
+					navigate("/error");
 			}
 			else
-			{
-				setErrorRequest(true)
-				localStorage.removeItem('token')
-			}
+				navigate("/error");
 		}
 	}
 
-	// async function connectionBy42() {
-	// 	try {
+	/* ================================ EMAIL =================================== */
 
-	// 		const test = await axios.get(`http://${url}:3333/auth/api42`)
-			
-	// 		console.log(test)
-			
-	// 		setToken(test.data.access_token)
-	// 		localStorage.setItem('token', test.data.access_token)
-			
-	// 		navigate("/game")
-	// 	}
-	// 	catch (error) {
-	// 		console.log(error)
-	// 	}
-	// }
+	const [email, setEmail] = useState<SettingData>(emptySetting)
 
-/* ================================ LOGIN =================================== */
-
-	const [login, setLogin] = useState<SettingData>(emptySetting)
-
-	function handleInputLoginChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setLogin({
-			value: value,
-			error: false
-		})
+
+		if (value.endsWith("@student.42.fr")) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Cannot signin with 42 email"
+			})
+		}
+		else {
+			setEmail({
+				value: value,
+				error: false
+			})
+		}
 	}
 
-/* ============================== PASSWORD ================================== */
+	/* ============================== PASSWORD ================================== */
 
 	const [password, setPassword] = useState<SettingData>(emptySetting)
 
@@ -163,40 +170,40 @@ function Signin() {
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
-/* ========================================================================== */
+	/* ========================================================================== */
 
 	return (
-		<SigninPage>
+		<Page>
 			<MainTitle>
 				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
 			<CentralWindow>
-			{
-				!errorRequest ?
-				<>
-					<StyledTitle>
-						Sign in
-					</StyledTitle>
-					<SettingsForm
-						onSubmit={handleSubmit}
-						autoComplete="off"
-						spellCheck="false">
-						<Setting>
-							Login or email
+				<WindowTitle>
+					Sign in
+				</WindowTitle>
+				<HorizontalSettingsForm
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					spellCheck="false">
+					<HorizontalSetting>
+						Email
+						<VerticalSettingWrapper>
 							<InputText
-								onChange={handleInputLoginChange}
-								type="text" value={login.value}
+								onChange={handleInputEmailChange}
+								type="text" value={email.value}
 								width={231}
 								fontSize={25}
-								$error={login.error} />
+								$error={email.error} />
 							<ErrorMessage>
-								{login.error && login.errorMessage}
+								{email.error && email.errorMessage}
 							</ErrorMessage>
-						</Setting>
-						<Setting>
-							Password
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<HorizontalSetting>
+						Password
+						<VerticalSettingWrapper>
 							<InputText
 								onChange={handleInputPasswordChange}
 								type={showPassword ? "text" : "password"}
@@ -211,6 +218,7 @@ function Signin() {
 								onClick={() => setShowPassword(!showPassword)}
 								type="button"
 								fontSize={18}
+								width={231}
 								alt="Show password button"
 								title={showPassword ? "Hide password" : "Show password"}
 								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
@@ -221,39 +229,30 @@ function Signin() {
 										"Show password"
 								}
 							</Button>
-						</Setting>
-						<div style={{ marginTop: "10px" }} />
-						<Button
-							type="submit" fontSize={35}
-							alt="Continue button" title="Continue">
-							Continue
-						</Button>
-					</SettingsForm>
-					<div>
-						Don't have an account?&nbsp;
-						<StyledLink to="/signup" color={colors.button}>
-							Sign up
-						</StyledLink>
-					</div>
-					<Separator>
-						<Line />
-						<TextSeparator>
-							OR
-						</TextSeparator>
-						<Line />
-					</Separator>
-					<FTRedirectWrapper>
-						<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
-							<img src={FTButton} style={{ paddingRight: "7px" }} />
-							Continue with 42
-						</LinkButtonImage>
-					</FTRedirectWrapper>
-				</>
-				:
-				<ErrorRequest />
-			}
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<div style={{ marginTop: "10px" }} />
+					<Button
+						type="submit" fontSize={35}
+						alt="Continue button" title="Continue">
+						Continue
+					</Button>
+				</HorizontalSettingsForm>
+				<div>
+					Don't have an account?&nbsp;
+					<StyledLink to="/signup" color={colors.button}>
+						Sign up
+					</StyledLink>
+				</div>
+				<Separator />
+				<FTRedirectWrapper>
+					<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
+						<img src={FTButton} style={{ paddingRight: "7px" }} />
+						Continue with 42
+					</LinkButtonImage>
+				</FTRedirectWrapper>
 			</CentralWindow>
-		</SigninPage>
+		</Page>
 	)
 }
 

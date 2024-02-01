@@ -7,14 +7,14 @@ import {
 	useEffect,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 import {
-	Setting,
+	HorizontalSetting,
 	SettingTtile,
 	Style,
 	CloseButtonWrapper,
-	SettingsForm,
+	HorizontalSettingsForm,
 	ErrorMessage,
 	TwoFAValue
 } from "./style"
@@ -26,91 +26,46 @@ import InputText from "../../componentsLibrary/InputText"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
 
 import DisplayContext from "../../contexts/DisplayContext"
+import InteractionContext from "../../contexts/InteractionContext"
+import AuthContext from "../../contexts/AuthContext"
 
-import { UserAuthenticate } from "../../utils/types"
+import {
+	ErrorResponse,
+	SettingData
+} from "../../utils/types"
+
+import {
+	emptySetting
+} from "../../utils/emptyObjects"
 
 import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
-	token: string,
-	url: string,
-	userAuthenticate: UserAuthenticate,
-	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
-	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
+	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
+	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
+	setTwoFACodeQR: Dispatch<SetStateAction<string>>
 }
 
-function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu }: PropsSettingsMenu) {
+function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
 
-	type PropsSetting = {
-		value: string,
-		error: boolean,
-		errorMessage?: string
-	}
+	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
 
-	type PropsTwoFA = {
-		value: boolean,
-		error: boolean,
-		errorMessage?: string
-	}
-
-	const [username, setUsername] = useState<PropsSetting>({
-		value: userAuthenticate.username,
-		error: false,
-		errorMessage: ''
-	})
-	const [password, setPassword] = useState<PropsSetting>({
-		value: '',
-		error: false,
-		errorMessage: ''
-	})
-	const [email, setEmail] = useState<PropsSetting>({
-		value: userAuthenticate.email,
-		error: false,
-		errorMessage: ''
-	})
-	const [phoneNumber, setPhoneNumber] = useState<PropsSetting>({
-		value: userAuthenticate.phoneNumber,
-		error: false,
-		errorMessage: ''
-	})
-	const [twoFA, setTwoFA] = useState<PropsTwoFA>({
-		value: userAuthenticate.twoFA,
-		error: false,
-		errorMessage: ''
-	})
-	const [avatar, setAvatar] = useState<string>(userAuthenticate.avatar)
-
-
-	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
 		try {
+
+			console.log("SUBMIT")
+
 			event.preventDefault()
-			if (username.error ||
-				password.error ||
-				email.error ||
-				phoneNumber.error)
-				return
 
-			const newDatas: any = {
-				username: username.value !== userAuthenticate.username ? username.value : undefined,
-				avatar: avatar !== userAuthenticate.avatar ? avatar : undefined,
-				hash: password.value ? password.value : undefined,
-				email: email.value !== userAuthenticate.email ? email.value : undefined,
-				phoneNumber: phoneNumber.value !== userAuthenticate.phoneNumber ? phoneNumber.value : undefined,
-				twoFA: twoFA.value !== userAuthenticate.twoFA ? twoFA.value : undefined,
-			}
-
-			await axios.patch(`http://${url}:3333/user/${userAuthenticate.id}`, newDatas,
+			await axios.patch(`http://${url}:3333/auth/2fa/enable`, {
+				twoFACode: QRcodeValue
+			},
 			{
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-
-			setUserAuthenticate((prevState) => ({
-				...prevState,
-				...newDatas,
-			}))
-			displaySettingsMenu(false)
 		}
 		catch (error) {
 
@@ -120,49 +75,138 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 		}
 	}
 
-	/* ============================== USERNAME ================================== */
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		try {
 
-	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		if (value.length > 8) {
-			setUsername((prevState) => ({
-				...prevState,
-				error: true,
-				errorMessage: "8 characters max"
-			}))
-		}
-		else if (!/^[a-zA-Z0-9-_.]*$/.test(value)) {
-			setUsername((prevState) => ({
-				...prevState,
-				error: true,
-				errorMessage: "Username can't contain special characters",
-			}))
-		}
-		else {
-			if (value.length === 0) {
-				setUsername({
-					value: value,
-					error: true,
-					errorMessage: "Insert username",
-				})
+			event.preventDefault()
+			if (username.value.length === 0 ||
+				email.value.length === 0 ||
+				phoneNumber.value.length === 0) {
+				if (username.value.length === 0) {
+
+					setUsername({
+						value: '',
+						error: true,
+						errorMessage: "Insert username",
+					})
+				}
+				if (email.value.length === 0) {
+					setEmail({
+						value: '',
+						error: true,
+						errorMessage: "Insert email",
+					})
+				}
+				if (phoneNumber.value.length === 0) {
+					setPhoneNumber({
+						value: '',
+						error: true,
+						errorMessage: "Insert phone number",
+					})
+				}
+				return
 			}
-			else {
-				setUsername({
-					value: value,
-					error: false
+
+			if (username.error || password.error || email.error || phoneNumber.error)
+				return
+
+			const newDatas: any = {}
+
+			if (username.value !== userAuthenticate.username)
+				newDatas.username = username.value
+			if (password.value)
+				newDatas.hash = password.value
+			if (email.value !== userAuthenticate.email)
+				newDatas.email = email.value
+			if (phoneNumber.value !== userAuthenticate.phoneNumber)
+				newDatas.phoneNumber = phoneNumber.value
+			if (twoFA !== userAuthenticate.twoFA)
+				newDatas.twoFA = twoFA
+			if (avatar !== userAuthenticate.avatar)
+				newDatas.avatar = avatar
+
+			if (Object.keys(newDatas).length !== 0)
+			{
+				await axios.patch(`http://${url}:3333/user/${userAuthenticate.id}`, newDatas,
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
 				})
+				
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					...newDatas,
+				}))
 			}
+
+			displaySettingsMenu(false)
+		}
+		catch (error) {
+			if (axios.isAxiosError(error))
+			{
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				if (statusCode === 409)
+				{
+					setEmail((prevState: SettingData) => ({
+						...prevState,
+						error: true,
+						errorMessage: "Invalid email"
+					}))
+				}
+				// else
+					// setErrorRequest(true)
+			}
+			// else
+				// setErrorRequest(true)
 		}
 	}
 
-	function handleInputUsernameBlur(event: ChangeEvent<HTMLInputElement>) {
+	/* ============================== USERNAME ================================== */
+
+	const [username, setUsername] = useState<SettingData>({
+		value: userAuthenticate.username,
+		error: false,
+		errorMessage: ''
+	})
+
+	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
 		if (value.length === 0) {
 			setUsername({
 				value: value,
 				error: true,
-				errorMessage: "Insert username",
+				errorMessage: "Username cannot be empty"
 			})
+		}
+		else if (value.length > 8) {
+			setUsername((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username must not exceed 8 characters"
+			}))
+		}
+		else if (/\d/.test(value)) {
+			setUsername((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username must not contain digits",
+			}))
+		}
+		else if (/[A-Z]/.test(value)) {
+			setUsername((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username must not contain uppercase",
+			}))
+		}
+		else if (!/^[a-z]+$/.test(value)) {
+			setUsername((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Username can't contain special characters",
+			}))
 		}
 		else {
 			setUsername({
@@ -172,14 +216,57 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 		}
 	}
 
+	function handleInputUsernameBlur() {
+		setUsername((prevState: SettingData) => ({
+			...prevState,
+			error: false
+		}))
+	}
+
 	/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<SettingData>(emptySetting)
 
 	function handleInputPasswordChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setPassword({
-			value: value,
-			error: false
-		})
+
+		if (value.length < 8 ||
+			!/[A-Z]/.test(value) ||
+			!/[a-z]/.test(value) ||
+			!/\d/.test(value) ||
+			!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value))
+		{
+			let errorMessages: string[] = []
+			if (value.length === 0) {
+				errorMessages.push("Password cannot be empty")
+			}
+			else if (value.length < 8) {
+				errorMessages.push("Password must be at least 8 characters long")
+			}
+			if (!/[A-Z]/.test(value)) {
+				errorMessages.push("Password must contain one uppercase")
+			}
+			if (!/[a-z]/.test(value)) {
+				errorMessages.push("Password must contain one lowercase")
+			}
+			if (!/\d/.test(value)) {
+				errorMessages.push("Password must contain one number")
+			}
+			if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
+				errorMessages.push("Password must contain one special character")
+			}
+			setPassword({
+				value: value,
+				error: true,
+				errorMessage: errorMessages
+			})
+		}
+		else {
+			setPassword({
+				value: value,
+				error: false
+			})
+		}
 	}
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -187,13 +274,33 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	/* =============================== EMAIL ==================================== */
 
+	const [email, setEmail] = useState<SettingData>({
+		value: userAuthenticate.email,
+		error: false,
+		errorMessage: ''
+	})
+
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (!/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(value)) {
+		if (value.length === 0) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Email cannot be empty"
+			})
+		}
+		else if (value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
 			setEmail({
 				value: value,
 				error: true,
 				errorMessage: "Invalid email"
+			})
+		}
+		else if (value.endsWith("@student.42.fr")) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "42 emails are forbidden"
 			})
 		}
 		else {
@@ -206,9 +313,22 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	/* ============================ PHONE NUMBER ================================ */
 
-	function handleInputTelChange(event: ChangeEvent<HTMLInputElement>) {
+	const [phoneNumber, setPhoneNumber] = useState<SettingData>({
+		value: userAuthenticate.phoneNumber,
+		error: false,
+		errorMessage: ''
+	})
+
+	function handleInputPhoneNumberChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (!/^(\+33|0)[1-9](\s?\d{2}){4}$/.test(value) && value.length !== 0) {
+		if (value.length === 0) {
+			setPhoneNumber({
+				value: value,
+				error: true,
+				errorMessage: "Phone number cannot be empty"
+			})
+		}
+		else if (!/^(?:\+(?:[0-9] ?){6,14}[0-9]|[0-9]{10})$/.test(value)) {
 			setPhoneNumber({
 				value: value,
 				error: true,
@@ -225,37 +345,35 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	/* ================================= 2FA ==================================== */
 
-	function handleClickTwoFAChange() {
-		if (email.error) {
-			setTwoFA({
-				value: false,
-				error: true,
-				errorMessage: "No valid email"
+	const [twoFA, setTwoFA] = useState<boolean>(userAuthenticate.twoFA)
+
+	const [QRcode, setQRcode] = useState<string>('')
+	const [QRcodeValue, setQRcodeValue] = useState<string>('')
+
+	function handleInputQRcodeChange(event: ChangeEvent<HTMLInputElement>) {
+		const value = event.target.value
+		setQRcodeValue(value)
+	}
+
+	async function handleClickTwoFAChange() {
+		try {
+			const responseQRcode = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
 			})
+
+			displayTwoFAMenu(true)
+			setTwoFACodeQR(responseQRcode.data)
 		}
-		else {
-			setTwoFA({
-				value: !twoFA.value,
-				error: false
-			})
+		catch (error) {
+			console.log(error)
 		}
 	}
 
-	useEffect(() => {
-		if (email.error && phoneNumber.error) {
-			setTwoFA({
-				value: false,
-				error: true,
-				errorMessage: "No valid email or phone number"
-			})
-		}
-		else {
-			setTwoFA((prevState) => ({
-				...prevState,
-				error: false
-			}))
-		}
-	}, [email.value, phoneNumber.value])
+	/* =============================== AVATAR ================================== */
+
+	const [avatar, setAvatar] = useState<string>(userAuthenticate.avatar)
 
 	/* ========================================================================== */
 
@@ -275,11 +393,11 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						onClick={() => displaySettingsMenu(false)}
 						alt="Close button" title="Close" />
 				</CloseButtonWrapper>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Username
 						</SettingTtile>
@@ -292,8 +410,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						<ErrorMessage>
 							{username.error && username.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Password
 						</SettingTtile>
@@ -306,9 +424,33 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 							value={password.value as string}
 							fontSize={16}
 							$error={password.error} />
-						<ErrorMessage>
-							{password.error && password.errorMessage}
-						</ErrorMessage>
+						{
+							password.errorMessage ?
+							<>
+							{
+								Array.isArray(password.errorMessage) ?
+								<>
+								{
+
+									(password.errorMessage as string[]).map((errorMessage, index) => {
+										return (
+											<ErrorMessage
+												key={"error_message" + index}>
+												{errorMessage}
+											</ErrorMessage>)
+										}
+									)
+								}
+								</>
+								:
+								<ErrorMessage>
+									{password.errorMessage}
+								</ErrorMessage>
+							}
+							</>
+							:
+							<div style={{ height: "15px" }} />
+						}
 						<Button
 							onClick={() => setShowPassword(!showPassword)}
 							type="button" width={200}
@@ -322,8 +464,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 									"Show password"
 							}
 						</Button>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							E-mail
 						</SettingTtile>
@@ -335,49 +477,55 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						<ErrorMessage>
 							{email.error && email.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Phone number
 						</SettingTtile>
 						<InputText
-							onChange={handleInputTelChange}
+							onChange={handleInputPhoneNumberChange}
 							type="text" value={phoneNumber.value as string}
 							fontSize={16}
 							$error={phoneNumber.error} />
 						<ErrorMessage>
 							{phoneNumber.error && phoneNumber.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							2FA
 						</SettingTtile>
-						<TwoFAValue $error={twoFA.error}>
+						<TwoFAValue>
 							{
-								twoFA.value ?
+								twoFA ?
 									"Able"
 									:
 									"Disable"
 							}
 						</TwoFAValue>
-						<ErrorMessage>
-							{twoFA.error && twoFA.errorMessage}
-						</ErrorMessage>
+						<div style={{ height: "15px" }} />
 						<Button
 							onClick={handleClickTwoFAChange}
 							type="button" width={200}
 							alt="Set 2FA button"
-							title={twoFA.value ? "Disable" : "Able"}
+							title={twoFA ? "Disable" : "Able"}
 							style={{ alignSelf: "center" }}>
 							{
-								twoFA.value ?
+								twoFA ?
 									"Disable"
 									:
 									"Able"
 							}
 						</Button>
-					</Setting>
+					</HorizontalSetting>
+
+							{/* <img src={QRcode} />
+							<InputText
+								onSubmit={handleSubmitTWOfa}
+								onChange={handleInputQRcodeChange}
+								type="text" value={QRcodeValue}
+								fontSize={16} /> */}
+
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />
@@ -387,7 +535,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						alt="Save button" title="Save changes">
 						Save
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 			</ScrollBar>
 		</Style>
 	)

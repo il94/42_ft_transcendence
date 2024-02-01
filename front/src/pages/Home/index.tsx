@@ -1,67 +1,124 @@
-import { useContext, useEffect } from 'react'
-
 import {
-	HomePage,
-	MainTitle,
-	CentralWindow,
-	StyledTitle,
-	ButtonsWrapper
-} from './style'
+	useContext,
+	useEffect,
+	useRef
+} from 'react'
+import styled from 'styled-components'
+import axios from 'axios'
+import Cookies from "js-cookie"
+import {
+	useNavigate
+} from 'react-router'
 
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
 
+
+
+import Page from '../../componentsLibrary/Page'
+import MainTitle from '../../componentsLibrary/MainTitle'
+import CentralWindow from '../../componentsLibrary/CentralWindow'
+import WindowTitle from '../../componentsLibrary/WindowTitle'
+import Button from '../../componentsLibrary/Button'
+
 import AuthContext from '../../contexts/AuthContext'
+
+import {
+  ErrorResponse
+} from '../../utils/types'
 
 import colors from '../../utils/colors'
 
+const ButtonsWrapper = styled.div`
+
+	display: flex;
+	justify-content: space-evenly;
+
+	width: 100%;
+
+	padding-bottom: 15px;
+
+`
+
 function Home() {
 
-	const { token, setToken } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
+	const navigate = useNavigate();
 
+	// Vérifie si le user est authentifié en récupérant le token soit par les cookies, soit en local
 	useEffect(() => {
+		const access_token: string | null | undefined = Cookies.get('access_token') ?
+			Cookies.get('access_token')
+			:
+			localStorage.getItem('access_token')
 
-			// Extraire la partie après "access_token="
-			// const tokenString: string = document.cookie.indexOf("access_token")
-			const index = document.cookie.indexOf("access_token=")
+		if (access_token)
+		{
+			localStorage.setItem('access_token', access_token)
+			setToken(access_token)
+		}
+    else
+      setToken('')
 
-			const accessTokenString = document.cookie.slice(index + "access_token=".length);
-			
-			// console.log("LOL = ", accessTokenString)
-
-			if (!localStorage.getItem('token'))
-			{
-				setToken(accessTokenString)
-				localStorage.setItem('token', accessTokenString)
-			}
+		const GameButtonContainer = gameButtonRef.current
+		if (GameButtonContainer)
+			GameButtonContainer.focus()
 
 	}, [])
 
+	// Déconnecte le user en supprimant son token des cookies et en local
 	async function handleDeconnexionClickText() {
-		localStorage.removeItem('token')
-		setToken('')
+		try {
+			await axios.get(`http://${url}:3333/auth/logout`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			}) 
+			Cookies.remove('access_token')
+			Cookies.remove('id')
+			Cookies.remove('two_FA')
+			Cookies.remove('isNew')
+			localStorage.clear();
+			setToken('')
+			navigate("/")
+		}
+		catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				console.log(error.message)
+				console.log(statusCode)
+			}
+			else
+				navigate("/error");
+		}
 	}
 
+	const gameButtonRef = useRef<HTMLButtonElement>(null)
+
 	return (
-		<HomePage>
+		<Page>
 			<MainTitle>
 				<StyledLink to="/">
 					Transcendance
 				</StyledLink>
 			</MainTitle>
 			<CentralWindow>
-				<StyledTitle>
+				<WindowTitle>
 					Welcome
-				</StyledTitle>
+				</WindowTitle>
 				{
+					// TODO : isNew ? prompt settings form
 					token ?
 						<>
-							<LinkButton
-								to="/game" fontSize={35}
-								alt="Game button" title="Game">
+							<Button
+								onClick={() => navigate("/game")}
+								fontSize={35}
+								alt="Game button" title="Game"
+								ref={gameButtonRef}>
 								Game !
-							</LinkButton>
+							</Button>
 							<ActiveText
 								onClick={handleDeconnexionClickText}
 								color={colors.button}>
@@ -83,7 +140,7 @@ function Home() {
 						</ButtonsWrapper>
 				}
 			</CentralWindow>
-		</HomePage>
+		</Page>
 	)
 }
 
