@@ -97,10 +97,21 @@ function Signin() {
 
 			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
 
-			if ('twoFA' in signinResponse.data)
-				navigate("/twofa")
+
+			if ('twoFA' in signinResponse.data) {
+				Cookies.remove('id');
+				Cookies.set("id", signinResponse.data.id);
+				navigate("/twofa")	
+			}
 			else {
-				localStorage.setItem('access_token', signinResponse.data.access_token)
+				const access_token: string = signinResponse.data.access_token;
+				if (access_token) {
+					localStorage.setItem('access_token', access_token)
+					setToken(access_token)
+				}
+				else { 
+					throw new Error
+				}
 				navigate("/")
 			}
 		}

@@ -104,12 +104,14 @@ function Signup() {
 			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
 			localStorage.setItem("access_token", signupResponse.data.access_token)
+
 			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
+				// TODO : GESTION d'erreur si nom ou mail deja pris
 				if (statusCode === 403 || statusCode === 409) {
 					setEmail((prevState) => ({
 						...prevState,

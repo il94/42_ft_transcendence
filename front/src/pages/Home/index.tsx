@@ -13,6 +13,9 @@ import {
 import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
+
+
+
 import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
@@ -20,6 +23,10 @@ import WindowTitle from '../../componentsLibrary/WindowTitle'
 import Button from '../../componentsLibrary/Button'
 
 import AuthContext from '../../contexts/AuthContext'
+
+import {
+  ErrorResponse
+} from '../../utils/types'
 
 import colors from '../../utils/colors'
 
@@ -51,10 +58,13 @@ function Home() {
 			localStorage.setItem('access_token', access_token)
 			setToken(access_token)
 		}
+    else
+      setToken('')
 
 		const GameButtonContainer = gameButtonRef.current
 		if (GameButtonContainer)
 			GameButtonContainer.focus()
+
 	}, [])
 
 	// Déconnecte le user en supprimant son token des cookies et en local
@@ -66,13 +76,22 @@ function Home() {
 				}
 			}) 
 			Cookies.remove('access_token')
-			localStorage.removeItem('token')
+			Cookies.remove('id')
+			Cookies.remove('two_FA')
+			Cookies.remove('isNew')
 			localStorage.clear();
 			setToken('')
 			navigate("/")
 		}
 		catch (error) {
-			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				console.log(error.message)
+				console.log(statusCode)
+			}
+			else
+				navigate("/error");
 		}
 	}
 
@@ -90,6 +109,7 @@ function Home() {
 					Welcome
 				</WindowTitle>
 				{
+					// TODO : isNew ? prompt settings form
 					token ?
 						<>
 							<Button

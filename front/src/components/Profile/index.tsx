@@ -5,7 +5,7 @@ import {
 } from "react"
 import { useNavigate } from "react-router"
 import Cookies from "js-cookie"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 import {
 	Style,
@@ -22,6 +22,7 @@ import InteractionContext from "../../contexts/InteractionContext"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
+import { ErrorResponse, SettingData } from '../../utils/types'
 
 type PropsProfile = {
 	card: boolean,
@@ -55,21 +56,33 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 	async function handleDeconnexionClickButton() {
 		try {
 
-			await axios.get(`http://${url}:3333/auth/logout`, {
+			const response: boolean = await axios.get(`http://${url}:3333/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			}) 
 			
-			Cookies.remove('access_token')
-			localStorage.removeItem('token')
-			localStorage.clear();
-			setToken('')
-			navigate("/")
+			if (response) {
+				Cookies.remove('access_token')
+				Cookies.remove('id')
+				Cookies.remove('two_FA')
+				Cookies.remove('isNew')
+				localStorage.clear();
+				setToken('')
+				navigate("/")
+			}
 		}
 		catch (error) {
-			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode } = axiosError.response?.data!
+				console.log(error.message)
+				console.log(statusCode)
+			}
+			else
+				navigate("/error");
 		}
+		
 	}
 
 	return (

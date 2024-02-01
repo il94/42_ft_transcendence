@@ -18,8 +18,8 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.id, },
     });
-
-    if (!user.twoFA) {
+    console.log("validate user in 2FA: ", user)
+    if (user.twoFA) {
       return user;
     }
   }

@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import Cookies from "js-cookie"
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -38,12 +39,15 @@ type PropsTwoFAResponse = {
 }
 
 function TwoFA() {
-	const { token, url } = useContext(AuthContext)!
-	const navigate = useNavigate()
 
+	const [errorRequest, setErrorRequest] = useState<boolean>(false)
+	const { token, setToken, url } = useContext(AuthContext)!
+	const navigate = useNavigate()
+      
 	useEffect(() => {
-		if (token)
-			navigate("/error")
+		const id: string | undefined = Cookies.get('id')
+		if (id)
+			setToken(id);
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -57,10 +61,12 @@ function TwoFA() {
 				})
 				return
 			}
+			
+			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
+			 
+			setToken(response.data.access_token)
 
-			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate`, {
-				twoFACode: code
-			})
+
 
 			localStorage.setItem("access_token", twoFAResponse.data.access_token)
 			navigate("/")

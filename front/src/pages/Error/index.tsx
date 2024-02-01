@@ -23,8 +23,11 @@ function Error() {
 		{
 			localStorage.removeItem("access_token")
 			Cookies.remove("access_token")
+      Cookies.remove("id")
+      Cookies.remove('isNew')
 			setToken('')
 		}
+
 	}, [])
 
 	return (

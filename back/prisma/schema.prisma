@@ -26,6 +26,12 @@ enum RequestStatus {
   FINISHED
 }
 
+enum GameStatus {
+  PENDING
+  PLAYING
+  FINISHED
+}
+
 enum Role {
   MEMBER
   ADMIN
@@ -65,7 +71,7 @@ model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
 
-  username    String
+  username    String  @unique
   email       String  @unique
   hash        String
   avatar      String
@@ -124,6 +130,7 @@ model Game {
   players     UsersOnGames[]
   invitation  Invitation[] 
   level       Int
+  status      GameStatus
 }
 
 // relation 1-m user-invitation channel-invitation game-invitation
