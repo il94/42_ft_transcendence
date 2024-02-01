@@ -72,7 +72,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 				})
 				return
 			}
-			else if (!password.value) {
+			else if (!password.value && channelType === channelStatus.PROTECTED) {
 				setPassword({
 					value: '',
 					error: true,
