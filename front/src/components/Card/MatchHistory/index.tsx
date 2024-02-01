@@ -1,19 +1,31 @@
-import { useEffect, useState } from "react"
+import {
+	useContext,
+	useEffect,
+	useState
+} from "react"
 // import axios from "axios"
 
-import { Style } from "./style"
+import {
+	Style
+} from "./style"
 
 import Match from "./Match"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
-import { MatchData, User, UserAuthenticate } from "../../../utils/types"
-import { matchResultStatus } from "../../../utils/status"
+import InteractionContext from "../../../contexts/InteractionContext"
 
-type PropsMatchHistory = {
-	userTarget: User | UserAuthenticate
-}
+import {
+	MatchData
+} from "../../../utils/types"
 
-function MatchHistory({ userTarget }: PropsMatchHistory) {
+import {
+	matchResultStatus
+} from "../../../utils/status"
+
+
+function MatchHistory() {
+
+	const { userTarget } = useContext(InteractionContext)!
 
 	const [matchs, setMatchs] = useState<MatchData[]>([])
 
@@ -57,7 +69,7 @@ function MatchHistory({ userTarget }: PropsMatchHistory) {
 
 			}
 			catch (error) {
-				setMatchs(undefined)
+				setMatchs([])
 			}
 		}
 		fetchMatchs()

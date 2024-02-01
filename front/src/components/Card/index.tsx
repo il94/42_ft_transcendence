@@ -64,7 +64,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 				wins={userTarget.wins}
 				draws={userTarget.draws}
 				losses={userTarget.losses} />
-			<MatchHistory userTarget={userTarget} />
+			<MatchHistory />
 		</Style>
 	)
 }
