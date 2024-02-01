@@ -36,7 +36,6 @@ export const ChannelName = styled.p`
 export const ButtonsWrapper = styled.div`
 
 	display: flex;
-	flex-direction: row-reverse;
 	justify-content: space-between;
 
 	min-width: 51px;

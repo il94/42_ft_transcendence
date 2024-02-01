@@ -5,6 +5,7 @@ import {
 	SetStateAction,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from "react"
 import axios, { AxiosError } from "axios"
@@ -197,6 +198,15 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 		}))
 	}
 
+	const nameInputTextRef = useRef<HTMLInputElement>(null)
+
+	useEffect(() => {
+		const NameInputTextComponent = nameInputTextRef.current
+
+		if (NameInputTextComponent)
+			NameInputTextComponent.focus()
+	}, [])
+
 	/* =========================== CHANNEL TYPE ================================= */
 
 	const [channelType, setChannelType] = useState<channelStatus>(
@@ -311,7 +321,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							type="text" value={name.value as string}
 							width={120}
 							fontSize={16}
-							$error={name.error} />
+							$error={name.error}
+							ref={nameInputTextRef} />
 						<ErrorMessage
 							fontSize={10}>
 							{name.error && name.errorMessage}
@@ -341,9 +352,11 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 										"No password")
 								handleInputPasswordBlur()
 							}}
+							onFocus={() => {channelType === channelStatus.PROTECTED && setPlaceHolder('')}}
 							type="text"
 							placeholder={placeHolder}
 							value={password.value}
+							tabIndex={channelType === channelStatus.PROTECTED ? 0 : 1}
 							width={120}
 							fontSize={16}
 							$disable={channelType !== channelStatus.PROTECTED}
@@ -358,7 +371,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					Avatar
 					<HorizontalSettingWrapper $width={155}>
 						<IconUploadFile
-							htmlFor="uploadAvatarChannel" fontSize={13}
+							htmlFor="uploadAvatarChannel" tabIndex={0} fontSize={13}
 							alt="Upload icon" title="Upload image">
 							&nbsp;Upload&nbsp;
 						</IconUploadFile>
@@ -367,7 +380,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							type="button" src={RemoveIcon} size={23}
 							alt="Remove icon" title="Remove image" />
 						<Avatar
-							src={avatar} htmlFor="uploadAvatarChannel"
+							src={avatar} htmlFor="uploadAvatarChannel" tabIndex={0}
 							title="Upload image" />
 						<HiddenInput onChange={handleAvatarUpload}
 							id="uploadAvatarChannel" type="file" accept="image/*" />

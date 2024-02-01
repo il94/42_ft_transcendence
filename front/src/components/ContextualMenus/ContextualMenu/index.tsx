@@ -4,6 +4,7 @@ import {
 	SetStateAction,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from "react"
 import axios, { AxiosError, AxiosResponse } from "axios"
@@ -394,7 +395,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
-	/* ========================================================================== */
+	/* ============================== DISPLAY =================================== */
 
 	const [adminSections, displayAdminSections] = useState<boolean>(false)
 	useEffect(() => {
@@ -411,6 +412,21 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}, [])
 
+	const inviteSectionRef = useRef<HTMLButtonElement>(null)
+	const contactSectionRef = useRef<HTMLButtonElement>(null)
+
+	useEffect(() => {
+		const InviteSectionContainer = inviteSectionRef.current
+		const ContactSectionContainer = contactSectionRef.current
+
+		if (InviteSectionContainer)
+			InviteSectionContainer.focus()
+		else if (ContactSectionContainer)
+			ContactSectionContainer.focus()
+
+			// console.log(InviteSectionContainer, ContactSectionContainer)
+	}, [])
+
 	/* ========================================================================== */
 
 	return (
@@ -422,14 +438,18 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			$bottom={contextualMenuPosition.bottom}>
 			{
 				userAuthenticate.channels.length > 0 &&
-				<Section onMouseEnter={showSecondaryContextualMenu}>
+				<Section
+					onMouseEnter={showSecondaryContextualMenu}
+					ref={inviteSectionRef}>
 					<SectionName>
 						Invite
 					</SectionName>
 				</Section>
 			}
 			<div onMouseEnter={() => displaySecondaryContextualMenu(false)}>
-				<Section onClick={handleContactClickEvent}>
+				<Section
+					onClick={handleContactClickEvent}
+					ref={contactSectionRef}>
 					<SectionName>
 						Contact
 					</SectionName>

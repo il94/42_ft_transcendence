@@ -45,6 +45,9 @@ export const Avatar = styled.label<{ src: string }>`
 
 		}
 	}
+	&:focus-visible {
+		outline: 3px solid ${colors.focusButton};
+	}
 
 `
 

@@ -123,10 +123,6 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 				{bannerName}
 			</ChannelName>
 			<ButtonsWrapper>
-				<Icon
-					onClick={() => displayChat(false)}
-					src={ReduceIcon} size={24}
-					alt="Reduce button" title="Reduce" />
 				{
 					(channelTarget &&
 						userIsOwner(channelTarget, userAuthenticate.id) &&
@@ -139,6 +135,10 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 						:
 						<div style={{ width: "24px" }} />
 				}
+				<Icon
+					onClick={() => displayChat(false)}
+					src={ReduceIcon} size={24}
+					alt="Reduce button" title="Reduce" />
 			</ButtonsWrapper>
 		</Style>
 	)
