@@ -38,7 +38,7 @@ export class AuthController {
 				res.clearCookie('id').clearCookie('two_FA')
 			return tok;
 		} catch (error) {
-			throw new BadRequestException(error.message)
+			throw error
 		}
 	}
 

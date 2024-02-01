@@ -50,6 +50,15 @@ const effects = {
 		${colors.shadowButton}
 		${colors.button}
 	`,
+	focusShadowButton: `
+		border-style: solid;
+		border-width: 5px;
+		border-color:
+		${colors.focusButton}
+		${colors.shadowFocusButton}
+		${colors.shadowFocusButton}
+		${colors.focusButton}
+	`,
 	shadowIcon: `
 		border-style: solid;
 		border-width: 3px;
@@ -58,7 +67,17 @@ const effects = {
 		${colors.shadowButton}
 		${colors.shadowButton}
 		${colors.button}
+	`,
+	focusShadowIcon: `
+		border-style: solid;
+		border-width: 3px;
+		border-color:
+		${colors.focusButton}
+		${colors.shadowFocusButton}
+		${colors.shadowFocusButton}
+		${colors.focusButton}
 	`
+
 }
 
 export default effects

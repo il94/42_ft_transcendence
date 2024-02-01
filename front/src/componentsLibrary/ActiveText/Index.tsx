@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import colors from '../../utils/colors'
 
 const ActiveText = styled.button <{ color?: string }>`
@@ -11,9 +12,12 @@ const ActiveText = styled.button <{ color?: string }>`
 	&:hover {
 		cursor: pointer;
 	}
-
 	&:active {
 		color: ${(props) => props.color && props.color !== colors.text && colors.shadowButton};
+	}
+	&:focus-visible {
+		outline: none;
+		color: ${colors.focusButton};
 	}
 
 `

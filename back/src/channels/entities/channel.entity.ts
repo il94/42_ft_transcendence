@@ -10,7 +10,7 @@ export class ChannelEntity implements Channel {
 	name:       string;
 	avatar:		string;
 	type:       ChannelStatus;
-	password:	string;
+	hash:		string;
 	invitation: Invitation[];
   
 	members:    UsersOnChannels[];

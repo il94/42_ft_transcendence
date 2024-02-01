@@ -1,9 +1,19 @@
+import {
+	useEffect,
+	useState
+} from "react"
+
 import styled from "styled-components"
 
 const Style = styled.div<{ $size: number, $backgroundColor?: string }>`
 	
 	display: flex;
 	justify-content: space-evenly;
+
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 
 	width: ${(props) => props.$size}px;
 	height: ${(props) => props.$size / 10 + (props.$size / 100 * 7.5)}px;
@@ -47,12 +57,25 @@ type LoaderProps = {
 
 function Loader({ size, color, backgroundColor } : LoaderProps) {
 
+	const [loader, displayLoader] = useState<boolean>(false)
+
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			displayLoader(true)
+		}, 500)
+
+		return () => clearTimeout(timeout)
+	}, [])
+
 	return (
-		<Style $size={size} $backgroundColor={backgroundColor} >
+		loader ?
+		<Style $size={size} $backgroundColor={backgroundColor}>
 			<Point $size={size} $color={color} />
 			<Point className="delay_1" $size={size} $color={color} />
 			<Point className="delay_2" $size={size} $color={color} />
 		</Style>
+		:
+		null
 	)
 }
 

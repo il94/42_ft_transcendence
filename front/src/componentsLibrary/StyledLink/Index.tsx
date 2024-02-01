@@ -1,5 +1,8 @@
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import {
+	Link
+} from 'react-router-dom'
+
 import colors from '../../utils/colors'
 
 const StyledLink = styled(Link) <{ color?: string }>`
@@ -10,6 +13,10 @@ const StyledLink = styled(Link) <{ color?: string }>`
 
 	&:active {
 		color: ${(props) => props.color && props.color !== colors.text && colors.shadowButton};
+	}
+	&:focus-visible {
+		outline: none;
+		color: ${colors.focusText};
 	}
 
 `

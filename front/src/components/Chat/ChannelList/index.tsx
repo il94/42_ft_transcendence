@@ -1,14 +1,17 @@
 import {
-	Dispatch,
-	SetStateAction
+	useContext
 } from "react"
-
 import styled from "styled-components"
 
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
+import Loader from "../../../componentsLibrary/Loader"
 
-import { Channel } from "../../../utils/types"
+import DisplayContext from "../../../contexts/DisplayContext"
+
+import {
+	Channel
+} from "../../../utils/types"
 
 import colors from "../../../utils/colors"
 
@@ -17,6 +20,8 @@ const Style = styled.div`
 	display: flex;
 	flex-direction: column;
 
+	position: relative;
+
 	width: 128px;
 
 	background-color: ${colors.channelList};
@@ -24,28 +29,30 @@ const Style = styled.div`
 `
 
 type PropsChannelList = {
-	channels: Channel[],
-	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
-	setErrorRequest: Dispatch<SetStateAction<boolean>>
+	channels: Channel[]
 }
 
-function ChannelList({ channels, setChannelTarget, setErrorRequest }: PropsChannelList) {
+function ChannelList({ channels }: PropsChannelList) {
+
+	const { loaderChannels } = useContext(DisplayContext)!
 
 	return (
 		<Style>
-			<ScrollBar>
+			{
+				loaderChannels ?
+				<Loader size={100} />
+				:
+				<ScrollBar>
 				{
 					channels.map((channel, index) => (
 						<ChannelSection
-							key={"channel" + index} // a definir
-							channel={channel}
-							setChannelTarget={setChannelTarget}
-							setErrorRequest={setErrorRequest}
-							backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
+						key={"channel" + index} // a definir
+						channel={channel}
 						/>
 					))
 				}
 			</ScrollBar>
+			}
 		</Style>
 	)
 }
