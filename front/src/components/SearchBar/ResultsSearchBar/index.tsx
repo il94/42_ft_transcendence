@@ -38,7 +38,7 @@ import {
 	UserAuthenticate
 } from "../../../utils/types"
 import {
-	channelStatus,
+	channelType,
 	resultSearchBarType
 } from "../../../utils/status"
 
@@ -167,7 +167,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 			else if (userIsBanned(channelWithRelationsResponse.data, userAuthenticate.id))
 				displayPopupError({ display: true, message: `You are banned from this channel` })
 			else {
-				if (channelWithRelationsResponse.data.type === channelStatus.PROTECTED) {
+				if (channelWithRelationsResponse.data.type === channelType.PROTECTED) {
 					setChannelTarget(channelWithRelationsResponse.data)
 					displayChat(true)
 				}

@@ -19,13 +19,13 @@ import {
 import {
 	challengeStatus,
 	channelRole,
-	messageStatus,
+	messageType,
 	userStatus
 } from "../../utils/status"
 
 import {
 	Channel,
-	ChannelDatas,
+	ChannelData,
 	Message,
 	MessageInvitation,
 	MessageText,
@@ -63,7 +63,7 @@ export function updateDiscussion(props: PropsUpdateDiscussion) {
 			throw new Error
 			messageContent = {
 				sender: userSend,
-				type: messageStatus.INVITATION,
+				type: messageType.INVITATION,
 				target: userTarget,
 				status: challengeStatus.PENDING
 			} as MessageInvitation
@@ -72,7 +72,7 @@ export function updateDiscussion(props: PropsUpdateDiscussion) {
 		else {
 			messageContent ={
 				sender: userSend,
-				type: messageStatus.TEXT,
+				type: messageType.TEXT,
 				content: props.idTargetOrMsg
 			} as MessageText
 		}
@@ -122,7 +122,7 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 	if (props.userId === props.userAuthenticate.id)
 	{
 		// Récupère les données du channel dans lequel il a été ajouté
-		const newChannelResponse: AxiosResponse<ChannelDatas> = await axios.get(`http://${props.url}:3333/channel/${props.channelId}`, {
+		const newChannelResponse: AxiosResponse<ChannelData> = await axios.get(`http://${props.url}:3333/channel/${props.channelId}`, {
 			headers: {
 				'Authorization': `Bearer ${props.token}`
 			}

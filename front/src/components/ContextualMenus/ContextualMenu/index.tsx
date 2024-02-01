@@ -29,16 +29,16 @@ import {
 
 import {
 	Channel,
-	ChannelDatas,
+	ChannelData,
 	ErrorResponse,
 	UserAuthenticate
 } from "../../../utils/types"
 
 import {
 	channelRole,
-	channelStatus,
+	channelType,
 	contextualMenuStatus,
-	messageStatus,
+	messageType,
 	userStatus
 } from "../../../utils/status"
 
@@ -105,7 +105,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				return (channelMP)
 			}
 			else {
-				const newChannelMPResponse: AxiosResponse<ChannelDatas> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, {}, {
+				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -164,7 +164,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				throw new Error
 
 			const idMsg = await axios.post(`http://localhost:3333/channel/${channel.id}/invitation`,
-				{ msgStatus: messageStatus.INVITATION, targetId: userTarget.id },
+				{ msgStatus: messageType.INVITATION, targetId: userTarget.id },
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -401,7 +401,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	useEffect(() => {
 		if (channelTarget && 
 			type === contextualMenuStatus.CHAT &&
-			channelTarget.type !== channelStatus.MP &&
+			channelTarget.type !== channelType.MP &&
 			(userIsOwner(channelTarget, userAuthenticate.id) ||
 				(userIsAdministrator(channelTarget, userAuthenticate.id) &&
 					!userIsOwner(channelTarget, userTarget.id)))) {

@@ -1,5 +1,5 @@
 import {
-	channelStatus,
+	channelType,
 	contextualMenuStatus,
 	userStatus
 } from "./status"
@@ -145,7 +145,7 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | undefined {
 	return (
 		userAuthenticate.channels.find((channel) => (
-		channel.name === recipientName && channel.type === channelStatus.MP))
+		channel.name === recipientName && channel.type === channelType.MP))
 	)
 }
 
@@ -195,25 +195,25 @@ export function userIsBanned(channel: Channel, userId: number): boolean {
 
 export function channelIsPublic(channel: Channel): boolean {
 	return (
-		channel.type === channelStatus.PUBLIC
+		channel.type === channelType.PUBLIC
 	)
 }
 
 export function channelIsProtected(channel: Channel): boolean {
 	return (
-		channel.type === channelStatus.PROTECTED
+		channel.type === channelType.PROTECTED
 	)
 }
 
 export function channelIsPrivate(channel: Channel): boolean {
 	return (
-		channel.type === channelStatus.PRIVATE
+		channel.type === channelType.PRIVATE
 	)
 }
 
 export function channelIsMP(channel: Channel): boolean {
 	return (
-		channel.type === channelStatus.MP
+		channel.type === channelType.MP
 	)
 }
 

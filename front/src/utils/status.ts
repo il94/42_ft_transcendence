@@ -14,7 +14,7 @@ export enum challengeStatus {
 	FINISHED = "FINISHED"
 }
 
-export enum channelStatus {
+export enum channelType {
 	PUBLIC = "PUBLIC",
 	PROTECTED = "PROTECTED",
 	PRIVATE = "PRIVATE",
@@ -37,7 +37,7 @@ export enum chatWindowStatus {
 	UPDATE_CHANNEL
 }
 
-export enum messageStatus {
+export enum messageType {
 	TEXT = "TEXT",
 	INVITATION = "INVITATION"
 }

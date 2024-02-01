@@ -15,7 +15,7 @@ import {
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
 
-import { messageStatus } from "../../../../utils/status"
+import { messageType } from "../../../../utils/status"
  
 function TextInput() {
 
@@ -44,7 +44,7 @@ function TextInput() {
 
 				/* post le meesage dans le back */
 				const idMsg = await axios.post(`http://${url}:3333/channel/${channelTarget.id}/message`, 
-				{ msg: message , msgStatus : messageStatus.TEXT},
+				{ msg: message , msgStatus : messageType.TEXT},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`

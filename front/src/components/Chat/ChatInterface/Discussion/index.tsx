@@ -21,7 +21,7 @@ import {
 } from "../../../../utils/types"
 
 import {
-	messageStatus
+	messageType
 } from "../../../../utils/status"
 
 function Discussion() {
@@ -46,7 +46,7 @@ function Discussion() {
 							message.sender.id === userAuthenticate.id ?
 
 								// Si le message est un message textuel
-								message.type === messageStatus.TEXT ?
+								message.type === messageType.TEXT ?
 									<UserText
 										key={"message" + index} // a definir
 										content={(message as MessageText).content}
@@ -66,7 +66,7 @@ function Discussion() {
 								:
 
 								// Si le message est un message textuel
-								message.type === messageStatus.TEXT ?
+								message.type === messageType.TEXT ?
 									<ContactText
 										key={"message" + index} // a definir
 										sender={message.sender}
