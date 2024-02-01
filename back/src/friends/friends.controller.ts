@@ -21,11 +21,12 @@ export class FriendsController {
 	@Param('id', ParseIntPipe) userTargetId: number) {
 		return this.friendsService.addFriend(userAuthId, userTargetId)
 	}
-  
-  @Get()
-  async getUserFriends(@getUser() user: User ) {
-    return await this.friendsService.getUserFriends(user.id);
-  }
+
+	// Retourne les amis du user
+	@Get()
+	async getUserFriends(@getUser() user: User) {
+		return await this.friendsService.getUserFriends(user.id)
+	}
 
 	// Supprime un ami
 	@Delete(':id')

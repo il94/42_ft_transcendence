@@ -4,6 +4,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
+type UserDatas = {
+	id: number,
+    username: string,
+    avatar: string,
+    wins: number,
+    draws: number,
+    losses: number,
+    status: UserStatus
+}
+
 @Injectable()
 export class FriendsService {
 	constructor(private prisma: PrismaService) {}
@@ -86,56 +96,54 @@ export class FriendsService {
 		return user;
 	}
 
-	async getUserFriends(userId: number) {
-		const relations = await this.prisma.user.findUnique({
-			where: {
-				id: userId
-			},
-			select: {
-				friends: {
-					select: {
-						friendId: true
+	// Retourne les amis du user
+	async getUserFriends(userId: number): Promise<UserDatas[]> {
+		try {
+			// Retourne les relations friends du user
+			const friendsRelations = await this.prisma.user.findUnique({
+				where: {
+					id: userId
+				},
+				select: {
+					friends: {
+						select: {
+							friendId: true
+						}
 					}
 				}
-			}
-		})
+			})
 
-		const friendsIds = relations.friends.map((relation) => relation.friendId)
+			// Retourne les ids des friends du user
+			const friendsIds = friendsRelations.friends.map((relation) => relation.friendId)
 
-		const friends = await this.prisma.user.findMany({
-			where: {
-				id: {
-					in: friendsIds
+			// Retourne les friends avec leurs donnees publiques
+			const friends = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: friendsIds
+					}
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
 				}
-			},
-			select: {
-				id: true,
-				username: true,
-				avatar: true,
-				status: true,
-				wins: true,
-				draws: true,
-				losses: true
-			}
-		})
+			})
 
-		const friendsMapped = friends.map((friend) => {
-
-			const { wins, draws, losses, ...rest } = friend
-
-			return {
-				...rest,
-				scoreResume: {
-					wins,
-					draws,
-					losses
-				}
-			}
-		})
-
-		return friendsMapped;
+			// console.log(`User ${userId} friends : `, friends)
+			return friends
+		}
+		catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
-
 
 	// Supprime un ami
 	async removeFriend(userAuthId: number, userTargetId: number) {

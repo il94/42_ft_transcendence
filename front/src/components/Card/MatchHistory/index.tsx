@@ -15,7 +15,7 @@ type PropsMatchHistory = {
 
 function MatchHistory({ userTarget }: PropsMatchHistory) {
 
-	const [matchs, setMatchs] = useState<MatchData[] | undefined>(undefined)
+	const [matchs, setMatchs] = useState<MatchData[]>([])
 
 	useEffect(() => {
 		async function fetchMatchs() {
