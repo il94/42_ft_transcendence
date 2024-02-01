@@ -170,14 +170,21 @@ export class ChannelsService {
 	// Ajoute un user dans un channel
 	async joinChannel(channelId: number, userId: number, hash?: string, inviterId?: number) {
 		try {
-			// Verifie si le channel existe et le retourne
+			// Verifie si le channel existe et retourne son role
 			const channelToJoin = await this.prisma.channel.findUnique({
 				where: {
 					id: channelId
+				},
+				select: {
+					id: true,
+					type: true,
+					hash: true
 				}
 			})
 			if (!channelToJoin)
 				throw new NotFoundException("Channel not found")
+			else if ((channelToJoin.type === ChannelStatus.PRIVATE || channelToJoin.type === ChannelStatus.MP) && !inviterId)
+				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Verifie si le user qui aurait lancé l'invitation est dans le channel
 			if (inviterId)

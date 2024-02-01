@@ -81,7 +81,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					initialStatus === challengeStatus.PENDING && target.id === userAuthenticate.id &&
 					<ButtonsWrapper>
 						<ButtonChallenge
-							onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan, {
+							onClick={() => handleClickChallengeStatus(challengeStatus.ACCEPTED, idMsg, idChan, {
 								userAuthenticate,
 								token,
 								url

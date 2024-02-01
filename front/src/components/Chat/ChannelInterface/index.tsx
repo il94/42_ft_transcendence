@@ -43,7 +43,7 @@ import {
 } from "../../../utils/types"
 
 import {
-	channelType,
+	ChannelType,
 	chatWindowStatus
 } from "../../../utils/status"
 
@@ -73,7 +73,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 				})
 				return
 			}
-			else if (!password.value && channelType === channelType.PROTECTED) {
+			else if (!password.value && channelType === ChannelType.PROTECTED) {
 				setPassword({
 					value: '',
 					error: true,
@@ -95,7 +95,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					newDatas.name = name.value
 				if (channelType !== channelTarget.type)
 					newDatas.type = channelType
-				if (password.value && channelType == channelType.PROTECTED)
+				if (password.value && channelType == ChannelType.PROTECTED)
 					newDatas.hash = password.value
 				if (avatar !== channelTarget.avatar)
 					newDatas.avatar = avatar
@@ -209,20 +209,20 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 	/* =========================== CHANNEL TYPE ================================= */
 
-	const [channelType, setChannelType] = useState<channelType>(
+	const [channelType, setChannelType] = useState<ChannelType>(
 		channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
 			channelTarget.type
 			:
-			channelType.PUBLIC
+			ChannelType.PUBLIC
 	)
 
 	function handleButtonClick() {
-		if (channelType === channelType.PUBLIC)
-			setChannelType(channelType.PROTECTED)
-		else if (channelType === channelType.PROTECTED)
-			setChannelType(channelType.PRIVATE)
+		if (channelType === ChannelType.PUBLIC)
+			setChannelType(ChannelType.PROTECTED)
+		else if (channelType === ChannelType.PROTECTED)
+			setChannelType(ChannelType.PRIVATE)
 		else
-			setChannelType(channelType.PUBLIC)
+			setChannelType(ChannelType.PUBLIC)
 	}
 
 	/* ============================== PASSWORD ================================== */
@@ -258,8 +258,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 	}
 
 	useEffect(() => {
-		if (channelType === channelType.PUBLIC
-			|| channelType === channelType.PRIVATE)
+		if (channelType === ChannelType.PUBLIC
+			|| channelType === ChannelType.PRIVATE)
 		setPassword({
 			value: '',
 			error: false
@@ -270,7 +270,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 	useEffect(() => {
 		if (chatWindowState === chatWindowStatus.UPDATE_CHANNEL
-			&& channelType === channelType.PROTECTED)
+			&& channelType === ChannelType.PROTECTED)
 			setPlaceHolder("Old password")
 		else
 			setPlaceHolder("No password")
@@ -338,12 +338,12 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 						{capitalize(channelType)}
 					</Button>
 				</VerticalSetting>
-				<VerticalSetting $disable={channelType !== channelType.PROTECTED}>
+				<VerticalSetting $disable={channelType !== ChannelType.PROTECTED}>
 					Password
 					<VerticalSettingWrapper>
 						<InputText
 							onInput={handleInputPasswordChange}
-							onClick={() => channelType === channelType.PROTECTED && setPlaceHolder('')}
+							onClick={() => channelType === ChannelType.PROTECTED && setPlaceHolder('')}
 							onBlur={() => {
 								setPlaceHolder(
 									channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
@@ -352,15 +352,15 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 										"No password")
 								handleInputPasswordBlur()
 							}}
-							onFocus={() => {channelType === channelType.PROTECTED && setPlaceHolder('')}}
+							onFocus={() => {channelType === ChannelType.PROTECTED && setPlaceHolder('')}}
 							type="text"
 							placeholder={placeHolder}
 							value={password.value}
-							tabIndex={channelType === channelType.PROTECTED ? 0 : 1}
+							tabIndex={channelType === ChannelType.PROTECTED ? 0 : 1}
 							width={120}
 							fontSize={16}
-							$disable={channelType !== channelType.PROTECTED}
-							readOnly={channelType !== channelType.PROTECTED} />
+							$disable={channelType !== ChannelType.PROTECTED}
+							readOnly={channelType !== ChannelType.PROTECTED} />
 						<ErrorMessage
 							fontSize={10}>
 							{password.error && password.errorMessage}

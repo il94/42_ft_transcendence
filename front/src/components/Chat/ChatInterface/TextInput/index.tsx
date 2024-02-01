@@ -40,7 +40,7 @@ function TextInput() {
 		if (message === '')
 			return
 			try {
-				if (new Date(channel.muteInfo[userAuthenticate.id]) > new Date())
+				if (new Date(channelTarget.muteInfo[userAuthenticate.id]) > new Date())
 				{
 					console.log("you are muted");
 					// voir comment gerer le mute coter front

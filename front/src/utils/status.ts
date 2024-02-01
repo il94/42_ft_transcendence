@@ -14,7 +14,7 @@ export enum challengeStatus {
 	FINISHED = "FINISHED"
 }
 
-export enum channelType {
+export enum ChannelType {
 	PUBLIC = "PUBLIC",
 	PROTECTED = "PROTECTED",
 	PRIVATE = "PRIVATE",
