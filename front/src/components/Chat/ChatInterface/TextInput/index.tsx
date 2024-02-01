@@ -15,7 +15,14 @@ import {
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
 
+import { Channel } from "../../../../utils/types"
 import { messageType } from "../../../../utils/status"
+
+
+type PropsTextInput = {
+	channel: Channel,
+}
+
  
 function TextInput() {
 
@@ -24,9 +31,7 @@ function TextInput() {
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	/*
-
 		response = tableau des socket des users connecter sur le channel
-
 	*/
 
 
@@ -35,8 +40,14 @@ function TextInput() {
 		if (message === '')
 			return
 			try {
-
+				if (new Date(channel.muteInfo[userAuthenticate.id]) > new Date())
+				{
+					console.log("you are muted");
+					// voir comment gerer le mute coter front
+					return;
+				}
 				const sockets = await axios.get(`http://${url}:3333/channel/${channelTarget.id}/sockets`, {
+
 				headers: {
 						'Authorization': `Bearer ${token}`
 					} 

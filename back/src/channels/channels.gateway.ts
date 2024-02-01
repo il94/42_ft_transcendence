@@ -109,6 +109,19 @@ export class ChannelsGateway {
   }
   
   /*
+    args[0] socket du user qui vien d'etre mute
+    args[1] id du channel
+   */
+
+    @SubscribeMessage('updateUserMute')
+    async handleUpdateUserMute(client: Socket, args: any[]) {
+      const argsToSend = args.slice(1)
+      this.server.to(args[0]).emit("updateUserMute", ...argsToSend);
+    }
+
+
+
+  /*
     args[0] tableau de sockets des users channel
     args[1] id du channel
    */
@@ -134,56 +147,5 @@ export class ChannelsGateway {
         this.server.to(socket).emit("leaveChannel", ...argsToSend);
       }
     }
-  
-//   // afterInit(server: Server) {
-//   //   console.log("server after init" );
-//   // }
-
-//   handleDisconnect(client: Socket) {
-//     // console.log(`Disconnected: ${client.id}`);
-//   }
-
-//   @SubscribeMessage('newMessage')
-//   createMessage(@MessageBody() Body: MessageDto) {
-//     console.log(Body);
-//     this.server.emit('onMessage', Body);
-//   }
-
-//   @SubscribeMessage('private message')
-// handlePrivateMessage(client: any, data: any) {
-//     client.to(data.to).emit('private message', {
-//       from: client.id,
-//       message: data.message,
-//     });
-// }
-
-//   handleConnection(client: Socket, ...args: any[]) {
-//     // console.log(`Connected ${client.id}`);
-//   }
-
-//   @SubscribeMessage('createChannel')
-//   create(@MessageBody() createChannelDto: CreateChannelDto,  @Request() creator: User) {
-//     return this.channelsService.createChannel(createChannelDto, creator);
-//   }
-
-//   @SubscribeMessage('findAllChannels')
-//   findAll() {
-//     return this.channelsService.findAllChannels();
-//   }
-
-//   @SubscribeMessage('findOneChannel')
-//   findOne(@MessageBody() id: number, @Request() member: User) {
-//     return this.channelsService.findOneChannel(id, member);
-//   }
-
-//   @SubscribeMessage('updateChannel')
-//   update(@MessageBody() updateChannelDto: UpdateChannelDto, @Request() member: User) {
-//     return this.channelsService.updateChannel(updateChannelDto, member);
-//   }
-
-//   @SubscribeMessage('removeChannel')
-//   remove(@MessageBody() id: number) {
-//     return this.channelsService.remove(id);
-//   }
 
 }

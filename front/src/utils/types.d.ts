@@ -44,8 +44,9 @@ export type Channel = ChannelData & {
 	members: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
-	mutedUsers: (User | UserAuthenticate)[],
-	banneds: (User | UserAuthenticate)[]
+	//mutedUsers: (User | UserAuthenticate)[],
+	banneds: (User | UserAuthenticate)[],
+	muteInfo: Record<number, string>
 }
 
 export type Message = {

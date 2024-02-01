@@ -121,7 +121,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					administrators: [],
 					owner: undefined,
 					mutedUsers: [],
-					banneds: []
+					banneds: [],
+					muteinfo: []
 				}
 				return (newChannelMP)
 			}
@@ -313,15 +314,19 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.mutedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.post(`http://${url}:3333/channel/${channelTarget.id}/mutedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.mutedUsers.push(userTarget)
-			}
+	
+			/* ============ Temporaire ============== */
+			console.log(userTarget.username, " has muted")
+			await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/mute/${userTarget.id}`, {},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+				
+			//userAuthenticate.socket?.emit("sendMute", userTarget.socket, channelTarget.id);
+			// userTarget.socket?.send()
+			// post dans le back avec un id de la target id du mec qui envoie
 		}
 		catch (error) {
 			// displayPopupError(true)

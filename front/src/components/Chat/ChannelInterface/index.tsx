@@ -132,8 +132,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					members: [],
 					administrators: [],
 					owner: userAuthenticate,
-					mutedUsers: [],
-					banneds: []
+					banneds: [],
+					muteInfo: []
 				}
 
 				setUserAuthenticate((prevState) => ({
