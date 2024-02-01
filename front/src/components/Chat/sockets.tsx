@@ -29,7 +29,6 @@ type PropsUpdateDiscussion = {
 export function updateDiscussion(props: PropsUpdateDiscussion) {
 	if (props.channelTarget)
 	{
-		console.log("here");
 		let messageContent: Message;
 		const userSend = findUserInChannel(props.channelTarget, props.idSend);
 		if (!userSend)

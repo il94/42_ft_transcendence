@@ -19,14 +19,24 @@ export class PongGateway {
 	
 	public PongBounds: { height: number; width: number } = {height: 0, width: 0}
 
-	private BallPos: {x:number; y:number } = {x: 0, y: 0}
-	private BallDir: {x:number; y:number } = {x: 0, y: 0}
-	private BallSize: number = 20;
-	private LeftPaddlePos: {top:number; bottom:number } = {top: 0, bottom: 0}
-	private RightPaddlePos: {top:number; bottom:number } = {top: 0, bottom: 0}
-	private Speed: number = 0
-	private PaddleX: number = 0
+	private BallPos: {x:number; y:number }
+	private BallDir: {x:number; y:number }
+	private BallSize: number
+	private LeftPaddlePos: {top:number; bottom:number }
+	private RightPaddlePos: {top:number; bottom:number }
+	private Speed: number
+	private PaddleX: number
 
+	constructor() {
+		this.BallPos = {x: 0, y: 0}
+		this.BallDir = {x: 0, y: 0}
+		this.BallSize = 20;
+		this.LeftPaddlePos = {top: 0, bottom: 0}	
+		this.RightPaddlePos = {top: 0, bottom: 0}
+		this.Speed = 0
+		this.PaddleX = 0
+	}
+	
 	@SubscribeMessage("PongBounds")
 		handlePongBounds(client: Socket, data: any){
 			console.log("PongBounds = ", data)
@@ -35,15 +45,20 @@ export class PongGateway {
 				width: data.width
 			}
 			this.PaddleX = (this.PongBounds.width * 2.5 / 100)
+
+			this.LeftPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
+			this.RightPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
 		}
 
 	@SubscribeMessage("score")
 	// handleScore(@MessageBody() data: string, @ConnectedSocket() client: Socket, args: any){
-		handleScore(client: Socket, data: any){
+		handleScore(client: Socket, args: any){
 			const clientID = client.id;
 			
-			//console.log("emit back", data)
-			this.server.to(client.id).emit('score', client.id, data)
+			console.log("Score : ", args)
+			// if (parseInt(args[0]) >= 11 || parseInt(args[1]) >= 11) // check the score finish game
+			this.server.to(client.id).emit('score', client.id, args)
+
 		}
 
 
@@ -67,25 +82,49 @@ export class PongGateway {
 	// 		}
 	// 		this.server.to(client.id).emit("moveball", this.BallPos)
 	// 	}
-
 	@SubscribeMessage("paddlemove")
-		handlePaddleMove(client: Socket, move: string)
+		handlePaddleMove(client: Socket, args: string)
 		{
-			if (move === "up")
+			// args0 move
+			// args1 paddle
+			//args2 value
+			if (args[1] == "left")
 			{
-				this.LeftPaddlePos = {
-					top: this.LeftPaddlePos.top - (this.PongBounds.height / 100) , // 1% 
-					bottom: this.LeftPaddlePos.bottom - (this.PongBounds.height / 100)
+				if (args[0] == "up")
+				{
+					this.LeftPaddlePos = {
+						top: this.LeftPaddlePos.top - parseFloat(args[2]) , // 1% 
+						bottom: this.LeftPaddlePos.bottom - parseFloat(args[2])
+					}
 				}
+				if (args[0] == "down")
+				{
+					this.LeftPaddlePos = {
+						top: this.LeftPaddlePos.top + parseFloat(args[2]) , // 1% 
+						bottom: this.LeftPaddlePos.bottom + parseFloat(args[2])
+					}
+				}
+				// this.server.to(client.id).emit("leftpaddlemove", this.LeftPaddlePos)            //// EMIT A L"ADVERSAIRE !!!!!!
 			}
-			else if (move === "down")
+			else if (args[1] == "right")
 			{
-				this.LeftPaddlePos = {
-					top: this.LeftPaddlePos.top + (this.PongBounds.height / 100) , // 1% 
-					bottom: this.LeftPaddlePos.bottom + (this.PongBounds.height / 100)
+				if (args[0] == "up")
+				{
+					this.RightPaddlePos = {
+						top: this.RightPaddlePos.top - parseFloat(args[2]) , // 1% 
+						bottom: this.RightPaddlePos.bottom - parseFloat(args[2])
+					}
 				}
+				if (args[0] == "down")
+				{
+					this.RightPaddlePos = {
+						top: this.RightPaddlePos.top + parseFloat(args[2]) , // 1% 
+						bottom: this.RightPaddlePos.bottom + parseFloat(args[2])
+					}
+				}
+				// this.server.to(client.id).emit("rightpaddlemove", this.RightPaddlePos)         //// EMIT A L"ADVERSAIRE !!!!!!
 			}
-			this.server.to(client.id).emit("paddlemove", this.LeftPaddlePos)
+			console.log("new paddle pos ", this.LeftPaddlePos, this.RightPaddlePos)
 		}
 
 	@SubscribeMessage("resetBall")
@@ -102,6 +141,7 @@ export class PongGateway {
 				x: Math.cos(phi) * 5,
 				y: Math.sin(phi) * 5
 			}
+			
 			console.log("reset game init : ", this.BallPos, this.BallDir)
 			this.server.to(client.id).emit("resetBall", this.BallPos, this.BallDir)
 		}
@@ -121,3 +161,7 @@ export class PongGateway {
 // receive de la victoire ou defaite 
 
 // 
+
+
+
+// requete post game if(une game en attende rejoins) else(cree une game en attende)

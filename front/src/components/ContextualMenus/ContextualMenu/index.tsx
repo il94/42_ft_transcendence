@@ -189,7 +189,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					'Authorization': `Bearer ${token}`
 				}
 			})
-			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id, idMsg.data);													 
+			console.log("data send from challenge button :", idMsg.data)
+			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id, idMsg.data);												 
 		}
 		catch (error) {
 			console.log(error);

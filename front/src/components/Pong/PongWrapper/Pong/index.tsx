@@ -39,7 +39,7 @@ function Pong({social}){
 	const [LeftPaddlePos, setLeftPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0}) //en px
 	const [RightPaddlePos, setRightPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
 
-	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
+	const [BallPos, setBallPos] = useState ({x: 100, y: 100});
 	const [BallDir, setBallDir] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
 
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
@@ -49,9 +49,9 @@ function Pong({social}){
 	const PaddleSize: number = 10;
 	const BallSize: number = 20;
 
-	let currentBallPos = {
-		x: 0,
-		y: 0
+	let	 currentBallPos = {
+		x: 100,
+		y: 100
 	}
 	
 	const handleKeyDown = (event: KeyboardEvent) => {
@@ -82,6 +82,9 @@ function Pong({social}){
 			startGame()
 			return;
 		}
+
+		//need rework : ecouter seulement deux touches choisir lequel des paddles selon si ont est l'host ou le guest (celui qui send l'invit et celui qui accepte)
+
 		if (PongBounds && (keysPressed['w'] || keysPressed['W'])) {
 			if (LeftPaddlePos.top - PongOne * step >= 0)
 			{
@@ -89,6 +92,7 @@ function Pong({social}){
 					top: LeftPaddlePos.top - PongOne * step,
 					bottom: LeftPaddlePos.bottom - PongOne * step
 				});
+				user.userAuthenticate.socket?.emit("paddlemove", "up", "left", PongOne * step)
 			}
 		}
 		if (PongBounds && (keysPressed['s'] || keysPressed['S'])) {
@@ -98,6 +102,7 @@ function Pong({social}){
 					top: LeftPaddlePos.top + PongOne * step,
 					bottom: LeftPaddlePos.bottom + PongOne * step
 				});
+				user.userAuthenticate.socket?.emit("paddlemove", "down", "left", PongOne * step)
 			}
 		}
 		if (PongBounds && keysPressed['ArrowUp']) {
@@ -107,6 +112,7 @@ function Pong({social}){
 					top: RightPaddlePos.top - PongOne * step,
 					bottom: RightPaddlePos.bottom - PongOne * step
 				});
+				user.userAuthenticate.socket?.emit("paddlemove", "up", "right", PongOne * step)
 			}
 		}
 		if (PongBounds && keysPressed['ArrowDown']) {
@@ -116,30 +122,37 @@ function Pong({social}){
 					top: RightPaddlePos.top + PongOne * step,
 					bottom: RightPaddlePos.bottom + PongOne * step
 				});
+				user.userAuthenticate.socket?.emit("paddlemove", "down", "right", PongOne * step)
 			}
 		}
 	};
 
+	function handlepaddlemove(){
+
+	}
+
 	const startGame = () => {
+
 		if (!PongBounds)
 		return ;
-		// if (keysPressed['Enter'])
-		// 	setGameState()
-		setBallPos({
-			x: PongBounds.width / 2 - (BallSize/2),
-			y: PongBounds.height / 2 - (BallSize/2)	
-		});
-		currentBallPos = {
-			x: PongBounds.width / 2 - (BallSize/2),
-			y: PongBounds.height / 2 - (BallSize/2)
-		}
+		// // if (keysPressed['Enter'])
+		// // 	setGameState()
+		// setBallPos({
+		// 	x: PongBounds.width / 2 - (BallSize/2),
+		// 	y: PongBounds.height / 2 - (BallSize/2)	
+		// });
+		// currentBallPos = {
+		// 	x: PongBounds.width / 2 - (BallSize/2),
+		// 	y: PongBounds.height / 2 - (BallSize/2)
+		// }
+		user.userAuthenticate.socket?.emit("resetball");
 		setLeftPaddlePos({
-			top: (45  * (PongBounds.height / 100)),
+			top: (45 * (PongBounds.height / 100)),
 			bottom: (55 * (PongBounds.height / 100))
 		});
 		setRightPaddlePos({
-			top: ((50 - (PaddleSize/2)) * (PongBounds.height / 100)),
-			bottom: ((50 + (PaddleSize/2)) * (PongBounds.height / 100))
+			top: (45 * (PongBounds.height / 100)),
+			bottom: (55 * (PongBounds.height / 100))
 		});
 		setScore({left: 0, right: 0})
 
@@ -177,15 +190,15 @@ function Pong({social}){
 			const PaddleSizePx: number = LeftPaddlePos.bottom - LeftPaddlePos.top 
 			const CollisionOnPaddle: number = (LeftPaddlePos.top + PaddleSizePx/2) - (currentBallPos.y + (BallSize/2))
 			const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
-				console.log('----LEFT-----')
-				console.log (BallDir)
-				console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
-				console.log("top of the ball y : ", BallPos.y + BallDir.y)
-				console.log("bottom of the ball y : ", BallPos.y + BallDir.y + BallSize)
-				console.log("veloy ", veloY)
-				console.log("top of the paddle y : ", LeftPaddlePos.top)
-				console.log("bottom of the paddle y : ", LeftPaddlePos.bottom)
-				console.log('---------')
+				// console.log('----LEFT-----')
+				// console.log (BallDir)
+				// console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
+				// console.log("top of the ball y : ", BallPos.y + BallDir.y)
+				// console.log("bottom of the ball y : ", BallPos.y + BallDir.y + BallSize)
+				// console.log("veloy ", veloY)
+				// console.log("top of the paddle y : ", LeftPaddlePos.top)
+				// console.log("bottom of the paddle y : ", LeftPaddlePos.bottom)
+				// console.log('---------')
 				setBallDir({
 					x: (-BallDir.x + 1),
 					y: (-veloY * 4)
@@ -214,17 +227,17 @@ function Pong({social}){
 			const CollisionOnPaddle: number = (RightPaddlePos.top + PaddleSizePx/2) - (currentBallPos.y + (BallSize/2))
 			const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
-				console.log("----RIGHT----")
-				console.log (BallDir)
-				console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
-				console.log("top of the ball y : ", BallPos.y + BallDir.y)
-				console.log("bottom of the ball y : ", BallPos.y + BallDir.y + BallSize)
-				console.log(" ", veloY)
-				console.log("top of the paddle y : ", RightPaddlePos.top)
-				console.log("bottom of the paddle y : ", RightPaddlePos.bottom)
-				// console.log("collision on paddle", CollisionOnPaddle)
-				// console.log("final angle ", BounceAngle)
-				console.log("--------")
+				// console.log("----RIGHT----")
+				// console.log (BallDir)
+				// console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
+				// console.log("top of the ball y : ", BallPos.y + BallDir.y)
+				// console.log("bottom of the ball y : ", BallPos.y + BallDir.y + BallSize)
+				// console.log(" ", veloY)
+				// console.log("top of the paddle y : ", RightPaddlePos.top)
+				// console.log("bottom of the paddle y : ", RightPaddlePos.bottom)
+				// // console.log("collision on paddle", CollisionOnPaddle)
+				// // console.log("final angle ", BounceAngle)
+				// console.log("--------")
 				setBallDir({
 					x: (-BallDir.x - 1),
 					y: (-veloY * 4)
@@ -326,12 +339,12 @@ function Pong({social}){
 		// 	x: (Math.cos(phi) * 5),
 		// 	y: (Math.sin(phi) * 5)
 		// })
-		user.userAuthenticate.socket?.on("score", (id: any, args: any) => { console.log("in client from fct ", args, "id ", id)})
 		user.userAuthenticate.socket?.on("resetBall", handleResetBallPos)
+		user.userAuthenticate.socket?.on("score", (id: any, args: any) => { console.log("in client from fct ", args, "id ", id)})
 		//user.userAuthenticate.socket?.emit("moveBall")
 		user.userAuthenticate.socket?.emit("resetBall")
 		user.userAuthenticate.socket?.emit("score", score)
-
+		
 		return () => {
 			user.userAuthenticate.socket?.off("score")
 			user.userAuthenticate.socket?.off("resetBall")
@@ -354,11 +367,16 @@ function Pong({social}){
 	}, [keysPressed, LeftPaddlePos, RightPaddlePos]);
 	
 	useEffect(() => {
+		
 		setPongBounds(PongRef.current?.getBoundingClientRect())
+		startGame()
+		user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBounds ", args, "id ", id)})
+		user.userAuthenticate.socket?.on("leftpaddlemove", handlepaddlemove)
+		user.userAuthenticate.socket?.on("leftpaddlemove", handlepaddlemove)
 
-		user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBunds ", args, "id ", id)})
 		user.userAuthenticate.socket?.emit("PongBounds", PongRef.current?.getBoundingClientRect())
-
+		user.userAuthenticate.socket?.emit("paddlemove", "down", "left", )
+		
 		return () => {
 			user.userAuthenticate.socket?.off("PongBounds")
 		}
@@ -368,18 +386,18 @@ function Pong({social}){
 		// console.log("actu")
 		// console.log("PongRef", PongRef.current?.getBoundingClientRect())
 		setPongBounds(PongRef.current?.getBoundingClientRect())
-		user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBunds ", args, "id ", id)})
+		// user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBunds ", args, "id ", id)})
 		user.userAuthenticate.socket?.emit("PongBounds", PongRef.current?.getBoundingClientRect())
 
 		return () => {
-			user.userAuthenticate.socket?.off("PongBounds")
+			// user.userAuthenticate.socket?.off("PongBounds")
 		}
 	}, [PongRef.current?.parentElement, window.innerWidth, window.innerHeight, social])				
 	
 	return (
 		<Style ref={PongRef}>
 			{
-				gameState == "ongame" && PongRef.current && gameState ? (
+				gameState == "ongame" && PongRef.current ? (
 					<>
 					<Paddle Hposition={2} Vposition={(LeftPaddlePos.bottom - (LeftPaddlePos.bottom - LeftPaddlePos.top) / 2)}/>
 					<Ball X={BallPos.x} Y={BallPos.y} BallSize={BallSize}/>
@@ -396,4 +414,9 @@ function Pong({social}){
 export default Pong
 
 
+// user --> left | target ---> right 
 
+
+//user move paddle emit l'info
+	//server receive l'info redonne les values du paddle a au player et a l'autre  (need usertarget + challegne status acepted to work)
+	//user receive et change paddle
