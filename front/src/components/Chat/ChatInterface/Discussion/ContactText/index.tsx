@@ -78,7 +78,8 @@ function ContactText({ sender, content }: PropsContactText) {
 								userAuthenticate,
 								setContextualMenuPosition,
 								displayContextualMenu
-							})} />
+							})}
+							tabIndex={0} />
 						<MessageContent
 							onClick={handleClickEvent}>
 							<UserName>

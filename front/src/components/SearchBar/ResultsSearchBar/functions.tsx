@@ -12,6 +12,7 @@ import {
 	Channel,
 	User
 } from "../../../utils/types"
+
 import {
 	resultSearchBarType
 } from "../../../utils/status"
@@ -32,6 +33,8 @@ export function generateResults(results: User[] | Channel[], type: resultSearchB
 									:
 									addFunction(result.id)
 							}}
+							tabIndex={0}
+							$index={index}
 							$noAvatar={littleResults}>
 							{
 								!littleResults &&

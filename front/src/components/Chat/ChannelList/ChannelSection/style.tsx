@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
 
-export const Style = styled.div<{ $backgroundColor: string }>`
+export const Style = styled.div<{ $id: number }>`
 
 	display: flex;
 	align-items: center;
@@ -10,11 +10,16 @@ export const Style = styled.div<{ $backgroundColor: string }>`
 	height: 40px;
 	min-height: 40px;
 
-	background-color: ${(props) => props.$backgroundColor};
+	cursor: pointer;
+
+	background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionTransparent : colors.sectionAltTransparent};
 
 	&:hover {
-		cursor: pointer;
-		background-color: ${colors.sectionHover};
+		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+	}
+	&:focus-visible {
+		outline: none;	
+		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
 
 `

@@ -14,15 +14,15 @@ import InteractionContext from "../../../../contexts/InteractionContext"
 import DisplayContext from "../../../../contexts/DisplayContext"
 
 import {
-	Channel, ErrorResponse
+	Channel,
+	ErrorResponse
 } from "../../../../utils/types"
 
 type PropsChannel = {
 	channel: Channel,
-	backgroundColor: string
 }
 
-function ChannelSection({ channel, backgroundColor }: PropsChannel) {
+function ChannelSection({ channel }: PropsChannel) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { setChannelTarget } = useContext(InteractionContext)!
@@ -55,7 +55,8 @@ function ChannelSection({ channel, backgroundColor }: PropsChannel) {
 	return (
 		<Style
 			onClick={handleClickEvent}
-			$backgroundColor={backgroundColor}>
+			tabIndex={0}
+			$id={channel.id}>
 			<Avatar src={channel.avatar} />
 			<ChannelName>
 				{channel.name}

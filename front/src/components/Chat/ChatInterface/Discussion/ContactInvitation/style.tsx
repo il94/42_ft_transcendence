@@ -25,6 +25,16 @@ export const Avatar = styled.img`
 
 	border-radius: 50%;
 
+	cursor: pointer;
+
+	&:hover {
+		transform: translate(0px, -2px);
+	}
+	&:focus-visible {
+		transform: translate(0px, -2px);
+		outline: 2px solid ${colors.focusButton};
+	}
+
 `
 
 export const InvitationContent = styled.div`

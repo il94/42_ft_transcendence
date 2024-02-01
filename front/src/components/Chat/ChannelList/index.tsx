@@ -1,14 +1,11 @@
-import {
-	Dispatch,
-	SetStateAction
-} from "react"
-
 import styled from "styled-components"
 
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 
-import { Channel } from "../../../utils/types"
+import {
+	Channel
+} from "../../../utils/types"
 
 import colors from "../../../utils/colors"
 
@@ -37,7 +34,6 @@ function ChannelList({ channels }: PropsChannelList) {
 						<ChannelSection
 							key={"channel" + index} // a definir
 							channel={channel}
-							backgroundColor={!(index % 2) ? colors.sectionTransparent : colors.sectionAltTransparent}
 						/>
 					))
 				}

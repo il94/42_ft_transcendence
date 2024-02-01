@@ -74,7 +74,9 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 
 	return (
 		<Style>
-			<ProfileWrapper onClick={showCard}>
+			<ProfileWrapper
+				onClick={showCard}
+				tabIndex={0}>
 				<Avatar src={userAuthenticate.avatar} />
 				<ProfileName>
 					{userAuthenticate.username}

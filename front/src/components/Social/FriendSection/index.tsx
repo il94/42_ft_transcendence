@@ -36,7 +36,6 @@ import {
 
 type PropsFriendSection = {
 	friend: User,
-	backgroundColor: string,
 	social: boolean,
 	displayContextualMenu: Dispatch<SetStateAction<{
 		display: boolean,
@@ -49,7 +48,7 @@ type PropsFriendSection = {
 	}>>
 }
 
-function FriendSection({ friend, backgroundColor, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ friend, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
 
 	const { userTarget, setUserTarget, userAuthenticate } = useContext(InteractionContext)!
 	const { card, displayCard, setCardPosition } = useContext(CardContext)!
@@ -112,7 +111,8 @@ function FriendSection({ friend, backgroundColor, social, displayContextualMenu,
 			onClick={showCard}
 			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
-			$backgroundColor={backgroundColor}
+			tabIndex={0}
+			$id={friend.id}
 			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
 			<Avatar src={friend.avatar} />

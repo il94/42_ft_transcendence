@@ -4,19 +4,28 @@ import {
 	useContext
 } from "react"
 
-import { Style, ReduceButton } from "./style"
+import {
+	Style,
+	ReduceButton
+} from "./style"
 
 import FriendSection from "./FriendSection"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
 
 import CardContext from "../../contexts/CardContext"
 
-import { User } from "../../utils/types"
-import { contextualMenuStatus } from "../../utils/status"
+import {
+	sortUserByName,
+	sortUserByStatus
+} from "../../utils/functions"
 
-import { sortUserByName, sortUserByStatus } from "../../utils/functions"
+import {
+	User
+} from "../../utils/types"
 
-import colors from "../../utils/colors"
+import {
+	contextualMenuStatus
+} from "../../utils/status"
 
 type PropsSocial = {
 	social: boolean,
@@ -53,7 +62,6 @@ function Social({ social, displaySocial, friends, displayContextualMenu, setCont
 						<FriendSection
 							key={"friend" + index} // a definir
 							friend={friend}
-							backgroundColor={!(index % 2) ? colors.section : colors.sectionAlt}
 							social={social}
 							displayContextualMenu={displayContextualMenu}
 							setContextualMenuPosition={setContextualMenuPosition}

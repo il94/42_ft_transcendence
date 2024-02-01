@@ -1,6 +1,7 @@
 import {
 	Dispatch,
-	SetStateAction
+	SetStateAction,
+	useState
 } from "react"
 
 import {
@@ -19,12 +20,18 @@ type PropsInputSearchBar = {
 }
 
 function InputSearchBar({ value, setValue, displaySearchBarResults } : PropsInputSearchBar) {
+
+	const [placeHolder, setPlaceHolder] = useState<string>("Search...")
+
 	return (
-		<Style onClick={() => displaySearchBarResults(true)}>
+		<Style
+			onClick={() => displaySearchBarResults(true)}
+			onBlur={() => setPlaceHolder("Search...")}>
 			<InputText
 				onChange={(event) => setValue(event.target.value)}
+				onClick={() => setPlaceHolder('')}
 				type="text"
-				placeholder="Search..."
+				placeholder={placeHolder}
 				autoComplete="off"
 				spellCheck="false"
 				value={value} />

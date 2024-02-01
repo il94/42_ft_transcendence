@@ -71,7 +71,8 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					userAuthenticate,
 					setContextualMenuPosition,
 					displayContextualMenu
-				})} />
+				})}
+				tabIndex={0} />
 			<InvitationContent>
 				<Text>
 					{sender.username} challenge {target.username} to a duel !

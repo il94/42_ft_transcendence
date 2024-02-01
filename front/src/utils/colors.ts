@@ -9,9 +9,14 @@ const colors = {
 	section: "#AA6736",
 	sectionAlt: "#995C2F",
 	sectionHover: "#d68215",
+	sectionAltHover: "#b97011",
 	sectionTransparent: "#aa6736b3",
 	sectionAltTransparent: "#995c2fb3",
+	sectionFocus: "#ffc400",
+	sectionAltFocus: "#ebac00",
 	sectionContextualMenu: "#8b5026",
+	sectionProfile: "#9E5B29",
+	sectionProfileFocus: "#ffc400",
 	navbar: "#C9783C",
 
 	/* Texts */
@@ -24,12 +29,19 @@ const colors = {
 
 	/* Buttons */
 	button: "#DB6045",
+	buttonFix: "#995C2F",
+	buttonFixHover: "#885028",
+	buttonFixFocus: "#eeb825",
 	buttonRed: "#D34221",
 	buttonGreen: "#2FAE1B",
 	buttonGray: "#705A56",
 	reduceButton: "#bb8054",
 	reduceButtonHover: "#be9473",
+	reduceButtonFocus: "#ebac00",
 	shadowButton: "#7a3525",
+	focusButton: "#ffe600",
+	shadowFocusButton: "#cc8502",
+	focusText: "#ffff52",
 	focusBorderText: "#ffff52",
 	menuTextSelection: "#d38040",
 
@@ -58,7 +70,13 @@ const colors = {
 	historyBorder: "#7A3525",
 	historyWin: "#6BCAFF",
 	historyLoose: "#FF6B6B",
-	historyDraw: "#FFF384"
+	historyDraw: "#FFF384",
+
+	/* Searchbar */
+	searchBar: "#804400",
+	searchBarResult: "#AA6736",
+	searchBarResultAlt: "#a36234",
+	
 }
 
 export default colors

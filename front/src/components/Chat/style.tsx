@@ -39,14 +39,17 @@ export const ChannelCreateButton = styled.button`
 
 	padding: 0;
 
-	background-color: ${colors.channelCreateButton};
+	background-color: ${colors.buttonFix};
 
 	&:hover {
-		background-color: ${colors.sectionHover};
+		background-color: ${colors.buttonFixHover};
+	}
+	&:focus-visible {
+		outline: none;	
+		background-color: ${colors.buttonFixFocus};
 	}
 
 `
-
 
 export const BottomChatWrapper = styled.div`
 	

@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import colors from "../../utils/colors"
 
 export const Style = styled.div`
@@ -29,6 +30,10 @@ export const ReduceButton = styled.button`
 
 	&:hover {
 		background-color: ${colors.reduceButtonHover};
+	}
+	&:focus-visible {
+		outline: none;
+		background-color: ${colors.reduceButtonFocus};
 	}
 
 `
