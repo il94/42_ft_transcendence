@@ -13,6 +13,18 @@ export const DisplayContext = createContext<{
 	setZSettingsIndex: Dispatch<SetStateAction<number>>,
 	zMaxIndex: number,
 	setZMaxIndex: Dispatch<SetStateAction<number>>,
+
+	loaderChannels: boolean,
+	setLoaderChannels: Dispatch<SetStateAction<boolean>>,
+	loaderChat: boolean,
+	setLoaderChat: Dispatch<SetStateAction<boolean>>,
+	loaderFriends: boolean,
+	setLoaderFriends: Dispatch<SetStateAction<boolean>>,
+	loaderResultsSearchBar: boolean,
+	setLoaderResultsSearchBar: Dispatch<SetStateAction<boolean>>,
+	loaderMatchsHistory: boolean,
+	setLoaderMatchsHistory: Dispatch<SetStateAction<boolean>>,
+
 	displayPopupError: Dispatch<SetStateAction<{ display: boolean, message?: string }>>,
 	GameWrapperRef: any
 } | undefined>(undefined)
