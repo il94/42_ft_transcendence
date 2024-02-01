@@ -11,7 +11,7 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Loader partout
 
 	Créer des fichiers fonctions si necessaire
-	Styliser le focus et autres effets
+	Styliser le focus et autres effets (reste card et contextual menu si possible)
 	Créer un composant Avatar pour la library
 	Checker les enums/types pour les noms
 	
