@@ -163,7 +163,7 @@ model UsersOnChannels {
   channel   Channel @relation(fields: [channelId], references: [id])
   channelId Int
   role      Role
-  // mute      Boolean
+  mute      DateTime @default(now())
 
   @@id([userId, channelId])
 }

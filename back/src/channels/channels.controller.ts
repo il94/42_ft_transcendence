@@ -98,6 +98,16 @@ export class ChannelController {
     return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
   }
 
+  // Change l'etat mute d'un user du channel
+  @Patch(':channelId/mute/:userTargetId')
+  updateMute(
+    @Param('channelId', ParseIntPipe) channelId: number,
+    @Param('userTargetId', ParseIntPipe) userTargetId: number,
+    @getUser('id') userAuthId: number,
+  ){
+    return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId);
+  }
+
   // Change le challenge status d'un channel par son id
 
   @Patch('message/:id')

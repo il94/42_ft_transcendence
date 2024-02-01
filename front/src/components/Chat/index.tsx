@@ -73,7 +73,6 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 				throw new Error
 			if (typeof idTargetOrMsg === 'number')
 			{
-
 				const userTarget = findUserInChannel(channelTarget , idTargetOrMsg);
 				if (!userTarget)
 				throw new Error
@@ -278,7 +277,27 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		}
 	}
 
+	async function refreshUserMute(idChan: number, time: string) {
+		if (idChan === channelTarget?.id)
+		{
+			setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState) {
+				const updatedMuteInfo = {
+					...prevState.muteInfo,
+					[userAuthenticate.id]: time,
+				  };
+				return {
+				...prevState,
+				muteInfo: updatedMuteInfo,
+				};
+			} else {
+				return undefined;
+			}
+			});
+		}
+	}
 
+	
 	async function refreshStatusChallenge(idMsg: number, status: challengeStatus, idChan: number) {
 		if (idChan === channelTarget?.id)
 		{
@@ -317,6 +336,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 		userAuthenticate.socket?.on("joinChannel", refreshJoinChannel);
 		userAuthenticate.socket?.on("leaveChannel", refreshLeaveChannel);
 		userAuthenticate.socket?.on("updateUserRole", refreshUserRole);
+		userAuthenticate.socket?.on("updateUserMute", refreshUserMute);
 		userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
 
 		return () => {
@@ -324,6 +344,7 @@ function Chat({ chat, displayChat, channels, setUserAuthenticate, channelTarget,
 			userAuthenticate.socket?.off("joinChannel", refreshJoinChannel);
 			userAuthenticate.socket?.off("leaveChannel", refreshLeaveChannel);
 			userAuthenticate.socket?.off("updateUserRole", refreshUserRole);
+			userAuthenticate.socket?.off("updateUserMute", refreshUserMute);
 			userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
 		}
 	}
