@@ -1,8 +1,12 @@
+import {
+	Dispatch,
+	SetStateAction,
+	useState
+} from "react"
 import styled from "styled-components"
 
 import InputSearchBar from "./InputSearchBar"
 import ResultsSearchBar from "./ResultsSearchBar"
-import { Dispatch, SetStateAction, useState } from "react"
 
 const Style = styled.div`
 

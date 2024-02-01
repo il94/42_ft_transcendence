@@ -6,8 +6,7 @@ import {
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
-import Cookies from "js-cookie"
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -19,14 +18,23 @@ import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 import Separator from '../../componentsLibrary/Separator/Index'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
 
@@ -43,8 +51,14 @@ const FTRedirectWrapper = styled.div`
 
 `
 
+type PropsSigninResponse = {
+	access_token: string
+} | {
+	twoFA: boolean
+}
+
 function Signin() {
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -81,9 +95,10 @@ function Signin() {
 				hash: password.value
 			}
 
-			const signinResponse = await axios.post(`http://${url}:3333/auth/signin`, user)
+			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
 
-			if (signinResponse.data.twoFA) {
+
+			if ('twoFA' in signinResponse.data) {
 				Cookies.remove('id');
 				Cookies.set("id", signinResponse.data.id);
 				navigate("/twofa")	
@@ -95,7 +110,7 @@ function Signin() {
 					setToken(access_token)
 				}
 				else { 
-					throw new AxiosError("Failed to retrieve access_token")
+					throw new Error
 				}
 				navigate("/")
 			}
@@ -125,10 +140,20 @@ function Signin() {
 
 	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setEmail({
-			value: value,
-			error: false
-		})
+
+		if (value.endsWith("@student.42.fr")) {
+			setEmail({
+				value: value,
+				error: true,
+				errorMessage: "Cannot signin with 42 email"
+			})
+		}
+		else {
+			setEmail({
+				value: value,
+				error: false
+			})
+		}
 	}
 
 	/* ============================== PASSWORD ================================== */
@@ -158,56 +183,61 @@ function Signin() {
 				<WindowTitle>
 					Sign in
 				</WindowTitle>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						Email
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email.value}
-							width={231}
-							fontSize={25}
-							$error={email.error} />
-						<ErrorMessage>
-							{email.error && email.errorMessage}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputEmailChange}
+								type="text" value={email.value}
+								width={231}
+								fontSize={25}
+								$error={email.error} />
+							<ErrorMessage>
+								{email.error && email.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						Password
-						<InputText
-							onChange={handleInputPasswordChange}
-							type={showPassword ? "text" : "password"}
-							value={password.value as string}
-							width={231}
-							fontSize={25}
-							$error={password.error} />
-						<ErrorMessage>
-							{password.error && password.errorMessage}
-						</ErrorMessage>
-						<Button
-							onClick={() => setShowPassword(!showPassword)}
-							type="button"
-							fontSize={18}
-							alt="Show password button"
-							title={showPassword ? "Hide password" : "Show password"}
-							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
-							{
-								showPassword ?
-									"Hide password"
-									:
-									"Show password"
-							}
-						</Button>
-					</Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputPasswordChange}
+								type={showPassword ? "text" : "password"}
+								value={password.value as string}
+								width={231}
+								fontSize={25}
+								$error={password.error} />
+							<ErrorMessage>
+								{password.error && password.errorMessage}
+							</ErrorMessage>
+							<Button
+								onClick={() => setShowPassword(!showPassword)}
+								type="button"
+								fontSize={18}
+								width={231}
+								alt="Show password button"
+								title={showPassword ? "Hide password" : "Show password"}
+								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+								{
+									showPassword ?
+										"Hide password"
+										:
+										"Show password"
+								}
+							</Button>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 				<div>
 					Don't have an account?&nbsp;
 					<StyledLink to="/signup" color={colors.button}>

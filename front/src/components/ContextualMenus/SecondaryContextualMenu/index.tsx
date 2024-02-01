@@ -1,17 +1,31 @@
-import { Dispatch, SetStateAction } from "react"
-// import axios from "axios"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext
+} from "react"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 import { Style } from "./style"
 
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
-import { Channel, User, UserAuthenticate } from "../../../utils/types"
+import InteractionContext from "../../../contexts/InteractionContext"
+import DisplayContext from "../../../contexts/DisplayContext"
+import AuthContext from "../../../contexts/AuthContext"
+
+import {
+	userIsBanned,
+	userIsInChannel
+} from "../../../utils/functions"
+
+import {
+	Channel,
+	ErrorResponse
+} from "../../../utils/types"
 
 type PropsSecondaryContextualMenu = {
 	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
-	userTarget: User | UserAuthenticate,
 	secondaryContextualMenuPosition: {
 		left?: number,
 		right?: number,
@@ -19,25 +33,47 @@ type PropsSecondaryContextualMenu = {
 		bottom?: number
 	},
 	secondaryContextualMenuHeight: number,
-	channels: Channel[] | undefined,
-	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>
+	channels: Channel[]
 }
 
-function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels, displayErrorContextualMenu }: PropsSecondaryContextualMenu) {
+function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels }: PropsSecondaryContextualMenu) {
+
+	const { token, url } = useContext(AuthContext)!
+	const { userTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
-			if (!channel.members.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.post(`http://${url}:3333/channel/${channel.id}/users/${userTarget.id}`, userTarget)
-
-				/* ====================================== */
-				channel.members.push(userTarget)
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channel.id}/relations`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			
+			if (userIsInChannel(channelWithRelationsResponse.data, userTarget.id))
+				displayPopupError({ display: true, message: `${userTarget.username} is already in channel` })
+			else if (userIsBanned(channelWithRelationsResponse.data, userTarget.id))
+				displayPopupError({ display: true, message: `${userTarget.username} is banned from this channel` })
+			else
+			{
+				await axios.post(`http://${url}:3333/channel/${channel.id}/add/${userTarget.id}`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
@@ -49,22 +85,19 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, userTarget, s
 			$top={secondaryContextualMenuPosition.top}
 			$bottom={secondaryContextualMenuPosition.bottom}
 			$height={secondaryContextualMenuHeight}>
-			{
-				channels ?
-					<ScrollBar visible>
-						{
-							channels.map((channel, index) => (
-								<Section key={"channelSection" + index} onClick={() => handleInviteClickEvent(channel)}>
-									<SectionName>
-										{channel.name}
-									</SectionName>
-								</Section>
-							))
-						}
-					</ScrollBar>
-					:
-					<ErrorRequestMessage />
-			}
+			<ScrollBar visible>
+				{
+					channels.map((channel, index) => (
+						<Section
+							key={"channelSection" + index}
+							onClick={() => handleInviteClickEvent(channel)}>
+							<SectionName>
+								{channel.name}
+							</SectionName>
+						</Section>
+					))
+				}
+			</ScrollBar>
 		</Style>
 	)
 }

@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import effects from "../../../utils/effects"
 import colors from "../../../utils/colors"
 
@@ -45,7 +46,7 @@ export const ResultsWrapper = styled.div`
 
 `
 
-export const Result = styled.div<{ $noAvatar?: boolean }>`
+export const Result = styled.div<{ $index: number, $noAvatar?: boolean }>`
 
 	display: flex;
 	align-items: center;
@@ -53,10 +54,16 @@ export const Result = styled.div<{ $noAvatar?: boolean }>`
 
 	height: 35px;
 
-	background-color: ${colors.section};
+	cursor: pointer;
+
+	background-color: ${(props) => props.$index % 2 === 0 ? colors.searchBarResult : colors.searchBarResultAlt };
 
 	&:hover {
-		background-color: ${colors.sectionHover};
+		background-color: ${(props) => props.$index % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+	}
+	&:focus-visible {
+		outline: none;	
+		background-color: ${(props) => props.$index % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
 
 `
@@ -66,6 +73,8 @@ export const NoResult = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	position: relative;
 
 	min-height: 35px;
 	

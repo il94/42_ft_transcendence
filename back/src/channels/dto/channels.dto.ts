@@ -1,70 +1,58 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message, Role } from "@prisma/client"
-import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class CreateChannelDto implements Channel {
-	
-	id:         number;
-	
-	createdAt:  Date;
+export class CreateChannelDto {
 
-	@IsOptional()
 	@IsString()
+	@IsNotEmpty()
 	@MaxLength(8)
-	name:       string;
+	name: string;
+
+	@IsEnum(ChannelStatus)
+	@IsNotEmpty()
+	type: ChannelStatus;
 
 	@IsOptional()
 	@IsString()
-	type:       ChannelStatus;
-
-	@IsOptional()
-	@IsString()
-	password:	string;
+	hash: string;
 	
 	@IsString()
+	@IsNotEmpty()
+	avatar: string;
+}
+
+export class UpdateChannelDto {
 	@IsOptional()
-	avatar:		string;
+	@IsString()
+	@IsNotEmpty()
+	@MaxLength(8)
+	name: string;
 
-	invitation: Invitation[];
+	@IsOptional()
+	@IsEnum(ChannelStatus)
+	@IsNotEmpty()
+	type: ChannelStatus;
+
+	@IsOptional()
+	@IsString()
+	hash: string;
   
-	members:    UsersOnChannels[];
-	content:    Message[];
-	
-  }
-
-export class UpdateChannelDto extends PartialType(CreateChannelDto) {
-
-  @IsString()
-  @MaxLength(8)
-  name:	string;
-
-  @IsString()
-  type:	ChannelStatus;
-
-  @IsOptional()
-  @IsString()
-  password:	string;
-  
-  @IsString()
-  @IsOptional()
-  avatar:	string;
-
-  members:	UsersOnChannels[];
-  
-  content:	Message[];
+	@IsOptional()
+	@IsString()
+	@IsNotEmpty()
+	avatar: string;
 }
 
 export class UpdateRoleDto extends PartialType(CreateChannelDto) {
-
-	@IsString()
+	@IsEnum(Role)
 	role:	Role;
-  
-  }
+}
 
 export class AuthChannelDto extends PartialType(CreateChannelDto) {
 
 	@IsString()
 	@IsOptional()
-	password:	string;
+	hash:	string;
 	
 }

@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
@@ -25,10 +26,16 @@ export const ProfileWrapper = styled.div`
 
 	padding-right: 7px;
 
+	cursor: pointer;
+
+	clip-path: ${effects.pixelateWindow};
+
 	&:hover {
-		cursor: pointer;	
-		clip-path: ${effects.pixelateWindow};
-		background-color: #9E5B29;
+		background-color: ${colors.sectionProfile};
+	}
+	&:focus-visible {
+		outline: none;
+		background-color: ${colors.sectionProfileFocus};
 	}
 
 `

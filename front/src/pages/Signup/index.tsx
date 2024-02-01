@@ -15,22 +15,37 @@ import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { getRandomDefaultAvatar } from '../../utils/functions'
+import {
+	getRandomDefaultAvatar
+} from '../../utils/functions'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
 
+type PropsSignupResponse = {
+	access_token: string
+}
+
 function Signup() {
 
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -86,12 +101,10 @@ function Signup() {
 				avatar: getRandomDefaultAvatar()
 			}
 
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
-			const response = await axios.post(`http://${url}:3333/auth/signup`, newUser)
-			
-			setToken(response.data.access_token)
-			localStorage.setItem('access_token', response.data.access_token)
-			
+			localStorage.setItem("access_token", signupResponse.data.access_token)
+
 			navigate("/")
 		}
 		catch (error) {
@@ -293,105 +306,113 @@ function Signup() {
 				<WindowTitle>
 					Sign up
 				</WindowTitle>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						Username
-						<InputText
-							onChange={handleInputUsernameChange}
-							onBlur={handleInputUsernameBlur}
-							type="text" value={username.value}
-							width={231}
-							fontSize={25}
-							$error={username.error} />
-						<ErrorMessage>
-							{username.error && username.errorMessage}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputUsernameChange}
+								onBlur={handleInputUsernameBlur}
+								type="text" value={username.value}
+								width={231}
+								fontSize={25}
+								$error={username.error} />
+							<ErrorMessage>
+								{username.error && username.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						Password
-						<InputText
-							onChange={handleInputPasswordChange}
-							type={showPassword ? "text" : "password"}
-							value={password.value as string}
-							width={231}
-							fontSize={25}
-							$error={password.error} />
-						{
-							password.errorMessage ?
-								<>
-									{
-										Array.isArray(password.errorMessage) ?
-											<>
-												{
-
-													(password.errorMessage as string[]).map((errorMessage, index) => {
-														return (
-															<ErrorMessage
-																key={"error_message" + index}>
-																{errorMessage}
-															</ErrorMessage>)
-													}
-													)
-												}
-											</>
-											:
-											<ErrorMessage>
-												{password.errorMessage}
-											</ErrorMessage>
-									}
-								</>
-								:
-								<div style={{ height: "15px" }} />
-						}
-						<Button
-							onClick={() => setShowPassword(!showPassword)}
-							type="button"
-							fontSize={18}
-							alt="Show password button"
-							title={showPassword ? "Hide password" : "Show password"}
-							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputPasswordChange}
+								type={showPassword ? "text" : "password"}
+								value={password.value as string}
+								width={231}
+								fontSize={25}
+								$error={password.error} />
 							{
-								showPassword ?
-									"Hide password"
+								password.errorMessage ?
+									<>
+										{
+											Array.isArray(password.errorMessage) ?
+												<>
+													{
+
+														(password.errorMessage as string[]).map((errorMessage, index) => {
+															return (
+																<ErrorMessage
+																	key={"error_message" + index}>
+																	{errorMessage}
+																</ErrorMessage>)
+														}
+														)
+													}
+												</>
+												:
+												<ErrorMessage>
+													{password.errorMessage}
+												</ErrorMessage>
+										}
+									</>
 									:
-									"Show password"
+									<div style={{ height: "15px" }} />
 							}
-						</Button>
-					</Setting>
-					<Setting>
+							<Button
+								onClick={() => setShowPassword(!showPassword)}
+								type="button"
+								fontSize={18}
+								alt="Show password button"
+								title={showPassword ? "Hide password" : "Show password"}
+								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+								{
+									showPassword ?
+										"Hide password"
+										:
+										"Show password"
+								}
+							</Button>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						E-mail
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email.value as string}
-							width={231}
-							fontSize={25}
-							$error={email.error} />
-						<ErrorMessage>
-							{email.error && email.errorMessage}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputEmailChange}
+								type="text" value={email.value as string}
+								width={231}
+								fontSize={25}
+								$error={email.error} />
+							<ErrorMessage>
+								{email.error && email.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						Phone number
-						<InputText
-							onChange={handleInputPhoneNumberChange}
-							type="text" value={phoneNumber.value as string}
-							width={231}
-							fontSize={25}
-							$error={phoneNumber.error} />
-						<ErrorMessage>
-							{phoneNumber.error && phoneNumber.errorMessage}
-						</ErrorMessage>
-					</Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputPhoneNumberChange}
+								type="text" value={phoneNumber.value as string}
+								width={231}
+								fontSize={25}
+								$error={phoneNumber.error} />
+							<ErrorMessage>
+								{phoneNumber.error && phoneNumber.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 				<div>
 					Already have an account ?&nbsp;
 					<StyledLink to="/signin" color={colors.button}>

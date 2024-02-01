@@ -1,21 +1,33 @@
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import Cookies from "js-cookie"
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
-import colors from '../../utils/colors'
 import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 
+import AuthContext from '../../contexts/AuthContext'
+
+import colors from '../../utils/colors'
+
 function Error() {
 
+	const { setToken } = useContext(AuthContext)!
+	const location = useLocation()
+
 	useEffect(() => {
-		localStorage.clear()
-		Cookies.remove("access_token")
-		Cookies.remove("id")
-		Cookies.remove('isNew')
+		if (location.state?.disconnect)
+		{
+			localStorage.removeItem("access_token")
+			Cookies.remove("access_token")
+      Cookies.remove("id")
+      Cookies.remove('isNew')
+			setToken('')
+		}
+
 	}, [])
 
 	return (

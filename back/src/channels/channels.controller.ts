@@ -12,27 +12,35 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 export class ChannelController {
   constructor(private readonly channelsService: ChannelsService) {}
 
-  // Cree un channel
-  @Post()
-  create(@Body() dto: CreateChannelDto, @Request() req) {
-	  return this.channelsService.createChannel(dto, req.user.id);
-  }
+	// Cree un channel
+	@Post()
+	create(@getUser('id') userId: number,
+	@Body() newChannel: CreateChannelDto) {
+		return this.channelsService.createChannel(newChannel, userId)
+	}
 
-  // Cree un channel MP et y ajoute un user
-  @Post('mp/:id')
-  createMP(@Param('id', ParseIntPipe) recipientId: number,
-    @Body() channelDatas: CreateChannelDto,
-    @getUser('id') creatorId: number) {
-	  return this.channelsService.createChannelMP(recipientId, creatorId, channelDatas);
-  }
+	// Cree un channel MP et y ajoute un user
+	@Post('mp/:id')
+	createMP(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.createChannelMP(userAuthId, userTargetId)
+	}
 
-  // Ajoute un user dans un channel
-  @Post('join/:id')
-  join(@Param('id', ParseIntPipe) channelId: number,
-    @Body() joinChannelDatas: AuthChannelDto,
-    @getUser('id') userId: number) {
-    return this.channelsService.joinChannel(joinChannelDatas, channelId, userId);
-  }
+	// Ajoute le user auth dans un channel
+	@Post(':id/join')
+	join(@getUser('id') userId: number,
+	@Param('id', ParseIntPipe) channelId: number,
+	@Body() { hash }: AuthChannelDto) {
+		return this.channelsService.joinChannel(channelId, userId, hash)
+	}
+
+	// Ajoute un user dans un channel
+	@Post(':channelId/add/:userTargetId')
+	addUser(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.joinChannel(channelId, userTargetId, undefined, userAuthId)
+	}
 
     /* ajout de message  avec l'id du channel  */
 
@@ -53,12 +61,11 @@ export class ChannelController {
     return channels;
   }
 
-  // Retourne tout les channels PUBLIC et PROTECTED
-  @Get('accessibles')
-  async findAllAccessibles() {
-    const channels = await this.channelsService.findAllChannelsAccessibles();
-    return channels;
-  }
+	// Retourne tout les channels PUBLIC et PROTECTED
+	@Get('accessibles')
+	async findAllAccessibles() {
+		return await this.channelsService.findAllChannelsAccessibles()
+	}
 
   // Retourne un channel
   @Get(':id')
@@ -67,35 +74,45 @@ export class ChannelController {
     return this.channelsService.findChannel(channelId, userId);
   }
 
-  // Retourne un channel avec ses relations
-  @Get(':id/relations')
-  findWithRelations(@Param('id', ParseIntPipe) channelId: number,
-    @getUser('id') userId: number) {
-    return this.channelsService.findChannelWithRelations(channelId, userId);
-  }
+	// Retourne un channel avec ses relations
+	@Get(':id/relations')
+	findWithRelations(@getUser('id') userId: number, 
+	@Param('id', ParseIntPipe) channelId: number) {
+		return this.channelsService.findChannelWithRelations(channelId, userId)
+	}
 
   // Retourne les sockets (string) des users
   @Get(':id/sockets')
   async findSockets(
     @Param('id', ParseIntPipe) id: number) {
-    return await this.channelsService.getAllSockets(id);
+    return await this.channelsService.getAllSocketsChannel(id);
   }
 
-  // Modifie un channel
-  @Patch(':id')
-  update(@Param('id', ParseIntPipe) channelId: number, 
-  @Body() newChannelDatas: UpdateChannelDto, 
-  @getUser('id') userId: number) {
-    return this.channelsService.updateChannel(channelId, newChannelDatas, userId);
-  }
+	// Modifie un channel
+	@Patch(':id')
+	update(@getUser('id') userId: number,
+	@Param('id', ParseIntPipe) channelId: number, 
+	@Body() newChannelDatas: UpdateChannelDto) {
+		return this.channelsService.updateChannel(channelId, newChannelDatas, userId)
+	}
 
-  // Change le role d'un user du channel
-  @Patch(':channelId/role/:userTargetId')
-  updateRole(@Param('channelId', ParseIntPipe) channelId: number,
+	// Change le role d'un user du channel
+	@Patch(':channelId/role/:userTargetId')
+	updateRole(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number,
+	@Body() { role: newRole }: UpdateRoleDto) {
+		return this.channelsService.updateUserRole(channelId, userAuthId, userTargetId, newRole)
+	}
+
+  // Change l'etat mute d'un user du channel
+  @Patch(':channelId/mute/:userTargetId')
+  updateMute(
+    @Param('channelId', ParseIntPipe) channelId: number,
     @Param('userTargetId', ParseIntPipe) userTargetId: number,
     @getUser('id') userAuthId: number,
-    @Body() newRole: UpdateRoleDto) {
-    return this.channelsService.updateUserRole(channelId, userTargetId, userAuthId, newRole);
+  ){
+    return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId);
   }
 
   // Change le challenge status d'un channel par son id
@@ -108,18 +125,18 @@ export class ChannelController {
   return this.channelsService.updateMessageStatus(idMsg, newStatus);
 }
 
-  // Supprime un channel
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) channelId: number) {
-    return this.channelsService.remove(channelId);
+	// Supprime un channel
+	@Delete(':id')
+	remove(@Param('id', ParseIntPipe) channelId: number) {
+		return this.channelsService.remove(channelId)
 	}
 
-  // Retire un user d'un channel
-  @Delete(':channelId/leave/:userTargetId')
-  leave(@Param('channelId', ParseIntPipe) channelId: number,
-    @Param('userTargetId', ParseIntPipe) userTargetId: number,
-    @getUser('id') userAuthId: number) {
-    return this.channelsService.leaveChannel(channelId, userTargetId, userAuthId);
+	// Retire un user d'un channel
+	@Delete(':channelId/leave/:userTargetId')
+	leave(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.leaveChannel(channelId, userAuthId, userTargetId)
 	}
 
 
@@ -146,12 +163,12 @@ async addInvitation(
 
 /* =========================== PAS UTILISEES ================================ */
 
-  @Patch('add/:user/in/:chan')
-  addUser(@Param('user', ParseIntPipe) user: number,
-  @Param('chan', ParseIntPipe) chan: number,
-  @Request() member: User) {
-    return this.channelsService.addUserInChannel(user, member, chan);
-  }
+//   @Patch('add/:user/in/:chan')
+//   addUser(@Param('user', ParseIntPipe) user: number,
+//   @Param('chan', ParseIntPipe) chan: number,
+//   @Request() member: User) {
+//     return this.channelsService.addUserInChannel(user, member, chan);
+//   }
 
 
 }

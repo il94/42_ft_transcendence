@@ -1,44 +1,95 @@
 import {
 	ChangeEvent,
-	Dispatch,
 	FormEvent,
-	SetStateAction,
 	useContext,
 	useState
 } from "react"
 import axios, { AxiosError } from "axios"
 
 import {
-	ErrorMessage,
-	Input,
-	Style,
-	Text
+	Style
 } from "./style"
 
 import Button from "../../../componentsLibrary/Button"
+import InputText from "../../../componentsLibrary/InputText"
+import {
+	ErrorMessage,
+	HorizontalSetting,
+	HorizontalSettingsForm,
+	VerticalSettingWrapper
+} from "../../../componentsLibrary/SettingsForm/Index"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
-import { Channel, UserAuthenticate } from "../../../utils/types"
+import {
+	ErrorResponse,
+	SettingData,
+	UserAuthenticate
+} from "../../../utils/types"
 
-type PropsLockedInterface = {
-	channel: Channel,
-	setChannel: Dispatch<SetStateAction<Channel>>,
-	setErrorRequest: Dispatch<SetStateAction<boolean>>
-}
-
-function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedInterface) {
+function LockedInterface() {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
-	type PropsSetting = {
-		value: string,
-		error: boolean,
-		errorMessage?: string
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		try {
+			event.preventDefault()
+			if (!channelTarget)
+				throw new Error
+
+			if (password.value.length === 0) {
+				setPassword({
+					value: '',
+					error: true,
+					errorMessage: "Insert password",
+				})
+				return
+			}
+
+			if (password.error)
+				return
+
+			await axios.post(`http://${url}:3333/channel/${channelTarget.id}/join`, {
+				hash: password.value
+			},
+				{
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+			setUserAuthenticate((prevState: UserAuthenticate) => ({
+				...prevState,
+				channels: [...prevState.channels, channelTarget]
+			}))
+
+			setChannelTarget(() => ({
+				...channelTarget,
+				members: [...channelTarget.members, userAuthenticate],
+			}))
+		}
+		catch (error) {
+			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+		}
 	}
 
-	const [password, setPassword] = useState<PropsSetting>({
+	/* ============================== PASSWORD ================================== */
+
+	const [password, setPassword] = useState<SettingData>({
 		value: '',
 		error: false,
 		errorMessage: ''
@@ -52,76 +103,41 @@ function LockedInterface({ channel, setChannel, setErrorRequest }: PropsLockedIn
 		})
 	}
 
-	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
-
-	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-		try {
-			event.preventDefault()
-			if (password.value.length === 0) {
-				setPassword({
-					value: '',
-					error: true,
-					errorMessage: "Insert password",
-				})
-				return
-			}
-
-			await axios.post(`http://${url}:3333/channel/join/${channel.id}`, {
-				password: password.value
-			},
-			{
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
-			setUserAuthenticate((prevState: UserAuthenticate) => ({
-				...prevState,
-				channels: [ ...prevState.channels, channel]
-			}))
-
-			setChannel(() => ({
-				...channel,
-				members: [...channel.members, userAuthenticate],
-			}))
-		}
-		catch (error) {
-			const axiosError = error as AxiosError
-
-			if (axiosError.response?.status === 403)
-			{
-				setPassword((prevState) => ({
-					...prevState,
-
-					error: true,
-					errorMessage: "Invalid password",
-				}))
-			}
-			else
-				setErrorRequest(true)
-		}
+	function handleInputPasswordBlur() {
+		setPassword((prevState: SettingData) => ({
+			...prevState,
+			error: false
+		}))
 	}
 
+	/* ========================================================================== */
+
 	return (
-		<Style
-			onSubmit={handleSubmit}
-			autoComplete="off"
-			spellCheck="false">
-			<Text>
-				Password
-			</Text>
-			<Input
-				onChange={handleInputPasswordChange}
-				value={password.value as string}
-				$error={password.error} />
-			<ErrorMessage>
-				{password.error && password.errorMessage}
-			</ErrorMessage>
-			<Button
-				type="submit" width={200}
-				alt="Submit button" title="Submit">
-				Submit
-			</Button>
+		<Style>
+			<HorizontalSettingsForm
+				onSubmit={handleSubmit}
+				autoComplete="off"
+				spellCheck="false">
+				<HorizontalSetting>
+					Password
+					<VerticalSettingWrapper>
+						<InputText
+							onChange={handleInputPasswordChange}
+							onBlur={handleInputPasswordBlur}
+							value={password.value as string}
+							width={200}
+							$error={password.error} />
+						<ErrorMessage>
+							{password.error && password.errorMessage}
+						</ErrorMessage>
+					</VerticalSettingWrapper>
+				</HorizontalSetting>
+				<Button
+					type="submit" width={200}
+					alt="Submit button" title="Submit">
+					Submit
+				</Button>
+			</HorizontalSettingsForm>
 		</Style>
 	)
 }

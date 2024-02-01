@@ -14,11 +14,12 @@ import { User } from '@prisma/client';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiOkResponse({ type: UserEntity, isArray: true })
-  findAll() {
-    return this.usersService.findAll();
-  }
+	// Renvoie tout les users
+	@Get()
+	@ApiOkResponse({ type: UserEntity, isArray: true })
+	findAll() {
+		return this.usersService.findAll()
+	}
   
   @Get('me')
   async getMe(@getUser() user: User) {

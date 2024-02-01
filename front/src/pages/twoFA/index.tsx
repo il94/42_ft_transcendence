@@ -6,7 +6,8 @@ import {
 	useState
 } from 'react'
 import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import Cookies from "js-cookie"
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -14,22 +15,35 @@ import InputText from '../../componentsLibrary/InputText'
 import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
-import Cookies from "js-cookie"
+import {
+	HorizontalSettingsForm,
+	HorizontalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
+
+type PropsTwoFAResponse = {
+	access_token: string
+}
 
 function TwoFA() {
+
 	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
-
+      
 	useEffect(() => {
 		const id: string | undefined = Cookies.get('id')
 		if (id)
@@ -47,17 +61,14 @@ function TwoFA() {
 				})
 				return
 			}
-
-			/* ============ Temporaire ============== */
 			
-			const response = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
+			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
 			 
-			localStorage.clear();
 			setToken(response.data.access_token)
-			localStorage.setItem('access_token', response.data.access_token)
 
-			/* ====================================== */
 
+
+			localStorage.setItem("access_token", twoFAResponse.data.access_token)
 			navigate("/")
 		}
 		catch (error) {
@@ -93,25 +104,6 @@ function TwoFA() {
 
 	/* ========================================================================== */
 
-	// useEffect(() => {
-	// 	async function sendCode() {
-	// 		try {
-
-	// 			/* ============ Temporaire ============== */
-
-	// 			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
-
-	// 			/* ====================================== */
-	// 		}
-	// 		catch (error) {
-	// 			navigate("/error");
-	// 		}
-	// 	}
-	// 	sendCode()
-	// }, [])
-
-	/* ========================================================================== */
-
 	return (
 		<Page>
 			<MainTitle>
@@ -123,29 +115,31 @@ function TwoFA() {
 				<WindowTitle>
 					TwoFA
 				</WindowTitle>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
-						Enter the six-digit code from Google Authenticator to secure your authentication
-						<InputText
-							onChange={handleInputCodeChange}
-							type="text" value={code.value}
-							width={231}
-							fontSize={25}
-							$error={code.error} />
-						<ErrorMessage>
-							{code.error && code.errorMessage}
-						</ErrorMessage>
-					</Setting>
+					<HorizontalSetting>
+						<VerticalSettingWrapper>
+							Enter the six-digit code from Google Authenticator to secure your authentication
+							<InputText
+								onChange={handleInputCodeChange}
+								type="text" value={code.value}
+								width={231}
+								fontSize={25}
+								$error={code.error} />
+							<ErrorMessage>
+								{code.error && code.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</HorizontalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 			</CentralWindow>
 		</Page>
 	)

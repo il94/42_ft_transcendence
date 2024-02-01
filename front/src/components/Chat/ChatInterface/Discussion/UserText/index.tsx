@@ -1,4 +1,7 @@
-import { Style, Text } from "./style"
+import {
+	Style,
+	Text
+} from "./style"
 
 type PropsUserText = {
 	content: string
@@ -8,7 +11,7 @@ function UserText({ content }: PropsUserText) {
 	return (
 		<Style className="UserTexts">
 			<Text>
-				{(content)}
+				{content}
 			</Text>
 		</Style>
 	)

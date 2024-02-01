@@ -15,10 +15,13 @@ export class UsersService {
 	async createUser(createUserDto: CreateUserDto): Promise<User> {
 		console.log("back create user")
 		try {
+			if (createUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException();
 			const userExists = await this.prisma.user.findFirst({
 				where: { email: createUserDto.email }
 			})
 			if (userExists)
+
 				throw new ConflictException('credential already taken');
 			const hash = await argon.hash(createUserDto.hash);
 			const userDatas = {
@@ -45,17 +48,29 @@ export class UsersService {
 		}
 	}
 
+	// Renvoie tout les users
 	findAll() {
-		const users = this.prisma.user.findMany({ 
-			select: { id: true,
-				username: true,
-				avatar: true,
-				status: true,
-				wins: true,
-				draws: true,
-				losses: true,
-			},});
-		return users;
+		try {
+			// Récupère tout les users
+			const users = this.prisma.user.findMany({
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
+				}
+			})
+			return users
+		}
+		catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	async findById(id: number): Promise<Partial<User>>  {

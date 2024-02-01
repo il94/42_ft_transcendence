@@ -18,19 +18,15 @@ import {
 import Icon from "../../componentsLibrary/Icon"
 
 import AuthContext from "../../contexts/AuthContext"
-
-import { User, UserAuthenticate } from "../../utils/types"
+import InteractionContext from "../../contexts/InteractionContext"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
 import { ErrorResponse, SettingData } from '../../utils/types'
 
 type PropsProfile = {
-	userAuthenticate: UserAuthenticate,
 	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	userTarget: User | UserAuthenticate,
-	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 	setCardPosition: Dispatch<SetStateAction<{
 		left?: number,
 		right?: number,
@@ -41,9 +37,10 @@ type PropsProfile = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarget, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
+function Profile({ card, displayCard, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
 	const { token, setToken, url } = useContext(AuthContext)!
+	const { userAuthenticate, userTarget, setUserTarget } = useContext(InteractionContext)!
 	const navigate = useNavigate()
 
 	function showCard() {
@@ -90,7 +87,9 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 
 	return (
 		<Style>
-			<ProfileWrapper onClick={showCard}>
+			<ProfileWrapper
+				onClick={showCard}
+				tabIndex={0}>
 				<Avatar src={userAuthenticate.avatar} />
 				<ProfileName>
 					{userAuthenticate.username}

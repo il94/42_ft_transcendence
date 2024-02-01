@@ -10,11 +10,11 @@ import {
 import axios, { AxiosError } from "axios"
 
 import {
-	Setting,
+	HorizontalSetting,
 	SettingTtile,
 	Style,
 	CloseButtonWrapper,
-	SettingsForm,
+	HorizontalSettingsForm,
 	ErrorMessage,
 	TwoFAValue
 } from "./style"
@@ -24,34 +24,32 @@ import Icon from "../../componentsLibrary/Icon"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
-import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
+import InteractionContext from "../../contexts/InteractionContext"
+import AuthContext from "../../contexts/AuthContext"
 
 import {
 	ErrorResponse,
-	SettingData,
-	UserAuthenticate
+	SettingData
 } from "../../utils/types"
-import { emptySetting } from "../../utils/emptyObjects"
+
+import {
+	emptySetting
+} from "../../utils/emptyObjects"
 
 import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
-	token: string,
-	url: string,
-	userAuthenticate: UserAuthenticate,
-	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
 	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
 	setTwoFACodeQR: Dispatch<SetStateAction<string>>
 }
 
+function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
 
-function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
-
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-
+	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
 
 	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -76,11 +74,6 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 			console.log(error)
 		}
 	}
-
-
-
-
-
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -162,11 +155,11 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						errorMessage: "Invalid email"
 					}))
 				}
-				else
-					setErrorRequest(true)
+				// else
+					// setErrorRequest(true)
 			}
-			else
-				setErrorRequest(true)
+			// else
+				// setErrorRequest(true)
 		}
 	}
 
@@ -394,19 +387,17 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 		<Style
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
-		{
-			!errorRequest ?
 			<ScrollBar visible>
 				<CloseButtonWrapper>
 					<Icon src={CloseIcon} size={24}
 						onClick={() => displaySettingsMenu(false)}
 						alt="Close button" title="Close" />
 				</CloseButtonWrapper>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Username
 						</SettingTtile>
@@ -419,8 +410,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						<ErrorMessage>
 							{username.error && username.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Password
 						</SettingTtile>
@@ -473,8 +464,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 									"Show password"
 							}
 						</Button>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							E-mail
 						</SettingTtile>
@@ -486,8 +477,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						<ErrorMessage>
 							{email.error && email.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Phone number
 						</SettingTtile>
@@ -499,8 +490,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						<ErrorMessage>
 							{phoneNumber.error && phoneNumber.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							2FA
 						</SettingTtile>
@@ -526,7 +517,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 									"Able"
 							}
 						</Button>
-					</Setting>
+					</HorizontalSetting>
 
 							{/* <img src={QRcode} />
 							<InputText
@@ -544,11 +535,8 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 						alt="Save button" title="Save changes">
 						Save
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 			</ScrollBar>
-			:
-			<ErrorRequestMessage />
-		}
 		</Style>
 	)
 }
