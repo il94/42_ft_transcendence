@@ -44,7 +44,7 @@ export const CloseButton = styled.div`
 
 `
 
-export const SettingsForm = styled.form`
+export const HorizontalSettingsForm = styled.form`
 
 	display: flex;
 	flex-direction: column;
@@ -54,7 +54,7 @@ export const SettingsForm = styled.form`
 
 `
 
-export const Setting = styled.div`
+export const HorizontalSetting = styled.div`
 
 	display: flex;
 	flex-direction: column;

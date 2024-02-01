@@ -10,11 +10,11 @@ import {
 import axios, { AxiosError } from "axios"
 
 import {
-	Setting,
+	HorizontalSetting,
 	SettingTtile,
 	Style,
 	CloseButtonWrapper,
-	SettingsForm,
+	HorizontalSettingsForm,
 	ErrorMessage,
 	TwoFAValue
 } from "./style"
@@ -33,7 +33,10 @@ import {
 	ErrorResponse,
 	SettingData
 } from "../../utils/types"
-import { emptySetting } from "../../utils/emptyObjects"
+
+import {
+	emptySetting
+} from "../../utils/emptyObjects"
 
 import CloseIcon from "../../assets/close.png"
 
@@ -390,11 +393,11 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						onClick={() => displaySettingsMenu(false)}
 						alt="Close button" title="Close" />
 				</CloseButtonWrapper>
-				<SettingsForm
+				<HorizontalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Username
 						</SettingTtile>
@@ -407,8 +410,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						<ErrorMessage>
 							{username.error && username.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Password
 						</SettingTtile>
@@ -461,8 +464,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 									"Show password"
 							}
 						</Button>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							E-mail
 						</SettingTtile>
@@ -474,8 +477,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						<ErrorMessage>
 							{email.error && email.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							Phone number
 						</SettingTtile>
@@ -487,8 +490,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						<ErrorMessage>
 							{phoneNumber.error && phoneNumber.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
+					</HorizontalSetting>
+					<HorizontalSetting>
 						<SettingTtile>
 							2FA
 						</SettingTtile>
@@ -514,7 +517,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 									"Able"
 							}
 						</Button>
-					</Setting>
+					</HorizontalSetting>
 
 							{/* <img src={QRcode} />
 							<InputText
@@ -532,7 +535,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						alt="Save button" title="Save changes">
 						Save
 					</Button>
-				</SettingsForm>
+				</HorizontalSettingsForm>
 			</ScrollBar>
 		</Style>
 	)
