@@ -14,6 +14,7 @@ export class PongService {
   constructor(private prisma: PrismaService) {}
 
   async createGame(creatorId: number): Promise<Game> {
+    console.log("create new game")
     const tmp = await this.prisma.game.create({
         data: {
             level: 1,
@@ -33,18 +34,21 @@ export class PongService {
   // util
   async connectGame(userId: number, gameId: number, userRole: roleInGame): Promise<Game> {
     try {
+        //console.log("userRole ", userRole)
         const connectGame = await this.prisma.game.update({
             where: { id: gameId },
             data: {
                 players: {
-                    create: [{ role: userRole, podium: 'DRAW', userId: userId }],
                     connect: { userId_gameId: {
                         userId: userId,
                         gameId: gameId
-                    }}
+                    }},
+                
                 }
             }
         })
+        const players =  await this.prisma.usersOnGames.findUnique({ where: { userId_gameId: { userId: userId, gameId: gameId } }})
+        console.log("connectGame: ", players)
         if (!connectGame)
             throw new NotFoundException(`Failed to update game ${gameId}`)
         await this.prisma.user.update({ where: { id: userId},
@@ -75,6 +79,7 @@ export class PongService {
             throw new NotFoundException('Game to join not found')
         if (countPlayers === 1) {
             const joinGame = await this.connectGame(userId, gameId, roleInGame.PLAYER);
+            console.log("count: ", countPlayers)
             // match playing
             await this.prisma.game.update({
                 where: { id: joinGame.id },
@@ -101,13 +106,14 @@ export class PongService {
             const newGame = await this.createGame(userId)
             return newGame;
         }
+        console.log("GAME ICI: ", game)
         const playGame = await this.playGame(userId, game.id)
         await this.prisma.user.update({ where: { id: userId},
             data: { status: UserStatus.PLAYING }
         })
         return playGame;
     } catch (error) {
-        throw error.message
+        throw error
     }
   }
 
@@ -140,6 +146,21 @@ export class PongService {
         throw error.message
     }
   }
+
+  async remove(id: number): Promise<Game> {
+    const deletePlayers = this.prisma.usersOnGames.deleteMany({
+        where: { userId: id }})
+    const transaction = await this.prisma.$transaction([deletePlayers])
+    const userExists = await this.prisma.game.findUnique({
+        where: { id: id },});
+    if (userExists) {
+        const deleteGame = this.prisma.game.delete({
+            where: { id: id },});
+        return deleteGame;
+    } else {
+        throw new Error(`Failed to remove game`);
+    }
+}
 
   
 

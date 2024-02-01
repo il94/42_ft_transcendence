@@ -25,8 +25,10 @@ export class PongController {
 
     // boutton : jouer 
     @Post('play')
-    playRandom(@getUser() user: User): Promise<Game>  {
-        return this.pongService.playRandomGame(user.id)
+    async playRandom(@getUser() user: User): Promise<Game>  {
+        const game = await this.pongService.playRandomGame(user.id)
+        console.log("game : ", game)
+        return game
     }
 
     @Post('watch/:id')

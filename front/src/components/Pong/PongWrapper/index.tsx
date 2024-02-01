@@ -53,11 +53,11 @@ function PongWrapper({social}) {
     async function handlePlayButton(){
         setGameState(true)
         try {
-        //     const response = await axios.post(`http://${url}:3333/pong/play`, {}, {
-		// 	headers: {
-		// 		'Authorization': `Bearer ${token}`
-		// 	}
-		// })
+            const response = await axios.post(`http://${url}:3333/pong/play`, {}, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
 		console.log('user socket', userAuthenticate)
         userAuthenticate.socket?.emit('searchGame', userAuthenticate.id)
         }
