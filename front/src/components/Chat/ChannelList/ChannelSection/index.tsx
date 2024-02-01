@@ -26,10 +26,12 @@ function ChannelSection({ channel }: PropsChannel) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { setChannelTarget } = useContext(InteractionContext)!
-	const { displayPopupError } = useContext(DisplayContext)!
+	const { setLoaderChat, displayPopupError } = useContext(DisplayContext)!
 	
 	async function handleClickEvent() {
 		try {
+			setLoaderChat(true)
+			
 			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channel.id}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
@@ -37,6 +39,7 @@ function ChannelSection({ channel }: PropsChannel) {
 			})
 
 			setChannelTarget(channelWithRelationsResponse.data)
+			setLoaderChat(false)
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {

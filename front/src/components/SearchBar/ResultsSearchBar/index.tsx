@@ -17,6 +17,8 @@ import {
 	generateResults
 } from "./functions"
 
+import Loader from "../../../componentsLibrary/Loader"
+
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 import DisplayContext from "../../../contexts/DisplayContext"
@@ -49,7 +51,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
-	const { displayPopupError } = useContext(DisplayContext)!
+	const { loaderResultsSearchBar, setLoaderResultsSearchBar, displayPopupError } = useContext(DisplayContext)!
 
 	/* ================================ SETUP =================================== */
 
@@ -62,6 +64,8 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
+				setLoaderResultsSearchBar(true)
+
 				const usersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/user`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -81,6 +85,8 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 
 				// Trie les channels par odre alphabétique liste des résultats
 				setChannels(accessiblesChannelsResponse.data.sort(sortChannelByName))
+
+				setLoaderResultsSearchBar(false)
 			}
 			catch (error) {
 				if (axios.isAxiosError(error)) {
@@ -218,26 +224,35 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 	return (
 		<Style ref={resultsSearchBarRef}>
 			{
-				usersFound.length > 0 &&
-				<>
-					{
-						generateResults(usersFound, resultSearchBarType.USER, littleResults, addUserToFriendList)
-					}
-				</>
-			}
-			{
-				channelsFound.length > 0 &&
-				<>
-					{
-						generateResults(channelsFound, resultSearchBarType.CHANNEL, littleResults, addChannelToChannelList)
-					}
-				</>
-			}
-			{
-				usersFound.length === 0 && channelsFound.length === 0 &&
+				loaderResultsSearchBar ?
 				<NoResult>
-					No result found
+					<Loader size={50}/>
 				</NoResult>
+				:
+				<>
+					{
+						usersFound.length > 0 &&
+						<>
+							{
+								generateResults(usersFound, resultSearchBarType.USER, littleResults, addUserToFriendList)
+							}
+						</>
+					}
+					{
+						channelsFound.length > 0 &&
+						<>
+							{
+								generateResults(channelsFound, resultSearchBarType.CHANNEL, littleResults, addChannelToChannelList)
+							}
+						</>
+					}
+					{
+						usersFound.length === 0 && channelsFound.length === 0 &&
+						<NoResult>
+							No result found
+						</NoResult>
+					}
+				</>
 			}
 		</Style>
 	)

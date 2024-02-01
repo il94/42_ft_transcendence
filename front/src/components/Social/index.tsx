@@ -11,8 +11,10 @@ import {
 
 import FriendSection from "./FriendSection"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
+import Loader from "../../componentsLibrary/Loader"
 
 import CardContext from "../../contexts/CardContext"
+import DisplayContext from "../../contexts/DisplayContext"
 
 import {
 	sortUserByName,
@@ -45,6 +47,7 @@ type PropsSocial = {
 function Social({ social, displaySocial, friends, displayContextualMenu, setContextualMenuPosition }: PropsSocial) {
 
 	const { displayCard } = useContext(CardContext)!
+	const { loaderFriends } = useContext(DisplayContext)!
 
 	function reduceSocial() {
 		displaySocial(!social)
@@ -56,32 +59,39 @@ function Social({ social, displaySocial, friends, displayContextualMenu, setCont
 
 	return (
 		<Style onContextMenu={(event) => event.preventDefault()}>
-			<ScrollBar>
-				{
-					sortedFriends.map((friend, index) => (
-						<FriendSection
-							key={"friend" + index} // a definir
-							friend={friend}
-							social={social}
-							displayContextualMenu={displayContextualMenu}
-							setContextualMenuPosition={setContextualMenuPosition}
-						/>
-					))
-				}
-			</ScrollBar>
-			<ReduceButton onClick={reduceSocial} title="Reduce">
-				{
-					social ?
-					<>
-						&gt;&gt;
-					</>
+			{
+				loaderFriends ?
+					<Loader size={50} />
 					:
-					<>
-						&lt;&lt;
-					</>
-				}
-			</ReduceButton>
-		</Style>
+						<>
+							<ScrollBar>
+								{
+									sortedFriends.map((friend, index) => (
+										<FriendSection
+											key={"friend" + index} // a definir
+											friend={friend}
+											social={social}
+											displayContextualMenu={displayContextualMenu}
+											setContextualMenuPosition={setContextualMenuPosition}
+										/>
+									))
+								}
+							</ScrollBar>
+							<ReduceButton onClick={reduceSocial} title="Reduce">
+							{
+								social ?
+								<>
+									&gt;&gt;
+								</>
+								:
+								<>
+									&lt;&lt;
+								</>
+							}
+							</ReduceButton>
+						</>
+			}
+			</Style>
 	)
 }
 

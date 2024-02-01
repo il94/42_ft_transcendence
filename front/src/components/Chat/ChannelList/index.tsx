@@ -1,7 +1,13 @@
+import {
+	useContext
+} from "react"
 import styled from "styled-components"
 
 import ChannelSection from "./ChannelSection"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
+import Loader from "../../../componentsLibrary/Loader"
+
+import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
 	Channel
@@ -13,6 +19,8 @@ const Style = styled.div`
 
 	display: flex;
 	flex-direction: column;
+
+	position: relative;
 
 	width: 128px;
 
@@ -26,18 +34,25 @@ type PropsChannelList = {
 
 function ChannelList({ channels }: PropsChannelList) {
 
+	const { loaderChannels } = useContext(DisplayContext)!
+
 	return (
 		<Style>
-			<ScrollBar>
+			{
+				loaderChannels ?
+				<Loader size={100} />
+				:
+				<ScrollBar>
 				{
 					channels.map((channel, index) => (
 						<ChannelSection
-							key={"channel" + index} // a definir
-							channel={channel}
+						key={"channel" + index} // a definir
+						channel={channel}
 						/>
 					))
 				}
 			</ScrollBar>
+			}
 		</Style>
 	)
 }

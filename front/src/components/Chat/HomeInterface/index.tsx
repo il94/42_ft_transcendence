@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import colors from "../../../utils/colors"
 
 const Style = styled.div`
@@ -7,7 +8,8 @@ const Style = styled.div`
 	justify-content: center;
 	align-items: center;
 
-	width: 245px;
+	width: 100%;
+	height: 100%;
 
 	background-color: ${colors.chatWindow};
 

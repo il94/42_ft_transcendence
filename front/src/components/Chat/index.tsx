@@ -11,7 +11,8 @@ import {
 	ChatButton,
 	TopChatWrapper,
 	BottomChatWrapper,
-	ChannelCreateButton
+	ChannelCreateButton,
+	Interfaces
 } from "./style"
 
 import ChannelList from "./ChannelList"
@@ -21,6 +22,7 @@ import Banner from "./Banner"
 import HomeInterface from "./HomeInterface"
 import LockedInterface from "./LockedInterface"
 import Icon from "../../componentsLibrary/Icon"
+import Loader from "../../componentsLibrary/Loader"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
@@ -51,7 +53,7 @@ type PropsChat = {
 function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState }: PropsChat) {
 
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
-	const { zChatIndex, setZChatIndex, zMaxIndex } = useContext(DisplayContext)!
+	const { zChatIndex, setZChatIndex, zMaxIndex, loaderChat } = useContext(DisplayContext)!
 
 	/* ============================ CHAT STATE ================================== */
 
@@ -154,8 +156,8 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 								setChatWindowState={setChatWindowState} />
 							:
 							<>
-								<ChannelList
-									channels={channels} />
+								<ChannelList channels={channels} />
+								<Interfaces>
 								{
 									chatWindowState === chatWindowStatus.HOME ||
 										!channelTarget ?
@@ -165,6 +167,11 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 											:
 											<ChatInterface />
 								}
+								{
+									loaderChat &&
+									<Loader size={150}/>
+								}
+								</Interfaces>
 							</>
 					}
 				</BottomChatWrapper>

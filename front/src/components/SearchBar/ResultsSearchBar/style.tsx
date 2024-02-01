@@ -74,6 +74,8 @@ export const NoResult = styled.div`
 	justify-content: center;
 	align-items: center;
 
+	position: relative;
+
 	min-height: 35px;
 	
 	background-color: ${colors.section};

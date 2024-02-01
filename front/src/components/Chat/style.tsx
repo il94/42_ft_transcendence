@@ -61,6 +61,14 @@ export const BottomChatWrapper = styled.div`
 
 `
 
+export const Interfaces = styled.div`
+	
+	width: 245px;
+
+	position: relative;
+
+`
+
 export const ChatButton = styled.div<{ $zIndex: number }>`
 
 	position: absolute;

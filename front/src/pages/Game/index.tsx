@@ -109,7 +109,6 @@ function Game() {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
 				return (friendsResponse.data)
 			}
 			catch (error) {
@@ -161,6 +160,8 @@ function Game() {
 
 		async function fetchMe() {
 			try {
+				setLoaderFriends(true)
+				setLoaderChannels(true)
 				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -188,6 +189,8 @@ function Game() {
 					channels: channels,
 					socket: socket
 				})
+				setLoaderChannels(false)
+				setLoaderFriends(false)
 			}
 			catch (error) {
 				navigate("/error", {
@@ -258,6 +261,12 @@ function Game() {
 		}
 		setZMaxIndex(Math.max(zCardIndex, zChatIndex, zSettingsIndex))
 	}, [zCardIndex, zChatIndex, zSettingsIndex])
+
+	const [loaderChannels, setLoaderChannels] = useState<boolean>(false)
+	const [loaderChat, setLoaderChat] = useState<boolean>(false)
+	const [loaderFriends, setLoaderFriends] = useState<boolean>(false)
+	const [loaderResultsSearchBar, setLoaderResultsSearchBar] = useState<boolean>(false)
+	const [loaderMatchsHistory, setLoaderMatchsHistory] = useState<boolean>(false)
 
 	useEffect(() => {
 		window.addEventListener('resize', closeContextualMenus);
@@ -361,7 +370,7 @@ function Game() {
 		<GamePage
 			onClick={closeContextualMenus}>
 			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
-				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, displayPopupError, GameWrapperRef }}>
+				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, loaderChat, setLoaderChat, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, loaderChannels, setLoaderChannels, loaderFriends, setLoaderFriends, loaderResultsSearchBar, setLoaderResultsSearchBar, loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError, GameWrapperRef }}>
 					<GameWrapper ref={GameWrapperRef}>
 						{
 							contextualMenu.display &&
