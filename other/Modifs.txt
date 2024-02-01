@@ -8,12 +8,9 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Gérer instantanément la présence du token
 	Set corectement tout les titles et alts
 	Vérifier les key dans les maps
-	Loader partout
 
 	Créer des fichiers fonctions si necessaire
-	Styliser le focus et autres effets (reste card et contextual menu si possible)
-	Créer un composant Avatar pour la library
-	Checker les enums/types pour les noms
+	Styliser le focus et autres effets (contextual menu si possible)
 	
 	Fix les erreurs ts
 
@@ -40,6 +37,11 @@ Profile/ : à faire après merge
 
 ScoreResume/ : à voir quand le Pong aura avancé
 -pas_regardé:
+
+MatchHistory/ : à voir quand le Pong aura avancé
+-pas_regardé:
+	Ajouter loader
+
 
 SettingsMenu/ : à faire après merge
 	Faire select Avatar si le temps
