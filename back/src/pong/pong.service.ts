@@ -27,12 +27,15 @@ export class PongService {
             }
         }
     })
+    await this.prisma.user.update({ where: { id: creatorId},
+        data: { status: UserStatus.WAITING }
+     })
     console.log("NEW game: ", tmp);
     return tmp
   }
 
   // util
-  async connectGame(userId: number, gameId: number, userRole: roleInGame): Promise<Game> {
+  async connectGame(userId: number, gameId: number, userRole: roleInGame, userStatus: UserStatus): Promise<Game> {
     try {
         //console.log("userRole ", userRole)
         const connectGame = await this.prisma.game.update({
@@ -49,10 +52,12 @@ export class PongService {
         })
         const players =  await this.prisma.usersOnGames.findUnique({ where: { userId_gameId: { userId: userId, gameId: gameId } }})
         console.log("connectGame: ", players)
+
+
         if (!connectGame)
             throw new NotFoundException(`Failed to update game ${gameId}`)
         await this.prisma.user.update({ where: { id: userId},
-            data: { status: UserStatus.WAITING }
+            data: { status:  userStatus}
         })
         return connectGame
     } catch (error) {
@@ -63,12 +68,6 @@ export class PongService {
   // to play
   async playGame(userId: number, gameId: number): Promise<Game> {
     try {
-        // const countUsers = await this.prisma.game.findUnique({ where: { id: gameId},
-        //     include: {        
-        //         _count: {
-        //             select: { players:  true }
-        //         }
-        // }})
         const countPlayers = await this.prisma.usersOnGames.count({
             where: {
               gameId: gameId,
@@ -78,7 +77,7 @@ export class PongService {
         if (!countPlayers)
             throw new NotFoundException('Game to join not found')
         if (countPlayers === 1) {
-            const joinGame = await this.connectGame(userId, gameId, roleInGame.PLAYER);
+            const joinGame = await this.connectGame(userId, gameId, roleInGame.PLAYER, UserStatus.PLAYING);
             console.log("count: ", countPlayers)
             // match playing
             await this.prisma.game.update({
@@ -86,9 +85,9 @@ export class PongService {
                 data: { status: GameStatus.PLAYING }
             })
             // user playing
-            await this.prisma.user.update({ where: { id: userId},
-                data: { status: UserStatus.PLAYING }
-            })
+            //await this.prisma.user.update({ where: { id: userId},
+            //   data: { status: UserStatus.PLAYING }
+           // })
             return joinGame;
         }
         else
@@ -108,9 +107,9 @@ export class PongService {
         }
         console.log("GAME ICI: ", game)
         const playGame = await this.playGame(userId, game.id)
-        await this.prisma.user.update({ where: { id: userId},
-            data: { status: UserStatus.PLAYING }
-        })
+       // await this.prisma.user.update({ where: { id: userId},
+        //    data: { status: UserStatus.PLAYING }
+       // })
         return playGame;
     } catch (error) {
         throw error
@@ -124,7 +123,7 @@ export class PongService {
             status: GameStatus.PLAYING }})
         if (!game)
             throw new NotFoundException('Game to watch not found')
-        const joinGame = await this.connectGame(userId, gameId, roleInGame.WATCHER);
+        const joinGame = await this.connectGame(userId, gameId, roleInGame.WATCHER, UserStatus.WATCHING);
         if (!joinGame)
         throw new NotFoundException('Failed to join game to watch')
         await this.prisma.user.update({ where: { id: userId},
