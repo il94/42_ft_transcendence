@@ -1,28 +1,31 @@
 (Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
-DISPLAY/ :
-	Checker le responsive de toutes les pages
-
 GLOBAL/ : A faire sur tout les fichiers un par un
 
+	(!!!!!)
 	Gérer instantanément la présence du token
-	Set corectement tout les titles et alts
-	Vérifier les key dans les maps
-
-	Créer des fichiers fonctions si necessaire
-	Styliser le focus et autres effets (contextual menu si possible)
-	
+	Vérifier les keys dans les maps
 	Fix les erreurs ts
 
+	(!!!)
+	Checker le responsive de toutes les pages
+	Finaliser la gestion des formulaires
+	Set corectement tout les titles et alts
+
+	(!!)
+	Créer des fichiers fonctions si necessaire
+	Styliser le focus et autres effets (contextual menu si possible)
+	CloseButton partout
+
+	(!)
 	Corriger l'anglais du bled
 	Checker les contextes
-
 	Checker les noms de routes (s pas s)
-
 	Shift + Alt + F
 
-TwoFA/ : à faire après merge
-	Gestion d'erreur à faire
+TwoFaGlobal/ : 
+	En cours
+	Gestion d'erreur (voir avec Claire)
 
 Home/ : à faire après merge
 	Gérer la déconnexion
@@ -48,8 +51,6 @@ SettingsMenu/ : à faire après merge
 	Gérer le twoFA
 	Gestion d'erreur ( + voir signin/signup)
 
-TwoFaMenu/ : à faire après merge
-	A faire
 
 Chat/ : à faire après merge
 	refreshStatusChallenge à retrouver (fonction de soso github)
