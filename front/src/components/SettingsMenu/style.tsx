@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
@@ -44,7 +45,7 @@ export const CloseButton = styled.div`
 
 `
 
-export const HorizontalSettingsForm = styled.form`
+export const HorizontalSettingsFormTemp = styled.form`
 
 	display: flex;
 	flex-direction: column;
@@ -54,7 +55,7 @@ export const HorizontalSettingsForm = styled.form`
 
 `
 
-export const HorizontalSetting = styled.div`
+export const HorizontalSettingTemp = styled.div`
 
 	display: flex;
 	flex-direction: column;

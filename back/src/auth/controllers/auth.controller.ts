@@ -111,7 +111,7 @@ export class AuthController {
 		try {
 			if (!body.twoFACode)
 				throw new BadRequestException('Empty 2FA code');
-			const tfaUser = await this.userService.turnOnTwoFA(user, body.twoFACode);
+			const tfaUser = await this.userService.turnOnTwoFA(user, body.twoFACode.value);
 			return  tfaUser.twoFA 
 		} catch (error) {
 			throw new BadRequestException(error.message);

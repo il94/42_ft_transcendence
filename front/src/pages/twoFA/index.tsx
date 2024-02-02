@@ -40,7 +40,6 @@ type PropsTwoFAResponse = {
 
 function TwoFA() {
 
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
       
@@ -62,11 +61,9 @@ function TwoFA() {
 				return
 			}
 			
-			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
+			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code.value)
 			 
-			setToken(response.data.access_token)
-
-
+			setToken(twoFAResponse.data.access_token)
 
 			localStorage.setItem("access_token", twoFAResponse.data.access_token)
 			navigate("/")

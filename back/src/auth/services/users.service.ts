@@ -184,7 +184,7 @@ export class UsersService {
 			data: { twoFASecret: secret },
 		});
 		if (!user)
-			throw new NotFoundException(`User with ${userId} does not exist.`);
+			throw new NotFoundException("User not found");
 		} catch (error) { throw error; }
 	}
 

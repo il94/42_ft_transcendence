@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import Cookies from 'js-cookie'
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -58,7 +59,7 @@ type PropsSigninResponse = {
 }
 
 function Signin() {
-	const { token, url } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {

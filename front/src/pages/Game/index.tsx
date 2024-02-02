@@ -239,7 +239,6 @@ function Game() {
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
-	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
 	/* =============================== DISPLAY ================================== */
 
@@ -431,7 +430,7 @@ function Game() {
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								{/* <PongWrapper social={social}/>  */}
-								<Pong />
+								{/* <Pong /> */}
 								{
 									card &&
 									<Card
@@ -442,13 +441,12 @@ function Game() {
 									settings &&
 									<SettingsMenu
 										displaySettingsMenu={displaySettingsMenu}
-										displayTwoFAMenu={displayTwoFAMenu}
-										setTwoFACodeQR={setTwoFACodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu} />
 								}
 								{
 									twoFAMenu &&
 									<TwoFaMenu
-										twoFAcodeQR={twoFAcodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu} />
 								}
 								{/* <TestsBack /> */}
 								{
