@@ -11,21 +11,32 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 export class PongController {
     constructor(private readonly pongService: PongService) {}
 
-    @Post()
-    create(@getUser() user: User, @Body() dto: CreatePongDto) {
-        return this.pongService.createGame(dto, user.id)
-    }
+    // create a game : boutton start a match
+    // @Post()
+    // create(@getUser() user: User): Promise<Game> {
+    //     return this.pongService.createGame(user.id)
+    // }
 
-    @Post('join/:id')
-    join(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User) {
-        return this.pongService.joinGame(user.id, gameId)
-    }
+    // // jouer contre quelqu'un
+    // @Post('play/:id')
+    // play(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
+    //     return this.pongService.playGame(user.id, gameId)
+    // }
 
-    @Get(':id')
-    getById(@Param('id', ParseIntPipe) gameId: number) {
-        return this.pongService.getGameById(gameId)
-    }
+    // // boutton : jouer 
+    // @Post('play')
+    // playRandom(@getUser() user: User): Promise<Game>  {
+    //     return this.pongService.playRandomGame(user.id)
+    // }
 
+    // @Post('watch/:id')
+    // watch(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
+    //     return this.pongService.watchGame(user.id, gameId)
+    // }
 
+    // @Get(':id')
+    // getById(@Param('id', ParseIntPipe) gameId: number): Promise<Game>  {
+    //     return this.pongService.getGameById(gameId)
+    // }
 
  }

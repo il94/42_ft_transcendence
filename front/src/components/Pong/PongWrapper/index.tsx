@@ -1,7 +1,9 @@
-import { useRef, useState, useContext } from "react"
+import { useRef, useState, useContext, useEffect } from "react"
 import styled from "styled-components"
 import axios, { AxiosResponse } from "axios"
 import AuthContext from "../../../contexts/AuthContext"
+import InteractionContext from "../../../contexts/InteractionContext"
+
 
 
 
@@ -34,35 +36,51 @@ const PlayButtonStyle = styled.div`
   	cursor: pointer;
 `
 
-function PongWrapper({social}) {
+function PongWrapper({social}: any) {
 
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
+
 
 	const [gameState, setGameState] = useState<boolean>(false)
 
-	if (wrapperRef.current)
-		console.log(wrapperRef.current.getBoundingClientRect())
+	const [EnemyId, setEnemyId] = useState(0)
+
+	// if (wrapperRef.current)
+	// 	console.log(wrapperRef.current.getBoundingClientRect())
 
 	async function handlePlayButton(){
-		setGameState(true)
-		console.log("coucou")
-		const response = await axios.post(`http://${url}:3333/pong/`, {},
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				}
-			);
+		// setGameState(true)
+		try {
+		//     const response = await axios.post(`http://${url}:3333/pong/play`, {}, {
+		// 	headers: {
+		// 		'Authorization': `Bearer ${token}`
+		// 	}
+		// })
+		console.log('user socket', userAuthenticate)
+		userAuthenticate.socket?.emit('searchGame', userAuthenticate.id)
+		}
+		catch (error) {
+			throw (error)
+		}
 	}
+
+	useEffect(() => {
+		userAuthenticate.socket?.on("launchGame", (id: number) => {setGameState(true); setEnemyId(id), console.log("je puex lancer une game")})
+
+		return () =>{
+			userAuthenticate.socket?.off("launchGame")
+		}
+	})
 
 	return (
 		<>
 		<Style ref={wrapperRef}>
 			<PlayButtonStyle onClick={handlePlayButton}>Search for a Game</PlayButtonStyle>
 				{ gameState &&
-					<Pong social={social} />
+					<Pong social={social} enemyId={EnemyId}/>
 				}
 		</Style>
 		</>

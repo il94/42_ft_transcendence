@@ -28,7 +28,7 @@ export enum status {
 	ONGAME = "ongame"
 }
 
-function Pong({social}){
+function Pong({social}:any, {enemyId}: any){
 	
 	const PongRef = useRef<HTMLDivElement | null>(null)
 	const [PongBounds, setPongBounds] = useState<DOMRect | undefined>(PongRef.current?.getBoundingClientRect())
@@ -135,6 +135,7 @@ function Pong({social}){
 
 		if (!PongBounds)
 		return ;
+		
 		// // if (keysPressed['Enter'])
 		// // 	setGameState()
 		// setBallPos({
@@ -369,16 +370,18 @@ function Pong({social}){
 	useEffect(() => {
 		
 		setPongBounds(PongRef.current?.getBoundingClientRect())
-		startGame()
+		// startGame()
 		user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBounds ", args, "id ", id)})
-		user.userAuthenticate.socket?.on("leftpaddlemove", handlepaddlemove)
-		user.userAuthenticate.socket?.on("leftpaddlemove", handlepaddlemove)
+		user.userAuthenticate.socket?.on("launchgame", startGame)
 
+
+		user.userAuthenticate.socket?.on("leftpaddlemove", handlepaddlemove)
 		user.userAuthenticate.socket?.emit("PongBounds", PongRef.current?.getBoundingClientRect())
 		user.userAuthenticate.socket?.emit("paddlemove", "down", "left", )
 		
 		return () => {
 			user.userAuthenticate.socket?.off("PongBounds")
+			user.userAuthenticate.socket?.off("leftpaddlemove")
 		}
 	}, [])
 

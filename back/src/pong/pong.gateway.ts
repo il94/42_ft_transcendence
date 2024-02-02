@@ -1,9 +1,11 @@
 import {WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket} from "@nestjs/websockets";
-import { subscribe } from "diagnostics_channel";
+import { ConflictException, Search } from "@nestjs/common";
+
 import { Server, Socket } from "socket.io";
 
 import { PongService } from "./pong.service";
 import { lstat } from "fs";
+import { PongGame } from "./game";
 
 @WebSocketGateway()
 export class PongGateway {
@@ -11,6 +13,10 @@ export class PongGateway {
 	@WebSocketServer()
 	server: Server;
 	
+	private searchingUsers: Map<number, Socket> = new Map();
+
+	constructor(private  PongService: PongService) {}
+
 	handleConnection(client: Socket){
 	}
 	
@@ -18,7 +24,7 @@ export class PongGateway {
 	}
 	
 	public PongBounds: { height: number; width: number } = {height: 0, width: 0}
-
+	
 	private BallPos: {x:number; y:number }
 	private BallDir: {x:number; y:number }
 	private BallSize: number
@@ -26,25 +32,62 @@ export class PongGateway {
 	private RightPaddlePos: {top:number; bottom:number }
 	private Speed: number
 	private PaddleX: number
-
-	constructor() {
-		this.BallPos = {x: 0, y: 0}
-		this.BallDir = {x: 0, y: 0}
-		this.BallSize = 20;
-		this.LeftPaddlePos = {top: 0, bottom: 0}	
-		this.RightPaddlePos = {top: 0, bottom: 0}
-		this.Speed = 0
-		this.PaddleX = 0
-	}
 	
-	@SubscribeMessage("PongBounds")
-		handlePongBounds(client: Socket, data: any){
-			console.log("PongBounds = ", data)
-			this.PongBounds = {
-				height: data.height,
-				width: data.width
+	// constructor() {
+	// 	this.BallPos = {x: 0, y: 0}
+	// 	this.BallDir = {x: 0, y: 0}
+	// 	this.BallSize = 20;
+	// 	this.LeftPaddlePos = {top: 0, bottom: 0}	
+	// 	this.RightPaddlePos = {top: 0, bottom: 0}
+	// 	this.Speed = 0
+	// 	this.PaddleX = 0
+	// }
+	
+	@SubscribeMessage('searchGame')
+	addSearchingPlayer(client: Socket, data: any) {
+		try {			
+			if (this.searchingUsers.get(data)){
+
+				this.searchingUsers.delete(data)
+				return
+				// throw new ConflictException('User already in game')
 			}
-			this.PaddleX = (this.PongBounds.width * 2.5 / 100)
+
+			this.searchingUsers.set(data, client)
+
+			let keysIterator  = this.searchingUsers.keys()
+			let keysArray = Array.from(keysIterator);
+			let firstkey = keysArray[0]
+
+			if (this.searchingUsers.size >= 2)
+			{		
+				let secondkey = keysArray[1]
+
+				let firstsocket = this.searchingUsers.get(firstkey)
+				let secondsocket = this.searchingUsers.get(secondkey)
+
+				this.server.to(firstsocket.id).emit("launchGame", secondkey)
+				this.server.to(secondsocket.id).emit("launchGame", firstkey)
+
+				this.PongService.activeGames.push(new PongGame(firstsocket, secondsocket))
+
+				console.log("map size", this.searchingUsers.size)
+				// this.searchingUsers.delete(firstkey)
+				// this.searchingUsers.delete(secondkey)
+			}
+		} catch (error) {
+			throw error
+		}
+	}
+
+	@SubscribeMessage("PongBounds")
+	handlePongBounds(client: Socket, data: any){
+		console.log("PongBounds = ", data)
+		this.PongBounds = {
+			height: data.height,
+			width: data.width
+		}
+		this.PaddleX = (this.PongBounds.width * 2.5 / 100)
 
 			this.LeftPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
 			this.RightPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
@@ -58,14 +101,14 @@ export class PongGateway {
 			console.log("Score : ", args)
 			// if (parseInt(args[0]) >= 11 || parseInt(args[1]) >= 11) // check the score finish game
 			this.server.to(client.id).emit('score', client.id, args)
-
+			
 		}
-
-
-	// // private PaddleCollision(){
-	// // 	if (this.BallPos.x + this.BallSize > this.PongBounds.width - this.PaddleX)
-	// // 	{
-	// // 		if ((this.BallPos.y + this.BallSize >= RightPaddlePos.top  && currentBallPos.y + BallSize <= RightPaddlePos.bottom) || (currentBallPos.y <= RightPaddlePos.bottom && currentBallPos.y >= RightPaddlePos.top))
+		
+		
+		// // private PaddleCollision(){
+			// // 	if (this.BallPos.x + this.BallSize > this.PongBounds.width - this.PaddleX)
+			// // 	{
+				// // 		if ((this.BallPos.y + this.BallSize >= RightPaddlePos.top  && currentBallPos.y + BallSize <= RightPaddlePos.bottom) || (currentBallPos.y <= RightPaddlePos.bottom && currentBallPos.y >= RightPaddlePos.top))
 	// // 	}
 	// // }
 

@@ -11,7 +11,7 @@ import { PongService } from './pong.service'
 		PongService,
 		AppService
 	],
-	controllers: [PongController,]
+	controllers: [PongController]
 })
 
 export class PongModule {}
