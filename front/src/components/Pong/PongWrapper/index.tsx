@@ -68,7 +68,11 @@ function PongWrapper({social}: any) {
 	}
 
 	useEffect(() => {
-		userAuthenticate.socket?.on("launchGame", (id: number) => {setGameState(true); setEnemyId(id), console.log("je puex lancer une game")})
+		userAuthenticate.socket?.on("launchGame", (id: number) => {
+			setEnemyId(id)
+			setGameState(true)
+			console.log("je peux lancer une game")
+		})
 
 		return () =>{
 			userAuthenticate.socket?.off("launchGame")

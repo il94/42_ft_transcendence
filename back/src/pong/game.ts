@@ -1,19 +1,20 @@
 import {Socket} from 'socket.io'
 import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class Player {
 
 	private socket: Socket;
 	
-	public paddlePos: {top: number, bottom: number}
+	private paddlePos: {top: number, bottom: number}
 	public score: number
 
-	contructor(socket: Socket)
-	// contructor()
+	constructor(socket: Socket)
 	{
 		this.socket = socket;
-		this.paddlePos = {top : 50, bottom: 50} // always poungbounds nique this shit
-		this.score = 0 // always poungbounds nique this shit
+		console.log("cc from player socket.id :", this.socket.id)
+		this.paddlePos = {top : 486, bottom: 594} // middle 540 == 50% de 1080
+		this.score = 0 
 	}
 
 	// setPaddlePos(newtop: number, newbottom: number){
@@ -27,12 +28,33 @@ export class Player {
 	// 	this.score = newscore;
 	// }
 
-	// getSocket() : Socket{
-	// 	return this.socket;
-	// }
+	moveUp(){
+		if (this.paddlePos.top - 1080/100 > 0)
+		{
+			this.paddlePos.top -= 1080/100
+			this.paddlePos.bottom -= 1080/100
+		}
+	}
+
+	moveDown(){
+		if (this.paddlePos.bottom + 1080/100 < 1080)
+		{
+			this.paddlePos.top += 1080/100
+			this.paddlePos.bottom += 1080/100
+		}
+	}
+
+	getPaddlePos(){
+		return this.paddlePos
+	}
+
+	getSocket() : Socket{
+		return this.socket;
+	}
 
 }
 
+@Injectable()
 export class Ball {
 
 	public ballPos: {x: number, y: number}
@@ -50,14 +72,16 @@ export class Ball {
 @Injectable()
 export class PongGame {
 
-	public PongBounds: { height: number; width: number } = {height: 0, width: 0}
-	private PaddleX: number
+	// public PongBounds: { height: number; width: number } = {height: 0, width: 0}
+	// private PaddleX: number
+
 	private Players: Socket[]
 
-	// private BallPos: {x:number; y:number }
-	// private BallDir: {x:number; y:number }
-	private BallSize: number
+	height: number;
+	width: number;
+
 	public	Ball: Ball
+	private BallSize: number
 	
 	private Speed: number
 	
@@ -70,17 +94,37 @@ export class PongGame {
 	// constructor() {
 		// this.BallPos = {x: 0, y: 0}
 		// this.BallDir = {x: 0, y: 0}
-		this.BallSize = 20;
-		this.Ball = new Ball
-
-		// this.Players = [host, guest]
 		this.LeftPlayer = new Player(host)
 		this.RightPlayer = new Player(guest)
+		this.Players = [host, guest]
+		this.Ball = new Ball
 
-		// this.LeftPaddlePos = {top: 0, bottom: 0}	
-		// this.RightPaddlePos = {top: 0, bottom: 0}
-		this.Speed = 0
-		this.PaddleX = 0
+		this.width = 1920;
+		this.height = 1080;
+		this.BallSize = 20;
+		this.Speed = 1
+
+	}
+
+	isMyPlayer(socket: Socket){
+		if(this.LeftPlayer.getSocket() === socket)
+			return true
+		else if (this.RightPlayer.getSocket() === socket)
+			return true
+		return false
+	}
+
+	isMyHost(socket: Socket){
+		if (this.LeftPlayer.getSocket() === socket)
+			return true
+	}
+
+	getHost(){
+		return this.Players[0]
+	}
+
+	getGuest(){
+		return this.Players[1]
 	}
 
 }

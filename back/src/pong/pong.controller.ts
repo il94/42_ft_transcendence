@@ -9,9 +9,9 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 @UseGuards(JwtGuard)
 @Controller('pong')
 export class PongController {
-    constructor(private readonly pongService: PongService) {}
+    // constructor(private readonly pongService: PongService) {}
 
-    // create a game : boutton start a match
+    // // create a game : boutton start a match
     // @Post()
     // create(@getUser() user: User): Promise<Game> {
     //     return this.pongService.createGame(user.id)

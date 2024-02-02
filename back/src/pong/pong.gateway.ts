@@ -3,9 +3,10 @@ import { ConflictException, Search } from "@nestjs/common";
 
 import { Server, Socket } from "socket.io";
 
+import { AppService } from 'src/app.service';
 import { PongService } from "./pong.service";
 import { lstat } from "fs";
-import { PongGame } from "./game";
+import { PongGame, Player, Ball } from "./game";
 
 @WebSocketGateway()
 export class PongGateway {
@@ -23,37 +24,18 @@ export class PongGateway {
 	handleDeconnection(client: Socket){
 	}
 	
-	public PongBounds: { height: number; width: number } = {height: 0, width: 0}
-	
-	private BallPos: {x:number; y:number }
-	private BallDir: {x:number; y:number }
-	private BallSize: number
-	private LeftPaddlePos: {top:number; bottom:number }
-	private RightPaddlePos: {top:number; bottom:number }
-	private Speed: number
-	private PaddleX: number
-	
-	// constructor() {
-	// 	this.BallPos = {x: 0, y: 0}
-	// 	this.BallDir = {x: 0, y: 0}
-	// 	this.BallSize = 20;
-	// 	this.LeftPaddlePos = {top: 0, bottom: 0}	
-	// 	this.RightPaddlePos = {top: 0, bottom: 0}
-	// 	this.Speed = 0
-	// 	this.PaddleX = 0
-	// }
-	
 	@SubscribeMessage('searchGame')
 	addSearchingPlayer(client: Socket, data: any) {
 		try {			
 			if (this.searchingUsers.get(data)){
-
 				this.searchingUsers.delete(data)
+				console.log("is now out of search")
 				return
 				// throw new ConflictException('User already in game')
 			}
 
 			this.searchingUsers.set(data, client)
+			console.log("is now in search")
 
 			let keysIterator  = this.searchingUsers.keys()
 			let keysArray = Array.from(keysIterator);
@@ -66,32 +48,36 @@ export class PongGateway {
 				let firstsocket = this.searchingUsers.get(firstkey)
 				let secondsocket = this.searchingUsers.get(secondkey)
 
+				// recup l'user authenticate de l'enemi pour l'envoyer au front ?
+
 				this.server.to(firstsocket.id).emit("launchGame", secondkey)
 				this.server.to(secondsocket.id).emit("launchGame", firstkey)
-
+			
 				this.PongService.activeGames.push(new PongGame(firstsocket, secondsocket))
 
 				console.log("map size", this.searchingUsers.size)
+				console.log("in back", secondkey)
+				console.log("in back", firstkey)
 				// this.searchingUsers.delete(firstkey)
 				// this.searchingUsers.delete(secondkey)
 			}
 		} catch (error) {
-			throw error
+			//throw error
 		}
 	}
 
-	@SubscribeMessage("PongBounds")
-	handlePongBounds(client: Socket, data: any){
-		console.log("PongBounds = ", data)
-		this.PongBounds = {
-			height: data.height,
-			width: data.width
-		}
-		this.PaddleX = (this.PongBounds.width * 2.5 / 100)
+	// @SubscribeMessage("PongBounds")
+	// handlePongBounds(client: Socket, data: any){
+	// 	console.log("PongBounds = ", data)
+	// 	this.PongBounds = {
+	// 		height: data.height,
+	// 		width: data.width
+	// 	}
+	// 	this.PaddleX = (this.PongBounds.width * 2.5 / 100)
 
-			this.LeftPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
-			this.RightPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
-		}
+	// 		this.LeftPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
+	// 		this.RightPaddlePos = { top : 45 * (this.PongBounds.height/100) , bottom: 55 * (this.PongBounds.height/100)}
+	// 	}
 
 	@SubscribeMessage("score")
 	// handleScore(@MessageBody() data: string, @ConnectedSocket() client: Socket, args: any){
@@ -128,69 +114,63 @@ export class PongGateway {
 	@SubscribeMessage("paddlemove")
 		handlePaddleMove(client: Socket, args: string)
 		{
-			// args0 move
-			// args1 paddle
-			//args2 value
-			if (args[1] == "left")
-			{
-				if (args[0] == "up")
-				{
-					this.LeftPaddlePos = {
-						top: this.LeftPaddlePos.top - parseFloat(args[2]) , // 1% 
-						bottom: this.LeftPaddlePos.bottom - parseFloat(args[2])
-					}
+			let game: PongGame;
+
+			this.PongService.activeGames.forEach((element) => {
+				if (element.isMyPlayer(client)){
+					game = element;
 				}
-				if (args[0] == "down")
-				{
-					this.LeftPaddlePos = {
-						top: this.LeftPaddlePos.top + parseFloat(args[2]) , // 1% 
-						bottom: this.LeftPaddlePos.bottom + parseFloat(args[2])
-					}
-				}
-				// this.server.to(client.id).emit("leftpaddlemove", this.LeftPaddlePos)            //// EMIT A L"ADVERSAIRE !!!!!!
+			});
+
+			if (game) {
+				const player = game.isMyHost(client) ? game.LeftPlayer : game.RightPlayer
+				const enemyPlayer = player === game.LeftPlayer ? game.RightPlayer : game.LeftPlayer
+
+				args === "up" ? player.moveUp() : player.moveDown()
+
+				this.server.to(enemyPlayer.getSocket().id).emit("enemyMove", args, player.getPaddlePos()) // args = up or down; 1080/100 = mouvement of the paddle (1% of the poung size to resize in the front)
 			}
-			else if (args[1] == "right")
+		}
+
+	@SubscribeMessage("getPos")
+		handleReRender(client: Socket){
+			let game: PongGame;
+
+			this.PongService.activeGames.forEach((element) => {
+				if (element.isMyPlayer(client)){
+					game = element;
+				}
+			});
+
+			if (game)
 			{
-				if (args[0] == "up")
-				{
-					this.RightPaddlePos = {
-						top: this.RightPaddlePos.top - parseFloat(args[2]) , // 1% 
-						bottom: this.RightPaddlePos.bottom - parseFloat(args[2])
-					}
-				}
-				if (args[0] == "down")
-				{
-					this.RightPaddlePos = {
-						top: this.RightPaddlePos.top + parseFloat(args[2]) , // 1% 
-						bottom: this.RightPaddlePos.bottom + parseFloat(args[2])
-					}
-				}
-				// this.server.to(client.id).emit("rightpaddlemove", this.RightPaddlePos)         //// EMIT A L"ADVERSAIRE !!!!!!
+				if(game.isMyHost(client))
+					this.server.to(client.id).emit("receivePos", game.LeftPlayer.getPaddlePos(), game.RightPlayer.getPaddlePos())
+				else
+					this.server.to(client.id).emit("receivePos", game.RightPlayer.getPaddlePos(), game.LeftPlayer.getPaddlePos())
 			}
-			console.log("new paddle pos ", this.LeftPaddlePos, this.RightPaddlePos)
 		}
 
 	@SubscribeMessage("resetBall")
 		resetBall(client: Socket){
-			this.BallPos = {
-				x: this.PongBounds.width / 2,
-				y: this.PongBounds.height / 2
-			}
-			let phi: number; 
-			do {
-				phi = 2*Math.PI*Math.random();
-			} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
-			this.BallDir = {
-				x: Math.cos(phi) * 5,
-				y: Math.sin(phi) * 5
-			}
+		// 	this.BallPos = {
+		// 		x: this.PongBounds.width / 2,
+		// 		y: this.PongBounds.height / 2
+		// 	}
+		// 	let phi: number; 
+		// 	do {
+		// 		phi = 2*Math.PI*Math.random();
+		// 	} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
+		// 	this.BallDir = {
+		// 		x: Math.cos(phi) * 5,
+		// 		y: Math.sin(phi) * 5
+		// 	}
 			
-			console.log("reset game init : ", this.BallPos, this.BallDir)
-			this.server.to(client.id).emit("resetBall", this.BallPos, this.BallDir)
-		}
-
+		// 	console.log("reset game init : ", this.BallPos, this.BallDir)
+		// 	this.server.to(client.id).emit("resetBall", this.BallPos, this.BallDir)
+		// }
+	}
 }
-
 // reception de challenge
 
 // envie de spectate
