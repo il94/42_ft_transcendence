@@ -52,13 +52,11 @@ function SignupFT() {
 	const { url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
-	const tokenFT = Cookies.get('token')
-
 	const usernameId = Cookies.get('usernameId')
 	const avatarCookie = Cookies.get('avatar')
 
 	useEffect(() => {
-		if (!tokenFT)
+		if (!usernameId || !avatarCookie)
 			navigate("/error")
 	}, [])
 
