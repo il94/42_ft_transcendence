@@ -15,8 +15,6 @@ export class UsersService {
 	async createUser(createUserDto: CreateUserDto): Promise<User> {
 		console.log("back create user")
 		try {
-			if (createUserDto.email.endsWith("@student.42.fr"))
-				throw new ForbiddenException();
 			const userExists = await this.prisma.user.findFirst({
 				where: { email: createUserDto.email }
 			})
@@ -157,7 +155,7 @@ export class UsersService {
 
 	/*********************** TwoFA settings ******************************************/
 
-	async turnOnTwoFA(user: User, twoFACode: string) {
+	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
 		try {
 			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
 			if (!getUser)
@@ -171,10 +169,11 @@ export class UsersService {
 			});
 			if (!isCodeValid)
 				throw new ForbiddenException('Wrong authentication code');
-			await this.prisma.user.update({
+			const setUser = await this.prisma.user.update({
 				where: { id: user.id, },
 				data: { twoFA: true, },
 			});
+			return setUser;
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
