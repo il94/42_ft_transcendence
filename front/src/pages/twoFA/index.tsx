@@ -47,13 +47,8 @@ function TwoFA() {
 	const navigate = useNavigate()
 	const location = useLocation()
 
-	// /!\ Pas de user id dans location.state !
-	//const userId: number = location.state.userId
-	const userId: string | undefined = Cookies.get('id')
-		if (userId)
-			setToken(userId);
+	const userId: string | number = Cookies.get('userId') ? Cookies.get('userId') : location.state.userId
 
-	console.log("location: ", location.state);
 	useEffect(() => {
 		if (token || !userId)
 			navigate("/error")

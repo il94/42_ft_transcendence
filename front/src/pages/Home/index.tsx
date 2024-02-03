@@ -76,7 +76,7 @@ function Home() {
 				}
 			}) 
 			Cookies.remove('access_token')
-			Cookies.remove('id')
+			Cookies.remove('userId')
 			Cookies.remove('two_FA')
 			Cookies.remove('isNew')
 			localStorage.clear();

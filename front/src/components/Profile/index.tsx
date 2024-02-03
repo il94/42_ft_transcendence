@@ -64,7 +64,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 			
 			if (response) {
 				Cookies.remove('access_token')
-				Cookies.remove('id')
+				Cookies.remove('userId')
 				Cookies.remove('two_FA')
 				Cookies.remove('isNew')
 				localStorage.clear();

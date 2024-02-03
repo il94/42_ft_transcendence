@@ -49,6 +49,8 @@ ChannelInterface/ :
 Messages/ : à faire après merge
 	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
 
+Signup/ : (et signin ect)
+	phone number a virer
 
 ScoreResume/ : à voir quand le Pong aura avancé
 -pas_regardé:

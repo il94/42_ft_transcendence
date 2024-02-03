@@ -29,7 +29,7 @@ export class UsersService {
 			const user = await this.prisma.user.create({
 				data: {
 					...userDatas,
-					phoneNumber: createUserDto.phoneNumber || '',
+					// phoneNumber: createUserDto.phoneNumber || '',
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,

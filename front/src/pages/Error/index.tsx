@@ -23,7 +23,7 @@ function Error() {
 		{
 			localStorage.removeItem("access_token")
 			Cookies.remove("access_token")
-      Cookies.remove("id")
+      Cookies.remove("userId")
       Cookies.remove('isNew')
 			setToken('')
 		}

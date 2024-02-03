@@ -60,8 +60,7 @@ function Signup() {
 			event.preventDefault()
 			if (username.value.length === 0 ||
 				password.value.length === 0 ||
-				email.value.length === 0 ||
-				phoneNumber.value.length === 0) {
+				email.value.length === 0) {
 				if (username.value.length === 0) {
 					setUsername({
 						value: '',
@@ -83,13 +82,6 @@ function Signup() {
 						errorMessage: "Insert email",
 					})
 				}
-				if (phoneNumber.value.length === 0) {
-					setPhoneNumber({
-						value: '',
-						error: true,
-						errorMessage: "Insert phone number",
-					})
-				}
 				return
 			}
 			if (username.error || password.error || email.error || phoneNumber.error)
@@ -99,9 +91,12 @@ function Signup() {
 				username: username.value,
 				hash: password.value,
 				email: email.value,
-				phoneNumber: phoneNumber.value,
 				avatar: getRandomDefaultAvatar()
 			}
+
+			// if (phoneNumber.value)
+			// newUser
+			// 	newUser.phoneNumber = phoneNumber.value
 
 			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
@@ -110,6 +105,9 @@ function Signup() {
 			navigate("/")
 		}
 		catch (error) {
+
+			console.log(error)
+
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
@@ -273,14 +271,7 @@ function Signup() {
 
 	function handleInputPhoneNumberChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
-			setPhoneNumber({
-				value: value,
-				error: true,
-				errorMessage: "Phone number cannot be empty"
-			})
-		}
-		else if (!/^(?:\+(?:[0-9] ?){6,14}[0-9]|[0-9]{10})$/.test(value)) {
+		if (!/^(?:\+(?:[0-9] ?){6,14}[0-9]|[0-9]{10})$/.test(value)) {
 			setPhoneNumber({
 				value: value,
 				error: true,

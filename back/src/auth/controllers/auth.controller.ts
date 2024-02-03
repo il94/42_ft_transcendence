@@ -74,7 +74,7 @@ export class AuthController {
 					.redirect("http://localhost:5173")
 				}
 				res.cookie('two_FA', true)
-				.cookie('id', user.id)
+				.cookie('userId', user.id)
 				.redirect(`http://localhost:5173/twofa`)	
 			}
 			if ('isNew' in user) {

@@ -32,8 +32,8 @@ export class CreateUserDto implements User {
 	@IsEmail()
 	email: string;
 
+	@IsOptional()
 	@IsString()
-	@IsNotEmpty()
 	@IsPhoneNumber()
 	phoneNumber: string;
 

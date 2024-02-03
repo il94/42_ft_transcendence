@@ -55,8 +55,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 		try {
 			event.preventDefault()
 			if (username.value.length === 0 ||
-				email.value.length === 0 ||
-				phoneNumber.value.length === 0) {
+				email.value.length === 0) {
 				if (username.value.length === 0) {
 					setUsername({
 						value: '',
@@ -71,13 +70,13 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 						errorMessage: "Insert email",
 					})
 				}
-				if (phoneNumber.value.length === 0) {
-					setPhoneNumber({
-						value: '',
-						error: true,
-						errorMessage: "Insert phone number",
-					})
-				}
+				// if (phoneNumber.value.length === 0) {
+				// 	setPhoneNumber({
+				// 		value: '',
+				// 		error: true,
+				// 		errorMessage: "Insert phone number",
+				// 	})
+				// }
 				return
 			}
 
@@ -115,6 +114,9 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			displaySettingsMenu(false)
 		}
 		catch (error) {
+
+			console.log("ERROR", error)
+
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
