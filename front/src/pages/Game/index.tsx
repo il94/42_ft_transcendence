@@ -27,7 +27,9 @@ import {
 	updateDiscussion,
 	refreshUserRole,
 	refreshNewOwner,
-	refreshJoinChannel
+	refreshJoinChannel,
+	refreshStatusChallenge,
+	refreshUserMute
 } from './sockets'
 
 import Logo from '../../components/Logo'
@@ -40,7 +42,7 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
-import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu'
+import TwoFaMenu from '../../components/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
 import PopupError from '../../components/PopupError'
@@ -59,6 +61,7 @@ import {
 } from '../../utils/types'
 
 import {
+	challengeStatus,
 	chatWindowStatus,
 	contextualMenuStatus
 } from '../../utils/status'
@@ -236,7 +239,6 @@ function Game() {
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
-	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
 	/* =============================== DISPLAY ================================== */
 
@@ -301,15 +303,21 @@ function Game() {
 
 		// console.log("CHANNEL TARGET = ", channelTarget)
 
-		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string) => 
-			updateDiscussion({ idSend, idChannel, idTargetOrMsg, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string, idMsg: number) => 
+			updateDiscussion({ idSend, idChannel, idTargetOrMsg, idMsg, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
 			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
 		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
 			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
-		// userAuthenticate.socket?.on("updateStatusChallenge", refreshStatusChallenge);
+		userAuthenticate.socket?.on("updateStatusChallenge", (idMsg: number, status: challengeStatus, idChan: number) => 
+			refreshStatusChallenge({ idMsg, status, idChan, channelTarget, setChannelTarget }));
+		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string) => 
+			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }));
+
+
+
 
 		return () => {
 
@@ -333,7 +341,8 @@ function Game() {
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
 			userAuthenticate.socket?.off("setNewOwner")
-			// userAuthenticate.socket?.off("updateStatusChallenge", refreshStatusChallenge);
+			userAuthenticate.socket?.off("updateStatusChallenge");
+			userAuthenticate.socket?.off("updateUserMute");
 		}
 
 	}, [userAuthenticate.socket, channelTarget])
@@ -421,7 +430,7 @@ function Game() {
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								{/* <PongWrapper social={social}/>  */}
-								<Pong />
+								{/* <Pong /> */}
 								{
 									card &&
 									<Card
@@ -432,13 +441,12 @@ function Game() {
 									settings &&
 									<SettingsMenu
 										displaySettingsMenu={displaySettingsMenu}
-										displayTwoFAMenu={displayTwoFAMenu}
-										setTwoFACodeQR={setTwoFACodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu} />
 								}
 								{
 									twoFAMenu &&
 									<TwoFaMenu
-										twoFAcodeQR={twoFAcodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu} />
 								}
 								{/* <TestsBack /> */}
 								{

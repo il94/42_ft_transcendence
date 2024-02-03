@@ -16,17 +16,18 @@ export const HorizontalSettingsForm = styled.form`
 
 `
 
-export const HorizontalSetting = styled.div`
+export const HorizontalSetting = styled.div<{ $fontSize?: number }>`
 
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	align-items: center;
 
 	width: 100%;
 	height: 100%;
 
 	text-align: center;
-	font-size: 20px;
+	font-size: ${(props) => props.$fontSize && props.$fontSize }px;
 
 `
 

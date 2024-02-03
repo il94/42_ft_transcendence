@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { useNavigate } from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import Cookies from 'js-cookie'
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -54,11 +55,12 @@ const FTRedirectWrapper = styled.div`
 type PropsSigninResponse = {
 	access_token: string
 } | {
-	twoFA: boolean
+	twoFA: boolean,
+	id: number
 }
 
 function Signin() {
-	const { token, url } = useContext(AuthContext)!
+	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -97,21 +99,17 @@ function Signin() {
 
 			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
 
-
 			if ('twoFA' in signinResponse.data) {
-				Cookies.remove('id');
-				Cookies.set("id", signinResponse.data.id);
-				navigate("/twofa")	
+				navigate("/twofa", {
+					state: {
+						userId: signinResponse.data.id
+					}
+				})
 			}
 			else {
-				const access_token: string = signinResponse.data.access_token;
-				if (access_token) {
-					localStorage.setItem('access_token', access_token)
-					setToken(access_token)
-				}
-				else { 
-					throw new Error
-				}
+				localStorage.setItem("access_token", signinResponse.data.access_token)
+				setToken(signinResponse.data.access_token)
+
 				navigate("/")
 			}
 		}
@@ -127,10 +125,10 @@ function Signin() {
 					}))
 				}
 				else
-					navigate("/error");
+					navigate("/error")
 			}
 			else
-				navigate("/error");
+				navigate("/error")
 		}
 	}
 

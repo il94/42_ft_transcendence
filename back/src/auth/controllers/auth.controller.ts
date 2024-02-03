@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param } from "@nestjs/common";
+import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param, ConflictException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard, TwoFAGuard  } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto, TwoFaDto } from "../dto/";
@@ -107,43 +107,21 @@ export class AuthController {
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
 	@UseGuards(JwtGuard)
-	async turnOnTwoFA(@getUser() user: User, @Body() body): Promise <boolean> {
-		try {
-			if (!body.twoFACode)
-				throw new BadRequestException('Empty 2FA code');
-			const tfaUser = await this.userService.turnOnTwoFA(user, body.twoFACode);
-			return  tfaUser.twoFA 
-		} catch (error) {
-			throw new BadRequestException(error.message);
-		}
+	async turnOnTwoFA(@getUser() user: User, @Body() { twoFACode }: TwoFaDto) {
+		return await this.userService.turnOnTwoFA(user, twoFACode);
 	}
 
 	@Post('2fa/authenticate/:id')
   	@HttpCode(200)
-  	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body): Promise <{access_token: string}> {
-		try {
-			const user = await this.userService.findUser(id);
-			if (user.status === UserStatus.ONLINE)
-				throw new BadRequestException('User is already authenticated');
-			if (!body.value)
-				throw new BadRequestException('Empty 2FA code');
-			const token: { access_token: string } = await this.authService.loginWith2fa(user, body.value);
-			return token;
-		} catch (error) {
-			throw new BadRequestException(error.message);
-		}
+  	async authenticate(@Param('id', ParseIntPipe) userId: number, @Body() { twoFACode }: TwoFaDto): Promise <{access_token: string}> {
+		return await this.authService.loginWith2fa(userId, twoFACode)
   	}
 
 	@Patch('2fa/disable')
 	@HttpCode(200)
 	@UseGuards(JwtGuard, TwoFAGuard)
-	async disable(@getUser() user: User, @Body() body): Promise <boolean> {
-		try {
-			const disable: boolean =  await this.userService.disableTwoFA(user, body.TwoFA)
-			return disable;
-		} catch (error) {
-			throw new BadRequestException(error.message);
-		}
+	async disable(@getUser() user: User, @Body() { twoFACode }: TwoFaDto) {
+		return await this.userService.disableTwoFA(user, twoFACode)
 	}
 
 }

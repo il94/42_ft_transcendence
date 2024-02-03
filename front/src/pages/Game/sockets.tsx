@@ -39,6 +39,7 @@ type PropsUpdateDiscussion = {
 	idSend: number,
 	idChannel: number,
 	idTargetOrMsg: number | string,
+	idMsg: number
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
@@ -62,6 +63,7 @@ export function updateDiscussion(props: PropsUpdateDiscussion) {
 			if (!userTarget)
 			throw new Error
 			messageContent = {
+				id: props.idMsg,
 				sender: userSend,
 				type: messageType.INVITATION,
 				target: userTarget,
@@ -71,6 +73,7 @@ export function updateDiscussion(props: PropsUpdateDiscussion) {
 		}
 		else {
 			messageContent ={
+				id: props.idMsg,
 				sender: userSend,
 				type: messageType.TEXT,
 				content: props.idTargetOrMsg
@@ -435,6 +438,67 @@ type PropsRecieveChannelMP = {
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 	displayChat: Dispatch<SetStateAction<boolean>>,
 }
+
+type RefreshUserMuteProps = {
+	idChan: number,
+	time: string,
+
+	userAuthenticate: UserAuthenticate,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
+}
+
+
+export async function refreshUserMute(props : RefreshUserMuteProps) {
+	if (props.idChan === props.channelTarget?.id)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+		if (prevState) {
+			const updatedMuteInfo = {
+				...prevState.muteInfo,
+				[props.userAuthenticate.id]: props.time,
+				};
+			return {
+			...prevState,
+			muteInfo: updatedMuteInfo,
+			};
+		} else {
+			return undefined;
+		}
+		});
+	}
+}
+
+	
+type RefreshStatusChallengeProps = {
+	idMsg: number,
+	status: challengeStatus,
+	idChan: number,
+
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
+
+}
+
+export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
+	if (props.idChan === props.channelTarget?.id)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+		if (prevState) {
+			const updatedMessages = prevState.messages.map((message) =>
+			message.id === props.idMsg ? { ...message, status: props.status } : message
+			);
+			return {
+			...prevState,
+			messages:updatedMessages,
+			};
+		} else {
+			return undefined;
+		}
+		});
+	}
+	}  
+
 
 // Crée un channel MP
 export async function recieveChannelMP(props: PropsRecieveChannelMP) {

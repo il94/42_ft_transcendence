@@ -54,47 +54,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 
 
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
-	const { zChatIndex, setZChatIndex, zMaxIndex, loaderChat } = useContext(DisplayContext)!
-
- 	async function refreshUserMute(idChan: number, time: string) {
-		if (idChan === channelTarget?.id)
-		{
-			setChannelTarget((prevState: Channel | undefined) => {
-			if (prevState) {
-				const updatedMuteInfo = {
-					...prevState.muteInfo,
-					[userAuthenticate.id]: time,
-				  };
-				return {
-				...prevState,
-				muteInfo: updatedMuteInfo,
-				};
-			} else {
-				return undefined;
-			}
-			});
-		}
-	}
-
-	
-	async function refreshStatusChallenge(idMsg: number, status: challengeStatus, idChan: number) {
-		if (idChan === channelTarget?.id)
-		{
-			setChannelTarget((prevState: Channel | undefined) => {
-			if (prevState) {
-				const updatedMessages = prevState.messages.map((message) =>
-				message.id === idMsg ? { ...message, status: status } : message
-				);
-				return {
-				...prevState,
-				messages:updatedMessages,
-				};
-			} else {
-				return undefined;
-			}
-			});
-		}
-	  }     
+	const { zChatIndex, setZChatIndex, zMaxIndex, loaderChat } = useContext(DisplayContext)!   
       
 	/* ============================ CHAT STATE ================================== */
 

@@ -7,7 +7,7 @@ import {
 	challengeStatus,
 	MatchResultStatus,
 	messageType,
-	channelType
+	ChannelType
 } from "./status"
 
 export type User = {
@@ -35,7 +35,7 @@ export type ChannelData = {
 	createdAt?: string,
 	name: string,
 	avatar: string,
-	type: channelType,
+	type: ChannelType,
 	password?: string
 }
 

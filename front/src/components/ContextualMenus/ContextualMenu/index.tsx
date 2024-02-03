@@ -36,7 +36,7 @@ import {
 
 import {
 	channelRole,
-	channelType,
+	ChannelType,
 	contextualMenuStatus,
 	messageType,
 	userStatus
@@ -406,7 +406,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	useEffect(() => {
 		if (channelTarget && 
 			type === contextualMenuStatus.CHAT &&
-			channelTarget.type !== channelType.MP &&
+			channelTarget.type !== ChannelType.MP &&
 			(userIsOwner(channelTarget, userAuthenticate.id) ||
 				(userIsAdministrator(channelTarget, userAuthenticate.id) &&
 					!userIsOwner(channelTarget, userTarget.id)))) {

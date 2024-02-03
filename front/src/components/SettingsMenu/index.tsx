@@ -10,11 +10,11 @@ import {
 import axios, { AxiosError } from "axios"
 
 import {
-	HorizontalSetting,
+	HorizontalSettingTemp,
 	SettingTtile,
 	Style,
 	CloseButtonWrapper,
-	HorizontalSettingsForm,
+	HorizontalSettingsFormTemp,
 	ErrorMessage,
 	TwoFAValue
 } from "./style"
@@ -42,42 +42,16 @@ import CloseIcon from "../../assets/close.png"
 
 type PropsSettingsMenu = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
-	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
-	setTwoFACodeQR: Dispatch<SetStateAction<string>>
+	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
+function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMenu) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
 
-	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
-		try {
-
-			console.log("SUBMIT")
-
-			event.preventDefault()
-
-			await axios.patch(`http://${url}:3333/auth/2fa/enable`, {
-				twoFACode: QRcodeValue
-			},
-			{
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-		}
-		catch (error) {
-
-			// afficher correctement la gestion d'erreur
-
-			console.log(error)
-		}
-	}
-
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
-
 			event.preventDefault()
 			if (username.value.length === 0 ||
 				email.value.length === 0 ||
@@ -120,8 +94,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 				newDatas.email = email.value
 			if (phoneNumber.value !== userAuthenticate.phoneNumber)
 				newDatas.phoneNumber = phoneNumber.value
-			if (twoFA !== userAuthenticate.twoFA)
-				newDatas.twoFA = twoFA
 			if (avatar !== userAuthenticate.avatar)
 				newDatas.avatar = avatar
 
@@ -345,31 +317,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 
 	/* ================================= 2FA ==================================== */
 
-	const [twoFA, setTwoFA] = useState<boolean>(userAuthenticate.twoFA)
-
-	const [QRcode, setQRcode] = useState<string>('')
-	const [QRcodeValue, setQRcodeValue] = useState<string>('')
-
-	function handleInputQRcodeChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		setQRcodeValue(value)
-	}
-
-	async function handleClickTwoFAChange() {
-		try {
-			const responseQRcode = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
-			displayTwoFAMenu(true)
-			setTwoFACodeQR(responseQRcode.data)
-		}
-		catch (error) {
-			console.log(error)
-		}
-	}
+	const twoFA = userAuthenticate.twoFA
 
 	/* =============================== AVATAR ================================== */
 
@@ -393,11 +341,11 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						onClick={() => displaySettingsMenu(false)}
 						alt="Close button" title="Close" />
 				</CloseButtonWrapper>
-				<HorizontalSettingsForm
+				<HorizontalSettingsFormTemp
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<HorizontalSetting>
+					<HorizontalSettingTemp>
 						<SettingTtile>
 							Username
 						</SettingTtile>
@@ -410,8 +358,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						<ErrorMessage>
 							{username.error && username.errorMessage}
 						</ErrorMessage>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</HorizontalSettingTemp>
+					<HorizontalSettingTemp>
 						<SettingTtile>
 							Password
 						</SettingTtile>
@@ -464,8 +412,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 									"Show password"
 							}
 						</Button>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</HorizontalSettingTemp>
+					<HorizontalSettingTemp>
 						<SettingTtile>
 							E-mail
 						</SettingTtile>
@@ -477,8 +425,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						<ErrorMessage>
 							{email.error && email.errorMessage}
 						</ErrorMessage>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</HorizontalSettingTemp>
+					<HorizontalSettingTemp>
 						<SettingTtile>
 							Phone number
 						</SettingTtile>
@@ -490,42 +438,24 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						<ErrorMessage>
 							{phoneNumber.error && phoneNumber.errorMessage}
 						</ErrorMessage>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</HorizontalSettingTemp>
+					<HorizontalSettingTemp>
 						<SettingTtile>
 							2FA
 						</SettingTtile>
 						<TwoFAValue>
-							{
-								twoFA ?
-									"Able"
-									:
-									"Disable"
-							}
+							{ twoFA ? "Enable" : "Disable" }
 						</TwoFAValue>
 						<div style={{ height: "15px" }} />
 						<Button
-							onClick={handleClickTwoFAChange}
+							onClick={() => displayTwoFAMenu(true)}
 							type="button" width={200}
 							alt="Set 2FA button"
-							title={twoFA ? "Disable" : "Able"}
+							title={ twoFA ? "Disable" : "Enable" }
 							style={{ alignSelf: "center" }}>
-							{
-								twoFA ?
-									"Disable"
-									:
-									"Able"
-							}
+							{ twoFA ? "Disable" : "Enable" }
 						</Button>
-					</HorizontalSetting>
-
-							{/* <img src={QRcode} />
-							<InputText
-								onSubmit={handleSubmitTWOfa}
-								onChange={handleInputQRcodeChange}
-								type="text" value={QRcodeValue}
-								fontSize={16} /> */}
-
+					</HorizontalSettingTemp>
 					<SelectAvatar
 						avatar={avatar}
 						setAvatar={setAvatar} />
@@ -535,7 +465,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }:
 						alt="Save button" title="Save changes">
 						Save
 					</Button>
-				</HorizontalSettingsForm>
+				</HorizontalSettingsFormTemp>
 			</ScrollBar>
 		</Style>
 	)

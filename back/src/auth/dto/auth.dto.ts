@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, IsNumberString, Length } from "class-validator";
 
 export class AuthDto {
 
