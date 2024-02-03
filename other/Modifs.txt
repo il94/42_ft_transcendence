@@ -8,6 +8,8 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Fix les erreurs ts
 
 	(!!!)
+	Revoir les z index
+	Signin a check
 	Checker le responsive de toutes les pages
 	Finaliser la gestion des formulaires
 	Set corectement tout les titles et alts
