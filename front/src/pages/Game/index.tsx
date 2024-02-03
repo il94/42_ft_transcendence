@@ -42,7 +42,7 @@ import Chat from '../../components/Chat'
 import Card from '../../components/Card'
 import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
-import TwoFaMenu from '../../components/SettingsMenu/TwoFaMenu'
+import TwoFaMenu from '../../components/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
 import PopupError from '../../components/PopupError'
@@ -239,7 +239,6 @@ function Game() {
 
 	const [settings, displaySettingsMenu] = useState<boolean>(false)
 	const [twoFAMenu, displayTwoFAMenu] = useState<boolean>(false)
-	const [twoFAcodeQR, setTwoFACodeQR] = useState<string>('')
 
 	/* =============================== DISPLAY ================================== */
 
@@ -431,7 +430,7 @@ function Game() {
 							</TopGameWrapper>
 							<BottomGameWrapper>
 								{/* <PongWrapper social={social}/>  */}
-								<Pong />
+								{/* <Pong /> */}
 								{
 									card &&
 									<Card
@@ -442,13 +441,12 @@ function Game() {
 									settings &&
 									<SettingsMenu
 										displaySettingsMenu={displaySettingsMenu}
-										displayTwoFAMenu={displayTwoFAMenu}
-										setTwoFACodeQR={setTwoFACodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu} />
 								}
 								{
 									twoFAMenu &&
 									<TwoFaMenu
-										twoFAcodeQR={twoFAcodeQR} />
+										displayTwoFAMenu={displayTwoFAMenu} />
 								}
 								{/* <TestsBack /> */}
 								{
