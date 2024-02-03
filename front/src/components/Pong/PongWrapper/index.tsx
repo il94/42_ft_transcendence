@@ -71,7 +71,6 @@ function PongWrapper({social}: any) {
 		userAuthenticate.socket?.on("launchGame", (id: number) => {
 			setEnemyId(id)
 			setGameState(true)
-			console.log("je peux lancer une game")
 		})
 
 		return () =>{

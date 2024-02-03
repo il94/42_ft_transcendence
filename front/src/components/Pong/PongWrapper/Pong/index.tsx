@@ -45,21 +45,15 @@ function Pong({social, enemyId}: PongProps){
 
 	const [PaddlePos, setPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0}) //en px
 	const [EnemyPaddlePos, setEnemyPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
+	
+	const [ballSize, setBallSize] = useState(20);
 
-	const [BallPos, setBallPos] = useState ({x: 100, y: 100});
-	const [BallDir, setBallDir] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
+	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
 
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
 
 	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); //tableau de key,    enfoncer = true; else false
 
-	const PaddleSize: number = 10;
-	const BallSize: number = 20;
-
-	// let	 currentBallPos = {
-	// 	x: 100,
-	// 	y: 100
-	// }
 	
 	const handleKeyDown = (event: KeyboardEvent) => {
 		
@@ -115,7 +109,7 @@ function Pong({social, enemyId}: PongProps){
 		let move: number = 0;
 
 		if (!PongRef.current?.getBoundingClientRect())
-		return
+			return
 
 		//console.log("je recois le deplacement de mon enemi")
 
@@ -164,11 +158,12 @@ function Pong({social, enemyId}: PongProps){
 		
 		let ConvertionFactor = PongRef.current?.getBoundingClientRect().height / 1080;
 
-		console.log("facteur de converstion : ", ConvertionFactor)
+		// console.log("facteur de converstion : ", ConvertionFactor)
 		let top = 486 * ConvertionFactor
 		let bottom = 594 * ConvertionFactor //size of back
-		console.log("top :", top)
-		console.log("bottom :", bottom)
+		// let ballX = 960 * ConvertionFactor 
+		// let ballY = 540 * ConvertionFactor 
+		user.userAuthenticate.socket?.emit("getBallInfo")
 		setPaddlePos({
 			top: (top),
 			bottom: (bottom)
@@ -178,7 +173,22 @@ function Pong({social, enemyId}: PongProps){
 			bottom: (bottom)
 		});
 		setScore({left: 0, right: 0})
+	}
 
+	const updateBall = (ballPosition: any, myScore: number, enemyScore: number) => {
+		
+		if (!PongRef.current?.getBoundingClientRect())
+		return ;
+		
+		let ConvertionFactor = PongRef.current?.getBoundingClientRect().height / 1080;
+
+		console.log("je rentre dans la function updateBall")
+		setBallPos({
+			x: ballPosition.x * ConvertionFactor,
+			y: ballPosition.y * ConvertionFactor
+		})
+		setBallSize(25 * ConvertionFactor)
+		setScore({left: myScore, right: enemyScore})
 	}
 
 	// const resetBall = () => {
@@ -375,6 +385,14 @@ function Pong({social, enemyId}: PongProps){
 	}, [score])
 	
 	useEffect(() => {
+		user.userAuthenticate.socket?.on("ballInfo", updateBall)
+
+		return () => {
+			user.userAuthenticate.socket?.off("ballInfo")
+		}
+	}, [BallPos])
+
+	useEffect(() => {
 		
 		document.addEventListener('keydown', handleKeyDown, true);
 		document.addEventListener('keyup', handleKeyUp, true);
@@ -402,6 +420,7 @@ function Pong({social, enemyId}: PongProps){
 		if(PongRef.current)
 			setPongBounds(PongRef.current?.getBoundingClientRect())
 
+		user.userAuthenticate.socket?.on("ballInfo", updateBall)
 		startGame()
 		// user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBounds ", args, "id ", id)})
 		// user.userAuthenticate.socket?.on("launchgame", startGame)
@@ -413,13 +432,13 @@ function Pong({social, enemyId}: PongProps){
 		
 		// return () => {
 		// 	user.userAuthenticate.socket?.off("PongBounds")
-		// 	user.userAuthenticate.socket?.off("leftpaddlemove")
+		// 	user.userAuthenticate.socket?.off("leftpaddlemove")start
 		// }
 		// user.userAuthenticate.socket?.on("enemyMove", handleEnemyMove)
 
-		// return () => {
-		// 	user.userAuthenticate.socket?.off("enemyMove")
-		// }
+		return () => {
+			user.userAuthenticate.socket?.off("ballInfo")
+		}
 	}, [])
 
 	useEffect(() => {
@@ -427,7 +446,7 @@ function Pong({social, enemyId}: PongProps){
 		// console.log("PongRef", PongRef.current?.getBoundingClientRect())
 		setPongBounds(PongRef.current?.getBoundingClientRect())
 		user.userAuthenticate.socket?.on("receivePos", reRender)
-		user.userAuthenticate.socket?.emit("getPos")
+		user.userAuthenticate.socket?.emit("reRender")
 		// user.userAuthenticate.socket?.on("PongBounds", (id: any, args: any) => { console.log("in client from PongBunds ", args, "id ", id)})
 		// user.userAuthenticate.socket?.emit("PongBounds", PongRef.current?.getBoundingClientRect())
 		return () => {
@@ -443,7 +462,7 @@ function Pong({social, enemyId}: PongProps){
 					PongRef.current ? (
 					<>
 					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)}/>
-					{/* <Ball X={BallPos.x} Y={BallPos.y} BallSize={BallSize}/> */}
+					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
 					<Score LeftScore={score.left} RightScore={score.right}/>
 					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)}/>
 					{/* <Paddle Hposition={98} Vposition={VRightPaddle}/> */}
