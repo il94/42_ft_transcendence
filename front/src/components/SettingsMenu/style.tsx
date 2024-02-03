@@ -13,75 +13,9 @@ export const Style = styled.div<{ $zIndex: number }>`
 
 	width: 350px;
 
-	height: inherit;
-	max-height: 636px;
-	min-height: 159px;
-
 	clip-path: ${effects.pixelateWindow};
 
 	background-color: ${colors.module};
-
-`
-
-export const CloseButtonWrapper = styled.div`
-
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-
-	height: 30.5px;
-
-	padding-right: 6.5px;
-
-`
-
-export const CloseButton = styled.div`
-
-	position: absolute;
-	top: 6.5px;
-	right: 6.5px;
-
-`
-
-export const HorizontalSettingsFormTemp = styled.form`
-
-	display: flex;
-	flex-direction: column;
-
-	margin-left: 15px;
-	margin-right: 15px;
-
-`
-
-export const HorizontalSettingTemp = styled.div`
-
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-
-`
-
-export const SettingTtile = styled.div`
-
-	font-weight: bold;
-	font-size: 15px;
-
-`
-
-export const ErrorMessage = styled.p`
-	
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	width: 100%;
-	height: 20px;
-
-	text-align: center;
-	font-size: 10px;
-
-	color: ${colors.textError};
 
 `
 

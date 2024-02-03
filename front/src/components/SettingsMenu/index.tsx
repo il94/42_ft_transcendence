@@ -251,7 +251,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
 			<CloseButton closeFunction={displaySettingsMenu} />
-			<ScrollBar visible>
+			<div style={{ height: "5px" }} />
 				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
@@ -352,9 +352,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 							alt="Save button" title="Save changes">
 							Save
 						</Button>
-					<div style={{ height: "2px" }} />
+					<div style={{ height: "5px" }} />
 				</VerticalSettingsForm>
-			</ScrollBar>
 		</Style>
 	)
 }
