@@ -82,9 +82,7 @@ function TestsBack() {
 				{
 					username: "user",
 					hash: "123456",
-					email: "user@test.fr",
 					avatar: getRandomDefaultAvatar(),
-					phoneNumber: "0000000000"
 				},
 				{
 					headers: {
@@ -109,9 +107,7 @@ function TestsBack() {
 					{
 						username: `user_${i}`,
 						hash: "123456",
-						email: `user_${i}@test.fr`,
 						avatar: getRandomDefaultAvatar(),
-						phoneNumber: "0000000000"
 					},
 					{
 						headers: {

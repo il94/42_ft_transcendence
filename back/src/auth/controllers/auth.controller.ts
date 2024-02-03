@@ -18,8 +18,6 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	async signup(@Body() dto: CreateUserDto): Promise<{access_token: string}> {
 		try {
-			if (dto.email.endsWith("@student.42.fr"))
-				throw new UnauthorizedException("42 emails are forbidden");
 			const token = await this.authService.signup(dto);
 			return token; 
 		} catch (error) {
@@ -59,7 +57,7 @@ export class AuthController {
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@getUser() user: {user: User, isNew: boolean} | Partial<User> | User, 
+	async handle42Redirect(@getUser() user: {usernameId: string, avatar: string, isNew: boolean} | Partial<User> | User, 
 	@Res({ passthrough: true }) res: Response,
 	): Promise<void> {
 		try {
@@ -79,11 +77,9 @@ export class AuthController {
 			}
 			if ('isNew' in user) {
 				const fiveMin = Date.now() + 5 * 60 * 1000;
-				const token = await this.authService.signToken(user.user.id, user.user.username);		
-				res.clearCookie('token', { httpOnly: true })
-				.cookie('isNew', true, { expires: new Date(fiveMin), /*httpOnly: true*/ })
-				.cookie("access_token", token.access_token)
-				.redirect("http://localhost:5173")
+				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
+				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
+				.redirect("http://localhost:5173/signup42")
 			}
 		} catch (error) {
 			throw new BadRequestException(error.message)

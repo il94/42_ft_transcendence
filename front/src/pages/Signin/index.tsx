@@ -73,13 +73,13 @@ function Signin() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (email.value.length === 0 ||
+			if (username.value.length === 0 ||
 				password.value.length === 0) {
-				if (email.value.length === 0) {
-					setEmail({
+				if (username.value.length === 0) {
+					setUsername({
 						value: '',
 						error: true,
-						errorMessage: "Insert email",
+						errorMessage: "Insert username",
 					})
 				}
 				if (password.value.length === 0) {
@@ -91,11 +91,11 @@ function Signin() {
 				}
 				return
 			}
-			if (email.error || password.error)
+			if (username.error || password.error)
 				return
 
 			const user = {
-				email: email.value,
+				username: username.value,
 				hash: password.value
 			}
 
@@ -120,10 +120,10 @@ function Signin() {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
 				if (statusCode === 403 || statusCode === 404) {
-					setEmail((prevState: SettingData) => ({
+					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid email"
+						errorMessage: "Invalid username"
 					}))
 				}
 				else
@@ -134,26 +134,16 @@ function Signin() {
 		}
 	}
 
-	/* ================================ EMAIL =================================== */
+	/* ================================ USERNAME =================================== */
 
-	const [email, setEmail] = useState<SettingData>(emptySetting)
+	const [username, setUsername] = useState<SettingData>(emptySetting)
 
-	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-
-		if (value.endsWith("@student.42.fr")) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "Cannot signin with 42 email"
-			})
-		}
-		else {
-			setEmail({
-				value: value,
-				error: false
-			})
-		}
+		setUsername({
+			value: value,
+			error: false
+		})
 	}
 
 	/* ============================== PASSWORD ================================== */
@@ -188,16 +178,16 @@ function Signin() {
 					autoComplete="off"
 					spellCheck="false">
 					<VerticalSetting fontSize={20}>
-						Email
+						Username
 						<VerticalSettingWrapper>
 							<InputText
-								onChange={handleInputEmailChange}
-								type="text" value={email.value}
+								onChange={handleInputUsernameChange}
+								type="text" value={username.value}
 								width={231}
 								fontSize={25}
-								$error={email.error} />
+								$error={username.error} />
 							<ErrorMessage>
-								{email.error && email.errorMessage}
+								{username.error && username.errorMessage}
 							</ErrorMessage>
 						</VerticalSettingWrapper>
 					</VerticalSetting>
