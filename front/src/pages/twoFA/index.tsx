@@ -3,11 +3,14 @@ import {
 	FormEvent,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from 'react'
-import { useNavigate } from 'react-router'
+import {
+	useNavigate,
+	useLocation
+} from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import Cookies from "js-cookie"
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -42,17 +45,19 @@ function TwoFA() {
 
 	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
-      
+	const location = useLocation()
+
+	const userId: number = location.state.userId
+
 	useEffect(() => {
-		const id: string | undefined = Cookies.get('id')
-		if (id)
-			setToken(id);
+		if (token || !userId)
+			navigate("/error")
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (code.value.length === 0) {
+			if (!code.value) {
 				setCode({
 					value: '',
 					error: true,
@@ -60,12 +65,25 @@ function TwoFA() {
 				})
 				return
 			}
-			
-			const twoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code.value)
-			 
-			setToken(twoFAResponse.data.access_token)
+			else if (code.value.length < 6) {
+				setCode((prevState: SettingData) => ({
+					...prevState,
+					error: true,
+					errorMessage: "Code must contains 6 digits"
+				}))
+				return
+			}
 
-			localStorage.setItem("access_token", twoFAResponse.data.access_token)
+			if (code.error)
+				return
+			
+			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${userId}`, {
+				twoFACode: code.value
+			})
+			 
+			localStorage.setItem("access_token", authTwoFAResponse.data.access_token)
+			setToken(authTwoFAResponse.data.access_token)
+
 			navigate("/")
 		}
 		catch (error) {
@@ -80,24 +98,62 @@ function TwoFA() {
 					}))
 				}
 				else
-					navigate("/error");
+					navigate("/error")
 			}
 			else
-				navigate("/error");
+				navigate("/error")
 		}
 	}
 
-	/* ================================ CODE =================================== */
+	/* ================================ CODE ==================================== */
 
 	const [code, setCode] = useState<SettingData>(emptySetting)
 
-	function handleInputCodeChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleInputCode(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setCode({
-			value: value,
-			error: false
-		})
+		if (value.length === 0) {
+			setCode({
+				value: value,
+				error: true,
+				errorMessage: "Code cannot be empty"
+			})
+		}
+		else if (value.length > 6) {
+			setCode((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Code must contains 6 digits"
+			}))
+		}
+		else if (!/\d/.test(value)) {
+			setCode((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Code must be containing by digits",
+			}))
+		}
+		else {
+			setCode({
+				value: value,
+				error: false
+			})
+		}
 	}
+
+	function handleInputCodeBlur() {
+		setCode((prevState: SettingData) => ({
+			...prevState,
+			error: false
+		}))
+	}
+
+	const inputCodeRef = useRef<HTMLInputElement>(null)
+
+	useEffect(() => {
+		const InputCodeContainer = inputCodeRef.current
+		if (InputCodeContainer)
+			InputCodeContainer.focus()
+	})
 
 	/* ========================================================================== */
 
@@ -120,11 +176,13 @@ function TwoFA() {
 						<VerticalSettingWrapper>
 							Enter the six-digit code from Google Authenticator to secure your authentication
 							<InputText
-								onChange={handleInputCodeChange}
+								onChange={handleInputCode}
+								onBlur={handleInputCodeBlur}
 								type="text" value={code.value}
 								width={231}
 								fontSize={25}
-								$error={code.error} />
+								$error={code.error}
+								ref={inputCodeRef} />
 							<ErrorMessage>
 								{code.error && code.errorMessage}
 							</ErrorMessage>
