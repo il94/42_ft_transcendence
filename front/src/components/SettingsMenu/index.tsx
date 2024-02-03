@@ -379,11 +379,10 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 								Array.isArray(password.errorMessage) ?
 								<>
 								{
-
 									(password.errorMessage as string[]).map((errorMessage, index) => {
 										return (
 											<ErrorMessage
-												key={"error_message" + index}>
+												key={"settingsErrorMessage" + index}>
 												{errorMessage}
 											</ErrorMessage>)
 										}

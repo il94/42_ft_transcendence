@@ -44,9 +44,9 @@ function ChannelList({ channels }: PropsChannelList) {
 				:
 				<ScrollBar>
 				{
-					channels.map((channel, index) => (
+					channels.map((channel) => (
 						<ChannelSection
-						key={"channel" + index} // a definir
+						key={"channel" + channel.id}
 						channel={channel}
 						/>
 					))

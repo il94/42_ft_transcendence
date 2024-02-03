@@ -26,7 +26,7 @@ export function generateResults(results: User[] | Channel[], type: resultSearchB
 				{
 					results.map((result, index) => (
 						<Result
-							key={`${type}_result` + index} // a definir
+							key={`${type}Result` + result.id}
 							onClick={() => {
 								type === resultSearchBarType.USER ?
 									addFunction(result as User)

@@ -4,11 +4,9 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 
 	(!!!!!)
 	Gérer instantanément la présence du token
-	Vérifier les keys dans les maps
 	Fix les erreurs ts
 
 	(!!!)
-	Revoir les z index
 	Signin a check
 	Checker le responsive de toutes les pages
 	Finaliser la gestion des formulaires
@@ -40,17 +38,10 @@ Profile/ : à faire après merge
 	Gérer la déconnexion
 	Gestion d'erreur
 
-ScoreResume/ : à voir quand le Pong aura avancé
--pas_regardé:
-
-MatchHistory/ : à voir quand le Pong aura avancé
--pas_regardé:
-	Ajouter loader
 
 
 SettingsMenu/ : à faire après merge
 	Faire select Avatar si le temps
-	Gérer le twoFA
 	Gestion d'erreur ( + voir signin/signup)
 
 
@@ -63,8 +54,19 @@ ChannelInterface/ :
 Messages/ : à faire après merge
 	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
 
+
+ScoreResume/ : à voir quand le Pong aura avancé
+-pas_regardé:
+
+MatchHistory/ : à voir quand le Pong aura avancé
+-pas_regardé:
+	Ajouter loader
+
+
+
 BACK/ :
 
 channels.service/ : à faire après merge
 -findChannelWithRelations:
 	Vérifier la fonction pour mapper les messages (soso)
+

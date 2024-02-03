@@ -48,14 +48,14 @@ function Discussion() {
 								// Si le message est un message textuel
 								message.type === messageType.TEXT ?
 									<UserText
-										key={"message" + index} // a definir
+										key={"message" + message.id}
 										content={(message as MessageText).content}
 									/>
 
 									// Si le message est une invitation
 									:
 									<UserInvitation
-										key={"message" + index} // a definir
+										key={"message" + message.id}
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}
 										idMsg={(message as MessageInvitation).id}
@@ -68,7 +68,7 @@ function Discussion() {
 								// Si le message est un message textuel
 								message.type === messageType.TEXT ?
 									<ContactText
-										key={"message" + index} // a definir
+										key={"message" + message.id}
 										sender={message.sender}
 										content={(message as MessageText).content}
 									/>
@@ -76,7 +76,7 @@ function Discussion() {
 									// Si le message est une invitation
 									:
 									<ContactInvitation
-										key={"message" + index} // a definir
+										key={"message" + message.id}
 										sender={message.sender}
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}
