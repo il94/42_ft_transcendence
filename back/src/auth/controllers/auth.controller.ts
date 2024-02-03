@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param, ConflictException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
-import { Api42AuthGuard, JwtGuard, TwoFAGuard  } from '../guards/auth.guard';
+import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto, TwoFaDto } from "../dto/";
 import { getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
@@ -121,14 +121,14 @@ export class AuthController {
 
 	@Post('2fa/authenticate/:id')
   	@HttpCode(200)
-  	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body): Promise <{access_token: string}> {
+  	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body: TwoFaDto): Promise <{access_token: string}> {
 		try {
 			const user = await this.userService.findUser(id);
 			if (user.status === UserStatus.ONLINE)
 				throw new BadRequestException('User is already authenticated');
-			if (!body.value)
+			if (!body.twoFACode)
 				throw new BadRequestException('Empty 2FA code');
-			const token: { access_token: string } = await this.authService.loginWith2fa(user.id, body.value);
+			const token: { access_token: string } = await this.authService.loginWith2fa(user.id, body.twoFACode);
 			return token;
 		} catch (error) {
 			throw new BadRequestException(error.message);
@@ -137,7 +137,7 @@ export class AuthController {
 
 	@Patch('2fa/disable')
 	@HttpCode(200)
-	@UseGuards(JwtGuard, TwoFAGuard)
+	@UseGuards(JwtGuard)
 	async disable(@getUser() user: User, @Body() body): Promise <boolean> {
 		try {
 			const disable: boolean =  await this.userService.disableTwoFA(user, body.TwoFA)

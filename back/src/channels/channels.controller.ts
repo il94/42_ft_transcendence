@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
 import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto';
-import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import { getUser } from '../auth/decorators/users.decorator';

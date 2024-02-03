@@ -11,7 +11,7 @@ import {
 	useLocation
 } from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-
+import Cookies from "js-cookie"
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
 import InputText from '../../componentsLibrary/InputText'
@@ -47,8 +47,13 @@ function TwoFA() {
 	const navigate = useNavigate()
 	const location = useLocation()
 
-	const userId: number = location.state.userId
+	// /!\ Pas de user id dans location.state !
+	//const userId: number = location.state.userId
+	const userId: string | undefined = Cookies.get('id')
+		if (userId)
+			setToken(userId);
 
+	console.log("location: ", location.state);
 	useEffect(() => {
 		if (token || !userId)
 			navigate("/error")

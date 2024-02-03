@@ -4,7 +4,6 @@ import { UsersService } from '../services/users.service';
 import { JwtGuard } from '../guards/auth.guard';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { UserEntity } from '../entities/user.entity';
 import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 
@@ -16,7 +15,6 @@ export class UsersController {
 
 	// Renvoie tout les users
 	@Get()
-	@ApiOkResponse({ type: UserEntity, isArray: true })
 	findAll() {
 		return this.usersService.findAll()
 	}

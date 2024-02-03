@@ -1,10 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
 import { BlockedsService } from './blockeds.service';
-// import { RelationDto } from './dto/blockeds.dto';
-import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-//import { AuthGuard } from '../auth/guards/auth.guard';
-//import { JwtPayload } from 'src/users/constants';
 import { getUser } from '../auth/decorators/users.decorator';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
