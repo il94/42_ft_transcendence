@@ -10,17 +10,11 @@ import {
 import axios, { AxiosError } from "axios"
 
 import {
-	HorizontalSettingTemp,
-	SettingTtile,
 	Style,
-	CloseButtonWrapper,
-	HorizontalSettingsFormTemp,
-	ErrorMessage,
 	TwoFAValue
 } from "./style"
 
 import SelectAvatar from "./SelectAvatar"
-import Icon from "../../componentsLibrary/Icon"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
 import ScrollBar from "../../componentsLibrary/ScrollBar"
@@ -38,7 +32,13 @@ import {
 	emptySetting
 } from "../../utils/emptyObjects"
 
-import CloseIcon from "../../assets/close.png"
+import {
+	ErrorMessage,
+	VerticalSetting,
+	VerticalSettingWrapper,
+	VerticalSettingsForm
+} from "../../componentsLibrary/SettingsForm/Index"
+import CloseButton from "../../componentsLibrary/CloseButton"
 
 type PropsSettingsMenu = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
@@ -49,6 +49,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
@@ -57,7 +58,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 				email.value.length === 0 ||
 				phoneNumber.value.length === 0) {
 				if (username.value.length === 0) {
-
 					setUsername({
 						value: '',
 						error: true,
@@ -99,7 +99,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 
 			if (Object.keys(newDatas).length !== 0)
 			{
-				await axios.patch(`http://${url}:3333/user/${userAuthenticate.id}`, newDatas,
+				await axios.patch(`http://${url}:3333/user/me`, newDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -119,19 +119,25 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 409)
+				if (statusCode === 403)
 				{
 					setEmail((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid email"
+						errorMessage: "42 emails are forbidden"
 					}))
 				}
-				// else
-					// setErrorRequest(true)
+				else
+				{
+					displayPopupError({ display: true })
+					displaySettingsMenu(false)
+				}
 			}
-			// else
-				// setErrorRequest(true)
+			else
+			{
+				displayPopupError({ display: true })
+				displaySettingsMenu(false)
+			}
 		}
 	}
 
@@ -335,34 +341,29 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 		<Style
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
+			<CloseButton closeFunction={displaySettingsMenu} />
 			<ScrollBar visible>
-				<CloseButtonWrapper>
-					<Icon src={CloseIcon} size={24}
-						onClick={() => displaySettingsMenu(false)}
-						alt="Close button" title="Close" />
-				</CloseButtonWrapper>
-				<HorizontalSettingsFormTemp
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<HorizontalSettingTemp>
-						<SettingTtile>
-							Username
-						</SettingTtile>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						Username
+						<VerticalSettingWrapper>
 						<InputText
 							onChange={handleInputUsernameChange}
 							onBlur={handleInputUsernameBlur}
 							type="text" value={username.value as string}
 							fontSize={16}
 							$error={username.error} />
-						<ErrorMessage>
+						<ErrorMessage fontSize={10} >
 							{username.error && username.errorMessage}
 						</ErrorMessage>
-					</HorizontalSettingTemp>
-					<HorizontalSettingTemp>
-						<SettingTtile>
-							Password
-						</SettingTtile>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						Password
+						<VerticalSettingWrapper>
 						<InputText
 							onChange={handleInputPasswordChange}
 							onClick={() => setPlaceHolder('')}
@@ -382,7 +383,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 									(password.errorMessage as string[]).map((errorMessage, index) => {
 										return (
 											<ErrorMessage
-												key={"settingsErrorMessage" + index}>
+												key={"settingsErrorMessage" + index}
+												fontSize={10} >
 												{errorMessage}
 											</ErrorMessage>)
 										}
@@ -390,7 +392,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 								}
 								</>
 								:
-								<ErrorMessage>
+								<ErrorMessage fontSize={10} >
 									{password.errorMessage}
 								</ErrorMessage>
 							}
@@ -411,37 +413,37 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 									"Show password"
 							}
 						</Button>
-					</HorizontalSettingTemp>
-					<HorizontalSettingTemp>
-						<SettingTtile>
-							E-mail
-						</SettingTtile>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						E-mail
+						<VerticalSettingWrapper>
 						<InputText
 							onChange={handleInputEmailChange}
 							type="text" value={email.value as string}
 							fontSize={16}
 							$error={email.error} />
-						<ErrorMessage>
+						<ErrorMessage fontSize={10} >
 							{email.error && email.errorMessage}
 						</ErrorMessage>
-					</HorizontalSettingTemp>
-					<HorizontalSettingTemp>
-						<SettingTtile>
-							Phone number
-						</SettingTtile>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						Phone number
+						<VerticalSettingWrapper>
 						<InputText
 							onChange={handleInputPhoneNumberChange}
 							type="text" value={phoneNumber.value as string}
 							fontSize={16}
 							$error={phoneNumber.error} />
-						<ErrorMessage>
+						<ErrorMessage fontSize={10} >
 							{phoneNumber.error && phoneNumber.errorMessage}
 						</ErrorMessage>
-					</HorizontalSettingTemp>
-					<HorizontalSettingTemp>
-						<SettingTtile>
-							2FA
-						</SettingTtile>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						2FA
+						<VerticalSettingWrapper>
 						<TwoFAValue>
 							{ twoFA ? "Enable" : "Disable" }
 						</TwoFAValue>
@@ -454,17 +456,21 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 							style={{ alignSelf: "center" }}>
 							{ twoFA ? "Disable" : "Enable" }
 						</Button>
-					</HorizontalSettingTemp>
-					<SelectAvatar
-						avatar={avatar}
-						setAvatar={setAvatar} />
-					<Button
-						type="submit"
-						fontSize={19}
-						alt="Save button" title="Save changes">
-						Save
-					</Button>
-				</HorizontalSettingsFormTemp>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting>
+						<SelectAvatar
+							avatar={avatar}
+							setAvatar={setAvatar} />
+					</VerticalSetting>
+						<Button
+							type="submit"
+							fontSize={19}
+							alt="Save button" title="Save changes">
+							Save
+						</Button>
+					<div style={{ height: "2px" }} />
+				</VerticalSettingsForm>
 			</ScrollBar>
 		</Style>
 	)

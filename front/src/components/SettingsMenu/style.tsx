@@ -17,8 +17,6 @@ export const Style = styled.div<{ $zIndex: number }>`
 	max-height: 636px;
 	min-height: 159px;
 
-	overflow-y: auto;
-
 	clip-path: ${effects.pixelateWindow};
 
 	background-color: ${colors.module};
@@ -88,6 +86,8 @@ export const ErrorMessage = styled.p`
 `
 
 export const TwoFAValue = styled.p`
+
+	width: 100%;
 
 	border-bottom: 1px solid;
 	text-align: center;
