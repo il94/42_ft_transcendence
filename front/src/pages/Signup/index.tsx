@@ -6,7 +6,9 @@ import {
 	useState
 } from 'react'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { useNavigate } from 'react-router'
+import {
+	useNavigate
+} from 'react-router'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -16,8 +18,8 @@ import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 import {
-	HorizontalSettingsForm,
-	HorizontalSetting,
+	VerticalSettingsForm,
+	VerticalSetting,
 	ErrorMessage,
 	VerticalSettingWrapper
 } from '../../componentsLibrary/SettingsForm/Index'
@@ -306,11 +308,11 @@ function Signup() {
 				<WindowTitle>
 					Sign up
 				</WindowTitle>
-				<HorizontalSettingsForm
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<HorizontalSetting>
+					<VerticalSetting fontSize={20}>
 						Username
 						<VerticalSettingWrapper>
 							<InputText
@@ -324,8 +326,8 @@ function Signup() {
 								{username.error && username.errorMessage}
 							</ErrorMessage>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</VerticalSetting>
+					<VerticalSetting fontSize={20}>
 						Password
 						<VerticalSettingWrapper>
 							<InputText
@@ -346,7 +348,7 @@ function Signup() {
 														(password.errorMessage as string[]).map((errorMessage, index) => {
 															return (
 																<ErrorMessage
-																	key={"error_message" + index}>
+																	key={"signupErrorMessage" + index}>
 																	{errorMessage}
 																</ErrorMessage>)
 														}
@@ -377,8 +379,8 @@ function Signup() {
 								}
 							</Button>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</VerticalSetting>
+					<VerticalSetting fontSize={20}>
 						E-mail
 						<VerticalSettingWrapper>
 							<InputText
@@ -391,8 +393,8 @@ function Signup() {
 								{email.error && email.errorMessage}
 							</ErrorMessage>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</VerticalSetting>
+					<VerticalSetting fontSize={20}>
 						Phone number
 						<VerticalSettingWrapper>
 							<InputText
@@ -405,14 +407,14 @@ function Signup() {
 								{phoneNumber.error && phoneNumber.errorMessage}
 							</ErrorMessage>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
+					</VerticalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</HorizontalSettingsForm>
+				</VerticalSettingsForm>
 				<div>
 					Already have an account ?&nbsp;
 					<StyledLink to="/signin" color={colors.button}>

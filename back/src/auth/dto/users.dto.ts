@@ -50,7 +50,7 @@ export class CreateUserDto implements User {
 	losses: number;
 }
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
+export class UpdateUserDto {
 
 	@IsOptional()
 	@IsString()

@@ -79,9 +79,9 @@ function MatchHistory() {
 		<Style>
 			<ScrollBar>
 				{
-					matchs.map((match, index) => (
+					matchs.map((match) => (
 						<Match
-							key={"match" + index} // a definir
+							key={"match" + match.id}
 							username={match.user.username}
 							opponent={match.opponent.username}
 							result={match.result}

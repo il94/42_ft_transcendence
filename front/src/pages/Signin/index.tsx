@@ -5,9 +5,11 @@ import {
 	useEffect,
 	useState
 } from 'react'
-import { useNavigate } from 'react-router'
+import {
+	useNavigate
+} from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import Cookies from 'js-cookie'
+
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -20,8 +22,8 @@ import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 import Separator from '../../componentsLibrary/Separator/Index'
 import {
-	HorizontalSettingsForm,
-	HorizontalSetting,
+	VerticalSettingsForm,
+	VerticalSetting,
 	ErrorMessage,
 	VerticalSettingWrapper
 } from '../../componentsLibrary/SettingsForm/Index'
@@ -181,11 +183,11 @@ function Signin() {
 				<WindowTitle>
 					Sign in
 				</WindowTitle>
-				<HorizontalSettingsForm
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<HorizontalSetting>
+					<VerticalSetting fontSize={20}>
 						Email
 						<VerticalSettingWrapper>
 							<InputText
@@ -198,8 +200,8 @@ function Signin() {
 								{email.error && email.errorMessage}
 							</ErrorMessage>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
-					<HorizontalSetting>
+					</VerticalSetting>
+					<VerticalSetting fontSize={20}>
 						Password
 						<VerticalSettingWrapper>
 							<InputText
@@ -228,14 +230,14 @@ function Signin() {
 								}
 							</Button>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
+					</VerticalSetting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</HorizontalSettingsForm>
+				</VerticalSettingsForm>
 				<div>
 					Don't have an account?&nbsp;
 					<StyledLink to="/signup" color={colors.button}>

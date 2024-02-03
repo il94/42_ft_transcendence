@@ -94,42 +94,38 @@ export class UsersService {
 		return user;
 	}
 
-	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User>  {
+  	// Modifie le user authentifie
+	async updateUser(userId: number, updateUserDto: UpdateUserDto)  {
 		try {
-			const userExists = await this.prisma.user.findFirst({
-				where: {
-					email: updateUserDto.email,
-					AND: {
-						id: {
-							not: id
-						}
-					}
-				}
-			})
-			if (userExists)
-				throw new ConflictException();
-			else if (updateUserDto.email.endsWith("@student.42.fr"))
-				throw new ForbiddenException("42 emails are forbidden");
-			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
+			if (updateUserDto.email && updateUserDto.email.endsWith("@student.42.fr"))
+				throw new ForbiddenException("42 emails are forbidden")
+
+			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : null
 
 			const userNewDatas = hash ? {
 				...updateUserDto,
 				hash: hash
 			} : updateUserDto
 
-	
-		const updateUser = await this.prisma.user.update({
+			// Modifie le user auth
+			await this.prisma.user.update({
 				where: {
-					id: id
+					id: userId
 				},
 				data: {
 					...userNewDatas
 				}
-			});
-			return updateUser;
+			})
+
+			console.log(`User ${userId} has been updated`)
 		}
 		catch (error) {
-			throw error
+			if (error instanceof ForbiddenException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
 		}
 	}
 

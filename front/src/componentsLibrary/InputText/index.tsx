@@ -1,9 +1,10 @@
-import styled from "styled-components";
-import colors from "../../utils/colors";
+import styled from "styled-components"
+
+import colors from "../../utils/colors"
 
 const InputText = styled.input<{ width?: number, fontSize?: number, $error?: boolean, $disable?: boolean }>`
 
-	width: ${(props) => props.width && props.width}px;
+	width: ${(props) => props.width ? props.width + "px" : "100%" };
 
 	border: none;
 	border-bottom: 1px solid ${(props) => props.$disable ? colors.textBlocked : props.$error && colors.textError};

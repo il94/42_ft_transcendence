@@ -1,7 +1,8 @@
 import styled from "styled-components"
+
 import effects from "../../../utils/effects"
 
-export const Style = styled.div<{ $left?: number, $right?: number, $top?: number, $bottom?: number, $height: number }>`
+export const Style = styled.div<{ $left?: number, $right?: number, $top?: number, $bottom?: number, height: number }>`
 
 	display: flex;
 	flex-direction: column;
@@ -14,7 +15,7 @@ export const Style = styled.div<{ $left?: number, $right?: number, $top?: number
 	z-index: 999;
 
 	width: 180px;
-	height: ${(props) => props.$height}px;
+	height: ${(props) => props.height}px;
 
 	clip-path: ${effects.pixelateWindow};
 

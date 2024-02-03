@@ -66,9 +66,9 @@ function Social({ social, displaySocial, friends, displayContextualMenu, setCont
 						<>
 							<ScrollBar>
 								{
-									sortedFriends.map((friend, index) => (
+									sortedFriends.map((friend) => (
 										<FriendSection
-											key={"friend" + index} // a definir
+											key={"friend" + friend.id}
 											friend={friend}
 											social={social}
 											displayContextualMenu={displayContextualMenu}

@@ -35,11 +35,12 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, 
-  @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
-  }
+  	// Modifie le user authentifie
+	@Patch('me')
+	async update(@getUser('id') userId: number, 
+	@Body() updateUserDto: UpdateUserDto) {
+		return this.usersService.updateUser(userId, updateUserDto)
+	}
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
