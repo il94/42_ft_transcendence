@@ -1,10 +1,15 @@
-import { useRef, useState, useContext } from "react"
+import { useRef, useState, useContext, useEffect } from "react"
 import styled from "styled-components"
 import axios, { AxiosResponse } from "axios"
 import AuthContext from "../../../contexts/AuthContext"
+import Cookies from "js-cookie"
+import { User, UserAuthenticate } from "../../../utils/types"
+import { Socket } from 'socket.io';
 
 
 import Pong from "./Pong"
+import { emptyUserAuthenticate } from "../../../utils/emptyObjects"
+import InteractionContext from "../../../contexts/InteractionContext"
 // import colors from "../../utils/colors"
 
 const Style = styled.div`
@@ -36,21 +41,29 @@ const PlayButtonStyle = styled.div`
 function PongWrapper({social}) {
 
     const wrapperRef = useRef<HTMLDivElement | null>(null)
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
+	// const { token, url } = useContext(Authenticate)!
+	const [gameState, setGameState] = useState<boolean>(false)
+    const { userAuthenticate } = useContext(InteractionContext)!
 
-    const [gameState, setGameState] = useState<boolean>(false)
 
-    if (wrapperRef.current)
-        console.log(wrapperRef.current.getBoundingClientRect())
+    //if (wrapperRef.current)
+    //    console.log(wrapperRef.current.getBoundingClientRect())
 
-    function handlePlayButton(){
+    async function handlePlayButton(){
         setGameState(true)
-        console.log("coucou")
-        const response = axios.post(`http://${url}:3333/pong/`, {
+        try {
+            const response = await axios.post(`http://${url}:3333/pong/play`, {}, {
 			headers: {
 				'Authorization': `Bearer ${token}`
 			}
-		} )
+		})
+		console.log('user socket', userAuthenticate)
+        userAuthenticate.socket?.emit('searchGame', userAuthenticate.id)
+        }
+        catch (error) {
+            throw (error)
+        }
     }
 
     return (

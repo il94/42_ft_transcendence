@@ -67,6 +67,11 @@ enum MatchResult {
   LOOSER
 }
 
+enum roleInGame {
+  PLAYER
+  WATCHER
+}
+
 model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
@@ -182,6 +187,7 @@ model UsersOnGames {
   game      Game  @relation(fields: [gameId], references: [id])
   gameId    Int
   podium    MatchResult
+  role      roleInGame
 
   @@id([userId, gameId])
 }

@@ -4,7 +4,7 @@ import {
 	useRef
 } from 'react'
 import styled from 'styled-components'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import Cookies from "js-cookie"
 import {
 	useNavigate
