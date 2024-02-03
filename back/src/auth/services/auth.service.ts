@@ -32,11 +32,9 @@ export class AuthService {
 
 	async validateUser(dto: AuthDto): Promise<{ access_token: string } | Partial<User>> {
 		try {
-			if (dto.email.endsWith("@student.42.fr"))
-				throw new ForbiddenException();
 			const user = await this.prisma.user.findUnique({
 				where: {
-					email: dto.email
+					username: dto.username
 				}
 			});
 			if (!user)
@@ -45,7 +43,7 @@ export class AuthService {
 			if (!pwdMatch)
 				throw new ForbiddenException();
 
-			const token: { access_token: string } = await this.signToken(user.id, user.email)
+			const token: { access_token: string } = await this.signToken(user.id, user.username)
 			if (user.twoFA === false)
 			{
 				await this.prisma.user.update({
@@ -99,24 +97,32 @@ export class AuthService {
 
 	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | Partial<User> | User> {
 		try {
+
+			console.log("CONNEXION")
 			const user = await this.prisma.user.findUnique({
-				where: { email: profile.email, },
+				where: { usernameId: profile.usernameId, },
 			});
 			if (user) {
 				if (!user.twoFA) {
 					const logUser = await this.prisma.user.update({ 
-						where: { email: profile.email },
+						where: { usernameId: profile.usernameId },
 						data: { status: UserStatus.ONLINE }})
 					return logUser
 				}
 				return { id: user.id, twoFA: user.twoFA };
 			}
 			console.log ("jai pas trouve le user");
-			profile.hash = generate({ length: 6, numbers: true });
-			const newUser = await this.userService.createUser(profile as CreateUserDto)
-			if (!newUser)
-				throw new ForbiddenException('Failed to create new 42 user');
-			return { user: newUser, isNew: true }
+			// profile.hash = generate({ length: 6, numbers: true });
+			// const newUser = await this.userService.createUser(profile as CreateUserDto)
+			// if (!newUser)
+			// 	throw new ForbiddenException('Failed to create new 42 user');
+
+			const partialUser: Partial<User> = {
+				usernameId: profile.usernameId,
+				avatar: profile.avatar,
+			}
+
+			return { usernameId: profile.usernameId, avatar: profile.avatar, isNew: true }
 		} catch (error) {
             throw new BadRequestException(error.message)
 		}
@@ -130,7 +136,7 @@ export class AuthService {
 
 	async generateTwoFASecret(user: User): Promise <{ secret:string, otpAuthURL: string}> {
 		const secret = authenticator.generateSecret();
-		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
+		const otpAuthURL = authenticator.keyuri(user.username, process.env.AUTH_APP_NAME, secret);
 		await this.userService.setTwoFASecret(secret, user.id);
 		return { secret, otpAuthURL };
 	}

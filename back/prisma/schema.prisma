@@ -76,14 +76,13 @@ model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
 
+  usernameId  String	@unique
   username    String  @unique
-  email       String  @unique
   hash        String
   avatar      String
-  phoneNumber String?
   twoFA       Boolean
   twoFASecret String
-  wins        Int
+	wins        Int
 	draws       Int
 	losses      Int
   status      UserStatus

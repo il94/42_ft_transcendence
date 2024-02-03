@@ -20,8 +20,6 @@ export const emptyUserAuthenticate = {
 	draws: 0,
 	losses: 0,
 	socket: undefined,
-	email: "",
-	phoneNumber: "",
 	twoFA: false,
 	friends: [],
 	blockeds: [],

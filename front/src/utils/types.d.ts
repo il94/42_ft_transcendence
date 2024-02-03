@@ -22,8 +22,6 @@ export type User = {
 }
 
 export type UserAuthenticate = User & {
-	email: string,
-	phoneNumber: string,
 	twoFA: boolean,
 	friends: User[],
 	blockeds: User[],

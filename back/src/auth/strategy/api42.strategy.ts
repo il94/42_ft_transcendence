@@ -25,9 +25,8 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
               else throw new BadRequestException(error.message);
             }),
           ),)
-        const user = await this.authService.validate42User({ 
-            email: profile.emails[0].value, 
-            username: profile.username, 
+        const user = await this.authService.validate42User({
+			usernameId: profile.username,
             avatar: data.image.link });
         return user;
     }

@@ -16,10 +16,11 @@ export class UsersService {
 		console.log("back create user")
 		try {
 			const userExists = await this.prisma.user.findFirst({
-				where: { email: createUserDto.email }
+				where: {
+					username: createUserDto.username
+				}
 			})
 			if (userExists)
-
 				throw new ConflictException('credential already taken');
 			const hash = await argon.hash(createUserDto.hash);
 			const userDatas = {
@@ -29,7 +30,6 @@ export class UsersService {
 			const user = await this.prisma.user.create({
 				data: {
 					...userDatas,
-					// phoneNumber: createUserDto.phoneNumber || '',
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,
@@ -38,6 +38,7 @@ export class UsersService {
 					losses: 0
 				},
 			});
+
             console.log(`User ${user.username} with id ${user.id} created successfully`);
 			return user;
 		}
@@ -97,9 +98,6 @@ export class UsersService {
   	// Modifie le user authentifie
 	async updateUser(userId: number, updateUserDto: UpdateUserDto)  {
 		try {
-			if (updateUserDto.email && updateUserDto.email.endsWith("@student.42.fr"))
-				throw new ForbiddenException("42 emails are forbidden")
-
 			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : null
 
 			const userNewDatas = hash ? {

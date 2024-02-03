@@ -54,8 +54,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (username.value.length === 0 ||
-				email.value.length === 0) {
+			if (username.value.length === 0) {
 				if (username.value.length === 0) {
 					setUsername({
 						value: '',
@@ -63,24 +62,10 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 						errorMessage: "Insert username",
 					})
 				}
-				if (email.value.length === 0) {
-					setEmail({
-						value: '',
-						error: true,
-						errorMessage: "Insert email",
-					})
-				}
-				// if (phoneNumber.value.length === 0) {
-				// 	setPhoneNumber({
-				// 		value: '',
-				// 		error: true,
-				// 		errorMessage: "Insert phone number",
-				// 	})
-				// }
 				return
 			}
 
-			if (username.error || password.error || email.error || phoneNumber.error)
+			if (username.error || password.error)
 				return
 
 			const newDatas: any = {}
@@ -89,10 +74,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 				newDatas.username = username.value
 			if (password.value)
 				newDatas.hash = password.value
-			if (email.value !== userAuthenticate.email)
-				newDatas.email = email.value
-			if (phoneNumber.value !== userAuthenticate.phoneNumber)
-				newDatas.phoneNumber = phoneNumber.value
 			if (avatar !== userAuthenticate.avatar)
 				newDatas.avatar = avatar
 
@@ -114,19 +95,16 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			displaySettingsMenu(false)
 		}
 		catch (error) {
-
-			console.log("ERROR", error)
-
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
 				if (statusCode === 403)
 				{
-					setEmail((prevState: SettingData) => ({
+					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "42 emails are forbidden"
+						errorMessage: "Invalid username"
 					}))
 				}
 				else
@@ -252,77 +230,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 	const [placeHolder, setPlaceHolder] = useState<string>("New password")
 
-	/* =============================== EMAIL ==================================== */
-
-	const [email, setEmail] = useState<SettingData>({
-		value: userAuthenticate.email,
-		error: false,
-		errorMessage: ''
-	})
-
-	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		if (value.length === 0) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "Email cannot be empty"
-			})
-		}
-		else if (value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "Invalid email"
-			})
-		}
-		else if (value.endsWith("@student.42.fr")) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "42 emails are forbidden"
-			})
-		}
-		else {
-			setEmail({
-				value: value,
-				error: false
-			})
-		}
-	}
-
-	/* ============================ PHONE NUMBER ================================ */
-
-	const [phoneNumber, setPhoneNumber] = useState<SettingData>({
-		value: userAuthenticate.phoneNumber,
-		error: false,
-		errorMessage: ''
-	})
-
-	function handleInputPhoneNumberChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		if (value.length === 0) {
-			setPhoneNumber({
-				value: value,
-				error: true,
-				errorMessage: "Phone number cannot be empty"
-			})
-		}
-		else if (!/^(?:\+(?:[0-9] ?){6,14}[0-9]|[0-9]{10})$/.test(value)) {
-			setPhoneNumber({
-				value: value,
-				error: true,
-				errorMessage: "Invalid phone number"
-			})
-		}
-		else {
-			setPhoneNumber({
-				value: value,
-				error: false
-			})
-		}
-	}
-
 	/* ================================= 2FA ==================================== */
 
 	const twoFA = userAuthenticate.twoFA
@@ -415,32 +322,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 									"Show password"
 							}
 						</Button>
-						</VerticalSettingWrapper>
-					</VerticalSetting>
-					<VerticalSetting fontSize={15} $alignItems="start">
-						E-mail
-						<VerticalSettingWrapper>
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email.value as string}
-							fontSize={16}
-							$error={email.error} />
-						<ErrorMessage fontSize={10} >
-							{email.error && email.errorMessage}
-						</ErrorMessage>
-						</VerticalSettingWrapper>
-					</VerticalSetting>
-					<VerticalSetting fontSize={15} $alignItems="start">
-						Phone number
-						<VerticalSettingWrapper>
-						<InputText
-							onChange={handleInputPhoneNumberChange}
-							type="text" value={phoneNumber.value as string}
-							fontSize={16}
-							$error={phoneNumber.error} />
-						<ErrorMessage fontSize={10} >
-							{phoneNumber.error && phoneNumber.errorMessage}
-						</ErrorMessage>
 						</VerticalSettingWrapper>
 					</VerticalSetting>
 					<VerticalSetting fontSize={15} $alignItems="start">

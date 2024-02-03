@@ -9,6 +9,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 import {
 	useNavigate
 } from 'react-router'
+import Cookies from 'js-cookie'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -40,18 +41,24 @@ import {
 } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
+import SelectAvatar from '../../components/SettingsMenu/SelectAvatar'
 
 type PropsSignupResponse = {
 	access_token: string
 }
 
-function Signup() {
+function SignupFT() {
 
-	const { token, url } = useContext(AuthContext)!
+	const { url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
+	const tokenFT = Cookies.get('token')
+
+	const usernameId = Cookies.get('usernameId')
+	const avatarCookie = Cookies.get('avatar')
+
 	useEffect(() => {
-		if (token)
+		if (!tokenFT)
 			navigate("/error")
 	}, [])
 
@@ -80,9 +87,10 @@ function Signup() {
 				return
 
 			const newUser = {
+				usernameId: usernameId,
 				username: username.value,
 				hash: password.value,
-				avatar: getRandomDefaultAvatar()
+				avatar: avatar
 			}
 
 			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
@@ -214,6 +222,11 @@ function Signup() {
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
+
+	/* ================================ AVATAR ================================== */
+
+	const [avatar, setAvatar] = useState<string>(avatarCookie!)
+
 	/* ========================================================================== */
 
 	return (
@@ -299,6 +312,20 @@ function Signup() {
 							</Button>
 						</VerticalSettingWrapper>
 					</VerticalSetting>
+
+						<VerticalSetting>
+							<SelectAvatar
+								avatar={avatar}
+								setAvatar={setAvatar} />
+						</VerticalSetting>
+							<Button
+								type="submit"
+								fontSize={19}
+								alt="Save button" title="Save changes">
+								Save
+							</Button>
+
+
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
@@ -318,4 +345,4 @@ function Signup() {
 	)
 }
 
-export default Signup
+export default SignupFT
