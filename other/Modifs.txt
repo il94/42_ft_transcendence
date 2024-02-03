@@ -9,7 +9,6 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	(!!!)
 	Signin a check
 	Checker le responsive de toutes les pages
-	Finaliser la gestion des formulaires
 	Set corectement tout les titles et alts
 
 	(!!)
@@ -38,12 +37,8 @@ Profile/ : à faire après merge
 	Gérer la déconnexion
 	Gestion d'erreur
 
-
-
-SettingsMenu/ : à faire après merge
+SettingsMenu/ :
 	Faire select Avatar si le temps
-	Gestion d'erreur ( + voir signin/signup)
-
 
 Chat/ : à faire après merge
 	refreshStatusChallenge à retrouver (fonction de soso github)

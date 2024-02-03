@@ -20,8 +20,8 @@ import MainTitle from '../../componentsLibrary/MainTitle'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import {
-	HorizontalSettingsForm,
-	HorizontalSetting,
+	VerticalSettingsForm,
+	VerticalSetting,
 	ErrorMessage,
 	VerticalSettingWrapper
 } from '../../componentsLibrary/SettingsForm/Index'
@@ -168,13 +168,13 @@ function TwoFA() {
 				<WindowTitle>
 					TwoFA
 				</WindowTitle>
-				<HorizontalSettingsForm
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<HorizontalSetting>
+					<VerticalSetting fontSize={18}>
+						Enter the six-digit code from Google Authenticator to secure your authentication
 						<VerticalSettingWrapper>
-							Enter the six-digit code from Google Authenticator to secure your authentication
 							<InputText
 								onChange={handleInputCode}
 								onBlur={handleInputCodeBlur}
@@ -187,14 +187,14 @@ function TwoFA() {
 								{code.error && code.errorMessage}
 							</ErrorMessage>
 						</VerticalSettingWrapper>
-					</HorizontalSetting>
+					</VerticalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</HorizontalSettingsForm>
+				</VerticalSettingsForm>
 			</CentralWindow>
 		</Page>
 	)

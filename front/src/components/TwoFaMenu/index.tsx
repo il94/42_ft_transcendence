@@ -22,8 +22,8 @@ import CloseButton from "../../componentsLibrary/CloseButton"
 import Loader from "../../componentsLibrary/Loader"
 import {
 	ErrorMessage,
-	HorizontalSetting,
-	HorizontalSettingsForm,
+	VerticalSetting,
+	VerticalSettingsForm,
 	VerticalSettingWrapper
 } from "../../componentsLibrary/SettingsForm/Index"
 
@@ -232,11 +232,11 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 	return (
 		<Style $zIndex={zSettingsIndex}>
 			<CloseButton closeFunction={displayTwoFAMenu} />
-			<HorizontalSettingsForm
+			<VerticalSettingsForm
 				onSubmit={handleSubmit}
 				autoComplete="off"
 				spellCheck="false">
-				<HorizontalSetting>
+				<VerticalSetting>
 					{
 						!userAuthenticate.twoFA ?
 							<>
@@ -270,8 +270,8 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 							{code.error && code.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>
-				</HorizontalSetting>
-			</HorizontalSettingsForm>
+				</VerticalSetting>
+			</VerticalSettingsForm>
 		</Style>
 	)
 }

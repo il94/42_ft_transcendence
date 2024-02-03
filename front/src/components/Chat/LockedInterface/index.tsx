@@ -14,8 +14,8 @@ import Button from "../../../componentsLibrary/Button"
 import InputText from "../../../componentsLibrary/InputText"
 import {
 	ErrorMessage,
-	HorizontalSetting,
-	HorizontalSettingsForm,
+	VerticalSetting,
+	VerticalSettingsForm,
 	VerticalSettingWrapper
 } from "../../../componentsLibrary/SettingsForm/Index"
 
@@ -114,11 +114,11 @@ function LockedInterface() {
 
 	return (
 		<Style>
-			<HorizontalSettingsForm
+			<VerticalSettingsForm
 				onSubmit={handleSubmit}
 				autoComplete="off"
 				spellCheck="false">
-				<HorizontalSetting>
+				<VerticalSetting>
 					Password
 					<VerticalSettingWrapper>
 						<InputText
@@ -131,13 +131,13 @@ function LockedInterface() {
 							{password.error && password.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>
-				</HorizontalSetting>
+				</VerticalSetting>
 				<Button
 					type="submit" width={200}
 					alt="Submit button" title="Submit">
 					Submit
 				</Button>
-			</HorizontalSettingsForm>
+			</VerticalSettingsForm>
 		</Style>
 	)
 }

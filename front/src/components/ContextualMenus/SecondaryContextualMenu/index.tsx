@@ -84,7 +84,7 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			$right={secondaryContextualMenuPosition.right}
 			$top={secondaryContextualMenuPosition.top}
 			$bottom={secondaryContextualMenuPosition.bottom}
-			$height={secondaryContextualMenuHeight}>
+			height={secondaryContextualMenuHeight}>
 			<ScrollBar visible>
 				{
 					channels.map((channel) => (

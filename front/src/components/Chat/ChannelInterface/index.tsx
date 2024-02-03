@@ -22,8 +22,8 @@ import IconUploadFile, { HiddenInput } from "../../../componentsLibrary/IconUplo
 import InputText from "../../../componentsLibrary/InputText"
 import {
 	VerticalSettingWrapper,
-	VerticalSetting,
-	VerticalSettingsForm,
+	HorizontalSetting,
+	HorizontalSettingsForm,
 	HorizontalSettingWrapper,
 	ErrorMessage
 } from "../../../componentsLibrary/SettingsForm/Index"
@@ -308,13 +308,13 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 	return (
 		<Style>
-			<VerticalSettingsForm
+			<HorizontalSettingsForm
 				onSubmit={handleSubmit}
 				autoComplete="off"
 				spellCheck="false">
-				<VerticalSetting>
+				<HorizontalSetting>
 					Name
-					<VerticalSettingWrapper>
+					<VerticalSettingWrapper $alignItems={"flex-end"}>
 						<InputText
 							onChange={handleInputNameChange}
 							onBlur={handleInputNameBlur}
@@ -328,8 +328,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							{name.error && name.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>
-				</VerticalSetting>
-				<VerticalSetting>
+				</HorizontalSetting>
+				<HorizontalSetting>
 					Type
 					<Button
 						onClick={handleButtonClick}
@@ -337,10 +337,10 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 						fontSize={13} alt="Type channel icon" title="Change type" >
 						{capitalize(channelType)}
 					</Button>
-				</VerticalSetting>
-				<VerticalSetting $disable={channelType !== ChannelType.PROTECTED}>
+				</HorizontalSetting>
+				<HorizontalSetting $disable={channelType !== ChannelType.PROTECTED}>
 					Password
-					<VerticalSettingWrapper>
+					<VerticalSettingWrapper $alignItems={"flex-end"}>
 						<InputText
 							onInput={handleInputPasswordChange}
 							onClick={() => channelType === ChannelType.PROTECTED && setPlaceHolder('')}
@@ -366,10 +366,10 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							{password.error && password.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>
-				</VerticalSetting>
-				<VerticalSetting>
+				</HorizontalSetting>
+				<HorizontalSetting>
 					Avatar
-					<HorizontalSettingWrapper $width={155}>
+					<HorizontalSettingWrapper width={155}>
 						<IconUploadFile
 							htmlFor="uploadAvatarChannel" tabIndex={0} fontSize={13}
 							alt="Upload icon" title="Upload image">
@@ -385,7 +385,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 						<HiddenInput onChange={handleAvatarUpload}
 							id="uploadAvatarChannel" type="file" accept="image/*" />
 					</HorizontalSettingWrapper>
-				</VerticalSetting>
+				</HorizontalSetting>
 				<ButtonsWrapper>
 					<Button
 						onClick={() => setChatWindowState(chatWindowStatus.CHANNEL)}
@@ -404,7 +404,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 						}
 					</Button>
 				</ButtonsWrapper>
-			</VerticalSettingsForm>
+			</HorizontalSettingsForm>
 		</Style>
 	)
 }
