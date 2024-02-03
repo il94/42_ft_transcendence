@@ -49,7 +49,7 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
-	const { displayPopupError } = useContext(DisplayContext)!
+	const { displayPopupError, zSettingsIndex } = useContext(DisplayContext)!
 
 	/* =============================== SUBMIT =================================== */
 
@@ -230,7 +230,7 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 	/* ========================================================================== */
 
 	return (
-		<Style>
+		<Style $zIndex={zSettingsIndex}>
 			<CloseButton closeFunction={displayTwoFAMenu} />
 			<HorizontalSettingsForm
 				onSubmit={handleSubmit}

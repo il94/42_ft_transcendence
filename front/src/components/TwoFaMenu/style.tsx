@@ -3,7 +3,7 @@ import styled from "styled-components"
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
-export const Style = styled.div`
+export const Style = styled.div<{ $zIndex: number }>`
 	
 	display: flex;
 	flex-direction: column;
@@ -12,7 +12,7 @@ export const Style = styled.div`
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	z-index: 999;
+	z-index: ${(props) => props.$zIndex + 1};
 	transform: translate(-50%, -50%);
 	
 	width: 350px;
