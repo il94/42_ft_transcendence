@@ -1,11 +1,11 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsNumberString, IsString, Length, MaxLength, MinLength } from "class-validator";
 
 export class TwoFaDto {
 
+	@IsString()
 	@IsNotEmpty()
-    @IsString()
-	value: string;
+	@IsNumberString()
+	@Length(6, 6)
+	twoFACode: string;
 
-    @IsBoolean()
-    error: boolean;
 }

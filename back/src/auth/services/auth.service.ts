@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -142,15 +142,28 @@ export class AuthService {
 		  });
 	}
 
-	async loginWith2fa(user: User, twoFACode: string): Promise <{access_token: string}> {
-		if (!await this.verifyCode(user, twoFACode))
-			throw new ForbiddenException('Wrong secret code')
-		const logUser = await this.prisma.user.update({ 
-				where: { id: user.id },
-				data: { status: UserStatus.ONLINE }})
-		if (!logUser)
-			throw new BadRequestException('Failed to log user with 2FA')
-		return this.signToken(user.id, user.username)
+	async loginWith2fa(userId: number, twoFACode: string): Promise <{access_token: string}> {
+		try {
+			const user = await this.userService.findUser(userId);
+			if (user.status === UserStatus.ONLINE)
+				throw new ConflictException('User is already authenticated');
+			if (!await this.verifyCode(user, twoFACode))
+				throw new ForbiddenException('Wrong secret code')
+			const logUser = await this.prisma.user.update({ 
+					where: { id: user.id },
+					data: { status: UserStatus.ONLINE }})
+			if (!logUser)
+				throw new BadRequestException('Failed to log user with 2FA')
+			return this.signToken(user.id, user.username)
+		}
+		catch (error) { // a check
+			if (error instanceof ForbiddenException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 }

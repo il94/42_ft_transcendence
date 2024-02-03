@@ -157,24 +157,33 @@ export class UsersService {
 
 	/*********************** TwoFA settings ******************************************/
 
-	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
-		const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
-		if (!getUser)
-			throw new NotFoundException('User not found');
-		if (getUser.twoFA)
-			throw new BadRequestException('2FA already enabled');
+	async turnOnTwoFA(user: User, twoFACode: string) {
+		try {
+			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
+			if (!getUser)
+				throw new NotFoundException('User not found');
+			if (getUser.twoFA)
+				throw new ConflictException('2FA already enabled');
 
-		const isCodeValid = authenticator.verify({
-			token: twoFACode,
-			secret: getUser.twoFASecret,
-		});
-		if (!isCodeValid)
-			throw new UnauthorizedException('Wrong authentication code');
-		const setUser = await this.prisma.user.update({
-			where: { id: user.id, },
-			data: { twoFA: true, },
-		});
-		return setUser;
+			const isCodeValid = authenticator.verify({
+				token: twoFACode,
+				secret: getUser.twoFASecret,
+			});
+			if (!isCodeValid)
+				throw new ForbiddenException('Wrong authentication code');
+			await this.prisma.user.update({
+				where: { id: user.id, },
+				data: { twoFA: true, },
+			});
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	async setTwoFASecret(secret: string, userId: number): Promise<void> {
@@ -188,7 +197,7 @@ export class UsersService {
 		} catch (error) { throw error; }
 	}
 
-	async disableTwoFA(user: User, code: string): Promise<boolean> {
+	async disableTwoFA(user: User, code: string) {
 		try {
 			const otpCode = await this.prisma.user.findUnique({
 				where: { id: user.id, twoFASecret:  code }
@@ -200,7 +209,15 @@ export class UsersService {
 				data: { twoFA: false },
 			});
 			return setUser.twoFA;
-		} catch (error) { throw error; }
+		}
+		catch (error) { // a check
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	/*********************** Channels ******************************************/
