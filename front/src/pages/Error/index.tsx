@@ -17,6 +17,7 @@ function Error() {
 
 	const { setToken } = useContext(AuthContext)!
 	const location = useLocation()
+	const message: string | undefined = location.state?.message
 
 	useEffect(() => {
 		if (location.state?.disconnect)
@@ -41,7 +42,9 @@ function Error() {
 				<WindowTitle>
 					Error
 				</WindowTitle>
-				An error has occurred
+				{
+					message ? message : "An error has occurred"
+				}
 				<div style={{ height: "10px" }} />
 				<StyledLink to="/" color={colors.button}>
 					Home

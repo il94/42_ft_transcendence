@@ -94,14 +94,18 @@ function Signup() {
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				// TODO : GESTION d'erreur si nom ou mail deja pris
-				if (statusCode === 403 || statusCode === 409) {
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 409) {
 					setUsername((prevState) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid username"
+						errorMessage: message
 					}))
+				}
+				else if (statusCode === 403) {
+					navigate("/error", { state: {
+						message: message
+					}})
 				}
 				else
 					navigate("/error")

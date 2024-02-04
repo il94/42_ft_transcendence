@@ -14,8 +14,6 @@ import LinkButton from '../../componentsLibrary/LinkButton'
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import ActiveText from '../../componentsLibrary/ActiveText/Index'
 
-
-
 import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
@@ -25,7 +23,7 @@ import Button from '../../componentsLibrary/Button'
 import AuthContext from '../../contexts/AuthContext'
 
 import {
-  ErrorResponse
+	ErrorResponse
 } from '../../utils/types'
 
 import colors from '../../utils/colors'
@@ -69,7 +67,6 @@ function Home() {
 		Cookies.remove('avatar')
 		Cookies.remove('two_FA')
 		Cookies.remove('userId')
-		// Cookies.remove('token')
 
 	}, [])
 
@@ -115,7 +112,6 @@ function Home() {
 					Welcome
 				</WindowTitle>
 				{
-					// TODO : isNew ? prompt settings form
 					token ?
 						<>
 							<Button

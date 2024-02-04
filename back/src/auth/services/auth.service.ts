@@ -20,14 +20,18 @@ export class AuthService {
 		private appGateway: AppGateway
 		) {}
 
-	async signup(dto: CreateUserDto): Promise<{ access_token: string }>{
+	// Cree un user et renvoie un token d'authentification
+	async signup(userDatas: CreateUserDto): Promise<{ access_token: string }>{
 		try {
-			const newUser = await this.userService.createUser(dto);
-			delete newUser.hash;
-			return this.signToken(newUser.id, newUser.username);
-		} catch (error) {
-            throw error
-        }	
+			const newUser = await this.userService.createUser(userDatas)
+			return this.signToken(newUser.id, newUser.username)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof ConflictException)
+				throw error
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	async validateUser(dto: AuthDto): Promise<{ access_token: string } | Partial<User>> {

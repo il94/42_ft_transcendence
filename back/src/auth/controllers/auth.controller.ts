@@ -14,19 +14,13 @@ export class AuthController {
 
 	/*********************** Auth form routes *******************************/
 
+	// Cree un user et renvoie un token d'authentification
 	@Post('signup')
-	@HttpCode(HttpStatus.OK)
-	async signup(@Body() dto: CreateUserDto): Promise<{access_token: string}> {
-		try {
-			const token = await this.authService.signup(dto);
-			return token; 
-		} catch (error) {
-			throw error.message
-		}
+	async signup(@Body() userDatas: CreateUserDto): Promise<{ access_token: string }> {
+		return await this.authService.signup(userDatas)
 	}
 
 	@Post('signin')
-	@HttpCode(HttpStatus.OK)
 	async signin(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response): 
 	Promise<{ access_token: string} | Partial<User>> {
 		try {
