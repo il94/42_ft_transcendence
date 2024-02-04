@@ -61,7 +61,7 @@ export class AuthService {
 			// Si le user n'a pas active le twoFA, connecte le user et renvoie son token
 			if (user.twoFA === false)
 			{
-				// Set le statut du du user a connecte
+				// Set le statut du user a connecte
 				await this.prisma.user.update({
 					where: {
 						id: user.id
@@ -168,29 +168,52 @@ export class AuthService {
 		return { secret, otpAuthURL };
 	}
 
-	async verifyCode(user: User, twoFACode: string): Promise <boolean> {
+	// Verifie si le code fourni est correct avec l'api de google
+	async verifyCode(userTwoFASecret: string, twoFACode: string): Promise <boolean> {
 		return authenticator.verify({
 			token: twoFACode,
-			secret: user.twoFASecret,
+			secret: userTwoFASecret
 		  });
 	}
 
-	async loginWith2fa(userId: number, twoFACode: string): Promise <{access_token: string}> {
+	// Verifie le code envoye avec l'api de google et renvoie un token d'authentification
+	async loginWith2fa(userId: number, twoFACode: string): Promise <{ access_token: string }> {
 		try {
-			const user = await this.userService.findUser(userId);
+			// Recupere le user avec son username et son twoFaSecret et verifie si il existe et si il n'est pas deja connecte
+			const user = await this.prisma.user.findFirst({
+				where: {
+					id: userId
+				},
+				select: {
+					username: true,
+					status: true,
+					twoFASecret: true
+				}
+			})
+			if (!user)
+				throw new NotFoundException("User not found")
 			if (user.status === UserStatus.ONLINE)
-				throw new ConflictException('User is already authenticated');
-			if (!await this.verifyCode(user, twoFACode))
-				throw new ForbiddenException('Wrong secret code')
-			const logUser = await this.prisma.user.update({ 
-					where: { id: user.id },
-					data: { status: UserStatus.ONLINE }})
-			if (!logUser)
-				throw new BadRequestException('Failed to log user with 2FA')
-			return this.signToken(user.id, user.username)
+				throw new ConflictException("User is already authenticated")
+
+			// Verifie si le code fourni est correct avec l'api de google
+			if (!await this.verifyCode(user.twoFASecret, twoFACode))
+				throw new ForbiddenException("Wrong code")
+
+			// Set le statut du user a connecte
+			await this.prisma.user.update({ 
+				where: {
+					id: userId
+				},
+				data: {
+					status: UserStatus.ONLINE
+				}
+			})
+
+			// Retourne un token d'authentification
+			return this.signToken(userId, user.username)
 		}
-		catch (error) { // a check
-			if (error instanceof ForbiddenException || error instanceof ConflictException)
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")

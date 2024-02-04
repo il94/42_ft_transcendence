@@ -24,7 +24,7 @@ export class AuthController {
 		return await this.authService.signup(userDatas)
 	}
 
-	// Renvoie un token d'authentification
+	// Verifie le username et le mot de passe et renvoie un token d'authentification
 	@Post('signin')
 	async signin(@Body() userDatas: AuthDto, @Res({ passthrough: true }) res: Response): Promise<SigninResponse> {
 		const signinResponse: SigninResponse = await this.authService.validateUser(userDatas)
@@ -108,20 +108,11 @@ export class AuthController {
 		}
 	}
 
+	// Verifie le code envoye avec l'api de google et renvoie un token d'authentification
 	@Post('2fa/authenticate/:id')
-  	@HttpCode(200)
-  	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body: TwoFaDto): Promise <{access_token: string}> {
-		try {
-			const user = await this.userService.findUser(id);
-			if (user.status === UserStatus.ONLINE)
-				throw new BadRequestException('User is already authenticated');
-			if (!body.twoFACode)
-				throw new BadRequestException('Empty 2FA code');
-			const token: { access_token: string } = await this.authService.loginWith2fa(user.id, body.twoFACode);
-			return token;
-		} catch (error) {
-			throw new BadRequestException(error.message);
-		}
+  	async authenticate(@Param('id', ParseIntPipe) userId: number,
+	@Body() { twoFACode }: TwoFaDto): Promise <{ access_token: string }> {
+		return await this.authService.loginWith2fa(userId, twoFACode)
   	}
 
 	@Patch('2fa/disable')

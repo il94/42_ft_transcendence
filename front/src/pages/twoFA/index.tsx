@@ -12,6 +12,7 @@ import {
 } from 'react-router'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import Cookies from "js-cookie"
+
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
 import InputText from '../../componentsLibrary/InputText'
@@ -43,7 +44,7 @@ type PropsTwoFAResponse = {
 
 function TwoFA() {
 
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 	const location = useLocation()
 
@@ -73,7 +74,6 @@ function TwoFA() {
 				}))
 				return
 			}
-
 			if (code.error)
 				return
 			
@@ -82,20 +82,24 @@ function TwoFA() {
 			})
 			 
 			localStorage.setItem("access_token", authTwoFAResponse.data.access_token)
-			setToken(authTwoFAResponse.data.access_token)
-
 			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 403) {
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 && message === "Wrong code") {
 					setCode((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Wrong code"
+						errorMessage: message
 					}))
+				}
+				else if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+				{
+					navigate("/error", { state: {
+						message: message
+					}})
 				}
 				else
 					navigate("/error")
@@ -111,7 +115,7 @@ function TwoFA() {
 
 	function handleInputCode(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
+		if (!value) {
 			setCode({
 				value: value,
 				error: true,
