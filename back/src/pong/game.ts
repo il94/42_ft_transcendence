@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class Player {
 
 	private socket: Socket;
-	
+
 	private Pos: {top: number, bottom: number}
 	private score: number
 
@@ -78,6 +78,11 @@ export class Ball {
 		return this.Pos
 	}
 
+	setPos(newX: number, newY: number){
+		this.Pos.x = newX
+		this.Pos.y = newY
+	}
+
 	getDir(){
 		return this.Dir
 	}
@@ -95,8 +100,8 @@ export class Ball {
 				phi = 2*Math.PI*Math.random();
 			} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
 		this.Dir = {
-			x: Math.cos(phi) * 7,
-			y: Math.sin(phi) * 7
+			x: Math.cos(phi) * 5,
+			y: Math.sin(phi) * 5
 		}
 	}
 
@@ -125,6 +130,8 @@ export class PongGame {
 
 	private Players: Socket[]
 
+	private state: boolean
+
 	height: number;
 	width: number;
 
@@ -143,6 +150,9 @@ export class PongGame {
 	// constructor() {
 		// this.BallPos = {x: 0, y: 0}
 		// this.BallDir = {x: 0, y: 0}
+
+		this.state = true
+
 		this.LeftPlayer = new Player(host)
 		this.RightPlayer = new Player(guest)
 		this.Players = [host, guest]
@@ -171,24 +181,16 @@ export class PongGame {
 		
 		if (ball.x + balldir.x - (this.BallSize/2) < this.paddleMargin) // rebond paddle gauche
 		{
+			// if (ball.x != this.paddleMargin)
+			// 	this.Ball.setPos(this.paddleMargin, ball.y)
 			if((ball.y + (this.BallSize/2) >= this.LeftPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.LeftPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.LeftPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.LeftPlayer.getPos().top))
 			{
-				// const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
-				// const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
-				// const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
-				
-				// // const normalizedCol: number = CollisionOnPaddle / (PaddleSizePx/2)
-				// // const bounceAngle =	normalizedCol * 1.0472 // angle of 60
-				// this.Speed += 1
-				// // const ballDirX = this.Speed * Math.cos(bounceAngle) 
-				// // const ballDirY = this.Speed * -Math.sin(bounceAngle) 
-				// // const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
 				const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
 				const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
-				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 5)
+				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 10)
 
 				console.log("col on paddle", CollisionOnPaddle)
 				console.log("left paddle pos", this.LeftPlayer.getPos())
@@ -198,29 +200,21 @@ export class PongGame {
 
 		if (ball.x + balldir.x + (this.BallSize/2) > 1920 - this.paddleMargin)
 		{
+		// 	if (ball.x != 1920 - this.paddleMargin)
+		// 	this.Ball.setPos(1920 - this.paddleMargin, ball.y)
 			if((ball.y + (this.BallSize/2) >= this.RightPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.RightPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.RightPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.RightPlayer.getPos().top))
 			{
-				// const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
-				// const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
-				// // const normalizedCol: number = CollisionOnPaddle / (PaddleSizePx/2)
-				// // const bounceAngle =	normalizedCol * 1.0472 // angle of 60
-				// this.Speed += 1
-				// // const ballDirX = this.Speed * Math.cos(bounceAngle) 
-				// // const ballDirY = this.Speed * -Math.sin(bounceAngle) 
-				// // const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
+
 
 				const PaddleSizePx: number = this.RightPlayer.getPos().bottom - this.RightPlayer.getPos().top 
 				const CollisionOnPaddle: number = (this.RightPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
-				this.Ball.setDir(balldir.x * -1 -1, -veloY * 5)
+				this.Ball.setDir(balldir.x * -1 -1, -veloY * 10)
 
 				console.log("col on paddle", CollisionOnPaddle)
 				console.log("left paddle pos", this.RightPlayer.getPos())
 				console.log("ball pos", this.Ball.getPos())
-
-				//this.Ball.setDir(-balldir.x - 1, balldir.y)
-				//this.Ball.setDir(-balldir.x - 0.5, balldir.y)
 			}
 		}
 	}
@@ -247,7 +241,12 @@ export class PongGame {
 		}
 	}
 
-	checkScore(){ // victory
+	checkScore(){
+		if (this.LeftPlayer.getScore() === 11 || this.RightPlayer.getScore() === 11)
+			this.setState(false)
+	}
+
+	getTheWinner(){ // victory
 		if (this.LeftPlayer.getScore() === 11)
 			return this.LeftPlayer
 		if (this.RightPlayer.getScore() === 11)
@@ -260,6 +259,14 @@ export class PongGame {
 		this.checkPaddleCollision()
 		this.checkWallCollision()
 		this.Ball.move()
+	}
+
+	setState(s: boolean){
+		this.state = s
+	}
+
+	getState(){
+		return this.state
 	}
 
 	isMyPlayer(socket: Socket){
@@ -282,5 +289,4 @@ export class PongGame {
 	getGuest(){
 		return this.Players[1]
 	}
-
 }
