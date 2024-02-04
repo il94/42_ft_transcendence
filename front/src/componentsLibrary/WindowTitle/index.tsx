@@ -2,8 +2,6 @@ import styled from 'styled-components'
 
 const WindowTitle = styled.h2`
 
-	width: 100%;
-
 	padding-top: 15px;
 	padding-bottom: 10px;
 
