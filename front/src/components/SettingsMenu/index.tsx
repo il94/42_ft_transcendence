@@ -131,7 +131,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
+		if (!value) {
 			setUsername({
 				value: value,
 				error: true,
