@@ -10,6 +10,7 @@ import { authenticator } from "otplib";
 import { generate } from "generate-password";
 import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
+import { Response } from "express";
 
 type SigninResponse = {
 	access_token: string
@@ -152,6 +153,55 @@ export class AuthService {
 			return { usernameId: profile.usernameId, avatar: profile.avatar, isNew: true }
 		} catch (error) {
             throw new BadRequestException(error.message)
+		}
+	}
+
+	// Selon la reponse de l'api 42, connecte le user OU le redirige vers le twoFA OU lui cree un compte
+	async return42Response(user: { usernameId: string, avatar: string, isNew: boolean } | Partial<User>, res: Response ) {
+		try {
+			// Verifie si le user possebe bien un compte 42
+			if (!user)
+				throw new BadRequestException("User not found from 42 intra")
+			
+			// Si le user possede deja un compte dans l'app
+			if ('id' in user)
+			{
+				// Si le user n'a pas active la twoFA
+				if (!user.twoFA)
+				{
+					// Genere un token d'authentification et l'envoie par les cookies
+					const token = await this.signToken(user.id, user.username)
+						res.clearCookie('token', { httpOnly: true })
+						.cookie('isNew', false)
+						.cookie("access_token", token.access_token)
+						.redirect("http://localhost:5173")
+				}
+			
+				// Si le user a active la twoFA
+				else
+				{
+					// Redirige vers la page twoFA avec les infos necessaires pour le front
+					res.cookie('two_FA', true)
+					.cookie('userId', user.id)
+					.redirect(`http://localhost:5173/twofa`)	
+				}
+			}
+			// Si le user ne possede pas de compte dans l'app
+			else if ('isNew' in user)
+			{
+				// Stocke les donnees necessaires a l'authentification dans des
+				// cookies de 5 mins  et redirige vers la page de creation de compte
+				const fiveMin = Date.now() + 5 * 60 * 1000;
+				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
+				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
+				.redirect("http://localhost:5173/signup42")
+			}
+		}
+		catch (error) { // a voir si besoin de throw
+			if (error instanceof BadRequestException)
+				throw error
+			else
+				throw new BadRequestException()
 		}
 	}
 

@@ -42,41 +42,17 @@ export class AuthController {
 
 	/*********************** Api42 routes ****************** ****************/
 
+	// Point d'entree pour l'authentification par 42
 	@Get('api42')
 	@UseGuards(Api42AuthGuard)
-	async get42User(@getUser() user: User): Promise<User> {
-		return user;
-	}
-
+	async get42User() {}
+	
+	// Selon la reponse de l'api 42, connecte le user OU le redirige vers le twoFA OU lui cree un compte
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@getUser() user: {usernameId: string, avatar: string, isNew: boolean} | Partial<User> | User, 
-	@Res({ passthrough: true }) res: Response,
-	): Promise<void> {
-		try {
-			if (!user)
-				throw new BadRequestException("Can't find user from 42 intra");
-			if ('id' in user) { // utilisateur 42 connu
-				const token = await this.authService.signToken(user.id, user.username);
-				if (!user.twoFA) {
-					res.clearCookie('token', { httpOnly: true })
-					.cookie('isNew', false)
-					.cookie("access_token", token.access_token)
-					.redirect("http://localhost:5173")
-				}
-				res.cookie('two_FA', true)
-				.cookie('userId', user.id)
-				.redirect(`http://localhost:5173/twofa`)	
-			}
-			if ('isNew' in user) {
-				const fiveMin = Date.now() + 5 * 60 * 1000;
-				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
-				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
-				.redirect("http://localhost:5173/signup42")
-			}
-		} catch (error) {
-			throw new BadRequestException(error.message)
-		}
+	async handle42Redirect(@getUser() user: { usernameId: string, avatar: string, isNew: boolean } | Partial<User>, 
+	@Res({ passthrough: true }) res: Response ) {
+		await this.authService.return42Response(user, res)
 	}
 
 	/*********************** 2FA routes *************************************/
