@@ -7,6 +7,10 @@ import { UsersService } from "../services/users.service";
 import { Response, Request } from 'express';
 import { User, UserStatus } from '@prisma/client';
 
+type SigninResponse = {
+	access_token: string
+} | Partial<User>
+
 @Controller('auth')
 export class AuthController {
 	constructor(private authService: AuthService, 
@@ -20,18 +24,13 @@ export class AuthController {
 		return await this.authService.signup(userDatas)
 	}
 
+	// Renvoie un token d'authentification
 	@Post('signin')
-	async signin(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response): 
-	Promise<{ access_token: string} | Partial<User>> {
-		try {
-			type token = Partial<User> | { access_token: string }
-			const tok: token  = await this.authService.validateUser(dto);
-			if ('id' in tok)
-				res.clearCookie('id').clearCookie('two_FA')
-			return tok;
-		} catch (error) {
-			throw error
-		}
+	async signin(@Body() userDatas: AuthDto, @Res({ passthrough: true }) res: Response): Promise<SigninResponse> {
+		const signinResponse: SigninResponse = await this.authService.validateUser(userDatas)
+		if ('id' in signinResponse)
+			res.clearCookie('id').clearCookie('two_FA')
+		return signinResponse
 	}
 
 	@Get('logout')

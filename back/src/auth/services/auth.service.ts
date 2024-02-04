@@ -11,6 +11,10 @@ import { generate } from "generate-password";
 import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
 
+type SigninResponse = {
+	access_token: string
+} | Partial<User>
+
 @Injectable()
 export class AuthService {
 	constructor(
@@ -18,7 +22,7 @@ export class AuthService {
 		private jwt: JwtService, 
 		private userService: UsersService,
 		private appGateway: AppGateway
-		) {}
+	) {}
 
 	// Cree un user et renvoie un token d'authentification
 	async signup(userDatas: CreateUserDto): Promise<{ access_token: string }>{
@@ -34,22 +38,30 @@ export class AuthService {
 		}
 	}
 
-	async validateUser(dto: AuthDto): Promise<{ access_token: string } | Partial<User>> {
+	// Renvoie un token d'authentification
+	async validateUser(userDatas: AuthDto): Promise<SigninResponse> {
 		try {
+			// Verifie si le user existe
 			const user = await this.prisma.user.findUnique({
 				where: {
-					username: dto.username
+					username: userDatas.username
 				}
-			});
+			})
 			if (!user)
-				throw new NotFoundException();
-			const pwdMatch = await argon.verify(user.hash, dto.hash);
-			if (!pwdMatch)
-				throw new ForbiddenException();
+				throw new NotFoundException("User not found")
 
+			// Verifie si le mot de passe fourni est correct
+			const pwdMatch = await argon.verify(user.hash, userDatas.hash)
+			if (!pwdMatch)
+				throw new ForbiddenException("Wrong password")
+
+			// Genere un token d'authentification a partir de l'id et du username
 			const token: { access_token: string } = await this.signToken(user.id, user.username)
+
+			// Si le user n'a pas active le twoFA, connecte le user et renvoie son token
 			if (user.twoFA === false)
 			{
+				// Set le statut du du user a connecte
 				await this.prisma.user.update({
 					where: {
 						id: user.id
@@ -59,15 +71,26 @@ export class AuthService {
 					}
 				})
 
-				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
-				return token;
-			} else
-				return { id: user.id, twoFA: user.twoFA };
-		} catch (error) {
-            throw error
-        }
+				// Emit
+				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE)
+				return token
+			}
+
+			// Si le user a active le twoFA, renvoie les datas necessaires pour le front pour le rediriger vers la page twoFA
+			else
+				return { id: user.id, twoFA: user.twoFA }
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
+	// Genere un token d'authentification
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,
