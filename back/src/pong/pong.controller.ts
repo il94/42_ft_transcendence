@@ -12,34 +12,37 @@ export class PongController {
     constructor(private readonly pongService: PongService) {}
 
     // create a game : boutton start a match
-    @Post()
-    create(@getUser() user: User): Promise<Game> {
-        return this.pongService.createGame(user.id)
+    @Post(':id')
+    create(
+        @Param('id', ParseIntPipe) userTwoId: number,
+        @getUser('id') userOneId: number
+        ): Promise<Game> {
+        return this.pongService.createGame(userOneId, userTwoId)
     }
 
-    // jouer contre quelqu'un
-    @Post('play/:id')
-    play(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
-        return this.pongService.playGame(user.id, gameId)
-    }
+    // // jouer contre quelqu'un
+    // @Post('play/:id')
+    // play(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
+    //     return this.pongService.playGame(user.id, gameId)
+    // }
 
-    // boutton : jouer 
-    @Post('play')
-    async playRandom(@getUser() user: User): Promise<Game>  {
-        const game = await this.pongService.playRandomGame(user.id)
-        console.log("game : ", game)
-        return game
-    }
+    // // boutton : jouer 
+    // @Post('play')
+    // async playRandom(@getUser() user: User): Promise<Game>  {
+    //     const game = await this.pongService.playRandomGame(user.id)
+    //     console.log("game : ", game)
+    //     return game
+    // }
 
-    @Post('watch/:id')
-    watch(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
-        return this.pongService.watchGame(user.id, gameId)
-    }
+    // @Post('watch/:id')
+    // watch(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
+    //     return this.pongService.watchGame(user.id, gameId)
+    // }
 
-    @Get(':id')
-    getById(@Param('id', ParseIntPipe) gameId: number): Promise<Game>  {
-        return this.pongService.getGameById(gameId)
-    }
+    // @Get(':id')
+    // getById(@Param('id', ParseIntPipe) gameId: number): Promise<Game>  {
+    //     return this.pongService.getGameById(gameId)
+    // }
 
 
 
