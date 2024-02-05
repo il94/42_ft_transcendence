@@ -63,6 +63,7 @@ function Home() {
 		if (GameButtonContainer)
 			GameButtonContainer.focus()
 
+		Cookies.remove('access_token')
 		Cookies.remove('usernameId')
 		Cookies.remove('avatar')
 		Cookies.remove('two_FA')
@@ -78,23 +79,25 @@ function Home() {
 					'Authorization': `Bearer ${token}`
 				}
 			}) 
-			Cookies.remove('access_token')
-			Cookies.remove('userId')
-			Cookies.remove('two_FA')
-			Cookies.remove('isNew')
-			localStorage.clear();
+			
+			localStorage.removeItem('access_token')
 			setToken('')
-			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				console.log(error.message)
-				console.log(statusCode)
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+				{
+					navigate("/error", { state: {
+						message: message
+					}})	
+				}
+				else
+					navigate("/error")
 			}
 			else
-				navigate("/error");
+				navigate("/error")
 		}
 	}
 

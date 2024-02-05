@@ -24,7 +24,9 @@ export class AuthController {
 		return await this.authService.signup(userDatas)
 	}
 
-	// Verifie le username et le mot de passe et renvoie un token d'authentification
+	// Verifie le username et le mot de passe
+	// Set le statut du user a connecte
+	// Renvoie un token d'authentification
 	@Post('signin')
 	async signin(@Body() userDatas: AuthDto, @Res({ passthrough: true }) res: Response): Promise<SigninResponse> {
 		const signinResponse: SigninResponse = await this.authService.validateUser(userDatas)
@@ -33,11 +35,11 @@ export class AuthController {
 		return signinResponse
 	}
 
+	// Set le statut du user a deconnecte
 	@Get('logout')
 	@UseGuards(JwtGuard)
-	async logout(@getUser() user: User, @Res({ passthrough: true }) res: Response): Promise<void> {
-		res.clearCookie('id').clearCookie('access_token').clearCookie('two_FA')
-		this.authService.logout(user.id);
+	async logout(@getUser('id') userId: number) {
+		await this.authService.logout(userId)
 	}
 
 	/*********************** Api42 routes ****************** ****************/

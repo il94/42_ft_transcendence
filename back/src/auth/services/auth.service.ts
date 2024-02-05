@@ -11,6 +11,8 @@ import { generate } from "generate-password";
 import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
 import { Response } from "express";
+import { Socket } from "socket.io";
+import { io } from "socket.io-client";
 
 type SigninResponse = {
 	access_token: string
@@ -39,6 +41,8 @@ export class AuthService {
 		}
 	}
 
+	// Verifie le username et le mot de passe
+	// Set le statut du user a connecte
 	// Renvoie un token d'authentification
 	async validateUser(userDatas: AuthDto): Promise<SigninResponse> {
 		try {
@@ -72,8 +76,6 @@ export class AuthService {
 					}
 				})
 
-				// Emit
-				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE)
 				return token
 			}
 
@@ -103,21 +105,41 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
-	async logout(userId: number): Promise<{success: boolean}> {
+	// Set le statut du user a deconnecte
+	async logout(userId: number) {
 		try {
-			const findUser = await this.userService.findUser(userId);
-			if (findUser.status === UserStatus.OFFLINE)
-				throw new BadRequestException(`User already logout`)
-			const user = await this.prisma.user.update({
-				where: { id: userId },
-				data: { status: UserStatus.OFFLINE }
+			// Verifie si le user existe
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId
+				}
 			})
 			if (!user)
-				throw new BadRequestException(`Failed to disconnect User with id ${userId}`)
-			this.appGateway.server.emit("updateUserStatus", userId, UserStatus.OFFLINE);
-			return { success: true };
-		} catch (error) {
-            throw new BadRequestException(error.message)
+				throw new NotFoundException("User not found")
+
+			// Change le statut du user
+			await this.prisma.user.update({
+				where: {
+					id: userId
+				},
+				data: {
+					status: UserStatus.OFFLINE
+				}
+			})
+		}
+		catch (error) {
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+		finally {
+			// Deconnecte le socket du user
+			const socketUser: Socket | undefined = this.appGateway.getSocketByUserId(userId.toString())
+			if (socketUser)
+				socketUser.disconnect()
 		}
 	}
 
@@ -172,7 +194,6 @@ export class AuthService {
 					// Genere un token d'authentification et l'envoie par les cookies
 					const token = await this.signToken(user.id, user.username)
 						res.clearCookie('token', { httpOnly: true })
-						.cookie('isNew', false)
 						.cookie("access_token", token.access_token)
 						.redirect("http://localhost:5173")
 				}
@@ -229,7 +250,7 @@ export class AuthService {
 	// Verifie le code envoye avec l'api de google et renvoie un token d'authentification
 	async loginWith2fa(userId: number, twoFACode: string): Promise <{ access_token: string }> {
 		try {
-			// Recupere le user avec son username et son twoFaSecret et verifie si il existe et si il n'est pas deja connecte
+			// Recupere le user avec son username et son twoFaSecret et verifie si il existe
 			const user = await this.prisma.user.findFirst({
 				where: {
 					id: userId
@@ -242,8 +263,6 @@ export class AuthService {
 			})
 			if (!user)
 				throw new NotFoundException("User not found")
-			if (user.status === UserStatus.ONLINE)
-				throw new ConflictException("User is already authenticated")
 
 			// Verifie si le code fourni est correct avec l'api de google
 			if (!await this.verifyCode(user.twoFASecret, twoFACode))
@@ -263,7 +282,7 @@ export class AuthService {
 			return this.signToken(userId, user.username)
 		}
 		catch (error) {
-			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")

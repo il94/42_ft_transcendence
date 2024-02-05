@@ -95,7 +95,7 @@ function TwoFA() {
 						errorMessage: message
 					}))
 				}
-				else if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+				else if (statusCode === 403 || statusCode === 404)
 				{
 					navigate("/error", { state: {
 						message: message

@@ -1,6 +1,9 @@
-import { useContext, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-import Cookies from "js-cookie"
+import {
+	useEffect
+} from 'react'
+import {
+	useLocation
+} from 'react-router-dom'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
@@ -9,26 +12,15 @@ import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 
-import AuthContext from '../../contexts/AuthContext'
-
 import colors from '../../utils/colors'
 
 function Error() {
 
-	const { setToken } = useContext(AuthContext)!
 	const location = useLocation()
 	const message: string | undefined = location.state?.message
 
 	useEffect(() => {
-		if (location.state?.disconnect)
-		{
-			localStorage.removeItem("access_token")
-			Cookies.remove("access_token")
-      Cookies.remove("userId")
-      Cookies.remove('isNew')
-			setToken('')
-		}
-
+		localStorage.removeItem("access_token")
 	}, [])
 
 	return (
