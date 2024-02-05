@@ -4,9 +4,7 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 
 	(!!!!!)
 	Clavier indisponible quand pong display
-	Gérer instantanément la présence du token
 	Fix les erreurs ts
-	Inscription avec 42 -> signin basique possible (voir si c'est ok)
 
 	(!!!)
 	Set corectement tout les titles et alts
@@ -17,6 +15,7 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Fix display settings menu
 	Redisplay avatars 42
 	Créer des fichiers fonctions si necessaire
+	Image 42 en blanc pour sign up 42
 
 	(!)
 	Formulaires styles
@@ -24,14 +23,6 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Checker les contextes
 	Checker les noms de routes (s pas s)
 	Shift + Alt + F
-
-Home/ : à faire après merge
-	Gérer la déconnexion
-	Gestion d'erreur
-
-Profile/ : à faire après merge
-	Gérer la déconnexion
-	Gestion d'erreur
 
 SettingsMenu/ :
 	Faire select Avatar si le temps
@@ -49,9 +40,6 @@ MatchHistory/ : à voir quand le Pong aura avancé
 	Ajouter loader
 
 (============================= SOSO ============================)
-
-Chat/ :
-	refreshStatusChallenge à retrouver (fonction de soso github)
 
 Messages/ :
 	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
