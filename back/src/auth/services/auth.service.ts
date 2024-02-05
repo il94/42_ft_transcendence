@@ -12,7 +12,6 @@ import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
 import { Response } from "express";
 import { Socket } from "socket.io";
-import { io } from "socket.io-client";
 
 type SigninResponse = {
 	access_token: string

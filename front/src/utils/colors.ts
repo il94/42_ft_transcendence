@@ -5,6 +5,9 @@ const colors = {
 	popup: "#FD994F",
 	module: "#85522C",
 
+	/* Pong */
+	pongBackground: "#fcc154",
+
 	/* Sections */
 	section: "#AA6736",
 	sectionAlt: "#995C2F",

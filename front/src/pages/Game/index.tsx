@@ -433,8 +433,8 @@ function Game() {
 									displaySettingsMenu={displaySettingsMenu} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								{/* {<PongWrapper social={social}/> } */}
-								<Pong />
+								{<PongWrapper social={social}/> }
+								{/* <Pong /> */}
 								{
 									card &&
 									<Card

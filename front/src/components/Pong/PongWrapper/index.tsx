@@ -9,6 +9,9 @@ import InteractionContext from "../../../contexts/InteractionContext"
 
 import Pong from "./Pong"
 import { User } from "../../../utils/types"
+import colors from "../../../utils/colors"
+import Button from "../../../componentsLibrary/Button"
+import Loader from "../../../componentsLibrary/Loader"
 // import colors from "../../utils/colors"
 
 const Style = styled.div`
@@ -27,7 +30,7 @@ const Style = styled.div`
 	justify-content: space-evenly;
 
 
-    background-color: yellow;
+    background-color: ${colors.pongBackground};
 `
 
 // const PlayButtonStyle = styled.div`
@@ -133,14 +136,41 @@ function PongWrapper({social}: any) {
        		 </DisconnectTextStyle>
       		) : (
 			<>
-			<PlayButtonStyle onClick={handlePlayButton}>{searching ? "Stop searching" : "Search for a Game"}</PlayButtonStyle>
-			<PlayButtonStyle >Spectate Mode</PlayButtonStyle>
+			{
+				!gameState ?
+				<>
+					{
+						!searching ?
+						<Button
+							onClick={handlePlayButton}
+							type="button"
+							width={500}
+							fontSize={75}
+							alt="" title="" >
+							Play !
+						</Button>
+						:
+						<>
+							<Loader size={300} />
+							<div style={{ height: "50px"}} />
+							<Button
+								onClick={handlePlayButton}
+								type="button"
+								width={250}
+								fontSize={37.5}
+								alt="" title="" >
+								Cancel
+							</Button>
+						</>
+					}
+				</>
+				:
+
+				<Pong social={social} enemy={Enemy}/>
+				}
 			</>
 			)
-			}
-			{ gameState &&
-				<Pong social={social} enemy={Enemy}/>
-			}
+		}
 		</Style>
 		);
 }

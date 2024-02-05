@@ -6,6 +6,7 @@ import Ball from './Ball'
 import Score from './Score'
 import InteractionContext from "../../../../contexts/InteractionContext"
 import { User } from '../../../../utils/types'
+import effects from '../../../../utils/effects'
 
 
 const Style = styled.div`
@@ -19,13 +20,21 @@ aspect-ratio: 16/9;
 max-width: 100%;
 max-height: 100%;
 
+
+
+// ICI
+
+
 /* border: 5px;
 border-color: white;
 border-style: solid;
 border-radius: 0.03ch; */
 
+/* clip-path: ${effects.pixelateWindow}; */
 
-background-color: black;
+/* border: 15px solid #ecb54e; */
+
+background-color: #ca9a40;
 
 `;
 
