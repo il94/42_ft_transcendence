@@ -58,22 +58,20 @@ function Signup() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (username.value.length === 0 ||
-				password.value.length === 0) {
-				if (username.value.length === 0) {
-					setUsername({
-						value: '',
-						error: true,
-						errorMessage: "Insert username",
-					})
-				}
-				if (password.value.length === 0) {
-					setPassword({
-						value: '',
-						error: true,
-						errorMessage: "Insert password",
-					})
-				}
+			if (!username.value) {
+				setUsername({
+					value: '',
+					error: true,
+					errorMessage: "Insert username",
+				})
+				return
+			}
+			if (!password.value) {
+				setPassword({
+					value: '',
+					error: true,
+					errorMessage: "Insert password",
+				})
 				return
 			}
 			if (username.error || password.error)
@@ -94,14 +92,18 @@ function Signup() {
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				// TODO : GESTION d'erreur si nom ou mail deja pris
-				if (statusCode === 403 || statusCode === 409) {
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 409) {
 					setUsername((prevState) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid username"
+						errorMessage: message
 					}))
+				}
+				else if (statusCode === 403) {
+					navigate("/error", { state: {
+						message: message
+					}})
 				}
 				else
 					navigate("/error")
@@ -117,7 +119,7 @@ function Signup() {
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
+		if (!value) {
 			setUsername({
 				value: value,
 				error: true,
@@ -180,7 +182,7 @@ function Signup() {
 			!/\d/.test(value) ||
 			!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
 			let errorMessages: string[] = []
-			if (value.length === 0) {
+			if (!value) {
 				errorMessages.push("Password cannot be empty")
 			}
 			else if (value.length < 8) {

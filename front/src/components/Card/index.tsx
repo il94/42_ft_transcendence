@@ -6,21 +6,17 @@ import {
 } from "react"
 
 import {
-	CloseButton,
 	Avatar,
 	Style,
-	TopWrapper,
 	UserName
 } from "./style"
 
 import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
-import Icon from "../../componentsLibrary/Icon"
+import CloseButton from "../../componentsLibrary/CloseButton"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
-
-import CloseIcon from "../../assets/close.png"
 
 type PropsCard = {
 	cardPosition: {
@@ -49,14 +45,8 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			$top={cardPosition.top}
 			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
-			<TopWrapper>
-				<Avatar src={userTarget.avatar} />
-				<CloseButton>
-					<Icon onClick={() => displayCard(false)}
-						src={CloseIcon} size={24}
-						alt="Close button" title="Close" />
-				</CloseButton>
-			</TopWrapper>
+			<CloseButton closeFunction={displayCard} />
+			<Avatar src={userTarget.avatar} />
 			<UserName>
 				{userTarget.username}
 			</UserName>
