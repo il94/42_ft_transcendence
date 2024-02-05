@@ -347,7 +347,7 @@ function Game() {
 									displaySettingsMenu={displaySettingsMenu} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								<PongWrapper social={social}/> 
+								{/* <PongWrapper social={social}/>  */}
 								<Pong />
 								{
 									card &&
@@ -372,7 +372,7 @@ function Game() {
 												<TwoFaMenu
 													twoFAcodeQR={twoFAcodeQR} />
 								}
-								{/* <TestsBack /> */}
+								<TestsBack />
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>

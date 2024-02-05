@@ -5,28 +5,19 @@ import { Injectable } from '@nestjs/common';
 export class Player {
 
 	private socket: Socket;
+	public id: number;
 
 	private Pos: {top: number, bottom: number}
 	private score: number
 
-	constructor(socket: Socket)
+	constructor(socket: Socket, Id:number)
 	{
 		this.socket = socket;
-		console.log("cc from player socket.id :", this.socket.id)
+		this.id = Id;
 		this.Pos = {top : 486, bottom: 594} // middle 540 == 50% de 1080
 		this.score = 0 
 	}
 
-	// setPaddlePos(newtop: number, newbottom: number){
-	// 	this.paddlePos = {
-	// 		top: newtop,
-	// 		bottom: newbottom
-	// 	}
-	// }
-
-	// setScore(newscore: number){
-	// 	this.score = newscore;
-	// }
 
 	moveUp(){
 		if (this.Pos.top - 1080/100 > 0)
@@ -118,15 +109,10 @@ export class Ball {
 			y: 540
 		}
 	}
-
-	//checkPadlleCollision(){}
 }
 
 @Injectable()
 export class PongGame {
-
-	// public PongBounds: { height: number; width: number } = {height: 0, width: 0}
-	// private PaddleX: number
 
 	private Players: Socket[]
 
@@ -136,25 +122,20 @@ export class PongGame {
 	width: number;
 
 	public	Ball: Ball
-	public 	BallSize: number
-	
+	public 	BallSize: number	
 	private Speed: number   // degager quand niveau de dificuliter ajouter (sera juste dans le constructor pour la ball)
 	
 	public LeftPlayer: Player
 	public RightPlayer: Player
 	public paddleMargin: number
-	// private LeftPaddlePos: {top:number; bottom:number }
-	// private RightPaddlePos: {top:number; bottom:number }
 
-	constructor(host: Socket, guest: Socket) {
-	// constructor() {
-		// this.BallPos = {x: 0, y: 0}
-		// this.BallDir = {x: 0, y: 0}
+
+	constructor(host: Socket, hostId:number,  guest: Socket, guestId: number) {
 
 		this.state = true
 
-		this.LeftPlayer = new Player(host)
-		this.RightPlayer = new Player(guest)
+		this.LeftPlayer = new Player(host, hostId)
+		this.RightPlayer = new Player(guest, guestId)
 		this.Players = [host, guest]
 		this.Speed = 7
 		this.Ball = new Ball(this.Speed)
@@ -171,18 +152,9 @@ export class PongGame {
 
 		const ball = this.Ball.getPos()
 		const balldir = this.Ball.getDir()
-
-		//gauche == ballpos - ballsize/2 
-		//droite == ballpos + ballsize/2 
-
-		//si le bas bas de la balle touche le haut du paddle
-		//si le haut de la balle touche le bas du paddle
-		//si le milieu touche le
-		
+	
 		if (ball.x + balldir.x - (this.BallSize/2) < this.paddleMargin) // rebond paddle gauche
 		{
-			// if (ball.x != this.paddleMargin)
-			// 	this.Ball.setPos(this.paddleMargin, ball.y)
 			if((ball.y + (this.BallSize/2) >= this.LeftPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.LeftPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.LeftPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.LeftPlayer.getPos().top))
 			{
 
@@ -192,16 +164,14 @@ export class PongGame {
 
 				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 10)
 
-				console.log("col on paddle", CollisionOnPaddle)
-				console.log("left paddle pos", this.LeftPlayer.getPos())
-				console.log("ball pos", this.Ball.getPos())
+				// console.log("col on paddle", CollisionOnPaddle)
+				// console.log("left paddle pos", this.LeftPlayer.getPos())
+				// console.log("ball pos", this.Ball.getPos())
 			}
 		}
 
 		if (ball.x + balldir.x + (this.BallSize/2) > 1920 - this.paddleMargin)
 		{
-		// 	if (ball.x != 1920 - this.paddleMargin)
-		// 	this.Ball.setPos(1920 - this.paddleMargin, ball.y)
 			if((ball.y + (this.BallSize/2) >= this.RightPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.RightPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.RightPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.RightPlayer.getPos().top))
 			{
 
@@ -212,9 +182,9 @@ export class PongGame {
 
 				this.Ball.setDir(balldir.x * -1 -1, -veloY * 10)
 
-				console.log("col on paddle", CollisionOnPaddle)
-				console.log("left paddle pos", this.RightPlayer.getPos())
-				console.log("ball pos", this.Ball.getPos())
+				// console.log("col on paddle", CollisionOnPaddle)
+				// console.log("left paddle pos", this.RightPlayer.getPos())
+				// console.log("ball pos", this.Ball.getPos())
 			}
 		}
 	}
