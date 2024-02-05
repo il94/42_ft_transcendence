@@ -12,24 +12,31 @@ export class UsersService {
 
 	/*********************** General CRUD ******************************************/
 
-	async createUser(createUserDto: CreateUserDto): Promise<User> {
-		console.log("back create user")
+	// Cree un user
+	async createUser(userDatas: CreateUserDto): Promise<User> {
 		try {
+			// Verifie si le username n'est pas deja pris
 			const userExists = await this.prisma.user.findFirst({
 				where: {
-					username: createUserDto.username
+					username: userDatas.username
 				}
 			})
 			if (userExists)
-				throw new ConflictException('credential already taken');
-			const hash = await argon.hash(createUserDto.hash);
-			const userDatas = {
-				...createUserDto,
+				throw new ConflictException("Username already taken")
+
+			// Hashe le mot de passe
+			const hash = await argon.hash(userDatas.hash)
+
+			// Remplace le mot de passe par sa version hashee
+			const user = {
+				...userDatas,
 				hash: hash
 			}
-			const user = await this.prisma.user.create({
+
+			// Cree le nouvel user
+			const newUser = await this.prisma.user.create({
 				data: {
-					...userDatas,
+					...user,
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,
@@ -37,13 +44,18 @@ export class UsersService {
 					draws: 0,
 					losses: 0
 				},
-			});
+			})
 
-            console.log(`User ${user.username} with id ${user.id} created successfully`);
-			return user;
+			console.log(`User ${newUser.id} was created`)
+			return newUser
 		}
 		catch (error) {
-			throw error;
+			if (error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
 		}
 	}
 

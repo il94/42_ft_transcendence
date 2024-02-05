@@ -6,11 +6,14 @@ import { Game, User, GameStatus, Role, Prisma, messageStatus, challengeStatus, r
 import { Socket } from 'socket.io';
 import { AppService } from 'src/app.service';
 import { ESLint } from 'eslint';
+import { PongGame } from './game';
 
 
 @UseGuards(JwtGuard)
 @Injectable()
 export class PongService {
+
+	public activeGames: PongGame[] = [];
   constructor(private prisma: PrismaService) {}
 
   async createGame(userOneId: number, userTwoId: number): Promise<Game> {

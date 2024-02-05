@@ -169,7 +169,6 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 			else {
 				if (channelWithRelationsResponse.data.type === ChannelType.PROTECTED) {
 					setChannelTarget(channelWithRelationsResponse.data)
-					displayChat(true)
 				}
 				else {
 					await axios.post(`http://${url}:3333/channel/${channelId}/join`, {},
@@ -187,6 +186,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 						members: [...channelWithRelationsResponse.data.members, userAuthenticate]
 					}))
 				}
+				displayChat(true)
 			}
 		}
 		catch (error) {

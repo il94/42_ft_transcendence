@@ -28,10 +28,6 @@ import {
 import AuthContext from '../../contexts/AuthContext'
 
 import {
-	getRandomDefaultAvatar
-} from '../../utils/functions'
-
-import {
 	ErrorResponse,
 	SettingData
 } from '../../utils/types'
@@ -42,10 +38,28 @@ import {
 
 import colors from '../../utils/colors'
 import SelectAvatar from '../../components/SettingsMenu/SelectAvatar'
+import styled from 'styled-components'
+
+import FTIcon from '../../assets/42.png'
 
 type PropsSignupResponse = {
 	access_token: string
 }
+
+const FTImage = styled.img`
+	
+	position: absolute;
+	top: 5px;
+	left: 7.5px;
+
+	width: 50px;
+	height: 38px;
+
+	&:hover {
+		transform: scale(1.05);
+	}
+
+`
 
 function SignupFT() {
 
@@ -63,22 +77,20 @@ function SignupFT() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (username.value.length === 0 ||
-				password.value.length === 0) {
-				if (username.value.length === 0) {
-					setUsername({
-						value: '',
-						error: true,
-						errorMessage: "Insert username",
-					})
-				}
-				if (password.value.length === 0) {
-					setPassword({
-						value: '',
-						error: true,
-						errorMessage: "Insert password",
-					})
-				}
+			if (!username.value) {
+				setUsername({
+					value: '',
+					error: true,
+					errorMessage: "Insert username",
+				})
+				return
+			}
+			if (!password.value) {
+				setPassword({
+					value: '',
+					error: true,
+					errorMessage: "Insert password",
+				})
 				return
 			}
 			if (username.error || password.error)
@@ -100,14 +112,18 @@ function SignupFT() {
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				// TODO : GESTION d'erreur si nom ou mail deja pris
-				if (statusCode === 403 || statusCode === 409) {
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 409) {
 					setUsername((prevState) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid username"
+						errorMessage: message
 					}))
+				}
+				else if (statusCode === 403) {
+					navigate("/error", { state: {
+						message: message
+					}})
 				}
 				else
 					navigate("/error")
@@ -123,7 +139,7 @@ function SignupFT() {
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
+		if (!value) {
 			setUsername({
 				value: value,
 				error: true,
@@ -186,7 +202,7 @@ function SignupFT() {
 			!/\d/.test(value) ||
 			!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
 			let errorMessages: string[] = []
-			if (value.length === 0) {
+			if (!value) {
 				errorMessages.push("Password cannot be empty")
 			}
 			else if (value.length < 8) {
@@ -220,7 +236,6 @@ function SignupFT() {
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
-
 	/* ================================ AVATAR ================================== */
 
 	const [avatar, setAvatar] = useState<string>(avatarCookie!)
@@ -238,6 +253,7 @@ function SignupFT() {
 				<WindowTitle>
 					Sign up
 				</WindowTitle>
+				<FTImage src={FTIcon} />
 				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
@@ -310,20 +326,11 @@ function SignupFT() {
 							</Button>
 						</VerticalSettingWrapper>
 					</VerticalSetting>
-
 						<VerticalSetting>
 							<SelectAvatar
 								avatar={avatar}
 								setAvatar={setAvatar} />
 						</VerticalSetting>
-							<Button
-								type="submit"
-								fontSize={19}
-								alt="Save button" title="Save changes">
-								Save
-							</Button>
-
-
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}

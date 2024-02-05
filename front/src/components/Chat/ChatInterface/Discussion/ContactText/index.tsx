@@ -24,6 +24,10 @@ import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
 
 import {
+	userIsBlocked
+} from "../../../../../utils/functions"
+
+import {
 	User
 } from "../../../../../utils/types"
 
@@ -42,7 +46,7 @@ function ContactText({ sender, content }: PropsContactText) {
 	/* =========================== BLOCK MESSAGES =============================== */
 
 	const [showMessage, setShowMessage] = useState(true)
-	const senderIsBlocked = userAuthenticate.blockeds.includes(sender)
+	const senderIsBlocked = userIsBlocked(userAuthenticate, sender.id)
 
 	function handleClickEvent() {
 		if (senderIsBlocked)

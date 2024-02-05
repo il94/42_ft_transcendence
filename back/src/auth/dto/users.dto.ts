@@ -11,6 +11,7 @@ export class CreateUserDto implements User {
 
 	createdAt: Date;
 
+	@IsOptional()
 	@IsString()
 	@IsOptional()
 	usernameId: string;

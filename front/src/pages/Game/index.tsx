@@ -289,8 +289,8 @@ function Game() {
 	// CHAT
 	useEffect(() => {
 
-		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		// userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+		// 	refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
@@ -325,7 +325,7 @@ function Game() {
 
 		return () => {
 
-			userAuthenticate.socket?.off("updateUserStatus")
+			// userAuthenticate.socket?.off("updateUserStatus")
 
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
@@ -452,7 +452,7 @@ function Game() {
 									<TwoFaMenu
 										displayTwoFAMenu={displayTwoFAMenu} />
 								}
-								<TestsBack />
+								{/* <TestsBack /> */}
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>

@@ -28,25 +28,6 @@ export const Style = styled.div<{ $left?: number, $right?: number, $top?: number
 	
 `
 
-export const TopWrapper = styled.div`
-
-	display: flex;
-	justify-content: flex-end;
-
-	width: 100%;
-	height: 121px;
-	min-width: 100%;
-	min-height: 121px;
-
-`
-
-export const CloseButton = styled.div`
-
-	margin-top: 6.5px;
-	margin-right: 6.5px;
-
-`
-
 export const Avatar = styled.img`
 
 	width: 92px;

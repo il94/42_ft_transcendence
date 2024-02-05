@@ -62,7 +62,7 @@ type PropsSigninResponse = {
 }
 
 function Signin() {
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -73,22 +73,20 @@ function Signin() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (username.value.length === 0 ||
-				password.value.length === 0) {
-				if (username.value.length === 0) {
-					setUsername({
-						value: '',
-						error: true,
-						errorMessage: "Insert username",
-					})
-				}
-				if (password.value.length === 0) {
-					setPassword({
-						value: '',
-						error: true,
-						errorMessage: "Insert password",
-					})
-				}
+			if (!username.value) {
+				setUsername({
+					value: '',
+					error: true,
+					errorMessage: "Insert username",
+				})
+				return
+			}
+			if (!password.value) {
+				setPassword({
+					value: '',
+					error: true,
+					errorMessage: "Insert password",
+				})
 				return
 			}
 			if (username.error || password.error)
@@ -110,20 +108,25 @@ function Signin() {
 			}
 			else {
 				localStorage.setItem("access_token", signinResponse.data.access_token)
-				setToken(signinResponse.data.access_token)
-
 				navigate("/")
 			}
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 403 || statusCode === 404) {
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403) {
+					setPassword((prevState: SettingData) => ({
+						...prevState,
+						error: true,
+						errorMessage: message
+					}))
+				}
+				else if (statusCode === 404) {
 					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid username"
+						errorMessage: message
 					}))
 				}
 				else
