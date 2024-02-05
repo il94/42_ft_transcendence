@@ -17,7 +17,6 @@ import {
 import SelectAvatar from "./SelectAvatar"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
-import ScrollBar from "../../componentsLibrary/ScrollBar"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
@@ -131,7 +130,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
+		if (!value) {
 			setUsername({
 				value: value,
 				error: true,
@@ -251,7 +250,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
 			<CloseButton closeFunction={displaySettingsMenu} />
-			<ScrollBar visible>
+			<div style={{ height: "5px" }} />
 				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
@@ -352,9 +351,8 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 							alt="Save button" title="Save changes">
 							Save
 						</Button>
-					<div style={{ height: "2px" }} />
+					<div style={{ height: "5px" }} />
 				</VerticalSettingsForm>
-			</ScrollBar>
 		</Style>
 	)
 }

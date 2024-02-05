@@ -3,8 +3,9 @@ import {
 	Dispatch,
 	useContext
 } from "react"
-import { useNavigate } from "react-router"
-import Cookies from "js-cookie"
+import {
+	useNavigate
+} from "react-router"
 import axios, { AxiosError } from "axios"
 
 import {
@@ -39,7 +40,7 @@ type PropsProfile = {
 
 function Profile({ card, displayCard, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, userTarget, setUserTarget } = useContext(InteractionContext)!
 	const navigate = useNavigate()
 
@@ -55,32 +56,30 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 
 	async function handleDeconnexionClickButton() {
 		try {
-
-			const response: boolean = await axios.get(`http://${url}:3333/auth/logout`, {
+			await axios.get(`http://${url}:3333/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			}) 
 			
-			if (response) {
-				Cookies.remove('access_token')
-				Cookies.remove('userId')
-				Cookies.remove('two_FA')
-				Cookies.remove('isNew')
-				localStorage.clear();
-				setToken('')
-				navigate("/")
-			}
+			localStorage.removeItem('access_token')
+			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				console.log(error.message)
-				console.log(statusCode)
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+				{
+					navigate("/error", { state: {
+						message: message
+					}})	
+				}
+				else
+					navigate("/error")
 			}
 			else
-				navigate("/error");
+				navigate("/error")
 		}
 		
 	}
