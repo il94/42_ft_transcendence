@@ -76,7 +76,7 @@ model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
 
-  usernameId  String	@unique
+  usernameId  String?	@unique
   username    String  @unique
   hash        String
   avatar      String

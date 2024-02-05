@@ -54,7 +54,7 @@ function SignupFT() {
 
 	const usernameId = Cookies.get('usernameId')
 	const avatarCookie = Cookies.get('avatar')
-
+	
 	useEffect(() => {
 		if (!usernameId || !avatarCookie)
 			navigate("/error")
