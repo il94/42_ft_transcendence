@@ -278,4 +278,8 @@ export class UsersService {
 
 		return userAllChannels;
 	}
+
+	/*********************** Matchs history ******************************************/
+
+	
 }

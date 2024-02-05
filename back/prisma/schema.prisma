@@ -90,11 +90,11 @@ model User {
 
   games       UsersOnGames[]
 
-  friends  Friend[] @relation("friends")
-  blockeds  Blocked[] @relation("blockeds")
+  friends     Friend[] @relation("friends")
+  blockeds    Blocked[] @relation("blockeds")
 
-  channels  UsersOnChannels[]
-  messages  Message[]
+  channels    UsersOnChannels[]
+  messages    Message[]
 
   @@map("users")
 }
@@ -121,7 +121,7 @@ model Channel {
   name        String
   avatar      String
   type        ChannelStatus
-  hash		  String?
+  hash        String?
   invitation  Invitation[]
 
   users       UsersOnChannels[]
@@ -185,7 +185,8 @@ model UsersOnGames {
   userId    Int
   game      Game  @relation(fields: [gameId], references: [id])
   gameId    Int
-  podium    MatchResult
+  score     Int
+  result    MatchResult    
   role      roleInGame
 
   @@id([userId, gameId])
