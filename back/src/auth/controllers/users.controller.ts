@@ -30,6 +30,12 @@ export class UsersController {
     return this.usersService.findUserChannel(user);
   }
 
+  // historique de matches du user (retourne null si aucun matchs joues)
+  @Get('matchs')
+  async getUserMatchs(@getUser() user: User) {
+    return this.usersService.getMatchHistory(user.id);
+  }
+
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findById(id);

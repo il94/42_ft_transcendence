@@ -13,6 +13,7 @@ export class CreateUserDto implements User {
 
 	@IsOptional()
 	@IsString()
+	@IsOptional()
 	usernameId: string;
 
 	@IsString()
