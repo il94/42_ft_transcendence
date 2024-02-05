@@ -11,6 +11,8 @@ import { ESLint } from 'eslint';
 @UseGuards(JwtGuard)
 @Injectable()
 export class PongService {
+
+	public activeGames: PongGame[] = [];
   constructor(private prisma: PrismaService) {}
 
   async createGame(userOneId: number, userTwoId: number): Promise<Game> {

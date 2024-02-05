@@ -76,8 +76,8 @@ model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
 
-  usernameId  String	@unique
-  username    String  @unique
+  username    String
+  email       String  @unique
   hash        String
   avatar      String
   twoFA       Boolean
@@ -190,11 +190,3 @@ model UsersOnGames {
 
   @@id([userId, gameId])
 }
-
-
-
-
-
-
-
-
