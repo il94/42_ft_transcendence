@@ -17,7 +17,6 @@ import {
 import SelectAvatar from "./SelectAvatar"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
-import ScrollBar from "../../componentsLibrary/ScrollBar"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"

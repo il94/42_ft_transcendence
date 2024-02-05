@@ -12,7 +12,6 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	(!!)
 	Fix focus bouton game dans home par navigate
 	Fix contextual menu display dans le chat
-	Fix display settings menu
 	Redisplay avatars 42
 	Créer des fichiers fonctions si necessaire
 	Image 42 en blanc pour sign up 42
