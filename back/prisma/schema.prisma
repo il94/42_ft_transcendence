@@ -190,11 +190,3 @@ model UsersOnGames {
 
   @@id([userId, gameId])
 }
-
-
-
-
-
-
-
-

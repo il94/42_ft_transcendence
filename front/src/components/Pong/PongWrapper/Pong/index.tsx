@@ -5,6 +5,7 @@ import Paddle from './Paddle'
 import Ball from './Ball'
 import Score from './Score'
 import InteractionContext from "../../../../contexts/InteractionContext"
+import { User } from '../../../../utils/types'
 
 
 const Style = styled.div`
@@ -18,50 +19,49 @@ aspect-ratio: 16/9;
 max-width: 100%;
 max-height: 100%;
 
+/* border: 5px;
+border-color: white;
+border-style: solid;
+border-radius: 0.03ch; */
+
+
 background-color: black;
 
 `;
 
-export enum status {
-	SOLO = "solo",
-	WAITING = "waiting",
-	ONGAME = "ongame"
+// export enum status {
+// 	SOLO = "solo",
+// 	WAITING = "waiting",
+// 	ONGAME = "ongame"
+// }
+
+type PongProps = {
+	social: any;
+	enemy: User | undefined;
 }
 
-function Pong({social}){
+function Pong({social, enemy}: PongProps){
 	
+	const user = useContext(InteractionContext)!																// !!!! object pour les sockets
+
 	const PongRef = useRef<HTMLDivElement | null>(null)
-	const [PongBounds, setPongBounds] = useState<DOMRect | undefined>(PongRef.current?.getBoundingClientRect())
-	const user = useContext(InteractionContext)!																	// !!!! object pour les sockets
+	const [PongBounds, setPongBounds] = useState<DOMRect | undefined>(undefined)
+	
+	// const [players, setPlayers] = useState<{left: Socket, }>
 
-	useEffect(() => {
-		// console.log("actu")
-		// console.log("PongRef", PongRef.current?.getBoundingClientRect())
-		setPongBounds(PongRef.current?.getBoundingClientRect())
-	}, [PongRef.current?.parentElement, window.innerWidth, window.innerHeight, social])				
+	// const [gameState, setGameState] = useState<status>(status.SOLO)											// neum moyen ilyes a mieux
 
-	const [VLeftPaddle, setVLeftPaddle] = useState(50); // en %
-	const [VRightPaddle, setVRightPaddle] = useState(50);
-
-	const [gameState, setGameState] = useState<status>(status.SOLO)											// neum moyen ilyes a mieux
-
-	const [LeftPaddlePos, setLeftPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0}) //en px
-	const [RightPaddlePos, setRightPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
+	const [PaddlePos, setPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0}) //en px
+	const [EnemyPaddlePos, setEnemyPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
+	
+	const [ballSize, setBallSize] = useState(20);
 
 	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
-	const [BallDir, setBallDir] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
 
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
 
 	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); //tableau de key,    enfoncer = true; else false
 
-	const PaddleSize: number = 10;
-	const BallSize: number = 20;
-
-	let currentBallPos = {
-		x: 0,
-		y: 0
-	}
 	
 	const handleKeyDown = (event: KeyboardEvent) => {
 		
@@ -79,259 +79,56 @@ function Pong({social}){
 	};
 	
 	const updatePositionOnKey = () => {
-		const step = 1;
-		let PongOne: number = 0; 
+	
+		let ConvertionFactor: number = 0;
+		let move: number = 0;
 		
-		if (PongBounds)
-			PongOne = PongBounds.height / 100; //Pong 1% height in px
-		
-		if (keysPressed['Enter'])
-		{
-			setGameState(status.ONGAME)
-			startGame()
-			return;
-		}
+		if (!PongRef.current?.getBoundingClientRect())
+			return
 
-		if (PongBounds && (keysPressed['w'] || keysPressed['W'])) {
-			if (VLeftPaddle >= 8)
-			{
-				setVLeftPaddle((prevSetVLeftPaddle) => (prevSetVLeftPaddle - step));
-				setLeftPaddlePos({
-					top: LeftPaddlePos.top - PongOne * step,
-					bottom: LeftPaddlePos.bottom - PongOne * step
-				});
-			}
+		ConvertionFactor = PongRef.current.getBoundingClientRect().height / 1080; // 1080 = base of pong in back
+		move = 10.8 * ConvertionFactor
+		
+		if (keysPressed['ArrowUp']) {
+			user.userAuthenticate.socket?.emit("paddlemove", "up")
 		}
-		if (PongBounds && (keysPressed['s'] || keysPressed['S'])) {
-			if (VLeftPaddle <= 92)
-			{
-				setVLeftPaddle((prevSetVLeftPaddle) => (prevSetVLeftPaddle + step));
-				setLeftPaddlePos({
-					top: LeftPaddlePos.top + PongOne * step,
-					bottom: LeftPaddlePos.bottom + PongOne * step
-				});
-			}
-		}
-		if (PongBounds && keysPressed['ArrowUp']) {
-			if (VRightPaddle >= 8)
-			{
-				setVRightPaddle((prevSetVRightPaddle) => (prevSetVRightPaddle - step));
-				setRightPaddlePos({
-					top: RightPaddlePos.top - PongOne * step,
-					bottom: RightPaddlePos.bottom - PongOne * step
-				});
-			}
-		}
-		if (PongBounds && keysPressed['ArrowDown']) {
-			if (VRightPaddle <= 92)
-			{
-				setVRightPaddle((prevSetVRightPaddle) => (prevSetVRightPaddle + step));
-				setRightPaddlePos({
-					top: RightPaddlePos.top + PongOne * step,
-					bottom: RightPaddlePos.bottom + PongOne * step
-				});
-			}
+		if (keysPressed['ArrowDown']) {
+			user.userAuthenticate.socket?.emit("paddlemove", "down")
 		}
 	};
 
-	const startGame = () => {
-		if (!PongBounds)
-		return ;
-		// if (keysPressed['Enter'])
-		// 	setGameState()
-		setBallPos({
-			x: PongBounds.width / 2 - (BallSize/2),
-			y: PongBounds.height / 2 - (BallSize/2)	
-		});
-		currentBallPos = {
-			x: PongBounds.width / 2 - (BallSize/2),
-			y: PongBounds.height / 2 - (BallSize/2)
-		}
-		setVLeftPaddle(50);
-		setLeftPaddlePos({
-			top: ((50 - (PaddleSize/2)) * (PongBounds.height / 100)),
-			bottom: ((50 + (PaddleSize/2)) * (PongBounds.height / 100))
-		});
-		setVRightPaddle(50);
-		setRightPaddlePos({
-			top: ((50 - (PaddleSize/2)) * (PongBounds.height / 100)),
-			bottom: ((50 + (PaddleSize/2)) * (PongBounds.height / 100))
-		});
-		setScore({left: 0, right: 0})
-
-	}
-
-	const resetBall = () => {
-		if (PongBounds)
-		{
-			setBallPos({
-				x: PongBounds.width / 2 - (BallSize/2),
-				y: PongBounds.height / 2 - (BallSize/2)
-			});
-			currentBallPos = {
-				x: PongBounds.width / 2 - (BallSize/2),
-				y: PongBounds.height / 2 - (BallSize/2)
-			}
-		}
-	}
-
-	const LeftPaddleCollision = () => {
-
-		let paddleX: number = 0;
-
-		if (PongBounds)
-		{
-			paddleX = (PongBounds.width * 2.5 / 100); // 2.5 == paddle widh/2 + 2
-			//paddleX = 27; // 2.5 == paddle widh/2 + 2
-		}
+	const updatePong = (ballPosition: any, myPos:any, enemyPos:any , myScore: number, enemyScore: number) => {
 		
-		if (PongBounds && currentBallPos.x < paddleX)
-		{
-			if (PongBounds && ((currentBallPos.y + BallSize >= LeftPaddlePos.top  && currentBallPos.y + BallSize <= LeftPaddlePos.bottom) || (currentBallPos.y <= LeftPaddlePos.bottom && currentBallPos.y >= LeftPaddlePos.top)))
-			{
-			//	const BounceAngle = PaddleAngle()
-			const PaddleSizePx: number = LeftPaddlePos.bottom - LeftPaddlePos.top 
-			const CollisionOnPaddle: number = (LeftPaddlePos.top + PaddleSizePx/2) - (currentBallPos.y + (BallSize/2))
-			const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
-				console.log('----LEFT-----')
-				console.log (BallDir)
-				console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
-				console.log("top of the ball y : ", BallPos.y + BallDir.y)
-				console.log("bottom of the ball y : ", BallPos.y + BallDir.y + BallSize)
-				console.log("veloy ", veloY)
-				console.log("top of the paddle y : ", LeftPaddlePos.top)
-				console.log("bottom of the paddle y : ", LeftPaddlePos.bottom)
-				console.log('---------')
-				setBallDir({
-					x: (-BallDir.x + 1),
-					y: (-veloY * 4)
-				})
-				return true
-			}
-		}
-		return false
-	}
+		if (!PongRef.current?.getBoundingClientRect())
+		return ;
+		
+		let ConvertionFactor = PongRef.current?.getBoundingClientRect().height / 1080;
 
-	const RightPaddleCollision = () => {
-		let paddleX: number = 0;
-		if (PongBounds)
-		{
-			paddleX = (PongBounds.width * 2.5 / 100); 	
-			//paddleX = 27; // 2.5 == paddle widh/2 + 2
-		}
-
-		if (PongBounds && currentBallPos.x + BallSize > PongBounds.width - paddleX)
-		{
-			if (PongBounds && ((currentBallPos.y + BallSize >= RightPaddlePos.top  && currentBallPos.y + BallSize <= RightPaddlePos.bottom) || (currentBallPos.y <= RightPaddlePos.bottom && currentBallPos.y >= RightPaddlePos.top)))
-			{
-				//const BounceAngle = PaddleAngle()
-
-			const PaddleSizePx: number = RightPaddlePos.bottom - RightPaddlePos.top 
-			const CollisionOnPaddle: number = (RightPaddlePos.top + PaddleSizePx/2) - (currentBallPos.y + (BallSize/2))
-			const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
-
-				console.log("----RIGHT----")
-				console.log (BallDir)
-				console.log ("pos of ball ",  (BallPos.y + BallDir.y + BallSize/2))
-				console.log("top of the ball y : ", BallPos.y + BallDir.y)
-				console.log("bottom of the ball y : ", BallPos.y + BallDir.y + BallSize)
-				console.log(" ", veloY)
-				console.log("top of the paddle y : ", RightPaddlePos.top)
-				console.log("bottom of the paddle y : ", RightPaddlePos.bottom)
-				// console.log("collision on paddle", CollisionOnPaddle)
-				// console.log("final angle ", BounceAngle)
-				console.log("--------")
-				setBallDir({
-					x: (-BallDir.x - 1),
-					y: (-veloY * 4)
-				})
-				return true
-			}
-		}
-		return false
-	}
-
-	const PaddleCollision = () => {
-		if (LeftPaddleCollision() || RightPaddleCollision())
-			return true;
-		return false
-	}
-
-	const checkCollision = () => {
-
-		let paddleX: number = 0;
-
-		if (PongBounds)
-			paddleX = (PongBounds.width * 2.5 / 100); // espace horizontal entre le paddle est le bord du pong 
-
-		if (PaddleCollision())
-			return;
-
-		if (PongBounds && (currentBallPos.x < paddleX || currentBallPos.x + BallSize > PongBounds.width - paddleX))
-		{
-			console.log('----SCORE-----')
-			console.log("ball pos ", BallPos)
-			console.log("current ball pos ", currentBallPos)
-			console.log("Left paddle top y", LeftPaddlePos.top)
-			console.log("Left paddle bottom y", LeftPaddlePos.bottom)
-			console.log("right paddle top y", RightPaddlePos.top)
-			console.log("right paddle bottom y", RightPaddlePos.bottom)
-			console.log('---------')
-			if (BallPos.x + BallDir.x < paddleX)
-				setScore((prevScore) => ({left: prevScore.left, right: prevScore.right + 1}))
-			else
-				setScore((prevScore) => ({left: prevScore.left + 1, right: prevScore.right}))
-			resetBall()
-		}
-		if (PongBounds && (currentBallPos.y <= 0 || currentBallPos.y + BallSize >= PongBounds.height))
-		{
-			//if (!(BallPos.y - BallDir.y + (BallSize/2) < 0 || BallPos.y - BallDir.y + (BallSize/2) > PongBounds.height - BallSize))
-			setBallDir((prevBallDir) => ({ x: prevBallDir.x, y: -prevBallDir.y }));
-			console.log(BallDir)
-		}
-	}
-	
-	const updateBallPosition = () => {
-		//console.log(BallDir)
-		if (gameState == "ongame")
-		{
-			setBallPos((prevBallPos) => ({
-				x: prevBallPos.x + BallDir.x,
-				y: prevBallPos.y + BallDir.y,
-			}));
-			currentBallPos = {
-				x: BallPos.x + BallDir.x,
-				y: BallPos.y + BallDir.y,
-			}
-			checkCollision()
-		}
-	}
-	
-	useEffect(() => {
-		const animationBallId = requestAnimationFrame(updateBallPosition);
-
-		return () => {
-				cancelAnimationFrame(animationBallId);
-			}
-	}, [BallPos]);
-	
-	useEffect(() => {
-		let phi: number; 
-		do {
-			phi = 2*Math.PI*Math.random();
-		} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
-		setBallDir({
-			x: (Math.cos(phi) * 5),
-			y: (Math.sin(phi) * 5)
+		//console.log("je rentre dans la function updatePong")
+		setBallPos({
+			x: ballPosition.x * ConvertionFactor,
+			y: ballPosition.y * ConvertionFactor
 		})
-		user.userAuthenticate.socket?.on("score", (id: any, args: any) => { console.log("in client from fct ", args, "id ", id)})
-		user.userAuthenticate.socket?.emit("score", "SCORE RECEIVE IN BACK : " , score)
+		setPaddlePos({
+			top: myPos.top * ConvertionFactor,
+			bottom: myPos.bottom * ConvertionFactor
+		})
+		setEnemyPaddlePos({
+			top: enemyPos.top * ConvertionFactor,
+			bottom: enemyPos.bottom * ConvertionFactor
+		})
+		setBallSize(25 * ConvertionFactor)
+		setScore({left: myScore, right: enemyScore})
+	}
+
+	useEffect(() => {
+		user.userAuthenticate.socket?.on("pongInfo", updatePong)
 
 		return () => {
-			user.userAuthenticate.socket?.off("score")
+			user.userAuthenticate.socket?.off("pongInfo")
 		}
-	}, [score])
-	
+	}, [BallPos, PaddlePos, EnemyPaddlePos])
+
 	useEffect(() => {
 		
 		document.addEventListener('keydown', handleKeyDown, true);
@@ -345,22 +142,29 @@ function Pong({social}){
 			cancelAnimationFrame(animationPaddleId);
 		};
 		
-	}, [keysPressed, VLeftPaddle, VRightPaddle]);
-	
+	}, [keysPressed, PaddlePos]);
+
 	useEffect(() => {
-		setPongBounds(PongRef.current?.getBoundingClientRect())
-	}, [])
-	
+		
+		if(PongRef.current)
+			setPongBounds(PongRef.current?.getBoundingClientRect())
+
+		user.userAuthenticate.socket?.on("pongInfo", updatePong)
+		user.userAuthenticate.socket?.emit("getPongInfo")
+		return () => {
+			user.userAuthenticate.socket?.off("pongInfo")
+		}
+	}, [])		
 	
 	return (
 		<Style ref={PongRef}>
 			{
-				gameState == "ongame" && PongRef.current && gameState ? (
+					PongRef.current ? (
 					<>
-					<Paddle Hposition={2} Vposition={VLeftPaddle}/>
-					<Ball X={BallPos.x} Y={BallPos.y} BallSize={BallSize}/>
+					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)}/>
+					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
 					<Score LeftScore={score.left} RightScore={score.right}/>
-					<Paddle Hposition={98} Vposition={VRightPaddle}/>
+					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)}/>
 				</> ) :
 				<div>PRESS ENTER TO PLAY</div>
 			}
