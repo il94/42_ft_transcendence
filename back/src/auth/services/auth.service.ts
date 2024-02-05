@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -26,32 +26,41 @@ export class AuthService {
 			delete newUser.hash;
 			return this.signToken(newUser.id, newUser.username);
 		} catch (error) {
-            throw new BadRequestException(error.message)
+            throw error
         }	
 	}
 
 	async validateUser(dto: AuthDto): Promise<{ access_token: string } | Partial<User>> {
 		try {
 			const user = await this.prisma.user.findUnique({
-					where: { email: dto.email, },
-				});
+				where: {
+					username: dto.username
+				}
+			});
 			if (!user)
-				throw new BadRequestException('user not found');
+				throw new NotFoundException();
 			const pwdMatch = await argon.verify(user.hash, dto.hash);
 			if (!pwdMatch)
-				throw new ForbiddenException('incorrect password');
+				throw new ForbiddenException();
+
 			const token: { access_token: string } = await this.signToken(user.id, user.username)
-			if(user.twoFA === false) {
+			if (user.twoFA === false)
+			{
 				await this.prisma.user.update({
-						where: { id: user.id },
-						data: { status: UserStatus.ONLINE }
+					where: {
+						id: user.id
+					},
+					data: {
+						status: UserStatus.ONLINE
+					}
 				})
+
 				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
 				return token;
 			} else
 				return { id: user.id, twoFA: user.twoFA };
 		} catch (error) {
-            throw new BadRequestException(error.message)
+            throw error
         }
 	}
 
@@ -86,26 +95,34 @@ export class AuthService {
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<User | Partial<User>> {
+	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | Partial<User> | User> {
 		try {
+
+			console.log("CONNEXION")
 			const user = await this.prisma.user.findUnique({
-				where: { email: profile.email, },
+				where: { usernameId: profile.usernameId, },
 			});
 			if (user) {
 				if (!user.twoFA) {
 					const logUser = await this.prisma.user.update({ 
-						where: { email: profile.email },
+						where: { usernameId: profile.usernameId },
 						data: { status: UserStatus.ONLINE }})
-					return logUser;
+					return logUser
 				}
 				return { id: user.id, twoFA: user.twoFA };
 			}
 			console.log ("jai pas trouve le user");
-			profile.hash = generate({ length: 6, numbers: true });
-			const newUser = await this.userService.createUser(profile as CreateUserDto)
-			if (!newUser)
-				throw new ForbiddenException('Failed to create new 42 user');
-			return newUser;
+			// profile.hash = generate({ length: 6, numbers: true });
+			// const newUser = await this.userService.createUser(profile as CreateUserDto)
+			// if (!newUser)
+			// 	throw new ForbiddenException('Failed to create new 42 user');
+
+			const partialUser: Partial<User> = {
+				usernameId: profile.usernameId,
+				avatar: profile.avatar,
+			}
+
+			return { usernameId: profile.usernameId, avatar: profile.avatar, isNew: true }
 		} catch (error) {
             throw new BadRequestException(error.message)
 		}
@@ -119,7 +136,7 @@ export class AuthService {
 
 	async generateTwoFASecret(user: User): Promise <{ secret:string, otpAuthURL: string}> {
 		const secret = authenticator.generateSecret();
-		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
+		const otpAuthURL = authenticator.keyuri(user.username, process.env.AUTH_APP_NAME, secret);
 		await this.userService.setTwoFASecret(secret, user.id);
 		return { secret, otpAuthURL };
 	}
@@ -131,15 +148,28 @@ export class AuthService {
 		  });
 	}
 
-	async loginWith2fa(user: User, twoFACode: string): Promise <{access_token: string}> {
-		if (!await this.verifyCode(user, twoFACode))
-			throw new ForbiddenException('Wrong secret code')
-		const logUser = await this.prisma.user.update({ 
-				where: { id: user.id },
-				data: { status: UserStatus.ONLINE }})
-		if (!logUser)
-			throw new BadRequestException('Failed to log user with 2FA')
-		return this.signToken(user.id, user.username)
+	async loginWith2fa(userId: number, twoFACode: string): Promise <{access_token: string}> {
+		try {
+			const user = await this.userService.findUser(userId);
+			if (user.status === UserStatus.ONLINE)
+				throw new ConflictException('User is already authenticated');
+			if (!await this.verifyCode(user, twoFACode))
+				throw new ForbiddenException('Wrong secret code')
+			const logUser = await this.prisma.user.update({ 
+					where: { id: user.id },
+					data: { status: UserStatus.ONLINE }})
+			if (!logUser)
+				throw new BadRequestException('Failed to log user with 2FA')
+			return this.signToken(user.id, user.username)
+		}
+		catch (error) { // a check
+			if (error instanceof ForbiddenException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 }

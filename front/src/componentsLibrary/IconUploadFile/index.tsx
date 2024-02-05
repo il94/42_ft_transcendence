@@ -33,6 +33,11 @@ const IconUploadFile = styled.label<{ src?: string, size?: number, fontSize?: nu
 		background-color: ${colors.shadowButton};
 		border-color: ${colors.shadowButton};
 	}
+	&:focus-visible {
+		outline: none;
+		${effects.focusShadowIcon};
+		background-color: ${colors.focusButton};
+	}
 
 `
 

@@ -76,14 +76,13 @@ model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
 
-  username    String  @unique
+  username    String
   email       String  @unique
   hash        String
   avatar      String
-  phoneNumber String
   twoFA       Boolean
   twoFASecret String
-  wins        Int
+	wins        Int
 	draws       Int
 	losses      Int
   status      UserStatus
@@ -122,7 +121,7 @@ model Channel {
   name        String
   avatar      String
   type        ChannelStatus
-  password    String?
+  hash		  String?
   invitation  Invitation[]
 
   users       UsersOnChannels[]
@@ -175,7 +174,7 @@ model UsersOnChannels {
   channel   Channel @relation(fields: [channelId], references: [id])
   channelId Int
   role      Role
-  // mute      Boolean
+  mute      DateTime @default(now())
 
   @@id([userId, channelId])
 }

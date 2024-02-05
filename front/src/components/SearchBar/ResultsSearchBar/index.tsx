@@ -6,212 +6,73 @@ import {
 	useRef,
 	useState
 } from "react"
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 import {
-	AvatarResult,
-	Group,
-	GroupName,
 	NoResult,
-	Result,
-	ResultsWrapper,
 	Style
 } from "./style"
 
-import ScrollBar from "../../../componentsLibrary/ScrollBar"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
+import {
+	generateResults
+} from "./functions"
+
+import Loader from "../../../componentsLibrary/Loader"
 
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
 	userIsInChannel,
 	sortChannelByName,
 	sortUserByName,
-	userIsBanned
+	userIsBanned,
+	userIsFriend
 } from "../../../utils/functions"
 
-import { Channel, User, UserAuthenticate } from "../../../utils/types"
-import { channelStatus } from "../../../utils/status"
+import {
+	Channel,
+	ErrorResponse,
+	User,
+	UserAuthenticate
+} from "../../../utils/types"
+import {
+	ChannelType,
+	resultSearchBarType
+} from "../../../utils/status"
 
 type PropsSearchBar = {
 	value: string,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
+function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
+	const { loaderResultsSearchBar, setLoaderResultsSearchBar, displayPopupError } = useContext(DisplayContext)!
 
-	function generateResults(results: User[] | Channel[], type: string) {
-		return (
-			<Group>
-				<GroupName>
-					{
-					type === "user" ?
-					<>
-						USERS
-					</>
-					:
-					<>
-						CHANNELS
-					</>
-				}
-				</GroupName>
-				{
-					results.length > 3 ?
-					<ResultsWrapper>
-						<ScrollBar>
-						{
-							results.map((result, index) => (
-								<Result
-									key={`${type}_result` + index} // a definir
-									onClick={() => {
-										type === "user" ?
-											addUserToFriendList(result as User)
-											:
-											addChannelToChannelList(result.id)
-										}
-									}
-									$noAvatar={littleResults}>
-									{
-										!littleResults &&
-										<AvatarResult src={result.avatar} />
-									}
-									{
-										type === "user" ?
-										<>
-											{(result as User).username}
-										</>
-										:
-										<>
-											{(result as Channel).name}
-										</>
-									}
-								</Result>
-							))
-						}
-						</ScrollBar>
-					</ResultsWrapper>
-					:
-					<>
-						{
-							results.map((result, index) => (
-								<Result
-									key={`${type}_result` + index} // a definir
-									onClick={() => {
-										type === "user" ?
-											addUserToFriendList(result as User)
-											:
-											addChannelToChannelList(result.id)
-										}
-									}
-									$noAvatar={littleResults}>
-									{
-										!littleResults &&
-										<AvatarResult src={result.avatar} />
-									}
-									{
-										type === "user" ?
-										<>
-											{(result as User).username}
-										</>
-										:
-										<>
-											{(result as Channel).name}
-										</>
-									}
-								</Result>
-							))
-						}
-					</>
-			}
-			</Group>
-		)
-	}
+	/* ================================ SETUP =================================== */
 
 	const [users, setUsers] = useState<User[]>([])
 	const [usersFound, setUsersFound] = useState<User[]>([])
 	const [channels, setChannels] = useState<Channel[]>([])
 	const [channelsFound, setChannelsFound] = useState<Channel[]>([])
 
-	const { userAuthenticate, setUserAuthenticate, setChannelTarget } = useContext(InteractionContext)!
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-
-	async function addUserToFriendList(user: User) {
-		try {
-			if (!userAuthenticate.friends.some((friend) => friend.id === user.id))
-			{
-				await axios.post(`http://${url}:3333/friends/${user.id}`, {}, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
-
-				setUserAuthenticate((prevState: UserAuthenticate) => ({
-					...prevState,
-					friends: [ ...prevState.friends, user]
-				}))
-			}
-		}
-		catch (error) {
-			setErrorRequest(true)
-		}
-	}
-
-	async function addChannelToChannelList(channelId: number) {
-		try {
-			const channelResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
-			if (userIsBanned(channelResponse.data, userAuthenticate.id))
-				throw new Error
-			else if (!userIsInChannel(channelResponse.data, userAuthenticate.id))
-			{
-				if (channelResponse.data.type === channelStatus.PROTECTED)
-					setChannelTarget(channelResponse.data)
-				else
-				{
-					await axios.post(`http://${url}:3333/channel/join/${channelId}`, {},
-					{
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					})
-
-					setUserAuthenticate((prevState: UserAuthenticate) => ({
-						...prevState,
-						channels: [ ...prevState.channels, channelResponse.data]
-					}))
-
-					setChannelTarget(() => ({
-						...channelResponse.data,
-						members: [...channelResponse.data.members, userAuthenticate]
-					}))
-				}
-			}
-			else
-				setChannelTarget(channelResponse.data)
-			displayChat(true)
-		}
-		catch (error) {
-			console.log(error)
-			setErrorRequest(true)
-		}
-	}
-
+	// Récupère tout les users et channels accessibles depuis la db
 	useEffect(() => {
 		async function fetchUsersAndChannels() {
 			try {
-				const usersResponse = await axios.get(`http://${url}:3333/user`, {
+				setLoaderResultsSearchBar(true)
+
+				const usersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/user`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
 
+				// Retire le user auth de la liste des résultats et trie par ordre alphabétique
 				setUsers(usersResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
 				)).sort(sortUserByName))
@@ -222,32 +83,135 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 					}
 				})
 
+				// Trie les channels par odre alphabétique liste des résultats
 				setChannels(accessiblesChannelsResponse.data.sort(sortChannelByName))
+
+				setLoaderResultsSearchBar(false)
 			}
 			catch (error) {
-				setErrorRequest(true)
+				if (axios.isAxiosError(error)) {
+					const axiosError = error as AxiosError<ErrorResponse>
+					const { statusCode, message } = axiosError.response?.data!
+					if (statusCode === 403)
+						displayPopupError({ display: true, message: message })
+					else
+						displayPopupError({ display: true })
+				}
+				else
+					displayPopupError({ display: true })
 			}
 		}
 		fetchUsersAndChannels()
 	}, [userAuthenticate])
 
+	// Filtre les résultats à afficher en fonction de l'input du user
 	useEffect(() => {
 		setUsersFound(users.filter((user: User) => user.username.startsWith(value)))
 		setChannelsFound(channels.filter((channel: Channel) => channel.name.startsWith(value)))
 	}, [value])
 
+	// Affiche tout les résultats au premier rendu (sans input du user)
 	useEffect(() => {
 		setUsersFound(users)
 		setChannelsFound(channels)
 	}, [users, channels])
 
+	/* ============================== GET DATAS ================================= */
+
+	// Ajoute un user en ami si il ne l'est pas déjà
+	async function addUserToFriendList(user: User) {
+		try {
+			if (!userIsFriend(userAuthenticate, user.id)) {
+				await axios.post(`http://${url}:3333/friends/${user.id}`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					friends: [...prevState.friends, user]
+				}))
+			}
+			else
+				displayPopupError({ display: true, message: `${user.username} is already your friend` })
+		}
+		catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+		}
+	}
+
+	// Join un channel si le user n'est pas ban
+	// Si le channel est protected, ouvre le formulaire de saisie de mot de passe
+	// Si le user est déjà dans le channel, ouvre le channel dans le chat
+	async function addChannelToChannelList(channelId: number) {
+		try {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			if (userIsInChannel(channelWithRelationsResponse.data, userAuthenticate.id)) {
+				setChannelTarget(channelWithRelationsResponse.data)
+				displayChat(true)
+			}
+			else if (userIsBanned(channelWithRelationsResponse.data, userAuthenticate.id))
+				displayPopupError({ display: true, message: `You are banned from this channel` })
+			else {
+				if (channelWithRelationsResponse.data.type === ChannelType.PROTECTED) {
+					setChannelTarget(channelWithRelationsResponse.data)
+					displayChat(true)
+				}
+				else {
+					await axios.post(`http://${url}:3333/channel/${channelId}/join`, {},
+						{
+							headers: {
+								'Authorization': `Bearer ${token}`
+							}
+						})
+					setUserAuthenticate((prevState: UserAuthenticate) => ({
+						...prevState,
+						channels: [...prevState.channels, channelWithRelationsResponse.data]
+					}))
+					setChannelTarget(() => ({
+						...channelWithRelationsResponse.data,
+						members: [...channelWithRelationsResponse.data.members, userAuthenticate]
+					}))
+				}
+			}
+		}
+		catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+		}
+	}
+
+	/* =============================== DISPLAY ================================== */
+
 	const resultsSearchBarRef = useRef<HTMLDivElement>(null)
 	const [littleResults, setLittleResults] = useState<boolean>(true)
 
+	// Retire l'avatar et centre le résultat si les sections sont trop petites
 	useEffect(() => {
 		const resultsSearchBarContainer: HTMLDivElement | null = resultsSearchBarRef.current
-		if (resultsSearchBarContainer)
-		{
+		if (resultsSearchBarContainer) {
 			if (resultsSearchBarContainer.getBoundingClientRect().width < 152)
 				setLittleResults(true)
 			else
@@ -255,36 +219,40 @@ function ResultsSearchBar({ value, displayChat } : PropsSearchBar) {
 		}
 	})
 
+	/* ========================================================================== */
+
 	return (
 		<Style ref={resultsSearchBarRef}>
 			{
-				!errorRequest ?
-				<>
-				{
-					usersFound.length > 0 &&
-					<>
-					{
-						generateResults(usersFound, "user")
-					}
-					</>
-				}
-				{
-					channelsFound.length > 0 &&
-					<>
-					{
-						generateResults(channelsFound, "channel")
-					}
-					</>
-				}
-				{
-					usersFound.length === 0 && channelsFound.length === 0 &&
-					<NoResult>
-						No result found
-					</NoResult>
-				}
-				</>
+				loaderResultsSearchBar ?
+				<NoResult>
+					<Loader size={50}/>
+				</NoResult>
 				:
-				<ErrorRequestMessage />
+				<>
+					{
+						usersFound.length > 0 &&
+						<>
+							{
+								generateResults(usersFound, resultSearchBarType.USER, littleResults, addUserToFriendList)
+							}
+						</>
+					}
+					{
+						channelsFound.length > 0 &&
+						<>
+							{
+								generateResults(channelsFound, resultSearchBarType.CHANNEL, littleResults, addChannelToChannelList)
+							}
+						</>
+					}
+					{
+						usersFound.length === 0 && channelsFound.length === 0 &&
+						<NoResult>
+							No result found
+						</NoResult>
+					}
+				</>
 			}
 		</Style>
 	)

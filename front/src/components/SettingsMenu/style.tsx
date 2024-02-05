@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
@@ -15,8 +16,6 @@ export const Style = styled.div<{ $zIndex: number }>`
 	height: inherit;
 	max-height: 636px;
 	min-height: 159px;
-
-	overflow-y: auto;
 
 	clip-path: ${effects.pixelateWindow};
 
@@ -44,7 +43,7 @@ export const CloseButton = styled.div`
 
 `
 
-export const SettingsForm = styled.form`
+export const HorizontalSettingsFormTemp = styled.form`
 
 	display: flex;
 	flex-direction: column;
@@ -54,7 +53,7 @@ export const SettingsForm = styled.form`
 
 `
 
-export const Setting = styled.div`
+export const HorizontalSettingTemp = styled.div`
 
 	display: flex;
 	flex-direction: column;
@@ -87,6 +86,8 @@ export const ErrorMessage = styled.p`
 `
 
 export const TwoFAValue = styled.p`
+
+	width: 100%;
 
 	border-bottom: 1px solid;
 	text-align: center;

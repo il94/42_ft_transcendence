@@ -3,19 +3,22 @@ import { CreatePongDto} from './pong.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PongService } from './pong.service';
 import { getUser } from '../auth/decorators/users.decorator';
-import { User, challengeStatus, messageStatus } from '@prisma/client';
+import { User, Game } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
 @UseGuards(JwtGuard)
 @Controller('pong')
 export class PongController {
-    // constructor(private readonly pongService: PongService) {}
+    constructor(private readonly pongService: PongService) {}
 
-    // // create a game : boutton start a match
-    // @Post()
-    // create(@getUser() user: User): Promise<Game> {
-    //     return this.pongService.createGame(user.id)
-    // }
+    // create a game : boutton start a match
+    @Post(':id')
+    create(
+        @Param('id', ParseIntPipe) userTwoId: number,
+        @getUser('id') userOneId: number
+        ): Promise<Game> {
+        return this.pongService.createGame(userOneId, userTwoId)
+    }
 
     // // jouer contre quelqu'un
     // @Post('play/:id')
@@ -25,8 +28,10 @@ export class PongController {
 
     // // boutton : jouer 
     // @Post('play')
-    // playRandom(@getUser() user: User): Promise<Game>  {
-    //     return this.pongService.playRandomGame(user.id)
+    // async playRandom(@getUser() user: User): Promise<Game>  {
+    //     const game = await this.pongService.playRandomGame(user.id)
+    //     console.log("game : ", game)
+    //     return game
     // }
 
     // @Post('watch/:id')
@@ -38,5 +43,9 @@ export class PongController {
     // getById(@Param('id', ParseIntPipe) gameId: number): Promise<Game>  {
     //     return this.pongService.getGameById(gameId)
     // }
+
+
+
+
 
  }

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param } from "@nestjs/common";
+import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param, ConflictException } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
-import { Api42AuthGuard, JwtGuard, TwoFAGuard  } from '../guards/auth.guard';
+import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto, TwoFaDto } from "../dto/";
 import { getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
@@ -18,8 +18,6 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	async signup(@Body() dto: CreateUserDto): Promise<{access_token: string}> {
 		try {
-			if (dto.email.endsWith("@student.42.fr"))
-				throw new UnauthorizedException("42 emails are forbidden");
 			const token = await this.authService.signup(dto);
 			return token; 
 		} catch (error) {
@@ -32,21 +30,20 @@ export class AuthController {
 	async signin(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response): 
 	Promise<{ access_token: string} | Partial<User>> {
 		try {
-			res.cookie("mon cookie", 'balbla')
 			type token = Partial<User> | { access_token: string }
 			const tok: token  = await this.authService.validateUser(dto);
 			if ('id' in tok)
 				res.clearCookie('id').clearCookie('two_FA')
 			return tok;
 		} catch (error) {
-			throw new BadRequestException(error.message)
+			throw error
 		}
 	}
 
 	@Get('logout')
 	@UseGuards(JwtGuard)
 	async logout(@getUser() user: User, @Res({ passthrough: true }) res: Response): Promise<void> {
-		res.clearCookie('id').clearCookie('access_token')
+		res.clearCookie('id').clearCookie('access_token').clearCookie('two_FA')
 		this.authService.logout(user.id);
 	}
 
@@ -60,20 +57,30 @@ export class AuthController {
 
 	@Get('api42/callback')
 	@UseGuards(Api42AuthGuard)
-	async handle42Redirect(@getUser() user: User, @Res({ passthrough: true }) res: Response,
+	async handle42Redirect(@getUser() user: {usernameId: string, avatar: string, isNew: boolean} | Partial<User> | User, 
+	@Res({ passthrough: true }) res: Response,
 	): Promise<void> {
 		try {
 			if (!user)
 				throw new BadRequestException("Can't find user from 42 intra");
-			const token = await this.authService.signToken(user.id, user.username);
-			if (!user.twoFA) {
-				res.clearCookie('token', { httpOnly: true })
-				.cookie("access_token", token.access_token)
-				.redirect("http://localhost:5173")
+			if ('id' in user) { // utilisateur 42 connu
+				const token = await this.authService.signToken(user.id, user.username);
+				if (!user.twoFA) {
+					res.clearCookie('token', { httpOnly: true })
+					.cookie('isNew', false)
+					.cookie("access_token", token.access_token)
+					.redirect("http://localhost:5173")
+				}
+				res.cookie('two_FA', true)
+				.cookie('userId', user.id)
+				.redirect(`http://localhost:5173/twofa`)	
 			}
-			res.cookie('two_FA', true)
-			.cookie('id', user.id)
-			.redirect(`http://localhost:5173/twofa`)	
+			if ('isNew' in user) {
+				const fiveMin = Date.now() + 5 * 60 * 1000;
+				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
+				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
+				.redirect("http://localhost:5173/signup42")
+			}
 		} catch (error) {
 			throw new BadRequestException(error.message)
 		}
@@ -97,7 +104,7 @@ export class AuthController {
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
 	@UseGuards(JwtGuard)
-	async turnOnTwoFA(@getUser() user: User, @Body() body): Promise <boolean> {
+	async turnOnTwoFA(@getUser() user: User, @Body() body: TwoFaDto): Promise <boolean> {
 		try {
 			if (!body.twoFACode)
 				throw new BadRequestException('Empty 2FA code');
@@ -110,14 +117,14 @@ export class AuthController {
 
 	@Post('2fa/authenticate/:id')
   	@HttpCode(200)
-  	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body): Promise <{access_token: string}> {
+  	async authenticate(@Param('id', ParseIntPipe) id: number, @Body() body: TwoFaDto): Promise <{access_token: string}> {
 		try {
 			const user = await this.userService.findUser(id);
 			if (user.status === UserStatus.ONLINE)
 				throw new BadRequestException('User is already authenticated');
-			if (!body.value)
+			if (!body.twoFACode)
 				throw new BadRequestException('Empty 2FA code');
-			const token: { access_token: string } = await this.authService.loginWith2fa(user, body.value);
+			const token: { access_token: string } = await this.authService.loginWith2fa(user.id, body.twoFACode);
 			return token;
 		} catch (error) {
 			throw new BadRequestException(error.message);
@@ -126,7 +133,7 @@ export class AuthController {
 
 	@Patch('2fa/disable')
 	@HttpCode(200)
-	@UseGuards(JwtGuard, TwoFAGuard)
+	@UseGuards(JwtGuard)
 	async disable(@getUser() user: User, @Body() body): Promise <boolean> {
 		try {
 			const disable: boolean =  await this.userService.disableTwoFA(user, body.TwoFA)

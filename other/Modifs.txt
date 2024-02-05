@@ -1,6 +1,69 @@
-Signin/ :
-	Codes d'erreur a recuperer
-	Recuperer le boolean twofa du user pour savoir si on redirige vers Game ou pas
+(Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
-Signup/ :
-	Verifier si user existe deja : mail ou username ?
+GLOBAL/ : A faire sur tout les fichiers un par un
+
+	(!!!!!)
+	Gérer instantanément la présence du token
+	Fix les erreurs ts
+
+	(!!!)
+	Signin a check
+	Checker le responsive de toutes les pages
+	Set corectement tout les titles et alts
+
+	(!!)
+	Créer des fichiers fonctions si necessaire
+	Styliser le focus et autres effets (contextual menu si possible)
+	CloseButton partout
+
+	(!)
+	Corriger l'anglais du bled
+	Checker les contextes
+	Checker les noms de routes (s pas s)
+	Shift + Alt + F
+
+TwoFaGlobal/ : 
+	En cours
+	Gestion d'erreur (voir avec Claire)
+
+Home/ : à faire après merge
+	Gérer la déconnexion
+	Gestion d'erreur
+
+ContextualMenu/ : à faire après merge
+	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
+
+Profile/ : à faire après merge
+	Gérer la déconnexion
+	Gestion d'erreur
+
+SettingsMenu/ :
+	Faire select Avatar si le temps
+
+Chat/ : à faire après merge
+	refreshStatusChallenge à retrouver (fonction de soso github)
+
+ChannelInterface/ :
+	Corriger envoi d'avatar socket
+
+Messages/ : à faire après merge
+	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
+
+Signup/ : (et signin ect)
+	phone number a virer
+
+ScoreResume/ : à voir quand le Pong aura avancé
+-pas_regardé:
+
+MatchHistory/ : à voir quand le Pong aura avancé
+-pas_regardé:
+	Ajouter loader
+
+
+
+BACK/ :
+
+channels.service/ : à faire après merge
+-findChannelWithRelations:
+	Vérifier la fonction pour mapper les messages (soso)
+

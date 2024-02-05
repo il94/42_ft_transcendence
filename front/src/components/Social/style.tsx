@@ -1,9 +1,12 @@
 import styled from "styled-components"
+
 import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
 	display: flex;
+
+	position: relative;
 
 	width: 100%;
 	height: 100%;
@@ -29,6 +32,10 @@ export const ReduceButton = styled.button`
 
 	&:hover {
 		background-color: ${colors.reduceButtonHover};
+	}
+	&:focus-visible {
+		outline: none;
+		background-color: ${colors.reduceButtonFocus};
 	}
 
 `

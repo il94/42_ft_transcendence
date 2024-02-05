@@ -4,43 +4,46 @@ import {
 	SetStateAction,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from "react"
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 import { Style } from "./style"
 
 import Section, { SectionName } from "../../../componentsLibrary/Section"
-import ErrorRequestMessage from "../../../componentsLibrary/ErrorRequestMessage"
 
 import InteractionContext from "../../../contexts/InteractionContext"
 import AuthContext from "../../../contexts/AuthContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
-import { userIsBanned, userIsInChannel } from "../../../utils/functions"
+import {
+	findChannelMP,
+	userIsAdministrator,
+	userIsBanned,
+	userIsBlocked,
+	userIsFriend,
+	userIsInChannel,
+	userIsOwner
+} from "../../../utils/functions"
 
 import {
 	Channel,
-	MessageInvitation,
-	User,
+	ChannelData,
+	ErrorResponse,
 	UserAuthenticate
 } from "../../../utils/types"
 
 import {
-	challengeStatus,
 	channelRole,
-	channelStatus,
+	ChannelType,
 	contextualMenuStatus,
-	messageStatus,
+	messageType,
 	userStatus
 } from "../../../utils/status"
 
 type PropsContextualMenu = {
 	type: contextualMenuStatus | undefined,
-	displayContextualMenu: Dispatch<SetStateAction<{
-		display: boolean,
-		type: contextualMenuStatus | undefined
-	}>>,
-	userTarget: User,
 	contextualMenuPosition: {
 		left?: number,
 		right?: number,
@@ -55,13 +58,16 @@ type PropsContextualMenu = {
 		bottom?: number
 	}>>,
 	secondaryContextualMenuHeight: number,
-	displayErrorContextualMenu: Dispatch<SetStateAction<boolean>>,
 	displayChat: Dispatch<SetStateAction<boolean>>
 }
 
-function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, userTarget, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayErrorContextualMenu, displayChat }: PropsContextualMenu) {
+function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextualMenu, setSecondaryContextualMenuPosition, secondaryContextualMenuHeight, displayChat }: PropsContextualMenu) {
 
 	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate, userTarget, channelTarget, setChannelTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
+
+	/* ====================== SECONDARY CONTEXTUAL MENU ========================= */
 
 	function showSecondaryContextualMenu(event: MouseEvent<HTMLButtonElement>) {
 
@@ -83,56 +89,27 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				right: contextualMenuPosition.right && contextualMenuPosition.right + offsetX,
 				top: contextualMenuPosition.top && contextualMenuPosition.top + offsetY,
 				bottom: contextualMenuPosition.bottom && contextualMenuPosition.bottom + offsetY
-
 			})
 			displaySecondaryContextualMenu(true)
 		}
 	}
 
-	const [adminSections, displayAdminSections] = useState<boolean>(false)
+	/* ============================== MP SECTION ================================ */
 
-	useEffect(() => {
-		if (channelTarget &&
-			type === contextualMenuStatus.CHAT &&
-			(channelTarget.owner?.id === userAuthenticate.id ||
-			(channelTarget.administrators.some((administrator) => administrator.id === userAuthenticate.id) &&
-				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) &&
-			(channelTarget.owner?.id !== userTarget.id &&
-				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)))) {
-			displayAdminSections(true)
-		}
-		else
-			displayAdminSections(false)
-	}, [])
-
-	const { userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget } = useContext(InteractionContext)!
-
-	async function handleContactClickEvent() {
+	async function handleContactClickEvent(): Promise<Channel | undefined> {
 		try {
-			const findChannelMP = userAuthenticate.channels.find((channel) => (
-				channel.name === userTarget.username && channel.type === channelStatus.MP
-			))
-			if (findChannelMP)
-			{
-				setChannelTarget(findChannelMP)
+			const channelMP = findChannelMP(userAuthenticate, userTarget.username)
+			if (channelMP) {
+				setChannelTarget(channelMP)
 				displayChat(true)
-				return (findChannelMP)
+				return (channelMP)
 			}
-			else
-			{
-				const MPDatas: any = {
-					name: '',
-					avatar: '',
-					type: channelStatus.MP
-				}		
-
-				const newChannelMPResponse: AxiosResponse = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, MPDatas,
-				{
+			else {
+				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				console.log("newChannelMPResponse", newChannelMPResponse)
 
 				const newChannelMP = {
 					...newChannelMPResponse.data,
@@ -144,31 +121,42 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					administrators: [],
 					owner: undefined,
 					mutedUsers: [],
-					banneds: []
+					banneds: [],
+					muteinfo: []
 				}
-				displayChat(true)
 				return (newChannelMP)
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+			return (undefined)
 		}
 	}
+
+	/* ========================== CHALLENGE SECTION ============================= */
 
 	async function handleChallengeClickEvent() {
 		try {
 			console.log(userTarget.id);
-			
+
 			/* ============ Temporaire ============== */
 			// Verifier si une invitation n'existe pas deja
 			/* ====================================== */
 
 			let channel: Channel
 
-			if (type === contextualMenuStatus.SOCIAL)
-			{
+			if (type === contextualMenuStatus.SOCIAL) {
 				const channelMP = await handleContactClickEvent()
-				
+
 				channel = channelMP
 			}
 			else if (channelTarget)
@@ -176,8 +164,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			else
 				throw new Error
 
-			const idMsg = await axios.post(`http://localhost:3333/channel/${channel.id}/invitation`, 
-			{ msgStatus : messageStatus.INVITATION, targetId : userTarget.id},
+			const idMsg = await axios.post(`http://localhost:3333/channel/${channel.id}/invitation`,
+				{ msgStatus: messageType.INVITATION, targetId: userTarget.id },
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -185,31 +173,31 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				}
 			);
 			const sockets = await axios.get(`http://localhost:3333/channel/${channel.id}/sockets`, {
-			headers: {
+				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-			console.log("data send from challenge button :", idMsg.data)
-			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id, idMsg.data);												 
+			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id, idMsg.data);
 		}
 		catch (error) {
 			console.log(error);
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
-	} 
+	}
+
+	/* ============================ FRIEND SECTION ============================== */
 
 	async function handleManageFriendClickEvent() {
 		try {
-			if (!userAuthenticate.friends.some((friend) => friend.id === userTarget.id)) {
+			if (!userIsFriend(userAuthenticate, userTarget.id)) {
 				await axios.post(`http://${url}:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
 				setUserAuthenticate((prevState: UserAuthenticate) => ({
 					...prevState,
-					friends: [ ...prevState.friends, userTarget]
+					friends: [...prevState.friends, userTarget]
 				}))
 			}
 			else {
@@ -218,39 +206,40 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-
-					const { friends, ...rest } = prevState
-
-					return {
-						...rest,
-						friends: friends.filter((friend) => friend.id !== userTarget.id)
-					}
-				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					friends: prevState.friends.filter((friend) => friend.id !== userTarget.id)
+				}))
 			}
 		}
 		catch (error) {
-			console.log(error)
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
+	/* ============================= BLOCK SECTION ============================== */
+
 	async function handleBlockClickEvent() {
 		try {
-			if (!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id)) {
+			if (!userIsBlocked(userAuthenticate, userTarget.id)) {
 				await axios.post(`http://${url}:3333/blockeds/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-					return {
-						...prevState,
-						blockedUsers: [ ...prevState.blockedUsers, userTarget ]
-					}
-				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					blockeds: [...prevState.blockeds, userTarget]
+				}))
 			}
 			else {
 				await axios.delete(`http://${url}:3333/blockeds/${userTarget.id}`, {
@@ -258,72 +247,93 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 						'Authorization': `Bearer ${token}`
 					}
 				})
-
-				setUserAuthenticate((prevState: UserAuthenticate) => {
-
-					const { blockedUsers, ...rest } = prevState
-
-					return {
-						...rest,
-						blockedUsers: blockedUsers.filter((blockedUser) => blockedUser.id !== userTarget.id)
-					}
-				})
+				setUserAuthenticate((prevState: UserAuthenticate) => ({
+					...prevState,
+					blockeds: prevState.blockeds.filter((friend) => friend.id !== userTarget.id)
+				}))
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
+
+	/* ============================ GRADE SECTION =============================== */
 
 	async function handleGradeClickEvent() {
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id)) {
-
+			if (!userIsAdministrator(channelTarget, userTarget.id)) {
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.ADMIN
 				},
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 			}
 			else {
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.MEMBER
 				},
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
+
+	/* ============================= MUTE SECTION =============================== */
 
 	async function handleMuteClickEvent() {
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.mutedUsers.includes(userTarget)) {
-				/* ============ Temporaire ============== */
-
-				// await axios.post(`http://${url}:3333/channel/${channelTarget.id}/mutedusers/${userTarget.id}`)
-
-				/* ====================================== */
-
-				channelTarget.mutedUsers.push(userTarget)
-			}
+	
+			/* ============ Temporaire ============== */
+			console.log(userTarget.username, " has muted")
+			await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/mute/${userTarget.id}`, {},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+				
+			//userAuthenticate.socket?.emit("sendMute", userTarget.socket, channelTarget.id);
+			// userTarget.socket?.send()
+			// post dans le back avec un id de la target id du mec qui envoie
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			// displayPopupError(true)
 		}
 	}
+
+	/* ============================= KICK SECTION =============================== */
 
 	async function handleKickClickEvent() {
 		try {
@@ -336,163 +346,183 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			})
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
+
+	/* ============================== BAN SECTION =============================== */
 
 	async function handleBanClickEvent() {
 		try {
 			if (!channelTarget)
 				throw new Error
-			if (!channelTarget.banneds.some((banned) => banned.id === userTarget.id)) {
-
+			if (!userIsBanned(channelTarget, userTarget.id)) {
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.BANNED
 				},
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 			}
 			else {
 				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.UNBANNED
 				},
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+					{
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 			}
 		}
 		catch (error) {
-			displayErrorContextualMenu(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
+	/* ============================== DISPLAY =================================== */
+
+	const [adminSections, displayAdminSections] = useState<boolean>(false)
+	useEffect(() => {
+		if (channelTarget && 
+			type === contextualMenuStatus.CHAT &&
+			channelTarget.type !== ChannelType.MP &&
+			(userIsOwner(channelTarget, userAuthenticate.id) ||
+				(userIsAdministrator(channelTarget, userAuthenticate.id) &&
+					!userIsOwner(channelTarget, userTarget.id)))) {
+			displayAdminSections(true)
+		}
+		else {
+			displayAdminSections(false)
+		}
+	}, [])
+
+	/* ========================================================================== */
+
 	return (
+		userTarget &&
 		<Style
 			$left={contextualMenuPosition.left}
 			$right={contextualMenuPosition.right}
 			$top={contextualMenuPosition.top}
 			$bottom={contextualMenuPosition.bottom}>
 			{
-				userTarget ?
+				userAuthenticate.channels.length > 0 &&
+				<Section onMouseEnter={showSecondaryContextualMenu}>
+					<SectionName>
+						Invite
+					</SectionName>
+				</Section>
+			}
+			<div onMouseEnter={() => displaySecondaryContextualMenu(false)}>
+				<Section onClick={handleContactClickEvent}>
+					<SectionName>
+						Contact
+					</SectionName>
+				</Section>
+				{
+					userTarget.status !== userStatus.OFFLINE &&
+					<Section onClick={handleChallengeClickEvent}>
+						<SectionName>
+							Challenge
+						</SectionName>
+					</Section>
+				}
+				{
+					userTarget.status === userStatus.PLAYING &&
+					<Section onClick={handleContactClickEvent}>
+						<SectionName>
+							Spectate
+						</SectionName>
+					</Section>
+				}
+				<Section onClick={handleManageFriendClickEvent}>
+					<SectionName>
+						{
+							!userIsFriend(userAuthenticate, userTarget.id) ?
+								"Add"
+								:
+								"Delete"
+						}
+					</SectionName>
+				</Section>
+				<Section onClick={handleBlockClickEvent}>
+					<SectionName>
+						{
+							!userIsBlocked(userAuthenticate, userTarget.id) ?
+								"Block"
+								:
+								"Unblock"
+						}
+					</SectionName>
+				</Section>
+				{
+					adminSections &&
 					<>
 						{
-							userAuthenticate.channels.length > 0 &&
-							<Section onMouseEnter={showSecondaryContextualMenu}>
+							userIsInChannel(channelTarget!, userTarget.id) &&
+							<>
+								{
+									userIsOwner(channelTarget!, userAuthenticate.id) &&
+									<Section onClick={handleGradeClickEvent}>
+										<SectionName>
+											{
+												!userIsAdministrator(channelTarget!, userTarget.id) ?
+													"Upgrade"
+													:
+													"Downgrade"
+											}
+										</SectionName>
+									</Section>
+								}
+								<Section onClick={handleMuteClickEvent}>
+									<SectionName>
+										Mute
+									</SectionName>
+								</Section>
+								<Section onClick={handleKickClickEvent}>
+									<SectionName>
+										Kick
+									</SectionName>
+								</Section>
+								<Section onClick={handleBanClickEvent}>
+									<SectionName>
+										Ban
+									</SectionName>
+								</Section>
+							</>
+						}
+						{
+							userIsBanned(channelTarget!, userTarget.id) &&
+							<Section onClick={handleBanClickEvent}>
 								<SectionName>
-									Invite
+									Unban
 								</SectionName>
 							</Section>
 						}
-						<div onMouseEnter={() => displaySecondaryContextualMenu(false)}>
-							<Section onClick={handleContactClickEvent}>
-								<SectionName>
-									Contact
-								</SectionName>
-							</Section>
-							{
-								userTarget.status !== userStatus.OFFLINE &&
-								<Section onClick={handleChallengeClickEvent}>
-									<SectionName>
-										Challenge
-									</SectionName>
-								</Section>
-							}
-							{
-								userTarget.status === userStatus.PLAYING &&
-								<Section onClick={handleContactClickEvent}>
-									<SectionName>
-										Spectate
-									</SectionName>
-								</Section>
-							}
-							<Section onClick={handleManageFriendClickEvent}>
-								<SectionName>
-									{
-										!userAuthenticate.friends.some((friend) => friend.id === userTarget.id) ?
-											"Add"
-											:
-											"Delete"
-									}
-								</SectionName>
-							</Section>
-							<Section onClick={handleBlockClickEvent}>
-								<SectionName>
-									{
-										!userAuthenticate.blockedUsers.some((blockedUser) => blockedUser.id === userTarget.id) ?
-											"Block"
-											:
-											"Unblock"
-									}
-								</SectionName>
-							</Section>
-							{
-								type === contextualMenuStatus.CHAT && channelTarget?.type !== channelStatus.MP &&
-								<>
-									{
-										channelTarget ?
-											<>
-												{
-													adminSections &&
-													<>
-														{
-															userIsInChannel(channelTarget, userTarget.id) &&
-															<>
-																{
-																channelTarget.owner?.id === userAuthenticate.id &&
-																	<Section onClick={handleGradeClickEvent}>
-																		<SectionName>
-																			{
-																				!channelTarget.administrators.some((administrator) => administrator.id === userTarget.id) ?
-																					"Upgrade"
-																					:
-																					"Downgrade"
-																			}
-																		</SectionName>
-																	</Section>
-																}
-																<Section onClick={handleMuteClickEvent}>
-																	<SectionName>
-																		Mute
-																	</SectionName>
-																</Section>
-																<Section onClick={handleKickClickEvent}>
-																	<SectionName>
-																		Kick
-																	</SectionName>
-																</Section>
-																<Section onClick={handleBanClickEvent}>
-																	<SectionName>
-																		Ban
-																	</SectionName>
-																</Section>
-															</>
-														}
-														{
-															userIsBanned(channelTarget, userTarget.id) &&
-															<Section onClick={handleBanClickEvent}>
-																<SectionName>
-																	Unban
-																</SectionName>
-															</Section>
-														}
-													</>
-												}
-											</>
-											:
-											<ErrorRequestMessage />
-									}
-								</>
-							}
-						</div>
 					</>
-					:
-					<ErrorRequestMessage />
-			}
+				}
+			</div>
 		</Style>
 	)
 }

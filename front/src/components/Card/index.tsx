@@ -18,8 +18,7 @@ import ScoreResume from "./ScoreResume"
 import Icon from "../../componentsLibrary/Icon"
 
 import DisplayContext from "../../contexts/DisplayContext"
-
-import { User, UserAuthenticate } from "../../utils/types"
+import InteractionContext from "../../contexts/InteractionContext"
 
 import CloseIcon from "../../assets/close.png"
 
@@ -30,23 +29,17 @@ type PropsCard = {
 		top?: number,
 		bottom?: number
 	},
-	displayCard: Dispatch<SetStateAction<boolean>>,
-	userTarget: User | UserAuthenticate
+	displayCard: Dispatch<SetStateAction<boolean>>
 }
 
-function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
+function Card({ cardPosition, displayCard }: PropsCard) {
 
+	const { userTarget } = useContext(InteractionContext)!
 	const { zCardIndex, setZCardIndex, zMaxIndex } = useContext(DisplayContext)!
 
 	useEffect(() => {
 		setZCardIndex(zMaxIndex + 1)
 	}, [])
-
-	const scoreResume = {
-		wins: userTarget.wins,
-		draws: userTarget.draws,
-		losses: userTarget.losses
-	}
 
 	return (
 		<Style
@@ -67,8 +60,11 @@ function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 			<UserName>
 				{userTarget.username}
 			</UserName>
-			<ScoreResume scoreResume={scoreResume} />
-			<MatchHistory userTarget={userTarget} />
+			<ScoreResume
+				wins={userTarget.wins}
+				draws={userTarget.draws}
+				losses={userTarget.losses} />
+			<MatchHistory />
 		</Style>
 	)
 }

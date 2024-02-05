@@ -5,9 +5,11 @@ import {
 	useEffect,
 	useState
 } from 'react'
-import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
-import Cookies from "js-cookie"
+import {
+	useNavigate
+} from 'react-router'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+
 import styled from 'styled-components'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
@@ -19,14 +21,23 @@ import MainTitle from '../../componentsLibrary/MainTitle'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
 import Separator from '../../componentsLibrary/Separator/Index'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
+import {
+	VerticalSettingsForm,
+	VerticalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
 
@@ -43,6 +54,13 @@ const FTRedirectWrapper = styled.div`
 
 `
 
+type PropsSigninResponse = {
+	access_token: string
+} | {
+	twoFA: boolean,
+	id: number
+}
+
 function Signin() {
 	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
@@ -55,13 +73,13 @@ function Signin() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (email.value.length === 0 ||
+			if (username.value.length === 0 ||
 				password.value.length === 0) {
-				if (email.value.length === 0) {
-					setEmail({
+				if (username.value.length === 0) {
+					setUsername({
 						value: '',
 						error: true,
-						errorMessage: "Insert email",
+						errorMessage: "Insert username",
 					})
 				}
 				if (password.value.length === 0) {
@@ -73,30 +91,27 @@ function Signin() {
 				}
 				return
 			}
-			if (email.error || password.error)
+			if (username.error || password.error)
 				return
 
 			const user = {
-				email: email.value,
+				username: username.value,
 				hash: password.value
 			}
 
-			const signinResponse = await axios.post(`http://${url}:3333/auth/signin`, user)
+			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
 
-			if (signinResponse.data.twoFA) {
-				Cookies.remove('id');
-				Cookies.set("id", signinResponse.data.id);
-				navigate("/twofa")	
+			if ('twoFA' in signinResponse.data) {
+				navigate("/twofa", {
+					state: {
+						userId: signinResponse.data.id
+					}
+				})
 			}
 			else {
-				const access_token: string = signinResponse.data.access_token;
-				if (access_token) {
-					localStorage.setItem('access_token', access_token)
-					setToken(access_token)
-				}
-				else { 
-					throw new AxiosError("Failed to retrieve access_token")
-				}
+				localStorage.setItem("access_token", signinResponse.data.access_token)
+				setToken(signinResponse.data.access_token)
+
 				navigate("/")
 			}
 		}
@@ -105,27 +120,27 @@ function Signin() {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
 				if (statusCode === 403 || statusCode === 404) {
-					setEmail((prevState: SettingData) => ({
+					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid email"
+						errorMessage: "Invalid username"
 					}))
 				}
 				else
-					navigate("/error");
+					navigate("/error")
 			}
 			else
-				navigate("/error");
+				navigate("/error")
 		}
 	}
 
-	/* ================================ EMAIL =================================== */
+	/* ================================ USERNAME =================================== */
 
-	const [email, setEmail] = useState<SettingData>(emptySetting)
+	const [username, setUsername] = useState<SettingData>(emptySetting)
 
-	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setEmail({
+		setUsername({
 			value: value,
 			error: false
 		})
@@ -158,56 +173,61 @@ function Signin() {
 				<WindowTitle>
 					Sign in
 				</WindowTitle>
-				<SettingsForm
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
-						Email
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email.value}
-							width={231}
-							fontSize={25}
-							$error={email.error} />
-						<ErrorMessage>
-							{email.error && email.errorMessage}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
+					<VerticalSetting fontSize={20}>
+						Username
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputUsernameChange}
+								type="text" value={username.value}
+								width={231}
+								fontSize={25}
+								$error={username.error} />
+							<ErrorMessage>
+								{username.error && username.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={20}>
 						Password
-						<InputText
-							onChange={handleInputPasswordChange}
-							type={showPassword ? "text" : "password"}
-							value={password.value as string}
-							width={231}
-							fontSize={25}
-							$error={password.error} />
-						<ErrorMessage>
-							{password.error && password.errorMessage}
-						</ErrorMessage>
-						<Button
-							onClick={() => setShowPassword(!showPassword)}
-							type="button"
-							fontSize={18}
-							alt="Show password button"
-							title={showPassword ? "Hide password" : "Show password"}
-							style={{ marginTop: "2.5px", marginBottom: "15px" }} >
-							{
-								showPassword ?
-									"Hide password"
-									:
-									"Show password"
-							}
-						</Button>
-					</Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputPasswordChange}
+								type={showPassword ? "text" : "password"}
+								value={password.value as string}
+								width={231}
+								fontSize={25}
+								$error={password.error} />
+							<ErrorMessage>
+								{password.error && password.errorMessage}
+							</ErrorMessage>
+							<Button
+								onClick={() => setShowPassword(!showPassword)}
+								type="button"
+								fontSize={18}
+								width={231}
+								alt="Show password button"
+								title={showPassword ? "Hide password" : "Show password"}
+								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
+								{
+									showPassword ?
+										"Hide password"
+										:
+										"Show password"
+								}
+							</Button>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</VerticalSettingsForm>
 				<div>
 					Don't have an account?&nbsp;
 					<StyledLink to="/signup" color={colors.button}>

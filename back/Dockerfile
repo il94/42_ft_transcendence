@@ -14,6 +14,6 @@ RUN chmod +x /usr/local/bin/start.sh
 
 RUN prisma generate
 
-#RUN npm run build
+# RUN npm run build
 
 ENTRYPOINT ["start.sh"]

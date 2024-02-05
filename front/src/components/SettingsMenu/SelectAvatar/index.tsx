@@ -46,7 +46,7 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 				Avatar
 			</SettingTtile>
 			<Avatar
-				src={avatar} htmlFor="uploadAvatarUser"
+				src={avatar} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
 			<HiddenInput onChange={handleAvatarUpload}
 				id="uploadAvatarUser" type="file" accept="image/*" />

@@ -1,5 +1,8 @@
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import {
+	Link
+} from 'react-router-dom'
+
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
@@ -32,6 +35,11 @@ const LinkButton = styled(Link) <{ width?: number, fontSize?: number, alt: strin
 		transform: translate(2px, 2px);
 		background-color: ${colors.shadowButton};
 		border-color: ${colors.shadowButton};
+	}
+	&:focus-visible {
+		outline: none;
+		${effects.focusShadowButton};
+		background-color: ${colors.focusButton};
 	}
 
 `

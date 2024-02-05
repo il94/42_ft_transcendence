@@ -13,10 +13,10 @@ import { User } from "../../../utils/types"
 
 const Style = styled.div`
 
-	position: relative;
+    position: relative;
 
-	width: 100%;
-	height: 100%;
+    width: 100%;
+    height: 100%;
 
 	display: flex;
 	/* align-items: center;
@@ -27,8 +27,20 @@ const Style = styled.div`
 	justify-content: space-evenly;
 
 
-	background-color: yellow;
+    background-color: yellow;
 `
+
+// const PlayButtonStyle = styled.div`
+    
+//     position: absolute;
+//       top: 20px;
+//       left: 50%;
+//       transform: translateX(-50%);
+//       padding: 10px 20px;
+//       font-size: 16px;
+//     background-color: black;
+//       cursor: pointer;
+// `
 
 // const SpectateButtonStyle = styled.div`
 	

@@ -7,31 +7,31 @@ import {
 } from "react"
 import axios from "axios"
 
-import { Input, Style } from "./style"
-
-import ErrorRequestMessage from "../../../../componentsLibrary/ErrorRequestMessage"
+import {
+	Input,
+	Style
+} from "./style"
 
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
 
 import { Channel } from "../../../../utils/types"
-import { messageStatus } from "../../../../utils/status"
+import { messageType } from "../../../../utils/status"
+
 
 type PropsTextInput = {
 	channel: Channel,
 }
- 
 
-function TextInput({ channel }: PropsTextInput) {
+ 
+function TextInput() {
+
 	const { token, url } = useContext(AuthContext)!
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
 	const [message, setMessage] = useState<string>('')
-	const { userAuthenticate } = useContext(InteractionContext)!
+	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	/*
-
 		response = tableau des socket des users connecter sur le channel
-
 	*/
 
 
@@ -40,28 +40,34 @@ function TextInput({ channel }: PropsTextInput) {
 		if (message === '')
 			return
 			try {
+				if (new Date(channelTarget.muteInfo[userAuthenticate.id]) > new Date())
+				{
+					console.log("you are muted");
+					// voir comment gerer le mute coter front
+					return;
+				}
+				const sockets = await axios.get(`http://${url}:3333/channel/${channelTarget.id}/sockets`, {
 
-				const sockets = await axios.get(`http://${url}:3333/channel/${channel.id}/sockets`, {
 				headers: {
 						'Authorization': `Bearer ${token}`
 					} 
 				})
 
 				/* post le meesage dans le back */
-				const idMsg = await axios.post(`http://${url}:3333/channel/${channel.id}/message`, 
-				{ msg: message , msgStatus : messageStatus.TEXT},
+				const idMsg = await axios.post(`http://${url}:3333/channel/${channelTarget.id}/message`, 
+				{ msg: message , msgStatus : messageType.TEXT},
 					{
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
 					}
 				);
-				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, message, idMsg.data);
+				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channelTarget.id, message, idMsg.data);
 				
 				setMessage("");
 			  } catch (error) {
 				console.log(error);
-				setErrorRequest(true);
+				// setErrorRequest(true);
 			  }
 			};
 
@@ -83,17 +89,12 @@ function TextInput({ channel }: PropsTextInput) {
 			onSubmit={handleSubmit}
 			autoComplete="off"
 			spellCheck="false"> 
-			{
-				!errorRequest ?
 					<Input
 						onFocus={removePlaceHolder}
 						onBlur={setPlaceHolder}
 						onChange={handleInputChange}
 						value={message}
 						placeholder="Type here..." />
-					:
-					<ErrorRequestMessage />
-			}
 		</Style>
 	)
 }

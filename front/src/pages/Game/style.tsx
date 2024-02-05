@@ -1,4 +1,5 @@
-import { styled } from 'styled-components'
+import styled from 'styled-components'
+
 import effects from '../../utils/effects'
 
 export const GamePage = styled.div`

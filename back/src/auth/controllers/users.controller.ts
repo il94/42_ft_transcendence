@@ -4,7 +4,6 @@ import { UsersService } from '../services/users.service';
 import { JwtGuard } from '../guards/auth.guard';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { UserEntity } from '../entities/user.entity';
 import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 
@@ -14,11 +13,11 @@ import { User } from '@prisma/client';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiOkResponse({ type: UserEntity, isArray: true })
-  findAll() {
-    return this.usersService.findAll();
-  }
+	// Renvoie tout les users
+	@Get()
+	findAll() {
+		return this.usersService.findAll()
+	}
   
   @Get('me')
   async getMe(@getUser() user: User) {
@@ -36,11 +35,12 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, 
-  @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(id, updateUserDto);
-  }
+  	// Modifie le user authentifie
+	@Patch('me')
+	async update(@getUser('id') userId: number, 
+	@Body() updateUserDto: UpdateUserDto) {
+		return this.usersService.updateUser(userId, updateUserDto)
+	}
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {

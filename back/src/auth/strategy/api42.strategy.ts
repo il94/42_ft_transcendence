@@ -20,15 +20,13 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
             this.httpService.get(`https://api.intra.42.fr/v2/me`,
         { headers: { Authorization: `Bearer ${accessToken}`},}).pipe(
             catchError((error) => {
-                console.log("error de get");
               if (typeof error.response === 'undefined')
                 throw new BadRequestException(error.response?.data);
               else throw new BadRequestException(error.message);
             }),
           ),)
-        const user = await this.authService.validate42User({ 
-            email: profile.emails[0].value, 
-            username: profile.username, 
+        const user = await this.authService.validate42User({
+			usernameId: profile.username,
             avatar: data.image.link });
         return user;
     }

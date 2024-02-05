@@ -16,7 +16,9 @@ export class UsersService {
 		console.log("back create user")
 		try {
 			const userExists = await this.prisma.user.findFirst({
-				where: { email: createUserDto.email }
+				where: {
+					username: createUserDto.username
+				}
 			})
 			if (userExists)
 				throw new ConflictException('credential already taken');
@@ -28,7 +30,6 @@ export class UsersService {
 			const user = await this.prisma.user.create({
 				data: {
 					...userDatas,
-					phoneNumber: createUserDto.phoneNumber || '',
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,
@@ -37,6 +38,7 @@ export class UsersService {
 					losses: 0
 				},
 			});
+
             console.log(`User ${user.username} with id ${user.id} created successfully`);
 			return user;
 		}
@@ -45,17 +47,29 @@ export class UsersService {
 		}
 	}
 
+	// Renvoie tout les users
 	findAll() {
-		const users = this.prisma.user.findMany({ 
-			select: { id: true,
-				username: true,
-				avatar: true,
-				status: true,
-				wins: true,
-				draws: true,
-				losses: true,
-			},});
-		return users;
+		try {
+			// Récupère tout les users
+			const users = this.prisma.user.findMany({
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
+				}
+			})
+			return users
+		}
+		catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	async findById(id: number): Promise<Partial<User>>  {
@@ -81,42 +95,35 @@ export class UsersService {
 		return user;
 	}
 
-	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User>  {
+  	// Modifie le user authentifie
+	async updateUser(userId: number, updateUserDto: UpdateUserDto)  {
 		try {
-			const userExists = await this.prisma.user.findFirst({
-				where: {
-					email: updateUserDto.email,
-					AND: {
-						id: {
-							not: id
-						}
-					}
-				}
-			})
-			if (userExists)
-				throw new ConflictException();
-			else if (updateUserDto.email.endsWith("@student.42.fr"))
-				throw new ForbiddenException("42 emails are forbidden");
-			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined;
+			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : null
 
 			const userNewDatas = hash ? {
 				...updateUserDto,
 				hash: hash
 			} : updateUserDto
 
-	
-		const updateUser = await this.prisma.user.update({
+			// Modifie le user auth
+			await this.prisma.user.update({
 				where: {
-					id: id
+					id: userId
 				},
 				data: {
 					...userNewDatas
 				}
-			});
-			return updateUser;
+			})
+
+			console.log(`User ${userId} has been updated`)
 		}
 		catch (error) {
-			throw error
+			if (error instanceof ForbiddenException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
 		}
 	}
 
@@ -143,23 +150,33 @@ export class UsersService {
 	/*********************** TwoFA settings ******************************************/
 
 	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
-		const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
-		if (!getUser)
-			throw new NotFoundException('User not found');
-		if (getUser.twoFA)
-			throw new BadRequestException('2FA already enabled');
+		try {
+			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
+			if (!getUser)
+				throw new NotFoundException('User not found');
+			if (getUser.twoFA)
+				throw new ConflictException('2FA already enabled');
 
-		const isCodeValid = authenticator.verify({
-			token: twoFACode,
-			secret: getUser.twoFASecret,
-		});
-		if (!isCodeValid)
-			throw new UnauthorizedException('Wrong authentication code');
-		const setUser = await this.prisma.user.update({
-			where: { id: user.id, },
-			data: { twoFA: true, },
-		});
-		return setUser;
+			const isCodeValid = authenticator.verify({
+				token: twoFACode,
+				secret: getUser.twoFASecret,
+			});
+			if (!isCodeValid)
+				throw new ForbiddenException('Wrong authentication code');
+			const setUser = await this.prisma.user.update({
+				where: { id: user.id, },
+				data: { twoFA: true, },
+			});
+			return setUser;
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	async setTwoFASecret(secret: string, userId: number): Promise<void> {
@@ -169,11 +186,11 @@ export class UsersService {
 			data: { twoFASecret: secret },
 		});
 		if (!user)
-			throw new NotFoundException(`User with ${userId} does not exist.`);
+			throw new NotFoundException("User not found");
 		} catch (error) { throw error; }
 	}
 
-	async disableTwoFA(user: User, code: string): Promise<boolean> {
+	async disableTwoFA(user: User, code: string) {
 		try {
 			const otpCode = await this.prisma.user.findUnique({
 				where: { id: user.id, twoFASecret:  code }
@@ -185,7 +202,15 @@ export class UsersService {
 				data: { twoFA: false },
 			});
 			return setUser.twoFA;
-		} catch (error) { throw error; }
+		}
+		catch (error) { // a check
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	/*********************** Channels ******************************************/
