@@ -19,19 +19,3 @@ export class Api42AuthGuard extends AuthGuard('42') {
 		return activate; 
 	}
 }
-
-// @Injectable()
-// export class TwoFAGuard implements CanActivate {
-//   canActivate(
-//     context: ExecutionContext,
-//   ): boolean | Promise<boolean> | Observable<boolean> {
-//     let user: any;
-//    if (context.getType<ContextType | 'graphql'>() === 'graphql') {
-//      user = GqlExecutionContext.create(context).getContext().req.user;
-//    } else {
-//       user = context.switchToHttp().getRequest().user;
-//    }
-//     if (!user) throw new UnauthorizedException();
-//     return true;
-//   }
-// }
