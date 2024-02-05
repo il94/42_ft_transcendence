@@ -1,10 +1,11 @@
 import { ConflictException, Search } from "@nestjs/common";
 import {WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket} from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { PongService } from "./pong.service";
 
 @WebSocketGateway()
 export class PongGateway {
-
+	constructor(private readonly pongService: PongService) {}
 	private searchingUsers: Map<string, Socket> = new Map();
 
 	@WebSocketServer()
@@ -21,18 +22,20 @@ export class PongGateway {
 	*/
 
 	@SubscribeMessage('searchGame')
-	addSearchingPlayer(client: Socket, data: any) {
+	async addSearchingPlayer(client: Socket, data: any) {
 		try {
 			if (this.searchingUsers.get(data[0]))
 				throw new ConflictException('User already in game')
 			this.searchingUsers[data[0]] = client;
-			let keysIterator  = this.searchingUsers.keys()
-			let keysArray = Array.from(keysIterator);
-			let firstkeys = keysArray[0]
-			let secondkeys = keysArray[1]
+			
 			if (this.searchingUsers.size >= 2)
 			{
-				
+				let keysIterator  = this.searchingUsers.keys()
+				let keysArray = Array.from(keysIterator);
+				let firstKeys = keysArray[0]
+				let secondKeys = keysArray[1]
+
+				const newGame = await this.pongService.createGame(parseInt(firstKeys), parseInt(secondKeys));
 				this.searchingUsers[this.searchingUsers.get[keysArray[0]]].emit("launchGame", keysArray[1])
 				this.searchingUsers[this.searchingUsers.get[keysArray[1]]].emit("launchGame", keysArray[0])
 			}
