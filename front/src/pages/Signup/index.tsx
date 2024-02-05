@@ -287,8 +287,7 @@ function Signup() {
 							}
 							<Button
 								onClick={() => setShowPassword(!showPassword)}
-								type="button"
-								fontSize={18}
+								type="button" fontSize={"18px"}
 								alt="Show password button"
 								title={showPassword ? "Hide password" : "Show password"}
 								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
@@ -303,7 +302,7 @@ function Signup() {
 					</VerticalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
-						type="submit" fontSize={35}
+						type="submit" fontSize={"35px"}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>

@@ -119,7 +119,7 @@ function Home() {
 						<>
 							<Button
 								onClick={() => navigate("/game")}
-								fontSize={35}
+								fontSize={"35px"}
 								alt="Game button" title="Game"
 								ref={gameButtonRef}>
 								Game !

@@ -127,6 +127,16 @@ function PongWrapper({social}: any) {
 		}
 	})
 
+	const [loaderSize, setLoaderSize] = useState<number>(0)
+
+	useEffect(() => {
+
+		const PongWrapperContainer = wrapperRef.current
+		if (PongWrapperContainer)
+			setLoaderSize(PongWrapperContainer.getBoundingClientRect().width * 30 / 100)
+
+	}, [window.innerWidth, window.innerHeight, social])
+
 	return (
 		<Style ref={wrapperRef}>
 			{
@@ -134,7 +144,9 @@ function PongWrapper({social}: any) {
         	<DisconnectTextStyle>
           		{DisconnectText}
        		 </DisconnectTextStyle>
-      		) : (
+      		)
+			:
+			(
 			<>
 			{
 				!gameState ?
@@ -143,22 +155,20 @@ function PongWrapper({social}: any) {
 						!searching ?
 						<Button
 							onClick={handlePlayButton}
-							type="button"
-							width={500}
-							fontSize={75}
-							alt="" title="" >
+							type="button" fontSize={"5.5vw"}
+							alt="" title=""
+							style={{width: "35%"}}>
 							Play !
 						</Button>
 						:
 						<>
-							<Loader size={300} />
-							<div style={{ height: "50px"}} />
+							<Loader size={loaderSize} />
+							<div style={{ height: "8%"}} />
 							<Button
 								onClick={handlePlayButton}
-								type="button"
-								width={250}
-								fontSize={37.5}
-								alt="" title="" >
+								type="button" fontSize={"2.25vw"}
+								alt="" title=""
+								style={{width: "17.5%"}}>
 								Cancel
 							</Button>
 						</>

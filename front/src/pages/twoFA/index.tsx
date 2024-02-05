@@ -194,7 +194,7 @@ function TwoFA() {
 					</VerticalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
-						type="submit" fontSize={35}
+						type="submit" fontSize={"35px"}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
