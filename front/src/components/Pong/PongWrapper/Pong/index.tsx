@@ -30,7 +30,7 @@ border-color: white;
 border-style: solid;
 border-radius: 0.03ch; */
 
-/* clip-path: ${effects.pixelateWindow}; */
+clip-path: ${effects.pixelateWindow};
 
 /* border: 15px solid #ecb54e; */
 
