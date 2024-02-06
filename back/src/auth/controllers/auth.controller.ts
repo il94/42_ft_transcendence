@@ -18,6 +18,11 @@ export class AuthController {
 
 	/*********************** Auth form routes *******************************/
 
+	// Verifie si le token fourni est valide
+	@Post('token')
+	@UseGuards(JwtGuard)
+	async verifyJwt() {}
+
 	// Cree un user et renvoie un token d'authentification
 	@Post('signup')
 	async signup(@Body() userDatas: CreateUserDto): Promise<{ access_token: string }> {
