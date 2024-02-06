@@ -6,7 +6,16 @@ const colors = {
 	module: "#85522C",
 
 	/* Pong */
-	pongBackground: "#fcc154",
+	pongBackground: "#ca9a40",
+	pongBackgroundWin: "#4097ca",
+	pongBackgroundDraw: "#ca9a40",
+	pongBackgroundLoose: "#ca6740",
+
+
+	pongWrapperBackground: "#fcc154",
+	pongWrapperBackgroundWin: "#54b9fc", 
+	pongWrapperBackgroundDraw: "#fcc154",
+	pongWrapperBackgroundLoose: "#fc7654",
 
 	/* Sections */
 	section: "#AA6736",

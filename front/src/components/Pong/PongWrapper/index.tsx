@@ -15,7 +15,7 @@ import Loader from "../../../componentsLibrary/Loader"
 import PongPopupError from "./PongPopupError"
 // import colors from "../../utils/colors"
 
-const Style = styled.div`
+const Style = styled.div<{ backgroundColor: string }>`
 
     position: relative;
 
@@ -31,7 +31,9 @@ const Style = styled.div`
 	justify-content: space-evenly;
 
 
-    background-color: ${colors.pongBackground};
+    background-color: ${(props) => props.backgroundColor};
+	transition: background-color 1s ease;
+
 `
 
 // const PlayButtonStyle = styled.div`
@@ -92,7 +94,8 @@ function PongWrapper({social}: any) {
 	const [searching, setSearching] = useState<boolean>(false)
 
 	const [gameState, setGameState] = useState<boolean>(false)
-
+	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
+	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongWrapperBackground)
 	const [pongPopupError, displayPongPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
 
 	const [Enemy, setEnemy] = useState<User>()
@@ -108,6 +111,7 @@ function PongWrapper({social}: any) {
 		setGameState(false)
 		console.log("i get the discoonect emit")
 		displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
+		setBackgroundColor(colors.pongBackground)
 	}
 
 	useEffect(() => {
@@ -133,8 +137,22 @@ function PongWrapper({social}: any) {
 
 	}, [window.innerWidth, window.innerHeight, social])
 
+	useEffect(() => {
+		if (!gameState)
+			setBackgroundColor(colors.pongWrapperBackground)
+		else
+		{
+			if (score.left > score.right)
+				setBackgroundColor(colors.pongWrapperBackgroundWin)
+			else if (score.left < score.right)
+				setBackgroundColor(colors.pongWrapperBackgroundLoose)
+			else
+				setBackgroundColor(colors.pongWrapperBackgroundDraw)
+		}
+	}, [score])
+
 	return (
-		<Style ref={wrapperRef}>
+		<Style backgroundColor={backgroundColor} ref={wrapperRef}>
 			{
 			pongPopupError.display ? (
 				<PongPopupError
@@ -172,7 +190,8 @@ function PongWrapper({social}: any) {
 				</>
 				:
 
-				<Pong social={social} enemy={Enemy}/>
+				<Pong score={score} setScore={setScore}
+						social={social} enemy={Enemy}/>
 				}
 			</>
 			)
