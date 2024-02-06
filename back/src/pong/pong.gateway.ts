@@ -11,13 +11,14 @@ import { subscribe } from "diagnostics_channel";
 
 import { UsersService } from "src/auth/services/users.service";
 import { disconnect } from "process";
+import { UserStatus } from "@prisma/client";
 
 @WebSocketGateway()
 export class PongGateway {
 	
 	@WebSocketServer()
 	server: Server;
-	
+	 
 	private searchingUsers: Map<number, Socket> = new Map();
 
 	constructor(private  PongService: PongService,
@@ -50,14 +51,16 @@ export class PongGateway {
 			game.setState(false)
 			// const index = this.PongService.activeGames.indexOf(game)
 			// this.PongService.activeGames.splice(index, 1)
+			// soso Patch Game
 		}
 	}
 	
 	@SubscribeMessage('searchGame')
-	addSearchingPlayer(client: Socket, data: any) {
+	async addSearchingPlayer(client: Socket, data: any) {
 		try {			
 			if (this.searchingUsers.get(data)){
 				this.searchingUsers.delete(data)
+				await this.PongService.updateStatusUser(data, UserStatus.ONLINE)
 				console.log("is now out of search")
 				return
 				// throw new ConflictException('User already in game')
@@ -65,7 +68,7 @@ export class PongGateway {
 
 			this.searchingUsers.set(data, client)
 			console.log("is now in search")
-
+			await this.PongService.updateStatusUser(data, UserStatus.WAITING)
 			let keysIterator  = this.searchingUsers.keys()
 			let keysArray = Array.from(keysIterator);
 			let firstkey = keysArray[0]
@@ -84,7 +87,9 @@ export class PongGateway {
 
 				this.server.to(firstsocket.id).emit("launchGame", user2)
 				this.server.to(secondsocket.id).emit("launchGame", user1)
-			
+				// POST la game et gerer le status des joueurs et recupere l'id newgame
+				const newgame = await this.PongService.createGame(firstkey, secondkey);
+
 				this.PongService.activeGames.push(new PongGame(firstsocket, secondsocket))
 
 				for (let [key, value] of this.searchingUsers.entries()) {
@@ -130,6 +135,7 @@ export class PongGateway {
 				if (index != -1)
 					this.PongService.activeGames.splice(index, 1)
 				console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
+				// soso Patch Game finish et les score
 				//route base de donner le winner
 			}
 		}, 30)

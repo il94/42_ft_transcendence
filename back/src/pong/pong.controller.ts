@@ -3,13 +3,27 @@ import { CreatePongDto} from './pong.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PongService } from './pong.service';
 import { getUser } from '../auth/decorators/users.decorator';
-import { User, challengeStatus, messageStatus } from '@prisma/client';
+import { User, challengeStatus, messageStatus, Game } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
 @UseGuards(JwtGuard)
 @Controller('pong')
 export class PongController {
-    // constructor(private readonly pongService: PongService) {}
+
+    constructor(private readonly pongService: PongService) {}
+
+    @Post(':id')
+    create(
+        @Param('id', ParseIntPipe) userTwoId: number,
+        @getUser('id') userOneId: number
+        ): Promise<number> {
+        return this.pongService.createGame(userOneId, userTwoId)
+    }
+
+
+
+
+    
 
     // // create a game : boutton start a match
     // @Post()
