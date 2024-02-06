@@ -185,8 +185,8 @@ model UsersOnGames {
   userId    Int
   game      Game  @relation(fields: [gameId], references: [id])
   gameId    Int
-  score     Int
-  result    MatchResult    
+  score     Int @default(0)
+  result    MatchResult   
   role      roleInGame
 
   @@id([userId, gameId])
