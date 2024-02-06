@@ -10,6 +10,7 @@ import { UsersService } from "src/auth/services/users.service";
 
 import { disconnect } from "process";
 import { GameStatus, MatchResult, UserStatus } from "@prisma/client";
+import { subscribe } from "diagnostics_channel";
 
 
 @WebSocketGateway()
@@ -19,6 +20,7 @@ export class PongGateway {
 	server: Server;
 	 
 	private searchingUsers: Map<number, Socket> = new Map();
+	// private watchingUsers: Map<number, Socket> = new Map(); // a teg
 
 	constructor(private  PongService: PongService,
 				private UserService: UsersService) {}
@@ -84,9 +86,11 @@ export class PongGateway {
 				this.server.to(secondsocket.id).emit("launchGame", user1)
 				// POST la game et gerer le status des joueurs et recupere l'id newgame
 				const newgame = await this.PongService.createGame(firstkey, secondkey);
-
 			
-				this.PongService.activeGames.push(new PongGame(newgame, firstsocket, firstkey, secondsocket, secondkey))
+				console.log("user1.usernme", (await user1).username)
+				console.log("user2.usernme", (await user2).username)
+
+				this.PongService.activeGames.push(new PongGame(newgame, firstsocket, firstkey,  (await user2).username, secondsocket, secondkey, (await user2).username))
 				for (let [key, value] of this.searchingUsers.entries()) {
 					if (value === firstsocket || value === secondsocket) {
 						this.searchingUsers.delete(key);
@@ -113,6 +117,13 @@ export class PongGateway {
 
 			this.server.to(host.id).emit("pongInfo", ball, game.LeftPlayer.getPos(), game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
 			this.server.to(guest.id).emit("pongInfo", reverseball, game.RightPlayer.getPos(), game.LeftPlayer.getPos(), game.RightPlayer.getScore(), game.LeftPlayer.getScore())
+			//watcher from prisma or 
+			// for (let [key, value] of this.watchingUsers.entries()) {
+			// 	this.server.to(value.id).emit("pongInfo", ball, game.LeftPlayer.getPos(), game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
+			// }
+			game.watcher.forEach((e) =>{
+				this.server.to(e.id).emit("pongInfo", ball, game.LeftPlayer.getPos(), game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
+			})
 			game.checkScore()
 			if (game.getState())
 				this.gameLoop(host, guest, game)
@@ -135,6 +146,7 @@ export class PongGateway {
 		}, 30)
 
 	}
+
 	@SubscribeMessage("getPongInfo") 
 		handleBallInfo(client: Socket){
 			let game: PongGame;
@@ -169,17 +181,34 @@ export class PongGateway {
 				args === "up" ? player.moveUp() : player.moveDown()
 			}
 		}
+
+		@SubscribeMessage("spectate")
+			handleSpectate(client: Socket, data: any)
+			{
+				let game: PongGame
+				console.log("data[0]", data[0])
+				console.log("data[1]", data[1])
+				console.log("data", data)
+				this.PongService.activeGames.forEach((element) => {
+					if (element.isMyPlayerById(data[1])){
+						game = element;
+					}
+				});
+				if(game)
+				{
+					const tmp = client
+					game.addWatcher(tmp)
+					this.server.to(client.id).emit("spectate")
+				}
+				// this.watchingUsers.set(data[0], client)
+			}
 }
 
 // need : 
 
-	// spectate mode
-
-	// winner and looser screen at end
+	// winner and looser screen at end need style
 
 	// cooldown at start ?
-
-	// bouton spectate
 
 	// route : create game, finish game, add a spectator ?  
 
@@ -190,3 +219,5 @@ export class PongGateway {
 	// game freeze --> a cause de modif du code ou qunad je regarde pas les pages pendant un certatin temps (je  crois)
 
 	// les possible element du pongWrapper peuvent se voir si on retrecie bcp le pong
+
+	// le inspect de la page clc

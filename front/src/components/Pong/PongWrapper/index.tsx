@@ -94,6 +94,7 @@ function PongWrapper({social}: any) {
 	const [searching, setSearching] = useState<boolean>(false)
 
 	const [gameState, setGameState] = useState<boolean>(false)
+	const [spectate, setSpectate] = useState<boolean>(false)
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
 	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongWrapperBackground)
 	const [pongPopupError, displayPongPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
@@ -114,8 +115,14 @@ function PongWrapper({social}: any) {
 		setBackgroundColor(colors.pongBackground)
 	}
 
+	function handleSpectate(){
+		setSpectate(true)
+		setGameState(true)
+	}
+
 	useEffect(() => {
 		userAuthenticate.socket?.on("decoInGame", handleDisconnect)
+		userAuthenticate.socket?.on("spectate", handleSpectate)
 		userAuthenticate.socket?.on("launchGame", (user: User) => {
 			setEnemy(user)
 			setSearching(false)
@@ -142,12 +149,15 @@ function PongWrapper({social}: any) {
 			setBackgroundColor(colors.pongWrapperBackground)
 		else
 		{
-			if (score.left > score.right)
-				setBackgroundColor(colors.pongWrapperBackgroundWin)
-			else if (score.left < score.right)
-				setBackgroundColor(colors.pongWrapperBackgroundLoose)
-			else
-				setBackgroundColor(colors.pongWrapperBackgroundDraw)
+			if (!spectate)
+			{
+				if (score.left > score.right)
+					setBackgroundColor(colors.pongWrapperBackgroundWin)
+				else if (score.left < score.right)
+					setBackgroundColor(colors.pongWrapperBackgroundLoose)
+				else
+					setBackgroundColor(colors.pongWrapperBackgroundDraw)
+			}
 		}
 	}, [score])
 
@@ -190,7 +200,7 @@ function PongWrapper({social}: any) {
 				</>
 				:
 
-				<Pong score={score} setScore={setScore}
+				<Pong score={score} setScore={setScore} spectate={spectate}
 						social={social} enemy={Enemy}/>
 				}
 			</>

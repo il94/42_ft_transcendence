@@ -185,6 +185,18 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}
 
+	/* ========================== CHALLENGE SECTION ============================= */
+
+	async function handleSpectateEvent() {
+		try {
+			userAuthenticate.socket?.emit("spectate", userAuthenticate.id, userTarget.id)
+		}
+		catch (error) {
+			console.log(error);
+			// displayPopupError(true)
+		}
+	}
+
 	/* ============================ FRIEND SECTION ============================== */
 
 	async function handleManageFriendClickEvent() {
@@ -450,7 +462,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				}
 				{
 					userTarget.status === userStatus.PLAYING &&
-					<Section onClick={handleContactClickEvent}>
+					<Section onClick={handleSpectateEvent}>
 						<SectionName>
 							Spectate
 						</SectionName>
