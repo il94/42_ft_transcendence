@@ -15,8 +15,6 @@ import { AppGateway } from 'src/app.gateway';
 export class PongService {
 
 	public activeGames: PongGame[] = [];
-  constructor(private prisma: PrismaService) {}
-
 
 	constructor
 	(
@@ -41,11 +39,11 @@ export class PongService {
 				status: GameStatus.PENDING,
 				players: {
 					create: [{ 
-						podium: 'DRAW',
+						result: 'DRAW',
 						role: roleInGame.PLAYER,
 						userId: userOneId},
 						{ 
-						  podium: 'DRAW',
+						  result: 'DRAW',
 						  role: roleInGame.PLAYER,
 						  userId: userTwoId}
 					  
@@ -83,7 +81,7 @@ export class PongService {
 	  }
 		
 
-	  async updateUserGameStats(userId: number, gameId: number, score: number, podium: MatchResult) {
+	  async updateUserGameStats(userId: number, gameId: number, score: number, result: MatchResult) {
 		try {
 		// check si game exist
 		// check si le user existe dans le server
@@ -97,7 +95,7 @@ export class PongService {
 			},
 			data: {
 			  score: score,
-			  podium: podium
+			  result: result
 			} as Prisma.UsersOnGamesUpdateInput
 		  });
 		  console.log(`User ${userId} game stats updated successfully.`);
@@ -117,7 +115,7 @@ export class PongService {
 // 					where: { id: gameId },
 // 					data: {
 // 						players: {
-// 							create: [{ role: userRole, podium: 'DRAW', userId: userId }],
+// 							create: [{ role: userRole, result: 'DRAW', userId: userId }],
 // 							connect: { userId_gameId: {
 // 								userId: userId,
 // 								gameId: gameId
