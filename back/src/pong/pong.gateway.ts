@@ -9,7 +9,7 @@ import { PongGame, Player, Ball } from "./game";
 import { UsersService } from "src/auth/services/users.service";
 
 import { disconnect } from "process";
-import { UserStatus } from "@prisma/client";
+import { GameStatus, MatchResult, UserStatus } from "@prisma/client";
 
 
 @WebSocketGateway()
@@ -39,9 +39,10 @@ export class PongGateway {
 		if (game)
 		{
 			// console.log("gonna delete game because of disconnect")
-			const enemy = game.LeftPlayer.getSocket() === client ? game.RightPlayer.getSocket() : game.LeftPlayer.getSocket() 
+			const enemy = game.LeftPlayer.getSocket() === client ? game.RightPlayer : game.LeftPlayer 
 			// this.server.to(client.id).emit("decoInGame", "you")
-			this.server.to(enemy.id).emit("decoInGame")
+			this.server.to(enemy.getSocket().id).emit("decoInGame")
+			enemy.setWinner()
 			game.setState(false)
 			// const index = this.PongService.activeGames.indexOf(game)
 			// this.PongService.activeGames.splice(index, 1)
@@ -85,7 +86,7 @@ export class PongGateway {
 				const newgame = await this.PongService.createGame(firstkey, secondkey);
 
 			
-				this.PongService.activeGames.push(new PongGame(firstsocket, firstkey, secondsocket, secondkey))
+				this.PongService.activeGames.push(new PongGame(newgame, firstsocket, firstkey, secondsocket, secondkey))
 				for (let [key, value] of this.searchingUsers.entries()) {
 					if (value === firstsocket || value === secondsocket) {
 						this.searchingUsers.delete(key);
@@ -117,11 +118,16 @@ export class PongGateway {
 				this.gameLoop(host, guest, game)
 			else
 			{
-				const winner = game.getTheWinner() // return PLayer instance (need socket id ? name ?)
+				game.SetTheWinner()
+				const winner = game.LeftPlayer.winner ? game.LeftPlayer : game.RightPlayer // return PLayer instance (need socket id ? name ?)
+				const looser = game.LeftPlayer.winner ? game.RightPlayer : game.LeftPlayer
+				this.PongService.updateUserGameStats(winner.id, game.id, winner.getScore(), MatchResult.WINNER)
+				this.PongService.updateUserGameStats(looser.id, game.id, looser.getScore(), MatchResult.LOOSER)
 				const index = this.PongService.activeGames.indexOf(game)
 				if (index != -1)
 					this.PongService.activeGames.splice(index, 1)
 				console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
+				this.PongService.updateGameStatus(game.id, GameStatus.FINISHED)
 				// soso Patch Game finish et les score
 				//route base de donner le winner
 

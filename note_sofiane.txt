@@ -1,0 +1,3 @@
+mettre jwt token sur les gateway @submessage
+
+quand user et en playing quil ne puissent pas spectate

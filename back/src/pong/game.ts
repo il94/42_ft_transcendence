@@ -6,6 +6,7 @@ export class Player {
 
 	private socket: Socket;
 	public id: number;
+	public winner: boolean;
 
 	private Pos: {top: number, bottom: number}
 	private score: number
@@ -13,9 +14,10 @@ export class Player {
 	constructor(socket: Socket, Id:number)
 	{
 		this.socket = socket;
+		this.winner = false;
 		this.id = Id;
 		this.Pos = {top : 486, bottom: 594} // middle 540 == 50% de 1080
-		this.score = 0 
+		this.score = 0
 	}
 
 
@@ -33,6 +35,10 @@ export class Player {
 			this.Pos.top += 1080/100
 			this.Pos.bottom += 1080/100
 		}
+	}
+
+	setWinner(){
+		this.winner = true
 	}
 
 	getPos(){
@@ -115,6 +121,7 @@ export class Ball {
 export class PongGame {
 
 	private Players: Socket[]
+	public	id: number
 
 	private state: boolean
 
@@ -130,8 +137,9 @@ export class PongGame {
 	public paddleMargin: number
 
 
-	constructor(host: Socket, hostId:number,  guest: Socket, guestId: number) {
+	constructor(Id: number, host: Socket, hostId:number,  guest: Socket, guestId: number) {
 
+		this.id = Id;
 		this.state = true
 
 		this.LeftPlayer = new Player(host, hostId)
@@ -216,12 +224,11 @@ export class PongGame {
 			this.setState(false)
 	}
 
-	getTheWinner(){ // victory
+	SetTheWinner(){ // victory
 		if (this.LeftPlayer.getScore() === 11)
-			return this.LeftPlayer
+			this.LeftPlayer.setWinner()
 		if (this.RightPlayer.getScore() === 11)
-			return this.RightPlayer
-		return null
+			this.RightPlayer.setWinner()
 	}
 
 	moveBall(){
