@@ -15,7 +15,7 @@ import Loader from "../../../componentsLibrary/Loader"
 import PongPopupError from "./PongPopupError"
 // import colors from "../../utils/colors"
 
-const Style = styled.div<{ backgroundColor: string }>`
+const Style = styled.div<{ $backgroundColor: string }>`
 
     position: relative;
 
@@ -31,7 +31,7 @@ const Style = styled.div<{ backgroundColor: string }>`
 	justify-content: space-evenly;
 
 
-    background-color: ${(props) => props.backgroundColor};
+    background-color: ${(props) => props.$backgroundColor};
 	transition: background-color 1s ease;
 
 `
@@ -152,7 +152,7 @@ function PongWrapper({social}: any) {
 	}, [score])
 
 	return (
-		<Style backgroundColor={backgroundColor} ref={wrapperRef}>
+		<Style $backgroundColor={backgroundColor} ref={wrapperRef}>
 			{
 			pongPopupError.display ? (
 				<PongPopupError

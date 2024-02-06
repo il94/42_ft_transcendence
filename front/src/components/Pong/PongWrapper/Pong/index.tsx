@@ -10,7 +10,7 @@ import effects from '../../../../utils/effects'
 import colors from '../../../../utils/colors'
 
 
-const Style = styled.div<{ backgroundColor: string }>`
+const Style = styled.div<{ $backgroundColor: string }>`
 
 position: absolute;
 
@@ -35,7 +35,7 @@ clip-path: ${effects.pixelateWindow};
 
 /* border: 15px solid #ecb54e; */
 
-background-color: ${(props) => props.backgroundColor};
+background-color: ${(props) => props.$backgroundColor};
 transition: background-color 1s ease;
 `;
 
@@ -185,7 +185,7 @@ function Pong({score, setScore, social, enemy}: PongProps){
 
 
 	return (
-		<Style backgroundColor={backgroundColor} ref={PongRef}>
+		<Style $backgroundColor={backgroundColor} ref={PongRef}>
 			{
 					PongRef.current ? (
 					<>
