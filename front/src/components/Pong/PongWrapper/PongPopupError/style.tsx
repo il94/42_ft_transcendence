@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
-import colors from "../../utils/colors"
-import effects from "../../utils/effects"
+import colors from "../../../../utils/colors"
+import effects from "../../../../utils/effects"
 
 export const Style = styled.div`
 
@@ -10,18 +10,13 @@ export const Style = styled.div`
 	justify-content: center;
 	align-items: center;
 
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	z-index: 9999;
-	transform: translate(-50%, -50%);
+	position: relative;
 
 	width: 325.5px;
 	min-height: 55px;
 	clip-path: ${effects.pixelateWindow};
 
-	padding-top: 5px;
-	padding-bottom: 5px;
+	margin: auto;
 
 	text-align: center;
 

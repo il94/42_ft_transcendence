@@ -12,6 +12,7 @@ import { User } from "../../../utils/types"
 import colors from "../../../utils/colors"
 import Button from "../../../componentsLibrary/Button"
 import Loader from "../../../componentsLibrary/Loader"
+import PongPopupError from "./PongPopupError"
 // import colors from "../../utils/colors"
 
 const Style = styled.div`
@@ -92,7 +93,7 @@ function PongWrapper({social}: any) {
 
 	const [gameState, setGameState] = useState<boolean>(false)
 
-	const [DisconnectText, setDisconnectText] = useState<string | null>(null)
+	const [pongPopupError, displayPongPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
 
 	const [Enemy, setEnemy] = useState<User>()
 
@@ -104,14 +105,9 @@ function PongWrapper({social}: any) {
 	}
 
 	function handleDisconnect(){
-		
 		setGameState(false)
 		console.log("i get the discoonect emit")
-
-		setDisconnectText("Your enemy has Disconnect")
-		setTimeout(() => {
-			setDisconnectText(null)
-		}, 3000)
+		displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
 	}
 
 	useEffect(() => {
@@ -140,11 +136,11 @@ function PongWrapper({social}: any) {
 	return (
 		<Style ref={wrapperRef}>
 			{
-			DisconnectText ? (
-        	<DisconnectTextStyle>
-          		{DisconnectText}
-       		 </DisconnectTextStyle>
-      		)
+			pongPopupError.display ? (
+				<PongPopupError
+					displayPongPopupError={displayPongPopupError}
+					message={pongPopupError.message}/>
+				)
 			:
 			(
 			<>

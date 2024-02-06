@@ -1,5 +1,6 @@
 import {
-	useContext,
+	Dispatch,
+	SetStateAction,
 	useEffect,
 	useState
 } from "react"
@@ -10,22 +11,20 @@ import {
 	Style
 } from "./style"
 
-import Icon from "../../componentsLibrary/Icon"
-import ActiveText from "../../componentsLibrary/ActiveText/Index"
+import Icon from "../../../../componentsLibrary/Icon"
+import ActiveText from "../../../../componentsLibrary/ActiveText/Index"
 
-import DisplayContext from "../../contexts/DisplayContext"
 
-import colors from "../../utils/colors"
+import colors from "../../../../utils/colors"
 
-import CloseIcon from "../../assets/close.png"
+import CloseIcon from "../../../../assets/close.png"
 
-type PropsPopupError = {
+type PropsPongPopupError = {
+	displayPongPopupError: Dispatch<SetStateAction<{ display: boolean, message?: string }>>,
 	message?: string
 }
 
-function PopupError({ message } : PropsPopupError) {
-
-	const { displayPopupError } = useContext(DisplayContext)!
+function PongPopupError({ displayPongPopupError, message } : PropsPongPopupError) {
 
 	const [timer, setTimer] = useState<number>(0)
 
@@ -41,7 +40,7 @@ function PopupError({ message } : PropsPopupError) {
 
 	useEffect(() => {
 		if (timer >= 5) {
-			displayPopupError({ display: false, message: undefined })
+			displayPongPopupError({ display: false, message: undefined })
 		}
 	}, [timer])
 
@@ -52,7 +51,7 @@ function PopupError({ message } : PropsPopupError) {
 	return (
 		<Style>
 			<CloseButton>
-				<Icon onClick={() => displayPopupError({ display: false, message: undefined })}
+				<Icon onClick={() => displayPongPopupError({ display: false, message: undefined })}
 					src={CloseIcon} size={22}
 					alt="Close button" title="Close" />
 			</CloseButton>
@@ -79,4 +78,4 @@ function PopupError({ message } : PropsPopupError) {
 	)
 }
 
-export default PopupError
+export default PongPopupError
