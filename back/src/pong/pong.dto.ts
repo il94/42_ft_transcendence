@@ -18,4 +18,4 @@ export class CreatePongDto implements Game {
   
 	players:    UsersOnGames[];
 	
-}
+  }

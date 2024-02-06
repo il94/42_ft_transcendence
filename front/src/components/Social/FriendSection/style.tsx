@@ -1,8 +1,11 @@
-import { RefObject } from "react"
+import {
+	RefObject
+} from "react"
 import styled from "styled-components"
+
 import colors from "../../../utils/colors"
 
-export const Style = styled.div<{ $backgroundColor: string, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
+export const Style = styled.div<{ $id: number, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
 
 	display: flex;
 	justify-content: center;
@@ -13,15 +16,20 @@ export const Style = styled.div<{ $backgroundColor: string, $isBlocked: boolean,
 	width: 100%;
 	min-width: 100%;
 	height: 53px;
-	min-height: 53px;
+	min-height: 53px;		
+
+	cursor: pointer;
 
 	opacity: ${(props) => props.$isBlocked && 0.5};
 
-	background-color: ${(props) => props.$backgroundColor};
+	background-color: ${(props) => props.$id % 2 === 0 ? colors.section : colors.sectionAlt};
 
 	&:hover {
-		cursor: pointer;
-		background-color: ${colors.sectionHover};
+		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+	}
+	&:focus-visible {
+		outline: none;	
+		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
 
 `
@@ -59,7 +67,6 @@ export const ProfileName = styled.p`
 	font-size: 13px;
 
 	color: inherit;
-
 
 `
 

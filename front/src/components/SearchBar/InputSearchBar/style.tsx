@@ -1,4 +1,5 @@
 import styled from "styled-components"
+
 import effects from "../../../utils/effects"
 import colors from "../../../utils/colors"
 
@@ -31,6 +32,7 @@ export const InputText = styled.input`
 	}
 
 `
+
 export const ArrowButton = styled.button`
 	
 	display: flex;
@@ -39,7 +41,15 @@ export const ArrowButton = styled.button`
 
 	width: 36px;
 	
-	background-color: ${colors.sectionAlt};
+	background-color: ${colors.buttonFix};
+
+	&:hover {
+		background-color: ${colors.buttonFixHover};
+	}
+	&:focus-visible {
+		outline: none;
+		background-color: ${colors.buttonFixFocus};
+	}
 
 `
 

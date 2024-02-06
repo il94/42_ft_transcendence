@@ -25,6 +25,10 @@ export const LogoFull = styled.p`
 	&:hover {
 		transform: scale(1.015);
 	}
+	&:focus-visible {
+		outline: none;	
+		color: ${colors.focusText};
+	}
 
 `
 
@@ -38,6 +42,9 @@ export const LogoReduced = styled.img`
 	&:hover {
 		width: 72.5%;
 		height: 72.5%;
+	}
+	&:focus-visible {
+		outline: none;	
 	}
 
 `

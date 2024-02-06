@@ -14,7 +14,7 @@ export enum challengeStatus {
 	FINISHED = "FINISHED"
 }
 
-export enum channelStatus {
+export enum ChannelType {
 	PUBLIC = "PUBLIC",
 	PROTECTED = "PROTECTED",
 	PRIVATE = "PRIVATE",
@@ -37,7 +37,7 @@ export enum chatWindowStatus {
 	UPDATE_CHANNEL
 }
 
-export enum messageStatus {
+export enum messageType {
 	TEXT = "TEXT",
 	INVITATION = "INVITATION"
 }
@@ -51,4 +51,9 @@ export enum matchResultStatus {
 export enum contextualMenuStatus {
 	SOCIAL,
 	CHAT
+}
+
+export enum resultSearchBarType {
+	USER = "USER",
+	CHANNEL = "CHANNEL"
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClient, User, Prisma, Role, UserStatus } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -10,6 +10,12 @@ import { authenticator } from "otplib";
 import { generate } from "generate-password";
 import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
+import { Response } from "express";
+import { Socket } from "socket.io";
+
+type SigninResponse = {
+	access_token: string
+} | Partial<User>
 
 @Injectable()
 export class AuthService {
@@ -18,43 +24,75 @@ export class AuthService {
 		private jwt: JwtService, 
 		private userService: UsersService,
 		private appGateway: AppGateway
-		) {}
+	) {}
 
-	async signup(dto: CreateUserDto): Promise<{ access_token: string }>{
+	// Cree un user et renvoie un token d'authentification
+	async signup(userDatas: CreateUserDto): Promise<{ access_token: string }>{
 		try {
-			const newUser = await this.userService.createUser(dto);
-			delete newUser.hash;
-			return this.signToken(newUser.id, newUser.username);
-		} catch (error) {
-            throw new BadRequestException(error.message)
-        }	
+			const newUser = await this.userService.createUser(userDatas)
+			return this.signToken(newUser.id, newUser.username)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof ConflictException)
+				throw error
+			else
+				throw new BadRequestException()
+		}
 	}
 
-	async validateUser(dto: AuthDto): Promise<{ access_token: string } | Partial<User>> {
+	// Verifie le username et le mot de passe
+	// Set le statut du user a connecte
+	// Renvoie un token d'authentification
+	async validateUser(userDatas: AuthDto): Promise<SigninResponse> {
 		try {
+			// Verifie si le user existe
 			const user = await this.prisma.user.findUnique({
-					where: { email: dto.email, },
-				});
+				where: {
+					username: userDatas.username
+				}
+			})
 			if (!user)
-				throw new BadRequestException('user not found');
-			const pwdMatch = await argon.verify(user.hash, dto.hash);
+				throw new NotFoundException("User not found")
+
+			// Verifie si le mot de passe fourni est correct
+			const pwdMatch = await argon.verify(user.hash, userDatas.hash)
 			if (!pwdMatch)
-				throw new ForbiddenException('incorrect password');
+				throw new ForbiddenException("Wrong password")
+
+			// Genere un token d'authentification a partir de l'id et du username
 			const token: { access_token: string } = await this.signToken(user.id, user.username)
-			if(user.twoFA === false) {
+
+			// Si le user n'a pas active le twoFA, connecte le user et renvoie son token
+			if (user.twoFA === false)
+			{
+				// Set le statut du user a connecte
 				await this.prisma.user.update({
-						where: { id: user.id },
-						data: { status: UserStatus.ONLINE }
+					where: {
+						id: user.id
+					},
+					data: {
+						status: UserStatus.ONLINE
+					}
 				})
-				this.appGateway.server.emit("updateUserStatus", user.id, UserStatus.ONLINE);
-				return token;
-			} else
-				return { id: user.id, twoFA: user.twoFA };
-		} catch (error) {
-            throw new BadRequestException(error.message)
-        }
+
+				return token
+			}
+
+			// Si le user a active le twoFA, renvoie les datas necessaires pour le front pour le rediriger vers la page twoFA
+			else
+				return { id: user.id, twoFA: user.twoFA }
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
+	// Genere un token d'authentification
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,
@@ -66,48 +104,122 @@ export class AuthService {
 		return { access_token: token, }
 	}
 
-	async logout(userId: number): Promise<{success: boolean}> {
+	// Set le statut du user a deconnecte
+	async logout(userId: number) {
 		try {
-			const findUser = await this.userService.findUser(userId);
-			if (findUser.status === UserStatus.OFFLINE)
-				throw new BadRequestException(`User already logout`)
-			const user = await this.prisma.user.update({
-				where: { id: userId },
-				data: { status: UserStatus.OFFLINE }
+			// Verifie si le user existe
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId
+				}
 			})
 			if (!user)
-				throw new BadRequestException(`Failed to disconnect User with id ${userId}`)
-			this.appGateway.server.emit("updateUserStatus", userId, UserStatus.OFFLINE);
-			return { success: true };
-		} catch (error) {
-            throw new BadRequestException(error.message)
+				throw new NotFoundException("User not found")
+
+			// Change le statut du user
+			await this.prisma.user.update({
+				where: {
+					id: userId
+				},
+				data: {
+					status: UserStatus.OFFLINE
+				}
+			})
+		}
+		catch (error) {
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+		finally {
+			// Deconnecte le socket du user
+			const socketUser: Socket | undefined = this.appGateway.getSocketByUserId(userId.toString())
+			if (socketUser)
+				socketUser.disconnect()
 		}
 	}
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<User | Partial<User>> {
+	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | Partial<User> | User> {
 		try {
 			const user = await this.prisma.user.findUnique({
-				where: { email: profile.email, },
+				where: { usernameId: profile.usernameId, },
 			});
 			if (user) {
 				if (!user.twoFA) {
 					const logUser = await this.prisma.user.update({ 
-						where: { email: profile.email },
+						where: { usernameId: profile.usernameId },
 						data: { status: UserStatus.ONLINE }})
-					return logUser;
+					return logUser
 				}
 				return { id: user.id, twoFA: user.twoFA };
 			}
 			console.log ("jai pas trouve le user");
-			profile.hash = generate({ length: 6, numbers: true });
-			const newUser = await this.userService.createUser(profile as CreateUserDto)
-			if (!newUser)
-				throw new ForbiddenException('Failed to create new 42 user');
-			return newUser;
+			// profile.hash = generate({ length: 6, numbers: true });
+			// const newUser = await this.userService.createUser(profile as CreateUserDto)
+			// if (!newUser)
+			// 	throw new ForbiddenException('Failed to create new 42 user');
+
+			const partialUser: Partial<User> = {
+				usernameId: profile.usernameId,
+				avatar: profile.avatar,
+			}
+
+			return { usernameId: profile.usernameId, avatar: profile.avatar, isNew: true }
 		} catch (error) {
             throw new BadRequestException(error.message)
+		}
+	}
+
+	// Selon la reponse de l'api 42, connecte le user OU le redirige vers le twoFA OU lui cree un compte
+	async return42Response(user: { usernameId: string, avatar: string, isNew: boolean } | Partial<User>, res: Response ) {
+		try {
+			// Verifie si le user possebe bien un compte 42
+			if (!user)
+				throw new BadRequestException("User not found from 42 intra")
+			
+			// Si le user possede deja un compte dans l'app
+			if ('id' in user)
+			{
+				// Si le user n'a pas active la twoFA
+				if (!user.twoFA)
+				{
+					// Genere un token d'authentification et l'envoie par les cookies
+					const token = await this.signToken(user.id, user.username)
+						res.clearCookie('token', { httpOnly: true })
+						.cookie("access_token", token.access_token)
+						.redirect(`http://${process.env.URL}:5173`)
+				}
+			
+				// Si le user a active la twoFA
+				else
+				{
+					// Redirige vers la page twoFA avec les infos necessaires pour le front
+					res.cookie('two_FA', true)
+					.cookie('userId', user.id)
+					.redirect(`http://${process.env.URL}:5173/twofa`)	
+				}
+			}
+			// Si le user ne possede pas de compte dans l'app
+			else if ('isNew' in user)
+			{
+				// Stocke les donnees necessaires a l'authentification dans des
+				// cookies de 5 mins  et redirige vers la page de creation de compte
+				const fiveMin = Date.now() + 5 * 60 * 1000;
+				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
+				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
+				.redirect(`http://${process.env.URL}:5173/signup42`)
+			}
+		}
+		catch (error) { // a voir si besoin de throw
+			if (error instanceof BadRequestException)
+				throw error
+			else
+				throw new BadRequestException()
 		}
 	}
 
@@ -119,27 +231,61 @@ export class AuthService {
 
 	async generateTwoFASecret(user: User): Promise <{ secret:string, otpAuthURL: string}> {
 		const secret = authenticator.generateSecret();
-		const otpAuthURL = authenticator.keyuri(user.email, process.env.AUTH_APP_NAME, secret);
+		const otpAuthURL = authenticator.keyuri(user.username, process.env.AUTH_APP_NAME, secret);
 		await this.userService.setTwoFASecret(secret, user.id);
 		return { secret, otpAuthURL };
 	}
 
-	async verifyCode(user: User, twoFACode: string): Promise <boolean> {
+	// Verifie si le code fourni est correct avec l'api de google
+	async verifyCode(userTwoFASecret: string, twoFACode: string): Promise <boolean> {
 		return authenticator.verify({
 			token: twoFACode,
-			secret: user.twoFASecret,
+			secret: userTwoFASecret
 		  });
 	}
 
-	async loginWith2fa(user: User, twoFACode: string): Promise <{access_token: string}> {
-		if (!await this.verifyCode(user, twoFACode))
-			throw new ForbiddenException('Wrong secret code')
-		const logUser = await this.prisma.user.update({ 
-				where: { id: user.id },
-				data: { status: UserStatus.ONLINE }})
-		if (!logUser)
-			throw new BadRequestException('Failed to log user with 2FA')
-		return this.signToken(user.id, user.username)
+	// Verifie le code envoye avec l'api de google et renvoie un token d'authentification
+	async loginWith2fa(userId: number, twoFACode: string): Promise <{ access_token: string }> {
+		try {
+			// Recupere le user avec son username et son twoFaSecret et verifie si il existe
+			const user = await this.prisma.user.findFirst({
+				where: {
+					id: userId
+				},
+				select: {
+					username: true,
+					status: true,
+					twoFASecret: true
+				}
+			})
+			if (!user)
+				throw new NotFoundException("User not found")
+
+			// Verifie si le code fourni est correct avec l'api de google
+			if (!await this.verifyCode(user.twoFASecret, twoFACode))
+				throw new ForbiddenException("Wrong code")
+
+			// Set le statut du user a connecte
+			await this.prisma.user.update({ 
+				where: {
+					id: userId
+				},
+				data: {
+					status: UserStatus.ONLINE
+				}
+			})
+
+			// Retourne un token d'authentification
+			return this.signToken(userId, user.username)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 }

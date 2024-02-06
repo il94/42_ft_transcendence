@@ -9,11 +9,14 @@ import { ESLint } from 'eslint';
 import { PongGame } from './game'
 import { AppGateway } from 'src/app.gateway';
 
+
 @UseGuards(JwtGuard)
 @Injectable()
 export class PongService {
 
 	public activeGames: PongGame[] = [];
+  constructor(private prisma: PrismaService) {}
+
 
 	constructor
 	(
@@ -224,56 +227,105 @@ export class PongService {
 
 // 	private activeGames: PongGame[] = [];
 
-//   constructor(private prisma: PrismaService) {}
 
-//   async createGame(dto: CreatePongDto, creatorId: number): Promise<Game> {
-//     const tmp = await this.prisma.game.create({
-//         data: {
-//             level: dto.level,
-//             status: GameStatus.PENDING,
-//         }
-//     })
-//     const newGame = this.connectGame(creatorId, tmp.id)
-//     return newGame
-//   }
-
-//   async connectGame(userId: number, gameId: number): Promise<Game> {
-//     const connectGame = await this.prisma.game.update({
-//         where: { id: gameId },
-//         data: {
-//             players: {
-//                 connect: { userId_gameId: {
-//                     userId: userId,
-//                     gameId: gameId
-//                 }}
-
-//             }
-//         }
-//     })
-//     return connectGame
-//   }
-
-//   async joinGame(userId: number, gameId: number): Promise<Game> {
+//   // util
+//   async connectGame(userId: number, gameId: number, userRole: roleInGame, userStatus: UserStatus): Promise<Game> {
 //     try {
-//         const count = await this.prisma.game.findUnique({ where: { id: gameId},
-//             include: {
-//                 _count: {
-//                     select: { players: true }
+//         //console.log("userRole ", userRole)
+//         const connectGame = await this.prisma.game.update({
+//             where: { id: gameId },
+//             data: {
+//                 players: {
+//                     connect: { userId_gameId: {
+//                         userId: userId,
+//                         gameId: gameId
+//                     }},
+                
 //                 }
-//         }})
-//         if (count._count.players === 1) {
-//             const joinGame = await this.connectGame(userId, gameId);
+//             }
+//         })
+//         const players =  await this.prisma.usersOnGames.findUnique({ where: { userId_gameId: { userId: userId, gameId: gameId } }})
+//         console.log("connectGame: ", players)
+
+
+//         if (!connectGame)
+//             throw new NotFoundException(`Failed to update game ${gameId}`)
+//         await this.prisma.user.update({ where: { id: userId},
+//             data: { status:  userStatus}
+//         })
+//         return connectGame
+//     } catch (error) {
+//         throw error.message
+//     }
+//   }
+
+//   // to play
+//   async playGame(userId: number, gameId: number): Promise<Game> {
+//     try {
+//         const countPlayers = await this.prisma.usersOnGames.count({
+//             where: {
+//               gameId: gameId,
+//               role: 'PLAYER',
+//             },
+//         });
+//         if (!countPlayers)
+//             throw new NotFoundException('Game to join not found')
+//         if (countPlayers === 1) {
+//             const joinGame = await this.connectGame(userId, gameId, roleInGame.PLAYER, UserStatus.PLAYING);
+//             console.log("count: ", countPlayers)
+//             // match playing
 //             await this.prisma.game.update({
 //                 where: { id: joinGame.id },
 //                 data: { status: GameStatus.PLAYING }
 //             })
-//             return joinGame
+//             // user playing
+//             //await this.prisma.user.update({ where: { id: userId},
+//             //   data: { status: UserStatus.PLAYING }
+//            // })
+//             return joinGame;
 //         }
 //         else
 //             throw new UnauthorizedException('error joining a game')
 //     } 
 //     catch (error) {
 //         throw error.message
+//     }
+//   }
+
+//   async playRandomGame(userId: number): Promise <Game> {
+//     try {
+//         const game = await this.prisma.game.findFirst({ where: { status: GameStatus.PENDING }})
+//         if (!game) {
+//             const newGame = await this.createGame(userId)
+//             return newGame;
+//         }
+//         console.log("GAME ICI: ", game)
+//         const playGame = await this.playGame(userId, game.id)
+//        // await this.prisma.user.update({ where: { id: userId},
+//         //    data: { status: UserStatus.PLAYING }
+//        // })
+//         return playGame;
+//     } catch (error) {
+//         throw error
+//     }
+//   }
+
+//   // to watch
+//   async watchGame(userId: number, gameId: number): Promise<Game> {
+//     try {
+//         const game = await this.prisma.game.findUnique({ where: { id: gameId, 
+//             status: GameStatus.PLAYING }})
+//         if (!game)
+//             throw new NotFoundException('Game to watch not found')
+//         const joinGame = await this.connectGame(userId, gameId, roleInGame.WATCHER, UserStatus.WATCHING);
+//         if (!joinGame)
+//         throw new NotFoundException('Failed to join game to watch')
+//         await this.prisma.user.update({ where: { id: userId},
+//             data: { status: UserStatus.WATCHING }
+//         })
+//         return joinGame;
+//     } catch (error) {
+//         throw error
 //     }
 //   }
 
@@ -288,7 +340,21 @@ export class PongService {
 //     }
 //   }
 
+//   async remove(id: number): Promise<Game> {
+//     const deletePlayers = this.prisma.usersOnGames.deleteMany({
+//         where: { userId: id }})
+//     const transaction = await this.prisma.$transaction([deletePlayers])
+//     const userExists = await this.prisma.game.findUnique({
+//         where: { id: id },});
+//     if (userExists) {
+//         const deleteGame = this.prisma.game.delete({
+//             where: { id: id },});
+//         return deleteGame;
+//     } else {
+//         throw new Error(`Failed to remove game`);
+//     }
 // }
 
+  
 
 }

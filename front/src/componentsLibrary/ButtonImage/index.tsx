@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
@@ -32,6 +33,11 @@ const ButtonImage = styled.button<{ fontSize?: number, alt: string, title: strin
 		transform: translate(2px, 2px);
 		background-color: ${colors.shadowButton};
 		border-color: ${colors.shadowButton};
+	}
+	&:focus-visible {
+		outline: none;
+		${effects.focusShadowButton};
+		background-color: ${colors.focusButton};
 	}
 
 `

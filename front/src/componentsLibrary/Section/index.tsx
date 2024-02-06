@@ -15,7 +15,11 @@ const Section = styled.button`
 
 	&:hover {
 		cursor: pointer;
-		background-color: ${colors.sectionHover};
+		background-color: ${colors.sectionContextualMenuHover};
+	}
+	&:focus-visible {
+		outline: none;
+		background-color: ${colors.sectionContextualMenuFocus};
 	}
 
 `

@@ -1,4 +1,5 @@
-import { styled } from 'styled-components'
+import styled from 'styled-components'
+
 import effects from '../../utils/effects'
 
 export const GamePage = styled.div`
@@ -22,7 +23,7 @@ export const GameWrapper = styled.div`
 	width: 95%;
 	height: 95%;
 	min-width: 623px;
-	min-height: 424px;
+	min-height: 528px;
 
 	clip-path: ${effects.pixelateWindow};
 
@@ -68,6 +69,6 @@ export const BottomGameWrapper = styled.div`
 	width: 100%;
 	height: 100%;
 	min-width: 373px;
-	min-height: 371px;
+	min-height: 475px;
 
 `

@@ -3,6 +3,7 @@ import { CreatePongDto} from './pong.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PongService } from './pong.service';
 import { getUser } from '../auth/decorators/users.decorator';
+
 import { User, challengeStatus, messageStatus, Game } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 
@@ -21,16 +22,6 @@ export class PongController {
     }
 
 
-
-
-    
-
-    // // create a game : boutton start a match
-    // @Post()
-    // create(@getUser() user: User): Promise<Game> {
-    //     return this.pongService.createGame(user.id)
-    // }
-
     // // jouer contre quelqu'un
     // @Post('play/:id')
     // play(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
@@ -39,8 +30,10 @@ export class PongController {
 
     // // boutton : jouer 
     // @Post('play')
-    // playRandom(@getUser() user: User): Promise<Game>  {
-    //     return this.pongService.playRandomGame(user.id)
+    // async playRandom(@getUser() user: User): Promise<Game>  {
+    //     const game = await this.pongService.playRandomGame(user.id)
+    //     console.log("game : ", game)
+    //     return game
     // }
 
     // @Post('watch/:id')
@@ -52,5 +45,9 @@ export class PongController {
     // getById(@Param('id', ParseIntPipe) gameId: number): Promise<Game>  {
     //     return this.pongService.getGameById(gameId)
     // }
+
+
+
+
 
  }

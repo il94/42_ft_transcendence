@@ -6,22 +6,17 @@ import {
 } from "react"
 
 import {
-	CloseButton,
 	Avatar,
 	Style,
-	TopWrapper,
 	UserName
 } from "./style"
 
 import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
-import Icon from "../../componentsLibrary/Icon"
+import CloseButton from "../../componentsLibrary/CloseButton"
 
 import DisplayContext from "../../contexts/DisplayContext"
-
-import { User, UserAuthenticate } from "../../utils/types"
-
-import CloseIcon from "../../assets/close.png"
+import InteractionContext from "../../contexts/InteractionContext"
 
 type PropsCard = {
 	cardPosition: {
@@ -30,23 +25,17 @@ type PropsCard = {
 		top?: number,
 		bottom?: number
 	},
-	displayCard: Dispatch<SetStateAction<boolean>>,
-	userTarget: User | UserAuthenticate
+	displayCard: Dispatch<SetStateAction<boolean>>
 }
 
-function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
+function Card({ cardPosition, displayCard }: PropsCard) {
 
+	const { userTarget } = useContext(InteractionContext)!
 	const { zCardIndex, setZCardIndex, zMaxIndex } = useContext(DisplayContext)!
 
 	useEffect(() => {
 		setZCardIndex(zMaxIndex + 1)
 	}, [])
-
-	const scoreResume = {
-		wins: userTarget.wins,
-		draws: userTarget.draws,
-		losses: userTarget.losses
-	}
 
 	return (
 		<Style
@@ -56,19 +45,16 @@ function Card({ cardPosition, displayCard, userTarget }: PropsCard) {
 			$top={cardPosition.top}
 			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
-			<TopWrapper>
-				<Avatar src={userTarget.avatar} />
-				<CloseButton>
-					<Icon onClick={() => displayCard(false)}
-						src={CloseIcon} size={24}
-						alt="Close button" title="Close" />
-				</CloseButton>
-			</TopWrapper>
+			<CloseButton closeFunction={displayCard} />
+			<Avatar src={userTarget.avatar} />
 			<UserName>
 				{userTarget.username}
 			</UserName>
-			<ScoreResume scoreResume={scoreResume} />
-			<MatchHistory userTarget={userTarget} />
+			<ScoreResume
+				wins={userTarget.wins}
+				draws={userTarget.draws}
+				losses={userTarget.losses} />
+			<MatchHistory />
 		</Style>
 	)
 }

@@ -1,5 +1,7 @@
 import styled from "styled-components"
 
+import colors from "../../utils/colors"
+
 const ButtonChallenge = styled.button`
 
 	width: 100%;
@@ -12,6 +14,11 @@ const ButtonChallenge = styled.button`
 	font-size: 10px;
 	
 	background-color: ${(props) => props.color};
+
+	&:focus-visible {
+		outline: none;
+		background-color: ${colors.focusButton};
+	}
 
 `
 

@@ -10,111 +10,61 @@ import {
 import axios, { AxiosError } from "axios"
 
 import {
-	Setting,
-	SettingTtile,
 	Style,
-	CloseButtonWrapper,
-	SettingsForm,
-	ErrorMessage,
 	TwoFAValue
 } from "./style"
 
 import SelectAvatar from "./SelectAvatar"
-import Icon from "../../componentsLibrary/Icon"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
-import ScrollBar from "../../componentsLibrary/ScrollBar"
-import ErrorRequestMessage from "../../componentsLibrary/ErrorRequestMessage"
 
 import DisplayContext from "../../contexts/DisplayContext"
+import InteractionContext from "../../contexts/InteractionContext"
+import AuthContext from "../../contexts/AuthContext"
 
 import {
 	ErrorResponse,
-	SettingData,
-	UserAuthenticate
+	SettingData
 } from "../../utils/types"
-import { emptySetting } from "../../utils/emptyObjects"
 
-import CloseIcon from "../../assets/close.png"
+import {
+	emptySetting
+} from "../../utils/emptyObjects"
+
+import {
+	ErrorMessage,
+	VerticalSetting,
+	VerticalSettingWrapper,
+	VerticalSettingsForm
+} from "../../componentsLibrary/SettingsForm/Index"
+import CloseButton from "../../componentsLibrary/CloseButton"
 
 type PropsSettingsMenu = {
-	token: string,
-	url: string,
-	userAuthenticate: UserAuthenticate,
-	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
-	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>,
-	setTwoFACodeQR: Dispatch<SetStateAction<string>>
+	displayTwoFAMenu: Dispatch<SetStateAction<boolean>>
 }
 
+function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMenu) {
 
-function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displaySettingsMenu, displayTwoFAMenu, setTwoFACodeQR }: PropsSettingsMenu) {
-
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-
-
-	async function handleSubmitTWOfa(event: FormEvent<HTMLFormElement>) {
-		try {
-
-			console.log("SUBMIT")
-
-			event.preventDefault()
-
-			await axios.patch(`http://${url}:3333/auth/2fa/enable`, {
-				twoFACode: QRcodeValue
-			},
-			{
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-		}
-		catch (error) {
-
-			// afficher correctement la gestion d'erreur
-
-			console.log(error)
-		}
-	}
-
-
-
-
-
+	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
-
 			event.preventDefault()
-			if (username.value.length === 0 ||
-				email.value.length === 0 ||
-				phoneNumber.value.length === 0) {
+			if (username.value.length === 0) {
 				if (username.value.length === 0) {
-
 					setUsername({
 						value: '',
 						error: true,
 						errorMessage: "Insert username",
 					})
 				}
-				if (email.value.length === 0) {
-					setEmail({
-						value: '',
-						error: true,
-						errorMessage: "Insert email",
-					})
-				}
-				if (phoneNumber.value.length === 0) {
-					setPhoneNumber({
-						value: '',
-						error: true,
-						errorMessage: "Insert phone number",
-					})
-				}
 				return
 			}
 
-			if (username.error || password.error || email.error || phoneNumber.error)
+			if (username.error || password.error)
 				return
 
 			const newDatas: any = {}
@@ -123,18 +73,12 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 				newDatas.username = username.value
 			if (password.value)
 				newDatas.hash = password.value
-			if (email.value !== userAuthenticate.email)
-				newDatas.email = email.value
-			if (phoneNumber.value !== userAuthenticate.phoneNumber)
-				newDatas.phoneNumber = phoneNumber.value
-			if (twoFA !== userAuthenticate.twoFA)
-				newDatas.twoFA = twoFA
 			if (avatar !== userAuthenticate.avatar)
 				newDatas.avatar = avatar
 
 			if (Object.keys(newDatas).length !== 0)
 			{
-				await axios.patch(`http://${url}:3333/user/${userAuthenticate.id}`, newDatas,
+				await axios.patch(`http://${url}:3333/user/me`, newDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -154,19 +98,25 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 409)
+				if (statusCode === 403)
 				{
-					setEmail((prevState: SettingData) => ({
+					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid email"
+						errorMessage: "Invalid username"
 					}))
 				}
 				else
-					setErrorRequest(true)
+				{
+					displayPopupError({ display: true })
+					displaySettingsMenu(false)
+				}
 			}
 			else
-				setErrorRequest(true)
+			{
+				displayPopupError({ display: true })
+				displaySettingsMenu(false)
+			}
 		}
 	}
 
@@ -180,7 +130,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 
 	function handleInputUsernameChange(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		if (value.length === 0) {
+		if (!value) {
 			setUsername({
 				value: value,
 				error: true,
@@ -279,104 +229,9 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 	const [placeHolder, setPlaceHolder] = useState<string>("New password")
 
-	/* =============================== EMAIL ==================================== */
-
-	const [email, setEmail] = useState<SettingData>({
-		value: userAuthenticate.email,
-		error: false,
-		errorMessage: ''
-	})
-
-	function handleInputEmailChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		if (value.length === 0) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "Email cannot be empty"
-			})
-		}
-		else if (value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "Invalid email"
-			})
-		}
-		else if (value.endsWith("@student.42.fr")) {
-			setEmail({
-				value: value,
-				error: true,
-				errorMessage: "42 emails are forbidden"
-			})
-		}
-		else {
-			setEmail({
-				value: value,
-				error: false
-			})
-		}
-	}
-
-	/* ============================ PHONE NUMBER ================================ */
-
-	const [phoneNumber, setPhoneNumber] = useState<SettingData>({
-		value: userAuthenticate.phoneNumber,
-		error: false,
-		errorMessage: ''
-	})
-
-	function handleInputPhoneNumberChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		if (value.length === 0) {
-			setPhoneNumber({
-				value: value,
-				error: true,
-				errorMessage: "Phone number cannot be empty"
-			})
-		}
-		else if (!/^(?:\+(?:[0-9] ?){6,14}[0-9]|[0-9]{10})$/.test(value)) {
-			setPhoneNumber({
-				value: value,
-				error: true,
-				errorMessage: "Invalid phone number"
-			})
-		}
-		else {
-			setPhoneNumber({
-				value: value,
-				error: false
-			})
-		}
-	}
-
 	/* ================================= 2FA ==================================== */
 
-	const [twoFA, setTwoFA] = useState<boolean>(userAuthenticate.twoFA)
-
-	const [QRcode, setQRcode] = useState<string>('')
-	const [QRcodeValue, setQRcodeValue] = useState<string>('')
-
-	function handleInputQRcodeChange(event: ChangeEvent<HTMLInputElement>) {
-		const value = event.target.value
-		setQRcodeValue(value)
-	}
-
-	async function handleClickTwoFAChange() {
-		try {
-			const responseQRcode = await axios.get(`http://${url}:3333/auth/2fa/generate`, {
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
-
-			displayTwoFAMenu(true)
-			setTwoFACodeQR(responseQRcode.data)
-		}
-		catch (error) {
-			console.log(error)
-		}
-	}
+	const twoFA = userAuthenticate.twoFA
 
 	/* =============================== AVATAR ================================== */
 
@@ -394,36 +249,29 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 		<Style
 			onClick={() => setZSettingsIndex(zMaxIndex + 1)}
 			$zIndex={zSettingsIndex}>
-		{
-			!errorRequest ?
-			<ScrollBar visible>
-				<CloseButtonWrapper>
-					<Icon src={CloseIcon} size={24}
-						onClick={() => displaySettingsMenu(false)}
-						alt="Close button" title="Close" />
-				</CloseButtonWrapper>
-				<SettingsForm
+			<CloseButton closeFunction={displaySettingsMenu} />
+			<div style={{ height: "5px" }} />
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
-						<SettingTtile>
-							Username
-						</SettingTtile>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						Username
+						<VerticalSettingWrapper>
 						<InputText
 							onChange={handleInputUsernameChange}
 							onBlur={handleInputUsernameBlur}
 							type="text" value={username.value as string}
 							fontSize={16}
 							$error={username.error} />
-						<ErrorMessage>
+						<ErrorMessage fontSize={10} >
 							{username.error && username.errorMessage}
 						</ErrorMessage>
-					</Setting>
-					<Setting>
-						<SettingTtile>
-							Password
-						</SettingTtile>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						Password
+						<VerticalSettingWrapper>
 						<InputText
 							onChange={handleInputPasswordChange}
 							onClick={() => setPlaceHolder('')}
@@ -440,11 +288,11 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 								Array.isArray(password.errorMessage) ?
 								<>
 								{
-
 									(password.errorMessage as string[]).map((errorMessage, index) => {
 										return (
 											<ErrorMessage
-												key={"error_message" + index}>
+												key={"settingsErrorMessage" + index}
+												fontSize={10} >
 												{errorMessage}
 											</ErrorMessage>)
 										}
@@ -452,7 +300,7 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 								}
 								</>
 								:
-								<ErrorMessage>
+								<ErrorMessage fontSize={10} >
 									{password.errorMessage}
 								</ErrorMessage>
 							}
@@ -473,82 +321,38 @@ function SettingsMenu({ token, url, userAuthenticate, setUserAuthenticate, displ
 									"Show password"
 							}
 						</Button>
-					</Setting>
-					<Setting>
-						<SettingTtile>
-							E-mail
-						</SettingTtile>
-						<InputText
-							onChange={handleInputEmailChange}
-							type="text" value={email.value as string}
-							fontSize={16}
-							$error={email.error} />
-						<ErrorMessage>
-							{email.error && email.errorMessage}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
-						<SettingTtile>
-							Phone number
-						</SettingTtile>
-						<InputText
-							onChange={handleInputPhoneNumberChange}
-							type="text" value={phoneNumber.value as string}
-							fontSize={16}
-							$error={phoneNumber.error} />
-						<ErrorMessage>
-							{phoneNumber.error && phoneNumber.errorMessage}
-						</ErrorMessage>
-					</Setting>
-					<Setting>
-						<SettingTtile>
-							2FA
-						</SettingTtile>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting fontSize={15} $alignItems="start">
+						2FA
+						<VerticalSettingWrapper>
 						<TwoFAValue>
-							{
-								twoFA ?
-									"Able"
-									:
-									"Disable"
-							}
+							{ twoFA ? "Enable" : "Disable" }
 						</TwoFAValue>
 						<div style={{ height: "15px" }} />
 						<Button
-							onClick={handleClickTwoFAChange}
+							onClick={() => displayTwoFAMenu(true)}
 							type="button" width={200}
 							alt="Set 2FA button"
-							title={twoFA ? "Disable" : "Able"}
+							title={ twoFA ? "Disable" : "Enable" }
 							style={{ alignSelf: "center" }}>
-							{
-								twoFA ?
-									"Disable"
-									:
-									"Able"
-							}
+							{ twoFA ? "Disable" : "Enable" }
 						</Button>
-					</Setting>
-
-							{/* <img src={QRcode} />
-							<InputText
-								onSubmit={handleSubmitTWOfa}
-								onChange={handleInputQRcodeChange}
-								type="text" value={QRcodeValue}
-								fontSize={16} /> */}
-
-					<SelectAvatar
-						avatar={avatar}
-						setAvatar={setAvatar} />
-					<Button
-						type="submit"
-						fontSize={19}
-						alt="Save button" title="Save changes">
-						Save
-					</Button>
-				</SettingsForm>
-			</ScrollBar>
-			:
-			<ErrorRequestMessage />
-		}
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<VerticalSetting>
+						<SelectAvatar
+							avatar={avatar}
+							setAvatar={setAvatar} />
+					</VerticalSetting>
+						<Button
+							type="submit"
+							fontSize={19}
+							alt="Save button" title="Save changes">
+							Save
+						</Button>
+					<div style={{ height: "5px" }} />
+				</VerticalSettingsForm>
 		</Style>
 	)
 }

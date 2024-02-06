@@ -52,8 +52,10 @@ services:
 
 volumes:
   db-data:
+    name: db-data
 
 networks:
   transcendence:
+    name: ft_transcendence
 
       

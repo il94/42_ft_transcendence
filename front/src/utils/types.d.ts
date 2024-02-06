@@ -1,10 +1,13 @@
-import { Socket } from "socket.io-client"
+import {
+	Socket
+} from "socket.io-client"
+
 import {
 	userStatus,
 	challengeStatus,
 	MatchResultStatus,
-	messageStatus,
-	channelStatus
+	messageType,
+	ChannelType
 } from "./status"
 
 export type User = {
@@ -19,38 +22,42 @@ export type User = {
 }
 
 export type UserAuthenticate = User & {
-	email: string,
-	phoneNumber: string,
 	twoFA: boolean,
 	friends: User[],
-	blockedUsers: User[],
+	blockeds: User[],
 	channels: Channel[]
 }
 
-export type Channel = {
+export type ChannelData = {
 	id: number,
 	createdAt?: string,
 	name: string,
 	avatar: string,
-	type: channelStatus,
-	password?: string,
+	type: ChannelType,
+	password?: string
+}
+
+export type Channel = ChannelData & {
 	messages: (MessageText | MessageInvitation)[],
 	members: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
-	mutedUsers: (User | UserAuthenticate)[],
-	banneds: (User | UserAuthenticate)[]
+	//mutedUsers: (User | UserAuthenticate)[],
+	banneds: (User | UserAuthenticate)[],
+	muteInfo: Record<number, string>
 }
 
 export type Message = {
 	id: number,
 	createdAt?: string,
 	sender: User | UserAuthenticate,
-	type: messageStatus
+	type: messageType
 }
+
 export type MessageText = Message & {
 	content: string,
 }
+
 export type MessageInvitation = Message & {
 	target: User | UserAuthenticate,
 	status: challengeStatus

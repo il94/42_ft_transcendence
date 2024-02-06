@@ -5,10 +5,10 @@ export const Style = styled.div`
 
 	display: flex;
 	flex-direction: column; // temporaire
-	justify-content: space-evenly;
+	justify-content: space-between;
 	align-items: center;
 
-	min-height: 175px;
+	height: 145px;
 
 `
 
@@ -50,6 +50,10 @@ export const Avatar = styled.label<{ src: string }>`
       		font-weight: bold;
 
 		}
+	}
+	&:focus-visible {
+		outline: none;
+		border-color: ${colors.focusButton};
 	}
 
 `

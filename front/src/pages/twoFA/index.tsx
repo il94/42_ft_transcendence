@@ -3,10 +3,15 @@ import {
 	FormEvent,
 	useContext,
 	useEffect,
+	useRef,
 	useState
 } from 'react'
-import { useNavigate } from 'react-router'
-import axios, { AxiosError } from 'axios'
+import {
+	useNavigate,
+	useLocation
+} from 'react-router'
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import Cookies from "js-cookie"
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -14,32 +19,46 @@ import InputText from '../../componentsLibrary/InputText'
 import Page from '../../componentsLibrary/Page'
 import MainTitle from '../../componentsLibrary/MainTitle'
 import WindowTitle from '../../componentsLibrary/WindowTitle'
-import ErrorMessage from '../../componentsLibrary/ErrorMessage/Index'
 import CentralWindow from '../../componentsLibrary/CentralWindow'
-import SettingsForm from '../../componentsLibrary/SettingsForm/Index'
-import Setting from '../../componentsLibrary/Setting/Index'
-import Cookies from "js-cookie"
+import {
+	VerticalSettingsForm,
+	VerticalSetting,
+	ErrorMessage,
+	VerticalSettingWrapper
+} from '../../componentsLibrary/SettingsForm/Index'
 
 import AuthContext from '../../contexts/AuthContext'
 
-import { ErrorResponse, SettingData } from '../../utils/types'
-import { emptySetting } from '../../utils/emptyObjects'
+import {
+	ErrorResponse,
+	SettingData
+} from '../../utils/types'
+
+import {
+	emptySetting
+} from '../../utils/emptyObjects'
+
+type PropsTwoFAResponse = {
+	access_token: string
+}
 
 function TwoFA() {
-	const [errorRequest, setErrorRequest] = useState<boolean>(false)
-	const { token, setToken, url } = useContext(AuthContext)!
+
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
+	const location = useLocation()
+
+	const userId: string | number = Cookies.get('userId') ? Cookies.get('userId') : location.state.userId
 
 	useEffect(() => {
-		const id: string | undefined = Cookies.get('id')
-		if (id)
-			setToken(id);
+		if (token || !userId)
+			navigate("/error")
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		try {
 			event.preventDefault()
-			if (code.value.length === 0) {
+			if (!code.value) {
 				setCode({
 					value: '',
 					error: true,
@@ -47,68 +66,98 @@ function TwoFA() {
 				})
 				return
 			}
-
-			/* ============ Temporaire ============== */
+			else if (code.value.length < 6) {
+				setCode((prevState: SettingData) => ({
+					...prevState,
+					error: true,
+					errorMessage: "Code must contains 6 digits"
+				}))
+				return
+			}
+			if (code.error)
+				return
 			
-			const response = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${token}`, code)
+			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${userId}`, {
+				twoFACode: code.value
+			})
 			 
-			localStorage.clear();
-			setToken(response.data.access_token)
-			localStorage.setItem('access_token', response.data.access_token)
-
-			/* ====================================== */
-
+			localStorage.setItem("access_token", authTwoFAResponse.data.access_token)
 			navigate("/")
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 403) {
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 && message === "Wrong code") {
 					setCode((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Wrong code"
+						errorMessage: message
 					}))
 				}
+				else if (statusCode === 403 || statusCode === 404)
+				{
+					navigate("/error", { state: {
+						message: message
+					}})
+				}
 				else
-					navigate("/error");
+					navigate("/error")
 			}
 			else
-				navigate("/error");
+				navigate("/error")
 		}
 	}
 
-	/* ================================ CODE =================================== */
+	/* ================================ CODE ==================================== */
 
 	const [code, setCode] = useState<SettingData>(emptySetting)
 
-	function handleInputCodeChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleInputCode(event: ChangeEvent<HTMLInputElement>) {
 		const value = event.target.value
-		setCode({
-			value: value,
-			error: false
-		})
+		if (!value) {
+			setCode({
+				value: value,
+				error: true,
+				errorMessage: "Code cannot be empty"
+			})
+		}
+		else if (value.length > 6) {
+			setCode((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Code must contains 6 digits"
+			}))
+		}
+		else if (!/\d/.test(value)) {
+			setCode((prevState: SettingData) => ({
+				...prevState,
+				error: true,
+				errorMessage: "Code must be containing by digits",
+			}))
+		}
+		else {
+			setCode({
+				value: value,
+				error: false
+			})
+		}
 	}
 
-	/* ========================================================================== */
+	function handleInputCodeBlur() {
+		setCode((prevState: SettingData) => ({
+			...prevState,
+			error: false
+		}))
+	}
 
-	// useEffect(() => {
-	// 	async function sendCode() {
-	// 		try {
+	const inputCodeRef = useRef<HTMLInputElement>(null)
 
-	// 			/* ============ Temporaire ============== */
-
-	// 			// const response = await axios.post(`http://${url}:3333/auth/signin/twofa`)
-
-	// 			/* ====================================== */
-	// 		}
-	// 		catch (error) {
-	// 			navigate("/error");
-	// 		}
-	// 	}
-	// 	sendCode()
-	// }, [])
+	useEffect(() => {
+		const InputCodeContainer = inputCodeRef.current
+		if (InputCodeContainer)
+			InputCodeContainer.focus()
+	})
 
 	/* ========================================================================== */
 
@@ -123,29 +172,33 @@ function TwoFA() {
 				<WindowTitle>
 					TwoFA
 				</WindowTitle>
-				<SettingsForm
+				<VerticalSettingsForm
 					onSubmit={handleSubmit}
 					autoComplete="off"
 					spellCheck="false">
-					<Setting>
+					<VerticalSetting fontSize={18}>
 						Enter the six-digit code from Google Authenticator to secure your authentication
-						<InputText
-							onChange={handleInputCodeChange}
-							type="text" value={code.value}
-							width={231}
-							fontSize={25}
-							$error={code.error} />
-						<ErrorMessage>
-							{code.error && code.errorMessage}
-						</ErrorMessage>
-					</Setting>
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputCode}
+								onBlur={handleInputCodeBlur}
+								type="text" value={code.value}
+								width={231}
+								fontSize={25}
+								$error={code.error}
+								ref={inputCodeRef} />
+							<ErrorMessage>
+								{code.error && code.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
 					<div style={{ height: "10px" }} />
 					<Button
 						type="submit" fontSize={35}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>
-				</SettingsForm>
+				</VerticalSettingsForm>
 			</CentralWindow>
 		</Page>
 	)

@@ -1,10 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
 import { BlockedsService } from './blockeds.service';
-// import { RelationDto } from './dto/blockeds.dto';
-import { UserEntity } from 'src/auth/entities/user.entity';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-//import { AuthGuard } from '../auth/guards/auth.guard';
-//import { JwtPayload } from 'src/users/constants';
 import { getUser } from '../auth/decorators/users.decorator';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
@@ -13,14 +9,14 @@ import { CreateUserDto } from 'src/auth/dto';
 @UseGuards(JwtGuard)
 @Controller('blockeds')
 export class BlockedsController {
-  constructor(private readonly blockedsService: BlockedsService) {}
+	constructor(private readonly blockedsService: BlockedsService) {}
 
-  @Post(':id')
-  addNewBlocked(@getUser() user: User,
-  @Param('id', ParseIntPipe) id: number) {
-      console.log("taget id: ", id);
-      return this.blockedsService.addBlocked(user.id, id);
-  }
+	// Bloque un user
+	@Post(':id')
+	addNewBlocked(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) userTargetId: number) {
+		return this.blockedsService.addBlocked(userAuthId, userTargetId)
+	}
 
   @Get()
   async getUserBlockeds(@getUser() user: User ) {
@@ -34,9 +30,10 @@ export class BlockedsController {
   //       return this.blockedsService.updateRelation(id, dto);
   //   }
 
-  @Delete(':id')
-  async removeBlocked(@getUser() user: User,
-  @Param('id', ParseIntPipe) blockedId: number) {
-        return this.blockedsService.removeBlocked(user.id, blockedId);
-    }
+	// Debloque un user
+	@Delete(':id')
+	removeBlocked(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) userTargetId: number) {
+		return this.blockedsService.removeBlocked(userAuthId, userTargetId)
+	}
 }

@@ -39,14 +39,17 @@ export const ChannelCreateButton = styled.button`
 
 	padding: 0;
 
-	background-color: ${colors.channelCreateButton};
+	background-color: ${colors.buttonFix};
 
 	&:hover {
-		background-color: ${colors.sectionHover};
+		background-color: ${colors.buttonFixHover};
+	}
+	&:focus-visible {
+		outline: none;	
+		background-color: ${colors.buttonFixFocus};
 	}
 
 `
-
 
 export const BottomChatWrapper = styled.div`
 	
@@ -55,6 +58,14 @@ export const BottomChatWrapper = styled.div`
 	width: 100%;
 	height: 213px;
 	min-height: 213px;
+
+`
+
+export const Interfaces = styled.div`
+	
+	width: 245px;
+
+	position: relative;
 
 `
 

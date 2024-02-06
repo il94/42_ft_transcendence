@@ -3,9 +3,10 @@ import {
 	Dispatch,
 	useContext
 } from "react"
-import { useNavigate } from "react-router"
-import Cookies from "js-cookie"
-import axios from "axios"
+import {
+	useNavigate
+} from "react-router"
+import axios, { AxiosError } from "axios"
 
 import {
 	Style,
@@ -18,18 +19,15 @@ import {
 import Icon from "../../componentsLibrary/Icon"
 
 import AuthContext from "../../contexts/AuthContext"
-
-import { User, UserAuthenticate } from "../../utils/types"
+import InteractionContext from "../../contexts/InteractionContext"
 
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
+import { ErrorResponse, SettingData } from '../../utils/types'
 
 type PropsProfile = {
-	userAuthenticate: UserAuthenticate,
 	card: boolean,
 	displayCard: Dispatch<SetStateAction<boolean>>,
-	userTarget: User | UserAuthenticate,
-	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 	setCardPosition: Dispatch<SetStateAction<{
 		left?: number,
 		right?: number,
@@ -40,9 +38,10 @@ type PropsProfile = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>
 }
 
-function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarget, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
+function Profile({ card, displayCard, setCardPosition, settings, displaySettingsMenu }: PropsProfile) {
 
-	const { token, setToken, url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
+	const { userAuthenticate, userTarget, setUserTarget } = useContext(InteractionContext)!
 	const navigate = useNavigate()
 
 	function showCard() {
@@ -57,29 +56,39 @@ function Profile({ userAuthenticate, card, displayCard, userTarget, setUserTarge
 
 	async function handleDeconnexionClickButton() {
 		try {
-
 			await axios.get(`http://${url}:3333/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			}) 
 			
-			Cookies.remove('access_token')
-			Cookies.remove('id')
-			Cookies.remove('two_FA')
-			//localStorage.removeItem('token')
-			localStorage.clear();
-			setToken('')
+			localStorage.removeItem('access_token')
 			navigate("/")
 		}
 		catch (error) {
-			console.log(error)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+				{
+					navigate("/error", { state: {
+						message: message
+					}})	
+				}
+				else
+					navigate("/error")
+			}
+			else
+				navigate("/error")
 		}
+		
 	}
 
 	return (
 		<Style>
-			<ProfileWrapper onClick={showCard}>
+			<ProfileWrapper
+				onClick={showCard}
+				tabIndex={0}>
 				<Avatar src={userAuthenticate.avatar} />
 				<ProfileName>
 					{userAuthenticate.username}

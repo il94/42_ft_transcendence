@@ -1,16 +1,324 @@
-import { Dispatch, SetStateAction } from "react"
+import {
+	Dispatch,
+	SetStateAction
+} from "react"
 import axios, { AxiosResponse } from "axios"
 
 import {
+	findUserInChannel,
+	removeUserInChannel,
+	setUserToAdministrator,
+	setUserToBanned,
+	setUserToMember,
+	setUserToOwner,
 	updateUserInChannel,
 	userIsFriend,
 	userIsInChannel
 } from "../../utils/functions"
 
-import { userStatus } from "../../utils/status"
-import { Channel, UserAuthenticate } from "../../utils/types"
+import {
+	challengeStatus,
+	channelRole,
+	messageType,
+	userStatus
+} from "../../utils/status"
+
+import {
+	Channel,
+	ChannelData,
+	Message,
+	MessageInvitation,
+	MessageText,
+	User,
+	UserAuthenticate
+} from "../../utils/types"
 
 // Fonctions appellées uniquement lors d'emits de socekts. Ces fonctions servent à mettre à jour des données en temps réel chez l'ensemble des utilisateurs 
+
+type PropsUpdateDiscussion = {
+	idSend: number,
+	idChannel: number,
+	idTargetOrMsg: number | string,
+	idMsg: number
+
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+export function updateDiscussion(props: PropsUpdateDiscussion) {
+	
+	if (props.channelTarget?.id === props.idChannel)
+	{
+		// console.log("here");
+
+		let messageContent: Message;
+		const userSend = findUserInChannel(props.channelTarget, props.idSend);
+		if (!userSend)
+			throw new Error
+		console.log("USERSEND = ", userSend)
+		if (typeof props.idTargetOrMsg === 'number')
+		{
+
+			const userTarget = findUserInChannel(props.channelTarget , props.idTargetOrMsg);
+			if (!userTarget)
+			throw new Error
+			messageContent = {
+				id: props.idMsg,
+				sender: userSend,
+				type: messageType.INVITATION,
+				target: userTarget,
+				status: challengeStatus.PENDING
+			} as MessageInvitation
+		
+		}
+		else {
+			messageContent ={
+				id: props.idMsg,
+				sender: userSend,
+				type: messageType.TEXT,
+				content: props.idTargetOrMsg
+			} as MessageText
+		}
+		if (props.idChannel === props.channelTarget.id)
+		{
+			props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+			{
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						messageContent
+					]
+				}
+			}
+			else
+				return (undefined)
+			});
+		};
+	}
+};
+
+
+
+type PropsRefreshJoinChannel = {
+	channelId: number,
+	userId: number,
+
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+
+	token: string,
+	url: string
+
+}
+
+export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
+
+
+	console.log("JOIN PROPS", props)
+
+
+	// Valide si le user auth est invité dans le channel
+	if (props.userId === props.userAuthenticate.id)
+	{
+		// Récupère les données du channel dans lequel il a été ajouté
+		const newChannelResponse: AxiosResponse<ChannelData> = await axios.get(`http://${props.url}:3333/channel/${props.channelId}`, {
+			headers: {
+				'Authorization': `Bearer ${props.token}`
+			}
+		})
+		
+		const newChannel: Channel = {
+			...newChannelResponse.data,
+			messages: [],
+			members: [],
+			administrators: [],
+			owner: undefined,
+			mutedUsers: [],
+			banneds: []
+		}
+
+		props.setUserAuthenticate((prevState: UserAuthenticate) => ({
+			...prevState,
+			channels: [ ...prevState.channels, newChannel ]
+		}))
+	}
+
+	// Valide si le user auth déjà présent dans le channel a la fenêtre de chat ouverte
+	else if (props.channelTarget?.id === props.channelId)
+	{
+		const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${props.userId}`, {
+			headers: {
+				'Authorization': `Bearer ${props.token}`
+			}
+		})
+
+		props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+			{
+				return {
+					...prevState,
+					members: [
+						...prevState.members,
+						userResponse.data
+					]
+				}
+			}
+			else
+				return (undefined)
+		})
+	}
+}
+
+
+type PropsRefreshLeaveChannel = {
+	channelId: number,
+	userId: number,
+
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+
+export async function refreshLeaveChannel(props: PropsRefreshLeaveChannel) {
+
+	if (props.userId === props.userAuthenticate.id)
+	{
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				channels: prevState.channels.filter((channel) => channel.id !== props.channelId)
+			}
+		})
+		if (props.channelTarget?.id === props.channelId)
+			props.setChannelTarget(undefined)
+	}
+	else if (props.channelTarget?.id === props.channelId)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+			{
+				return {
+					...prevState,
+					members: prevState.members.filter((member) => member.id !== props.userId),
+					administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
+					owner: prevState.owner?.id === props.userId ? undefined : prevState.owner
+				}
+			}
+			else
+				return (undefined)
+		})	
+	}
+}
+
+type PropsRefreshUserRole = {
+	channelId: number,
+	userId: number,
+	newRole: any,
+
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
+}
+
+export async function refreshUserRole(props : PropsRefreshUserRole) {
+	try {
+		if (props.newRole === channelRole.BANNED && props.userAuthenticate.id === props.userId)
+		{
+			await refreshLeaveChannel({
+				channelId: props.channelId,
+				userId: props.userId,
+				userAuthenticate: props.userAuthenticate,
+				setUserAuthenticate: props.setUserAuthenticate,
+				channelTarget: props.channelTarget,
+				setChannelTarget: props.setChannelTarget
+			})
+		}
+		else if (props.channelTarget?.id === props.channelId)
+		{
+			const setChannel = props.setChannelTarget as Dispatch<SetStateAction<Channel>> 
+
+			if (props.newRole === channelRole.UNBANNED) {
+				setChannel((prevState: Channel) => {
+					return (removeUserInChannel(prevState, props.userId))
+				})
+			}
+			else
+			{
+				const userTarget = findUserInChannel(props.channelTarget, props.userId)
+				if (!userTarget)
+					throw new Error
+
+				if (props.newRole === channelRole.MEMBER) {
+					setChannel((prevState: Channel) => {
+						return (setUserToMember(prevState, userTarget))
+					})
+				}
+				else if (props.newRole === channelRole.ADMIN) {	
+					setChannel((prevState: Channel) => {
+						return (setUserToAdministrator(prevState, userTarget))
+					})
+				}
+				else if (props.newRole === channelRole.BANNED) {	
+					setChannel((prevState: Channel) => {
+						return (setUserToBanned(prevState, userTarget))
+					})
+				}
+			}
+		}
+	}
+	catch (error) {
+		console.log(error)
+	}
+
+}
+
+type PropsRefreshNewOwner = {
+	channelId: number,
+	userId: number,
+
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+export async function refreshNewOwner(props: PropsRefreshNewOwner) {
+	if (props.userId === props.userAuthenticate.id)
+	{
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				channels: prevState.channels.map((channel: Channel) => {
+					if (channel.id === props.channelId)
+						return (setUserToOwner(channel, prevState))
+					else
+						return (channel)
+				})
+			}
+		})
+	}
+	if (props.channelTarget?.id === props.channelId)
+	{
+		const userTarget = findUserInChannel(props.channelTarget, props.userId)
+		if (!userTarget)
+			throw new Error
+		props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState)
+				return (setUserToOwner(prevState, userTarget))
+			else
+				return (undefined)
+		})	
+	}
+}
+
+
 
 type PropsRefreshUserStatus = {
 	userId: number,
@@ -64,22 +372,26 @@ type PropsRefreshUpdateChannel = {
 	newDatas: any,
 
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
 }
 
 // Met à jour les données d'un channel
 export function refreshUpdateChannel(props: PropsRefreshUpdateChannel) {
-	props.setChannelTarget((prevState: Channel | undefined) => {
-		if (prevState) {
-			return {
-				...prevState,
-				...props.newDatas
+	if (props.channelTarget?.id === props.channelId)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState) {
+				return {
+					...prevState,
+					...props.newDatas
+				}
 			}
-		}
-		else
-			return (undefined)
+			else
+				return (undefined)
 
-	});
+		});
+	}
 
 	props.setUserAuthenticate((prevState) => ({
 		...prevState,
@@ -117,12 +429,76 @@ export function refreshDeleteChannel(props: PropsRefreshDeleteChannel) {
 
 type PropsRecieveChannelMP = {
 	channelId: number,
+	recipientId: number,
 
 	token: string,
 	url: string,
+	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	displayChat: Dispatch<SetStateAction<boolean>>,
 }
+
+type RefreshUserMuteProps = {
+	idChan: number,
+	time: string,
+
+	userAuthenticate: UserAuthenticate,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
+}
+
+
+export async function refreshUserMute(props : RefreshUserMuteProps) {
+	if (props.idChan === props.channelTarget?.id)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+		if (prevState) {
+			const updatedMuteInfo = {
+				...prevState.muteInfo,
+				[props.userAuthenticate.id]: props.time,
+				};
+			return {
+			...prevState,
+			muteInfo: updatedMuteInfo,
+			};
+		} else {
+			return undefined;
+		}
+		});
+	}
+}
+
+	
+type RefreshStatusChallengeProps = {
+	idMsg: number,
+	status: challengeStatus,
+	idChan: number,
+
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
+
+}
+
+export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
+	if (props.idChan === props.channelTarget?.id)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+		if (prevState) {
+			const updatedMessages = prevState.messages.map((message) =>
+			message.id === props.idMsg ? { ...message, status: props.status } : message
+			);
+			return {
+			...prevState,
+			messages:updatedMessages,
+			};
+		} else {
+			return undefined;
+		}
+		});
+	}
+	}  
+
 
 // Crée un channel MP
 export async function recieveChannelMP(props: PropsRecieveChannelMP) {
@@ -141,5 +517,9 @@ export async function recieveChannelMP(props: PropsRecieveChannelMP) {
 		]
 	}))
 
-	props.setChannelTarget(channelMPResponse.data)
+	if (props.userAuthenticate.id !== props.recipientId)
+	{
+		props.setChannelTarget(channelMPResponse.data)
+		props.displayChat(true)
+	}
 }

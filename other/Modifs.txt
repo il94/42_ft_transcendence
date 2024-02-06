@@ -1,6 +1,58 @@
-Signin/ :
-	Codes d'erreur a recuperer
-	Recuperer le boolean twofa du user pour savoir si on redirige vers Game ou pas
+(Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
-Signup/ :
-	Verifier si user existe deja : mail ou username ?
+GLOBAL/ : A faire sur tout les fichiers un par un
+
+	(!!!!!)
+	Clavier indisponible quand pong display
+	Fix les erreurs ts
+
+	(!!!)
+	Set corectement tout les titles et alts
+
+	(!!)
+	Fix focus bouton game dans home par navigate
+	Fix contextual menu display dans le chat
+	Redisplay avatars 42
+	Créer des fichiers fonctions si necessaire
+	Image 42 en blanc pour sign up 42
+
+	(!)
+	Formulaires styles
+	Corriger l'anglais du bled
+	Checker les contextes
+	Checker les noms de routes (s pas s)
+	Shift + Alt + F
+
+SettingsMenu/ :
+	Faire select Avatar si le temps
+
+Signup42/ :
+	Faire select Avatar si le temps
+
+(============================= PONG ============================)
+
+ScoreResume/ : à voir quand le Pong aura avancé
+-pas_regardé:
+
+MatchHistory/ : à voir quand le Pong aura avancé
+-pas_regardé:
+	Ajouter loader
+
+(============================= SOSO ============================)
+
+Messages/ :
+	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
+
+channels.service/ :
+-findChannelWithRelations:
+	Vérifier la fonction pour mapper les messages (soso)
+
+ContextualMenu/ : à faire après merge
+	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
+
+(============================ CLAIRE ============================)
+
+auth.service/ : 
+-return42Response:
+	Verifier throw (claire)
+

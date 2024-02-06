@@ -76,14 +76,13 @@ model User {
   id          Int @id @default(autoincrement())
   createdAt   DateTime @default(now())
 
+  usernameId  String?	@unique
   username    String  @unique
-  email       String  @unique
   hash        String
   avatar      String
-  phoneNumber String
   twoFA       Boolean
   twoFASecret String
-  wins        Int
+	wins        Int
 	draws       Int
 	losses      Int
   status      UserStatus
@@ -91,11 +90,11 @@ model User {
 
   games       UsersOnGames[]
 
-  friends  Friend[] @relation("friends")
-  blockeds  Blocked[] @relation("blockeds")
+  friends     Friend[] @relation("friends")
+  blockeds    Blocked[] @relation("blockeds")
 
-  channels  UsersOnChannels[]
-  messages  Message[]
+  channels    UsersOnChannels[]
+  messages    Message[]
 
   @@map("users")
 }
@@ -122,7 +121,7 @@ model Channel {
   name        String
   avatar      String
   type        ChannelStatus
-  password    String?
+  hash        String?
   invitation  Invitation[]
 
   users       UsersOnChannels[]
@@ -175,7 +174,7 @@ model UsersOnChannels {
   channel   Channel @relation(fields: [channelId], references: [id])
   channelId Int
   role      Role
-  // mute      Boolean
+  mute      DateTime @default(now())
 
   @@id([userId, channelId])
 }
@@ -185,9 +184,9 @@ model UsersOnGames {
   user      User  @relation(fields: [userId], references: [id])
   userId    Int
   game      Game  @relation(fields: [gameId], references: [id])
-  gameId    Int 
+  gameId    Int
   score     Int @default(0)
-  podium    MatchResult
+  result    MatchResult   
   role      roleInGame
 
   @@id([userId, gameId])
