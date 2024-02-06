@@ -158,11 +158,6 @@ export class AuthService {
 				}
 				return { id: user.id, twoFA: user.twoFA };
 			}
-			//console.log ("jai pas trouve le user");
-			// profile.hash = generate({ length: 6, numbers: true });
-			// const newUser = await this.userService.createUser(profile as CreateUserDto)
-			// if (!newUser)
-			// 	throw new ForbiddenException('Failed to create new 42 user');
 
 			const partialUser: Partial<User> = {
 				usernameId: profile.usernameId,
@@ -215,11 +210,9 @@ export class AuthService {
 				.redirect(`http://localhost:5173/signup42`)
 			}
 		}
-		catch (error) { // a voir si besoin de throw
-			if (error instanceof BadRequestException)
-				throw error
-			else
-				throw new BadRequestException()
+		catch (error) {
+			res.cookie("error_message", error.message).
+			redirect(`http://localhost:5173/error`)
 		}
 	}
 

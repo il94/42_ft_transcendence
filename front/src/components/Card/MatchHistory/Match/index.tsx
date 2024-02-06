@@ -23,7 +23,7 @@ type PropsMatch = {
 function Match({ username, opponent, result, scoreUser, scoreOpponent }: PropsMatch) {
 
 	const backgroundColor =
-		result === matchResultStatus.WIN ?
+		result === matchResultStatus.WINNER ?
 			colors.historyWin
 			: result === matchResultStatus.DRAW ?
 				colors.historyDraw

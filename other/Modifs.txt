@@ -29,15 +29,6 @@ SettingsMenu/ :
 Signup42/ :
 	Faire select Avatar si le temps
 
-(============================= PONG ============================)
-
-ScoreResume/ : à voir quand le Pong aura avancé
--pas_regardé:
-
-MatchHistory/ : à voir quand le Pong aura avancé
--pas_regardé:
-	Ajouter loader
-
 (============================= SOSO ============================)
 
 Messages/ :
@@ -50,9 +41,7 @@ channels.service/ :
 ContextualMenu/ : à faire après merge
 	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
 
-(============================ CLAIRE ============================)
+(============================= CLAIRE ============================)
 
-auth.service/ : 
--return42Response:
-	Verifier throw (claire)
-
+	Update Win Draw Loose du joueur
+	Ajouter statut DRAW aux matchs

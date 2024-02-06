@@ -31,9 +31,9 @@ export class UsersController {
   }
 
   // historique de matches du user (retourne null si aucun matchs joues)
-  @Get('matchs')
-  async getUserMatchs(@getUser() user: User) {
-    return this.usersService.getMatchHistory(user.id);
+  @Get('matchs/:id')
+  async getUserMatchs(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.getMatchHistory(id);
   }
 
   @Get(':id')
@@ -48,9 +48,9 @@ export class UsersController {
 		return this.usersService.updateUser(userId, updateUserDto)
 	}
 
-  @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  @Delete()
+  async remove(@getUser('id') userId: number) {
+    return this.usersService.remove(userId);
   }
 
 }

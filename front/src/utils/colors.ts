@@ -11,7 +11,6 @@ const colors = {
 	pongBackgroundDraw: "#ca9a40",
 	pongBackgroundLoose: "#ca6740",
 
-
 	pongWrapperBackground: "#fcc154",
 	pongWrapperBackgroundWin: "#54b9fc", 
 	pongWrapperBackgroundDraw: "#fcc154",
@@ -81,7 +80,7 @@ const colors = {
 
 	/* History */
 	history: "#D9D9D9",
-	historyBorder: "#7A3525",
+	historyBorder: "#b68c5c",
 	historyWin: "#6BCAFF",
 	historyLoose: "#FF6B6B",
 	historyDraw: "#FFF384",
