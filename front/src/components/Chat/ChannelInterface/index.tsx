@@ -333,8 +333,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					Type
 					<Button
 						onClick={handleButtonClick}
-						type="button"
-						fontSize={13} alt="Type channel icon" title="Change type" >
+						type="button" fontSize={"13px"}
+						alt="Type channel icon" title="Change type" >
 						{capitalize(channelType)}
 					</Button>
 				</HorizontalSetting>
@@ -389,13 +389,13 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 				<ButtonsWrapper>
 					<Button
 						onClick={() => setChatWindowState(chatWindowStatus.CHANNEL)}
-						type="button"
-						fontSize={14} alt="Cancel icon" title="Cancel" >
+						type="button" fontSize={"14px"}
+						alt="Cancel icon" title="Cancel" >
 						Cancel
 					</Button>
 					<Button
-						type="submit"
-						fontSize={14} alt="Create icon" title="Create" >
+						type="submit" fontSize={"14px"}
+						alt="Create icon" title="Create" >
 						{
 							chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
 								"Create"

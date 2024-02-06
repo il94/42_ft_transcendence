@@ -1,4 +1,4 @@
-import  {useState, useEffect, KeyboardEvent, useRef, useContext } from 'react'
+import  {useState, useEffect, KeyboardEvent, useRef, useContext, Dispatch, SetStateAction } from 'react'
 
 import styled from 'styled-components'
 import Paddle from './Paddle'
@@ -7,9 +7,10 @@ import Score from './Score'
 import InteractionContext from "../../../../contexts/InteractionContext"
 import { User } from '../../../../utils/types'
 import effects from '../../../../utils/effects'
+import colors from '../../../../utils/colors'
 
 
-const Style = styled.div`
+const Style = styled.div<{ backgroundColor: string }>`
 
 position: absolute;
 
@@ -34,8 +35,8 @@ clip-path: ${effects.pixelateWindow};
 
 /* border: 15px solid #ecb54e; */
 
-background-color: #ca9a40;
-
+background-color: ${(props) => props.backgroundColor};
+transition: background-color 1s ease;
 `;
 
 // export enum status {
@@ -45,16 +46,24 @@ background-color: #ca9a40;
 // }
 
 type PongProps = {
+	score: {
+		left: number, right: number
+	},
+	setScore: Dispatch<SetStateAction<{
+		left: number,
+		right: number
+	}>>,
 	social: any;
 	enemy: User | undefined;
 }
 
-function Pong({social, enemy}: PongProps){
+function Pong({score, setScore, social, enemy}: PongProps){
 	
 	const user = useContext(InteractionContext)!																// !!!! object pour les sockets
 
 	const PongRef = useRef<HTMLDivElement | null>(null)
 	const [PongBounds, setPongBounds] = useState<DOMRect | undefined>(undefined)
+	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongBackground)
 	
 	// const [players, setPlayers] = useState<{left: Socket, }>
 
@@ -67,7 +76,7 @@ function Pong({social, enemy}: PongProps){
 
 	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
 
-	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
+	// const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
 
 	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); //tableau de key,    enfoncer = true; else false
 
@@ -165,8 +174,18 @@ function Pong({social, enemy}: PongProps){
 		}
 	}, [])		
 	
+	useEffect(() => {
+		if (score.left > score.right)
+			setBackgroundColor(colors.pongBackgroundWin)
+		else if (score.left < score.right)
+			setBackgroundColor(colors.pongBackgroundLoose)
+		else
+			setBackgroundColor(colors.pongBackgroundDraw)
+	}, [score])
+
+
 	return (
-		<Style ref={PongRef}>
+		<Style backgroundColor={backgroundColor} ref={PongRef}>
 			{
 					PongRef.current ? (
 					<>

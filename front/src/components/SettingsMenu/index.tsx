@@ -346,8 +346,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 							setAvatar={setAvatar} />
 					</VerticalSetting>
 						<Button
-							type="submit"
-							fontSize={19}
+							type="submit" fontSize={"19px"}
 							alt="Save button" title="Save changes">
 							Save
 						</Button>

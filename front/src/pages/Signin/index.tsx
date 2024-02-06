@@ -209,9 +209,7 @@ function Signin() {
 							</ErrorMessage>
 							<Button
 								onClick={() => setShowPassword(!showPassword)}
-								type="button"
-								fontSize={18}
-								width={231}
+								type="button" fontSize={"18px"} width={231}
 								alt="Show password button"
 								title={showPassword ? "Hide password" : "Show password"}
 								style={{ marginTop: "2.5px", marginBottom: "15px" }} >
@@ -226,7 +224,7 @@ function Signin() {
 					</VerticalSetting>
 					<div style={{ marginTop: "10px" }} />
 					<Button
-						type="submit" fontSize={35}
+						type="submit" fontSize={"35px"}
 						alt="Continue button" title="Continue">
 						Continue
 					</Button>

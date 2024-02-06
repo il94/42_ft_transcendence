@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import colors from '../../utils/colors'
 import effects from '../../utils/effects'
 
-const Button = styled.button<{ width?: number, fontSize?: number, alt: string, title: string }>`
+const Button = styled.button<{ width?: number, fontSize?: string, alt: string, title: string }>`
 
 	width: ${(props) => props.width ? props.width + "px" : "auto"};
 
@@ -14,7 +14,7 @@ const Button = styled.button<{ width?: number, fontSize?: number, alt: string, t
 
 	cursor: pointer;
 
-	font-size: ${(props) => props.fontSize && props.fontSize}px;
+	font-size: ${(props) => props.fontSize && props.fontSize};
 	text-decoration: none;
 	text-align: center;
 
