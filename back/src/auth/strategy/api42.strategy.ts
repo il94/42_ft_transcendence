@@ -11,7 +11,7 @@ export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy
         super({
             clientID: process.env.FORTYTWO_APP_ID,
             clientSecret: process.env.FORTYTWO_APP_SECRET,
-            callbackURL: 'http://localhost:3333/auth/api42/callback',
+            callbackURL: `http://${process.env.URL}:3333/auth/api42/callback`,
         });
     }
 
