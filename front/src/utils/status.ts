@@ -43,9 +43,9 @@ export enum messageType {
 }
 
 export enum matchResultStatus {
-	WIN,
-	DRAW,
-	LOOSE
+	WINNER = "WINNER",
+	DRAW = "DRAW",
+	LOOSER = "LOOSER"
 }
 
 export enum contextualMenuStatus {

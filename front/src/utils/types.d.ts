@@ -65,11 +65,11 @@ export type MessageInvitation = Message & {
 
 export type MatchData = {
 	id: number,
-	user: User | UserAuthenticate,
-	opponent: User | UserAuthenticate,
+	username: string
+	opponentname: string,
 	result: matchResultStatus,
-	scoreUser: number,
-	scoreOpponent: number
+	userScore: number,
+	opponentScore: number
 }
 
 export type SettingData = {
