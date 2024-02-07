@@ -40,7 +40,7 @@ function Discussion() {
 					activeState>
 					{
 						// Mappage des messages
-						channelTarget?.messages.map((message, index) => (
+						channelTarget?.messages.map((message) => (
 
 							// Si l'auteur du message est le user auth
 							message.sender.id === userAuthenticate.id ?
@@ -48,14 +48,14 @@ function Discussion() {
 								// Si le message est un message textuel
 								message.type === messageType.TEXT ?
 									<UserText
-										key={"message" + message.id}
+										key={"message_user_text" + message.id}
 										content={(message as MessageText).content}
 									/>
 
 									// Si le message est une invitation
 									:
 									<UserInvitation
-										key={"message" + message.id}
+										key={"message_user_invitation" + message.id}
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}
 										idMsg={(message as MessageInvitation).id}
@@ -68,7 +68,7 @@ function Discussion() {
 								// Si le message est un message textuel
 								message.type === messageType.TEXT ?
 									<ContactText
-										key={"message" + message.id}
+										key={"message_contact_text" + message.id}
 										sender={message.sender}
 										content={(message as MessageText).content}
 									/>
@@ -76,7 +76,7 @@ function Discussion() {
 									// Si le message est une invitation
 									:
 									<ContactInvitation
-										key={"message" + message.id}
+										key={"message_contact_invitation" + message.id}
 										sender={message.sender}
 										target={(message as MessageInvitation).target}
 										initialStatus={(message as MessageInvitation).status}

@@ -5,7 +5,7 @@ import {
 	useContext,
 	useState
 } from "react"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 import {
 	Input,
@@ -14,62 +14,64 @@ import {
 
 import InteractionContext from "../../../../contexts/InteractionContext"
 import AuthContext from "../../../../contexts/AuthContext"
+import DisplayContext from "../../../../contexts/DisplayContext"
 
-import { Channel } from "../../../../utils/types"
-import { messageType } from "../../../../utils/status"
+import {
+	ErrorResponse
+} from "../../../../utils/types"
 
-
-type PropsTextInput = {
-	channel: Channel,
-}
-
+import {
+	messageType
+} from "../../../../utils/status"
  
 function TextInput() {
 
 	const { token, url } = useContext(AuthContext)!
-	const [message, setMessage] = useState<string>('')
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
-	/*
-		response = tableau des socket des users connecter sur le channel
-	*/
-
+	const [message, setMessage] = useState<string>('')
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
-		if (message === '')
+		if (!message)
 			return
-			try {
-				if (new Date(channelTarget.muteInfo[userAuthenticate.id]) > new Date())
-				{
-					console.log("you are muted");
-					// voir comment gerer le mute coter front
-					return;
-				}
-				const sockets = await axios.get(`http://${url}:3333/channel/${channelTarget.id}/sockets`, {
+		try {
+			if (!channelTarget)
+				throw new Error
 
+			if (new Date(channelTarget.muteInfo[userAuthenticate.id]) > new Date())
+			{
+				displayPopupError({ display: true, message: "You are muted from this channel" })
+				return
+			}
+
+			await axios.post(`http://${url}:3333/channel/${channelTarget.id}/message`, {
+				msg: message,
+				msgStatus : messageType.TEXT
+			},
+			{
 				headers: {
-						'Authorization': `Bearer ${token}`
-					} 
-				})
-
-				/* post le meesage dans le back */
-				const idMsg = await axios.post(`http://${url}:3333/channel/${channelTarget.id}/message`, 
-				{ msg: message , msgStatus : messageType.TEXT},
-					{
-						headers: {
-							'Authorization': `Bearer ${token}`
-						}
-					}
-				);
-				userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channelTarget.id, message, idMsg.data);
-				
-				setMessage("");
-			  } catch (error) {
-				console.log(error);
-				// setErrorRequest(true);
-			  }
-			};
+					'Authorization': `Bearer ${token}`
+				}
+			})
+		}
+		catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+		}
+		finally {
+			setMessage('')
+		}
+	}
 
 	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
 		setMessage(event.target.value)
@@ -89,12 +91,12 @@ function TextInput() {
 			onSubmit={handleSubmit}
 			autoComplete="off"
 			spellCheck="false"> 
-					<Input
-						onFocus={removePlaceHolder}
-						onBlur={setPlaceHolder}
-						onChange={handleInputChange}
-						value={message}
-						placeholder="Type here..." />
+			<Input
+				onFocus={removePlaceHolder}
+				onBlur={setPlaceHolder}
+				onChange={handleInputChange}
+				value={message}
+				placeholder="Type here..." />
 		</Style>
 	)
 }

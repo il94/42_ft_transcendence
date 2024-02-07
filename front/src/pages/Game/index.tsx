@@ -24,12 +24,13 @@ import {
 	refreshLeaveChannel,
 	refreshUpdateChannel,
 	refreshUserStatus,
-	updateDiscussion,
+	postInvitation,
 	refreshUserRole,
 	refreshNewOwner,
 	refreshJoinChannel,
 	refreshStatusChallenge,
-	refreshUserMute
+	refreshUserMute,
+	postText
 } from './sockets'
 
 import Logo from '../../components/Logo'
@@ -149,7 +150,6 @@ function Game() {
 						members: [],
 						administrators: [],
 						owner: undefined,
-						mutedUsers: [],
 						banneds: [],
 						muteInfo: []
 					}
@@ -305,10 +305,11 @@ function Game() {
 
 
 
-		// console.log("CHANNEL TARGET = ", channelTarget)
 
-		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string, idMsg: number) => 
-			updateDiscussion({ idSend, idChannel, idTargetOrMsg, idMsg, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("postText", (channelId: number, userId: number, textDatas: any) => 
+			postText({ channelId, userId, textDatas, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("postInvitation", (channelId: number, userAuthId: number, userTargetId: number, invitationDatas: any) => 
+			postInvitation({ channelId, userAuthId, userTargetId, invitationDatas, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
@@ -341,7 +342,8 @@ function Game() {
 
 
 
-			userAuthenticate.socket?.off("updateDiscussion")
+			userAuthenticate.socket?.off("postText")
+			userAuthenticate.socket?.off("postInvitation")
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
 			userAuthenticate.socket?.off("setNewOwner")

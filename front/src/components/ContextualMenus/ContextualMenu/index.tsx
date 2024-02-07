@@ -111,7 +111,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					}
 				})
 
-				const newChannelMP = {
+				const newChannelMP: Channel = {
 					...newChannelMPResponse.data,
 					messages: [],
 					members: [
@@ -120,9 +120,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					],
 					administrators: [],
 					owner: undefined,
-					mutedUsers: [],
 					banneds: [],
-					muteinfo: []
+					muteInfo: []
 				}
 				return (newChannelMP)
 			}
@@ -156,32 +155,37 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 			if (type === contextualMenuStatus.SOCIAL) {
 				const channelMP = await handleContactClickEvent()
-
-				channel = channelMP
+				if (channelMP)
+					channel = channelMP
+				else
+					return
 			}
 			else if (channelTarget)
 				channel = channelTarget
 			else
 				throw new Error
 
-			const idMsg = await axios.post(`http://${url}:3333/channel/${channel.id}/invitation`,
-				{ msgStatus: messageType.INVITATION, targetId: userTarget.id },
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				}
-			);
-			const sockets = await axios.get(`http://${url}:3333/channel/${channel.id}/sockets`, {
+			await axios.post(`http://${url}:3333/channel/${channel.id}/invitation`, {
+				msgStatus: messageType.INVITATION,
+				targetId: userTarget.id
+			},
+			{
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
-			userAuthenticate.socket?.emit("sendDiscussion", sockets.data, userAuthenticate.id, channel.id, userTarget.id, idMsg.data);
 		}
 		catch (error) {
-			console.log(error);
-			// displayPopupError(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404 || statusCode === 409)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
@@ -315,21 +319,24 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			if (!channelTarget)
 				throw new Error
 	
-			/* ============ Temporaire ============== */
-			console.log(userTarget.username, " has muted")
-			await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/mute/${userTarget.id}`, {},
-			{
+			await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/mute/${userTarget.id}`, {}, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
 			})
 				
-			//userAuthenticate.socket?.emit("sendMute", userTarget.socket, channelTarget.id);
-			// userTarget.socket?.send()
-			// post dans le back avec un id de la target id du mec qui envoie
 		}
 		catch (error) {
-			// displayPopupError(true)
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
 		}
 	}
 
