@@ -44,4 +44,3 @@ ContextualMenu/ : à faire après merge
 (============================= CLAIRE ============================)
 
 	Update Win Draw Loose du joueur
-	Ajouter statut DRAW aux matchs

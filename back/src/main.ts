@@ -27,7 +27,7 @@ async function bootstrap() {
 
 	app.use(
 		session({
-		  secret: 'my-secret',
+		  secret: process.env.SESSION_SECRET,
 		  resave: false,
 		  saveUninitialized: false,
 		  cookie: { maxAge: 60000, }
@@ -43,7 +43,7 @@ async function bootstrap() {
 	app.use(passport.session());
 	app.use(cookieParser());
 	
-	await app.listen(process.env.PORT, process.env.API_IP);
-	console.log(`Server listening on ${process.env.API_IP}:${process.env.PORT}`)
+	await app.listen(process.env.PORT);
+	console.log(`Server listening on ${process.env.IP}:${process.env.PORT}`)
 }
 bootstrap();

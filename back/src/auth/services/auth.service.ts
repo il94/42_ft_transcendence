@@ -187,7 +187,7 @@ export class AuthService {
 					const token = await this.signToken(user.id, user.username)
 						res.clearCookie('token', { httpOnly: true })
 						.cookie("access_token", token.access_token)
-						.redirect(`http://localhost:5173`)
+						.redirect(`http://${process.env.IP}:5173`)
 				}
 			
 				// Si le user a active la twoFA
@@ -196,7 +196,7 @@ export class AuthService {
 					// Redirige vers la page twoFA avec les infos necessaires pour le front
 					res.cookie('two_FA', true)
 					.cookie('userId', user.id)
-					.redirect(`http://localhost:5173/twofa`)	
+					.redirect(`http://${process.env.IP}:5173/twofa`)	
 				}
 			}
 			// Si le user ne possede pas de compte dans l'app
@@ -207,12 +207,12 @@ export class AuthService {
 				const fiveMin = Date.now() + 5 * 60 * 1000;
 				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
 				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
-				.redirect(`http://localhost:5173/signup42`)
+				.redirect(`http://${process.env.IP}:5173/signup42`)
 			}
 		}
 		catch (error) {
 			res.cookie("error_message", error.message).
-			redirect(`http://localhost:5173/error`)
+			redirect(`http://${process.env.IP}:5173/error`)
 		}
 	}
 

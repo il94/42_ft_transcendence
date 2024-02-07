@@ -39,10 +39,12 @@ export class PongService {
 				status: GameStatus.PENDING,
 				players: {
 					create: [{ 
+						score: 0,
 						result: 'DRAW',
 						role: roleInGame.PLAYER,
 						userId: userOneId},
 						{ 
+						  score: 0,
 						  result: 'DRAW',
 						  role: roleInGame.PLAYER,
 						  userId: userTwoId}
