@@ -294,7 +294,7 @@ export class UsersService {
 
 	/*********************** Matchs history ******************************************/
 
-	async setResult(userId: number, result: MatchResult): Promise<User> {
+	async setResult(userId: number, result: MatchResult): Promise<void> {
 		try {
 			const user = await this.prisma.user.findUnique({where: { id: userId }})	
 			if (result == MatchResult.WINNER) {
@@ -309,8 +309,9 @@ export class UsersService {
 				})
 				user.losses++
 			}
-			return user;
-		} catch (error) {}
+		} catch (error) {
+			throw error
+		}
 	}
 
 	async getMatchHistory(userId: number): Promise<Array<any>> {

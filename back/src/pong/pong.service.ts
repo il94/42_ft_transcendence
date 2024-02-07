@@ -8,6 +8,7 @@ import { AppService } from 'src/app.service';
 import { ESLint } from 'eslint';
 import { PongGame } from './game'
 import { AppGateway } from 'src/app.gateway';
+import { UsersService } from 'src/auth/services/users.service';
 
 
 @UseGuards(JwtGuard)
@@ -20,6 +21,7 @@ export class PongService {
 	(
 		private prisma: PrismaService,
 		private appGateway: AppGateway,
+		private userService: UsersService
 		) {}
 	
 
@@ -102,6 +104,7 @@ export class PongService {
 		  });
 		  console.log(`User ${userId} game stats updated successfully.`);
 		  this.updateStatusUser(userId, UserStatus.ONLINE);
+		  this.userService.setResult(userId, result); // set user match history  
 		  return updatedUserGame;
 		} catch (error) {
 		  console.error(`Error updating user ${userId} game stats:`, error);
