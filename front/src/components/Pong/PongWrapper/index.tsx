@@ -111,7 +111,7 @@ function PongWrapper({social}: any) {
 		setGameState(false)
 		console.log("i get the discoonect emit")
 		displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
-		setBackgroundColor(colors.pongBackground)
+		setBackgroundColor(colors.pongWrapperBackground)
 	}
 
 	useEffect(() => {

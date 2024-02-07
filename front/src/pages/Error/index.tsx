@@ -4,6 +4,7 @@ import {
 import {
 	useLocation
 } from 'react-router-dom'
+import Cookies from 'js-cookie'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 
@@ -17,7 +18,7 @@ import colors from '../../utils/colors'
 function Error() {
 
 	const location = useLocation()
-	const message: string | undefined = location.state?.message
+	const message: string | undefined = location.state?.message ? location.state.message : Cookies.get("error_message")
 
 	useEffect(() => {
 		localStorage.removeItem("access_token")

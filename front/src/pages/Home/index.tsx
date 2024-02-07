@@ -42,32 +42,48 @@ const ButtonsWrapper = styled.div`
 function Home() {
 
 	const { token, setToken, url } = useContext(AuthContext)!
-	const navigate = useNavigate();
+	const navigate = useNavigate()
 
-	// Vérifie si le user est authentifié en récupérant le token soit par les cookies, soit en local
 	useEffect(() => {
-		const access_token: string | null | undefined = Cookies.get('access_token') ?
-			Cookies.get('access_token')
-			:
-			localStorage.getItem('access_token')
+		async function getToken() {
+			try {
+				// Recupere le token soit par les cookies, soit en local
+				const access_token: string | null | undefined = Cookies.get('access_token') ?
+					Cookies.get('access_token')
+					:
+					localStorage.getItem('access_token')
 
-		if (access_token)
-		{
-			localStorage.setItem('access_token', access_token)
-			setToken(access_token)
+				// Si un token est trouve, verifie si'il est valide et le set
+				if (access_token)
+				{
+					await axios.post(`http://${url}:3333/auth/token`, {}, {
+						headers: {
+							'Authorization': `Bearer ${access_token}`
+						}
+					})
+					localStorage.setItem('access_token', access_token)
+					setToken(access_token)
+				}
+				else
+					setToken('')
+
+				Cookies.remove('access_token')
+				Cookies.remove('usernameId')
+				Cookies.remove('avatar')
+				Cookies.remove('two_FA')
+				Cookies.remove('userId')
+			}
+			catch (error) {
+				setToken('')
+				localStorage.removeItem("access_token")
+				return (false)
+			}
 		}
-		else
-			setToken('')
+		getToken()
 
 		const GameButtonContainer = gameButtonRef.current
 		if (GameButtonContainer)
 			GameButtonContainer.focus()
-
-		Cookies.remove('access_token')
-		Cookies.remove('usernameId')
-		Cookies.remove('avatar')
-		Cookies.remove('two_FA')
-		Cookies.remove('userId')
 
 	}, [])
 

@@ -3,70 +3,41 @@ import {
 	useEffect,
 	useState
 } from "react"
-// import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import {
+	NoMatchMessage,
 	Style
 } from "./style"
 
 import Match from "./Match"
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
+import Loader from "../../../componentsLibrary/Loader"
 
 import InteractionContext from "../../../contexts/InteractionContext"
-
-import {
-	MatchData
-} from "../../../utils/types"
-
-import {
-	matchResultStatus
-} from "../../../utils/status"
-
+import AuthContext from "../../../contexts/AuthContext"
+import DisplayContext from "../../../contexts/DisplayContext"
 
 function MatchHistory() {
 
+	const { token, url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
+	const { loaderMatchsHistory, setLoaderMatchsHistory } = useContext(DisplayContext)!
 
-	const [matchs, setMatchs] = useState<MatchData[]>([])
+	const [matchs, setMatchs] = useState<any[]>([])
+	const [historyHeight, setHistoryHeight] = useState<number>(0)
 
 	useEffect(() => {
 		async function fetchMatchs() {
 			try {
-
-				/* ============ Temporaire ============== */
-
-				// const response = await axios.get(`http://${url}:3333/user/:id/history`) //(id etant userIdTarget)
-				// setMatchs(response.data)		
-
-				setMatchs([
-					{
-						id: 0,
-						user: userTarget,
-						opponent: userTarget,
-						result: matchResultStatus.WIN,
-						scoreUser: 15,
-						scoreOpponent: 0
-					},
-					{
-						id: 1,
-						user: userTarget,
-						opponent: userTarget,
-						result: matchResultStatus.DRAW,
-						scoreUser: 10,
-						scoreOpponent: 10
-					},
-					{
-						id: 2,
-						user: userTarget,
-						opponent: userTarget,
-						result: matchResultStatus.LOOSE,
-						scoreUser: 0,
-						scoreOpponent: 999
+				setLoaderMatchsHistory(true)
+				const matchsResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/matchs/${userTarget.id}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
 					}
-				])
-
-				/* ====================================== */
-
+				})
+				setMatchs(matchsResponse.data)
+				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
 				setMatchs([])
@@ -75,22 +46,47 @@ function MatchHistory() {
 		fetchMatchs()
 	}, [userTarget])
 
+	useEffect(() => {
+		const height = matchs.length <= 5 ? matchs.length * 30 : 150
+		setHistoryHeight(height)
+	}, [matchs])
+
+	if (matchs.length === 0)
+	{
+		return (
+			<NoMatchMessage>
+				No match
+			</NoMatchMessage>
+		)
+	}
+
 	return (
-		<Style>
-			<ScrollBar>
+		<Style
+			height={historyHeight}
+			$loader={loaderMatchsHistory} >
+			{
+				<ScrollBar>
 				{
-					matchs.map((match) => (
-						<Match
-							key={"match" + match.id}
-							username={match.user.username}
-							opponent={match.opponent.username}
-							result={match.result}
-							scoreUser={match.scoreUser}
-							scoreOpponent={match.scoreOpponent}
-						/>
-					))
+					loaderMatchsHistory ?
+					<Loader size={150} />
+					:
+					<>
+					{
+						matchs.map((match: any) => (
+							<Match
+								key={"match" + match.match.gameId}
+								username={userTarget.username}
+								opponent={match.challengerData.challenger}
+								result={match.match.result}
+								scoreUser={match.match.score}
+								scoreOpponent={match.challengerData.challengerScore}
+							/>
+						))
+					}
+					</>
 				}
-			</ScrollBar>
+				</ScrollBar>
+			}
 		</Style>
 	)
 }

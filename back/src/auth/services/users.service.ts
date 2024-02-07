@@ -333,7 +333,7 @@ export class UsersService {
 				//console.log("challenger: ", challenger.username);
 				res.challenger = challenger.username;
 				const score  = await this.prisma.usersOnGames.findFirst({ where: { gameId: gameId, userId: challenger.id},
-					select: { score: true }})
+					select: { score: true, gameId: true }})
 				res.challengerScore = score.score;
 			}
 		}
