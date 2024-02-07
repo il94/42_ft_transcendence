@@ -175,7 +175,8 @@ export class UsersService {
 			});
 			if (!isCodeValid)
 				throw new ForbiddenException('Wrong authentication code');
-			const setUser = await this.prisma.user.update({
+			
+				const setUser = await this.prisma.user.update({
 				where: { id: user.id, },
 				data: { twoFA: true, },
 			});
