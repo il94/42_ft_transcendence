@@ -11,13 +11,13 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	app.use(json({ limit: '5mb' }))
-	const config = new DocumentBuilder()
-    .setTitle('Median')
-    .setDescription('The Median API description')
-    .setVersion('0.1')
-    .build();
-	const document = SwaggerModule.createDocument(app, config);
-	SwaggerModule.setup('api', app, document);
+	// const config = new DocumentBuilder()
+    // .setTitle('Median')
+    // .setDescription('The Median API description')
+    // .setVersion('0.1')
+    // .build();
+	// const document = SwaggerModule.createDocument(app, config);
+	// SwaggerModule.setup('api', app, document);
 	
 	app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true,}));
 	app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
@@ -43,6 +43,7 @@ async function bootstrap() {
 	app.use(passport.session());
 	app.use(cookieParser());
 	
-	await app.listen(3333);
+	await app.listen(process.env.PORT, process.env.API_IP);
+	console.log(`Server listening on ${process.env.API_IP}:${process.env.PORT}`)
 }
 bootstrap();
