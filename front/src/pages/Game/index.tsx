@@ -315,8 +315,8 @@ function Game() {
 			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
 		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
 			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
-		userAuthenticate.socket?.on("updateStatusChallenge", (idMsg: number, status: challengeStatus, idChan: number) => 
-			refreshStatusChallenge({ idMsg, status, idChan, channelTarget, setChannelTarget }));
+		userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus) => 
+			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }));
 		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string) => 
 			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }));
 
@@ -345,7 +345,7 @@ function Game() {
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
 			userAuthenticate.socket?.off("setNewOwner")
-			userAuthenticate.socket?.off("updateStatusChallenge");
+			userAuthenticate.socket?.off("updateChallenge");
 			userAuthenticate.socket?.off("updateUserMute");
 		}
 

@@ -164,7 +164,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			else
 				throw new Error
 
-			const idMsg = await axios.post(`http://${process.env.IP}:3333/channel/${channel.id}/invitation`,
+			const idMsg = await axios.post(`http://${url}:3333/channel/${channel.id}/invitation`,
 				{ msgStatus: messageType.INVITATION, targetId: userTarget.id },
 				{
 					headers: {
@@ -172,7 +172,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					}
 				}
 			);
-			const sockets = await axios.get(`http://${process.env.IP}:3333/channel/${channel.id}/sockets`, {
+			const sockets = await axios.get(`http://${url}:3333/channel/${channel.id}/sockets`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

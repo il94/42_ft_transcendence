@@ -1043,19 +1043,69 @@ export class ChannelsService {
       }
     }
 
+	// Change le statut d'une invitation
+	async updateMessageStatus(channelId: number, messageId: number, userAuthId: number, newStatus: challengeStatus) { 
+		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
 
-    async updateMessageStatus(idMsg: number, newStatus: challengeStatus)
-    { 
-      try {
-        const updatedMessage = await this.prisma.message.update({
-          where: { id: idMsg },
-          data: { status: newStatus },
-        });
-        return updatedMessage;
-      } catch (error) { 
-        throw error;
-    }
-  }
+			// Verifie si le message existe et recupere ses donnees
+			const messageDatas = await this.prisma.message.findUnique({
+				where: {
+					id: messageId
+				},
+				select: {
+					authorId: true,
+					targetId: true,
+					isInvit: true,
+					status: true
+				}
+			})
+			if (!messageDatas)
+				throw new NotFoundException("Message not found")
+
+			// Verifie si le message est bien une invitation
+			else if (!messageDatas.isInvit)
+				throw new ForbiddenException("Message is not an invitation")
+
+			// Verifie si l'invitation est destinee au user auth ou si il en est l'auteur
+			else if (messageDatas.targetId !== userAuthId &&
+				messageDatas.authorId !== userAuthId)
+				throw new ForbiddenException("You dont have permissions for this action")
+
+			// Verifie si le nouveau statut est accepte ou refuse
+			else if (newStatus !== challengeStatus.ACCEPTED &&
+				newStatus !== challengeStatus.CANCELLED)
+				throw new ForbiddenException("You dont have permissions for this action")
+
+			// Update l'invitation
+			await this.prisma.message.update({
+				where: {
+					id: messageId
+				},
+				data: {
+					status: newStatus
+				}
+			})
+
+			// Emit
+			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
 /* =============================== UTILS ==================================== */
 

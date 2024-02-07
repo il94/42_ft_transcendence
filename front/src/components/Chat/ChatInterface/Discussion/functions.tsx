@@ -15,10 +15,11 @@ import {
 
 import {
 	Channel,
+	ErrorResponse,
 	User,
 	UserAuthenticate
 } from "../../../../utils/types"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 type ShowCardProps = {
 	displayCard: Dispatch<SetStateAction<boolean>>,
@@ -105,24 +106,36 @@ export async function showContextualMenu(event: MouseEvent<HTMLDivElement>, send
 
 type handleClickChallengeStatusProps = {
 	userAuthenticate: UserAuthenticate,
+	displayPopupError: Dispatch<SetStateAction<{
+		display: boolean,
+		message?: string
+	}>>,
 
 	token: string,
 	url: string,
 }
 
 export async function handleClickChallengeStatus(status : challengeStatus, idMsg: number, idChan : number, props: handleClickChallengeStatusProps) {
-	const sockets = await axios.get(`http://${props.url}:3333/channel/${idChan}/sockets`, {
+	try {
+		await axios.patch(`http://${props.url}:3333/channel/${idChan}/message/${idMsg}`, {
+			newStatus : status
+		},
+		{
 			headers: {
-					'Authorization': `Bearer ${props.token}`
-				} 
-			})
-	await axios.patch(`http://${props.url}:3333/channel/message/${idMsg}`, 
-	{ idMsg: idMsg , msgStatus : status},
-	{
-	headers: {
-		'Authorization': `Bearer ${props.token}`
+				'Authorization': `Bearer ${props.token}`
 			}
+		})
+	}
+	catch (error) {
+		if (axios.isAxiosError(error)) {
+			const axiosError = error as AxiosError<ErrorResponse>
+			const { statusCode, message } = axiosError.response?.data!
+			if (statusCode === 403 || statusCode === 404)
+				props.displayPopupError({ display: true, message: message })
+			else
+				props.displayPopupError({ display: true })
 		}
-	);
-	props.userAuthenticate.socket?.emit('updateChallenge', sockets.data, idMsg, status, idChan);
+		else
+			props.displayPopupError({ display: true })
+	}
 }

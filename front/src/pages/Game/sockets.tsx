@@ -469,24 +469,23 @@ export async function refreshUserMute(props : RefreshUserMuteProps) {
 	}
 }
 
-	
 type RefreshStatusChallengeProps = {
-	idMsg: number,
-	status: challengeStatus,
-	idChan: number,
+	channelId: number,
+	messageId: number,
+	newStatus: challengeStatus,
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
-
 }
 
+// Met a jour le statut d'une invitation
 export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
-	if (props.idChan === props.channelTarget?.id)
+	if (props.channelId === props.channelTarget?.id)
 	{
 		props.setChannelTarget((prevState: Channel | undefined) => {
 		if (prevState) {
 			const updatedMessages = prevState.messages.map((message) =>
-			message.id === props.idMsg ? { ...message, status: props.status } : message
+			message.id === props.messageId ? { ...message, status: props.newStatus } : message
 			);
 			return {
 			...prevState,

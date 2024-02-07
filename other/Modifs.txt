@@ -5,8 +5,10 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	(!!!!!)
 	Clavier indisponible quand pong display
 	Fix les erreurs ts
+	Fix invite dans MP
 
 	(!!!)
+	Faire DTO pour verifier les status envoye au back
 	Set corectement tout les titles et alts
 
 	(!!)
@@ -31,9 +33,6 @@ Signup42/ :
 
 (============================= SOSO ============================)
 
-Messages/ :
-	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
-
 channels.service/ :
 -findChannelWithRelations:
 	Vérifier la fonction pour mapper les messages (soso)
@@ -42,5 +41,3 @@ ContextualMenu/ : à faire après merge
 	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
 
 (============================= CLAIRE ============================)
-
-	Update Win Draw Loose du joueur

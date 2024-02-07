@@ -114,15 +114,14 @@ export class ChannelController {
     return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId);
   }
 
-  // Change le challenge status d'un channel par son id
-
-  @Patch('message/:id')
-  updateStatusChannel(
-  @Param('id', ParseIntPipe) idMsg: number, 
-  @Body('msgStatus') newStatus: challengeStatus,
-  ) {
-  return this.channelsService.updateMessageStatus(idMsg, newStatus);
-}
+	// Change le statut d'une invitation
+	@Patch(':channelId/message/:messageId')
+	updateStatusChannel(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('messageId', ParseIntPipe) messageId: number,
+	@Body('newStatus') newStatus: challengeStatus) {
+		return this.channelsService.updateMessageStatus(channelId, messageId, userAuthId, newStatus)
+	}
 
 	// Supprime un channel
 	@Delete(':id')
