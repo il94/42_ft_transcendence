@@ -19,7 +19,9 @@ export class PongGateway {
 	@WebSocketServer()
 	server: Server;
 	 
-	private searchingUsers: Map<number, Socket> = new Map();
+	private searchingUsersEz: Map<number, Socket> = new Map();
+	private searchingUsersMedium: Map<number, Socket> = new Map();
+	private searchingUsersHard: Map<number, Socket> = new Map();
 	// private watchingUsers: Map<number, Socket> = new Map(); // a teg
 
 	constructor(private  PongService: PongService,
@@ -37,7 +39,6 @@ export class PongGateway {
 					game = element;
 				}
 			});
-		// console.log("deconnection of :", client.id, " !!! ")
 		if (game)
 		{
 			// console.log("gonna delete game because of disconnect")
@@ -46,65 +47,111 @@ export class PongGateway {
 			this.server.to(enemy.getSocket().id).emit("decoInGame")
 			enemy.setWinner()
 			game.setState(false)
-			// const index = this.PongService.activeGames.indexOf(game)
-			// this.PongService.activeGames.splice(index, 1)
-			// soso Patch Game
+			return
 		}
+		this.delUserFromSearchingUser(client)
+	}
+
+	delUserFromSearchingUser(client: Socket)
+	{
+		this.searchingUsersEz.forEach((value, key) => {
+			if (value === client) {
+				this.searchingUsersEz.delete(key);
+				return;
+			}
+		});
+		this.searchingUsersMedium.forEach((value, key) => {
+			if (value === client) {
+					this.searchingUsersEz.delete(key);
+				return; 
+			}
+		});
+		this.searchingUsersHard.forEach((value, key) => {
+			if (value === client) {
+					this.searchingUsersEz.delete(key);
+				return; 
+			}
+		});
+	} // fct degeu :/
+
+	async toSearchingArray(client: Socket, userId: number, dif: number){
+		
+		let array: Map<number, Socket>
+
+		if (dif === 1)
+			array = this.searchingUsersEz
+		if (dif === 2)
+			array = this.searchingUsersMedium 
+		if (dif === 3)
+			array = this.searchingUsersHard
+
+			if (array.get(userId)){
+				array.delete(userId)
+				await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
+				return
+				// throw new ConflictException('User already in game')
+			}
+		array.set(userId, client)
+		await this.PongService.updateStatusUser(userId, UserStatus.WAITING)
+
+	}
+
+	async checkToLaunchGame(client: Socket, dif: number)
+	{
+		let array: Map<number, Socket>
+		if (dif === 1)
+			array = this.searchingUsersEz
+		if (dif === 2)
+			array = this.searchingUsersMedium 
+		if (dif === 3)
+			array = this.searchingUsersHard
+
+		let keysIterator  = array.keys()
+		let keysArray = Array.from(keysIterator);
+		let firstkey = keysArray[0]
+		
+		if (array.size >= 2)
+		{
+			let secondkey = keysArray[1]
+
+			let firstsocket = array.get(firstkey)
+			let secondsocket = array.get(secondkey)
+
+			const user1 = this.UserService.findById(firstkey)
+			const user2 = this.UserService.findById(secondkey)
+
+			this.server.to(firstsocket.id).emit("launchGame")
+			this.server.to(secondsocket.id).emit("launchGame")
+
+			const newgame = await this.PongService.createGame(firstkey, secondkey);
+
+			this.PongService.activeGames.push(new PongGame(newgame, dif, firstsocket, firstkey, (await user1).username, secondsocket, secondkey, (await user2).username))
+			this.gameLoop(firstsocket, secondsocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
+
+			for (let [key, value] of array.entries()) {
+				if (value === firstsocket || value === secondsocket) {
+					array.delete(key);
+				}
+			}
+		}
+
 	}
 	
 	@SubscribeMessage('searchGame')
 	async addSearchingPlayer(client: Socket, data: any) {
 		try {			
-			if (this.searchingUsers.get(data)){
-				this.searchingUsers.delete(data)
-				await this.PongService.updateStatusUser(data, UserStatus.ONLINE)
-				console.log("is now out of search")
 
-				return
-				// throw new ConflictException('User already in game')
-			}
+			this.toSearchingArray(client, data[0], data[1])
 
-			this.searchingUsers.set(data, client)
+			this.checkToLaunchGame(client, data[1])
 
-			console.log("is now in search")
-			await this.PongService.updateStatusUser(data, UserStatus.WAITING)
-			let keysIterator  = this.searchingUsers.keys()
-			let keysArray = Array.from(keysIterator);
-			let firstkey = keysArray[0]
-
-			if (this.searchingUsers.size >= 2)
-			{		
-				let secondkey = keysArray[1]
-
-				let firstsocket = this.searchingUsers.get(firstkey)
-				let secondsocket = this.searchingUsers.get(secondkey)
-
-				const user1 = this.UserService.findById(firstkey)
-				const user2 = this.UserService.findById(secondkey)
-
-				this.server.to(firstsocket.id).emit("launchGame", user2)
-				this.server.to(secondsocket.id).emit("launchGame", user1)
-				// POST la game et gerer le status des joueurs et recupere l'id newgame
-				const newgame = await this.PongService.createGame(firstkey, secondkey);
-			
-				console.log("user1.usernme", (await user1).username)
-				console.log("user2.usernme", (await user2).username)
-
-				this.PongService.activeGames.push(new PongGame(newgame, firstsocket, firstkey,  (await user2).username, secondsocket, secondkey, (await user2).username))
-				for (let [key, value] of this.searchingUsers.entries()) {
-					if (value === firstsocket || value === secondsocket) {
-						this.searchingUsers.delete(key);
-					}
-				} //delete Searchinguser after finding a game
-				// console.log("size of map searchinguser", this.searchingUsers.size)
-				this.gameLoop(firstsocket, secondsocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
-			}
 		} catch (error) {
 			//throw error
 		}
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
+		const speed = 30 / game.difficulty
 		setTimeout(() =>{
 			game.moveBall()
 			
@@ -115,14 +162,10 @@ export class PongGateway {
 				y: (ball.y)
 			}
 
-			this.server.to(host.id).emit("pongInfo", ball, game.LeftPlayer.getPos(), game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
-			this.server.to(guest.id).emit("pongInfo", reverseball, game.RightPlayer.getPos(), game.LeftPlayer.getPos(), game.RightPlayer.getScore(), game.LeftPlayer.getScore())
-			//watcher from prisma or 
-			// for (let [key, value] of this.watchingUsers.entries()) {
-			// 	this.server.to(value.id).emit("pongInfo", ball, game.LeftPlayer.getPos(), game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
-			// }
+			this.server.to(host.id).emit("pongInfo", game.id, ball, game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.name, game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
+			this.server.to(guest.id).emit("pongInfo", game.id, reverseball, game.RightPlayer.name, game.RightPlayer.getPos(), game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.getScore(), game.LeftPlayer.getScore())
 			game.watcher.forEach((e) =>{
-				this.server.to(e.id).emit("pongInfo", ball, game.LeftPlayer.getPos(), game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
+				this.server.to(e.id).emit("pongInfo", game.id, ball, game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.name, game.RightPlayer.getPos(), game.LeftPlayer.getScore(), game.RightPlayer.getScore())
 			})
 			game.checkScore()
 			if (game.getState())
@@ -134,36 +177,19 @@ export class PongGateway {
 				const looser = game.LeftPlayer.winner ? game.RightPlayer : game.LeftPlayer
 				this.PongService.updateUserGameStats(winner.id, game.id, winner.getScore(), MatchResult.WINNER)
 				this.PongService.updateUserGameStats(looser.id, game.id, looser.getScore(), MatchResult.LOOSER)
+				
+				this.PongService.updateStatusUser(winner.id, UserStatus.ONLINE)
+				this.PongService.updateStatusUser(looser.id, UserStatus.ONLINE)
+				this.PongService.updateGameStatus(game.id, GameStatus.FINISHED)
+
 				const index = this.PongService.activeGames.indexOf(game)
 				if (index != -1)
 					this.PongService.activeGames.splice(index, 1)
 				console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
-				this.PongService.updateGameStatus(game.id, GameStatus.FINISHED)
-				// soso Patch Game finish et les score
-				//route base de donner le winner
-
 			}
-		}, 30)
+		}, speed)
 
 	}
-
-	@SubscribeMessage("getPongInfo") 
-		handleBallInfo(client: Socket){
-			let game: PongGame;
-
-			this.PongService.activeGames.forEach((element) => {
-				if (element.isMyPlayer(client)){
-					game = element;
-				}
-			});
-			if (game)
-			{
-				const player = game.isMyHost(client) ? game.LeftPlayer : game.RightPlayer
-				const enemy = player === game.LeftPlayer ? game.RightPlayer : game.LeftPlayer
-				
-				this.server.to(client.id).emit("pongInfo", game.Ball.getPos(), player.getPos(), enemy.getPos(), 0, 0)
-			}
-		}
 		
 	@SubscribeMessage("paddlemove")
 		handlePaddleMove(client: Socket, args: string)
@@ -183,12 +209,9 @@ export class PongGateway {
 		}
 
 		@SubscribeMessage("spectate")
-			handleSpectate(client: Socket, data: any)
+			async handleSpectate(client: Socket, data: any)
 			{
 				let game: PongGame
-				console.log("data[0]", data[0])
-				console.log("data[1]", data[1])
-				console.log("data", data)
 				this.PongService.activeGames.forEach((element) => {
 					if (element.isMyPlayerById(data[1])){
 						game = element;
@@ -198,9 +221,28 @@ export class PongGateway {
 				{
 					const tmp = client
 					game.addWatcher(tmp)
+					await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
 					this.server.to(client.id).emit("spectate")
 				}
 				// this.watchingUsers.set(data[0], client)
+			}
+
+		@SubscribeMessage("stopSpectate")
+			async handleStopSpectate(client: Socket, data: number)
+			{
+				let game: PongGame
+				this.PongService.activeGames.forEach((element) => {
+					if (element.id === data[0]){
+						game = element;
+					}
+				});
+				if (game)
+				{
+					await this.PongService.updateStatusUser(data[1], UserStatus.ONLINE)
+					const index = game.watcher.indexOf(client)
+					if(index != -1)
+						game.watcher.splice(index,1)
+				}
 			}
 }
 
@@ -208,16 +250,19 @@ export class PongGateway {
 
 	// winner and looser screen at end need style
 
-	// cooldown at start ?
-
-	// route : create game, finish game, add a spectator ?  
+	// cooldown at start ? 
 
 	// ...
 
-// bugs :
+	// enlever le waiting quand on cherche plus 
+	
 
-	// game freeze --> a cause de modif du code ou qunad je regarde pas les pages pendant un certatin temps (je  crois)
+// bugs :
 
 	// les possible element du pongWrapper peuvent se voir si on retrecie bcp le pong
 
 	// le inspect de la page clc
+
+	// bug status peut etre moi
+
+

@@ -60,28 +60,28 @@ const Style = styled.div<{ backgroundColor: string }>`
 //   	cursor: pointer;
 // `
 
-const PlayButtonStyle = styled.div`
+// const PlayButtonStyle = styled.div`
 	
-	/* position: absolute; */
-  	/* top: 50%;
-  	left: 50%; */
-  	/* transform: translateX(-50%); */
-	width: 350px;
-  	padding: 2% 4%;
-  	font-size: 16px;
-	background-color: black;
-  	cursor: pointer;
-`
-const DisconnectTextStyle = styled.div`
-	position: absolute;
-  	top: 50%;
-  	left: 50%;
-  	transform: translateX(-50%);
-  	padding: 2% 4%;
-  	font-size: 16px;
-	background-color: black;
-  	cursor: pointer;
-`
+// 	/* position: absolute; */
+//   	/* top: 50%;
+//   	left: 50%; */
+//   	/* transform: translateX(-50%); */
+// 	width: 350px;
+//   	padding: 2% 4%;
+//   	font-size: 16px;
+// 	background-color: black;
+//   	cursor: pointer;
+// `
+// const DisconnectTextStyle = styled.div`
+// 	position: absolute;
+//   	top: 50%;
+//   	left: 50%;
+//   	transform: translateX(-50%);
+//   	padding: 2% 4%;
+//   	font-size: 16px;
+// 	background-color: black;
+//   	cursor: pointer;
+// `
 
 function PongWrapper({social}: any) {
 
@@ -95,22 +95,27 @@ function PongWrapper({social}: any) {
 
 	const [gameState, setGameState] = useState<boolean>(false)
 	const [spectate, setSpectate] = useState<boolean>(false)
+	const [difficultyChoose, setDifficultyChoose] = useState<boolean>(false)
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
 	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongWrapperBackground)
 	const [pongPopupError, displayPongPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
 
-	const [Enemy, setEnemy] = useState<User>()
 
 
 	function handlePlayButton(){
 		console.log('user socket', userAuthenticate)
 		setSearching(!searching)
-		userAuthenticate.socket?.emit('searchGame', userAuthenticate.id)
+		if(difficultyChoose)
+			setDifficultyChoose(false)
+	}
+
+	function handleChooseDifficulty(dif: number){
+		setDifficultyChoose(true)
+		userAuthenticate.socket?.emit('searchGame', userAuthenticate.id, dif)
 	}
 
 	function handleDisconnect(){
 		setGameState(false)
-		console.log("i get the discoonect emit")
 		displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
 		setBackgroundColor(colors.pongBackground)
 	}
@@ -123,13 +128,14 @@ function PongWrapper({social}: any) {
 	useEffect(() => {
 		userAuthenticate.socket?.on("decoInGame", handleDisconnect)
 		userAuthenticate.socket?.on("spectate", handleSpectate)
-		userAuthenticate.socket?.on("launchGame", (user: User) => {
-			setEnemy(user)
+		userAuthenticate.socket?.on("launchGame", () => {
 			setSearching(false)
+			setDifficultyChoose(false)
 			setGameState(true)
 		})
 		return () =>{
 			userAuthenticate.socket?.off("launchGame")
+			userAuthenticate.socket?.off("spectate")
 			userAuthenticate.socket?.off("decoInGame")
 		}
 	})
@@ -143,6 +149,11 @@ function PongWrapper({social}: any) {
 			setLoaderSize(PongWrapperContainer.getBoundingClientRect().width * 30 / 100)
 
 	}, [window.innerWidth, window.innerHeight, social])
+
+	useEffect(() => {
+		if(!gameState)
+			setBackgroundColor(colors.pongWrapperBackgroundDraw)
+	}, [gameState])
 
 	useEffect(() => {
 		if (!gameState)
@@ -185,23 +196,33 @@ function PongWrapper({social}: any) {
 							Play !
 						</Button>
 						:
-						<>
-							<Loader size={loaderSize} />
-							<div style={{ height: "8%"}} />
-							<Button
-								onClick={handlePlayButton}
-								type="button" fontSize={"2.25vw"}
-								alt="" title=""
-								style={{width: "17.5%"}}>
-								Cancel
-							</Button>
-						</>
+						(
+							!difficultyChoose ?
+								<>
+									<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
+									<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
+									<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
+									{/* handleChooseDifficulty */}
+								</>
+							:
+							<>
+								<Loader size={loaderSize} />
+								<div style={{ height: "8%"}} />
+								<Button
+									onClick={handlePlayButton}
+									type="button" fontSize={"2.25vw"}
+									alt="" title=""
+									style={{width: "17.5%"}}>
+									Cancel
+								</Button>
+							</>
+						)
 					}
 				</>
 				:
 
-				<Pong score={score} setScore={setScore} spectate={spectate}
-						social={social} enemy={Enemy}/>
+				<Pong score={score} setScore={setScore} setGameState={setGameState} setSpectate={setSpectate} spectate={spectate}
+						social={social}/>
 				}
 			</>
 			)
