@@ -194,12 +194,12 @@ export class UsersService {
 
 	async setTwoFASecret(secret: string, userId: number): Promise<void> {
 		try {
-		const user = await this.prisma.user.update({
-			where: { id: userId,},
-			data: { twoFASecret: secret },
-		});
-		if (!user)
-			throw new NotFoundException("User not found");
+			const user = await this.prisma.user.update({
+				where: { id: userId,},
+				data: { twoFASecret: secret },
+			});
+			if (!user)
+				throw new NotFoundException("User not found");
 		} catch (error) { throw error; }
 	}
 
@@ -294,22 +294,22 @@ export class UsersService {
 
 	/*********************** Matchs history ******************************************/
 
-	async setResult(userId: number, result: MatchResult): Promise<User> {
+	async setResult(userId: number, result: MatchResult): Promise<void> {
 		try {
-			const user = await this.prisma.user.findUnique({where: { id: userId }})	
+			//const user = await this.prisma.user.findUnique({where: { id: userId }})	
 			if (result == MatchResult.WINNER) {
 				await this.prisma.user.update({ where: { id: userId },
 					data: { wins: { increment: 1 } }
 				})
-				user.wins++
+				//user.wins++
 			}
 			else if (result == MatchResult.LOOSER) {
 				await this.prisma.user.update({ where: { id: userId },
 					data: { losses: { increment: 1 } }
 				})
-				user.losses++
+				//user.losses++
 			}
-			return user;
+			//return user;
 		} catch (error) {}
 	}
 
