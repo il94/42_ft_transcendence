@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, UserStatus, Game, ChannelStatus, UsersOnGames, roleInGame, GameStatus } from '@prisma/client';
+import { PrismaClient, User, Prisma, Role, UserStatus, Game, ChannelStatus, UsersOnGames, MatchResult, roleInGame, GameStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 import { authenticator } from "otplib";
@@ -294,6 +294,25 @@ export class UsersService {
 
 	/*********************** Matchs history ******************************************/
 
+	async setResult(userId: number, result: MatchResult): Promise<User> {
+		try {
+			const user = await this.prisma.user.findUnique({where: { id: userId }})	
+			if (result == MatchResult.WINNER) {
+				await this.prisma.user.update({ where: { id: userId },
+					data: { wins: { increment: 1 } }
+				})
+				user.wins++
+			}
+			else if (result == MatchResult.LOOSER) {
+				await this.prisma.user.update({ where: { id: userId },
+					data: { losses: { increment: 1 } }
+				})
+				user.losses++
+			}
+			return user;
+		} catch (error) {}
+	}
+
 	async getMatchHistory(userId: number): Promise<Array<any>> {
 		try {
 			const matchTab = await this.prisma.usersOnGames.findMany({ where: { userId: userId, role: roleInGame.PLAYER }})
@@ -313,32 +332,30 @@ export class UsersService {
 		}
 	}
 
-	async getChallenger(gameId: number, userId: number): Promise <{/*match: Game,*/ challenger: string, challengerScore: number}> {
+	async getChallenger(gameId: number, userId: number): Promise <{challenger: string, challengerScore: number}> {
 		const game = await this.prisma.game.findFirst({ where: { AND: [ {id: gameId}, {status: GameStatus.FINISHED} ] },
 			include: { 
 				players: { where: { role: roleInGame.PLAYER, userId: { not: userId } },
 				}}
 		})
-		const res: {/* match: Game; */challenger: string, challengerScore: number } = {
-			//match: game,
+		const res: {challenger: string, challengerScore: number } = {
 			challenger: null,
 			challengerScore: 0
 		  };
-		//res.match = game;
 		if (game) {
 			for (let i = 0; i < game.players.length; i++) {
-				const challenger = await this.prisma.user.findUnique({ where: { id: game.players[i].userId },
+				const challenger = await this.prisma.user.findUnique({ 
+					where: { id: game.players[i].userId },
 					select: { id: true, username: true }	
 				})
-				//console.log("challenger: ", challenger.username);
 				res.challenger = challenger.username;
-				const score  = await this.prisma.usersOnGames.findFirst({ where: { gameId: gameId, userId: challenger.id},
+				const score  = await this.prisma.usersOnGames.findFirst({ 
+					where: { gameId: gameId, userId: challenger.id},
 					select: { score: true, gameId: true }})
 				res.challengerScore = score.score;
 			}
-		}
-		else 
-			return null;
-		return res;
+			return res;
+		} 
+		return null;
 	}
 }

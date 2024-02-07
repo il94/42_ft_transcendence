@@ -19,7 +19,7 @@ export class PongService {
 	constructor
 	(
 		private prisma: PrismaService,
-		private appGateway: AppGateway
+		private appGateway: AppGateway,
 		) {}
 	
 
