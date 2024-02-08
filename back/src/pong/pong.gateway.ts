@@ -9,6 +9,7 @@ import { PongGame, Player, Ball } from "./game";
 import { UsersService } from "src/auth/services/users.service";
 
 import { disconnect } from "process";
+import { AppService } from "src/app.service";
 import { GameStatus, MatchResult, UserStatus } from "@prisma/client";
 import { subscribe } from "diagnostics_channel";
 
@@ -25,7 +26,9 @@ export class PongGateway {
 	// private watchingUsers: Map<number, Socket> = new Map(); // a teg
 
 	constructor(private  PongService: PongService,
-				private UserService: UsersService) {}
+				private UserService: UsersService,
+				private appService: AppService
+				) {}
 
 	handleConnection(client: Socket){
 		//console.log("connection of :", client.id)
@@ -62,18 +65,25 @@ export class PongGateway {
 		});
 		this.searchingUsersMedium.forEach((value, key) => {
 			if (value === client) {
-				this.searchingUsersEz.delete(key);
+				this.searchingUsersMedium.delete(key);
 				return; 
 			}
 		});
 		this.searchingUsersHard.forEach((value, key) => {
 			if (value === client) {
-				this.searchingUsersEz.delete(key);
+				this.searchingUsersHard.delete(key);
 				return; 
 			}
 		});
 	} // fct degeu :/
 
+	@SubscribeMessage("cancelSearching")
+		async handleCancelSearching(client: Socket, userId: number)
+		{
+			this.delUserFromSearchingUser(client)
+			await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
+		}
+	
 	async toSearchingArray(client: Socket, userId: number, dif: number){
 		
 		let array: Map<number, Socket>
@@ -85,15 +95,30 @@ export class PongGateway {
 		if (dif === 3)
 			array = this.searchingUsersHard
 
-			if (array.get(userId)){
-				array.delete(userId)
-				await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
-				return
-				// throw new ConflictException('User already in game')
-			}
 		array.set(userId, client)
 		await this.PongService.updateStatusUser(userId, UserStatus.WAITING)
 
+	}
+
+	async launchGame(id: number, enemyId: number)
+	{
+		const leftSocket = AppService.connectedUsers.get(id.toString())
+		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
+
+		const leftUser = this.UserService.findById(id)
+		const rightUser = this.UserService.findById(enemyId)
+
+		const newgame = await this.PongService.createGame(id, enemyId);
+
+		this.server.to(leftSocket.id).emit("launchGame")
+		this.server.to(rightSocket.id).emit("launchGame")
+
+		this.PongService.activeGames.push(new PongGame(newgame, 2, leftSocket, id, (await leftUser).username, rightSocket, enemyId, (await rightUser).username))
+
+		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
+
+		this.delUserFromSearchingUser(leftSocket)
+		this.delUserFromSearchingUser(rightSocket)
 	}
 
 	async checkToLaunchGame(client: Socket, dif: number)
@@ -117,22 +142,7 @@ export class PongGateway {
 			let firstsocket = array.get(firstkey)
 			let secondsocket = array.get(secondkey)
 
-			const user1 = this.UserService.findById(firstkey)
-			const user2 = this.UserService.findById(secondkey)
-
-			this.server.to(firstsocket.id).emit("launchGame")
-			this.server.to(secondsocket.id).emit("launchGame")
-
-			const newgame = await this.PongService.createGame(firstkey, secondkey);
-
-			this.PongService.activeGames.push(new PongGame(newgame, dif, firstsocket, firstkey, (await user1).username, secondsocket, secondkey, (await user2).username))
-			this.gameLoop(firstsocket, secondsocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
-
-			for (let [key, value] of array.entries()) {
-				if (value === firstsocket || value === secondsocket) {
-					array.delete(key);
-				}
-			}
+			this.launchGame(firstkey, secondkey)
 		}
 
 	}
@@ -254,7 +264,9 @@ export class PongGateway {
 
 	// ...
 
-	// enlever le waiting quand on cherche plus 
+	// enlever le waiting quand on cherche plus
+
+	// cherche une game, cancel, bien delete des tableau userSearching
 	
 
 // bugs :

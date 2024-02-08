@@ -104,7 +104,7 @@ function PongWrapper({social}: any) {
 
 	function handlePlayButton(){
 		console.log('user socket', userAuthenticate)
-		setSearching(!searching)
+		setSearching(true)
 		if(difficultyChoose)
 			setDifficultyChoose(false)
 	}
@@ -112,6 +112,18 @@ function PongWrapper({social}: any) {
 	function handleChooseDifficulty(dif: number){
 		setDifficultyChoose(true)
 		userAuthenticate.socket?.emit('searchGame', userAuthenticate.id, dif)
+	}
+
+	function handleCancelButton()
+	{
+		setSearching(false)
+		userAuthenticate.socket?.emit('cancelSearching', userAuthenticate.id)
+	}
+
+	function handleLaunchGame(){
+		setSearching(false)
+		setDifficultyChoose(false)
+		setGameState(true)
 	}
 
 	function handleDisconnect(){
@@ -128,11 +140,7 @@ function PongWrapper({social}: any) {
 	useEffect(() => {
 		userAuthenticate.socket?.on("decoInGame", handleDisconnect)
 		userAuthenticate.socket?.on("spectate", handleSpectate)
-		userAuthenticate.socket?.on("launchGame", () => {
-			setSearching(false)
-			setDifficultyChoose(false)
-			setGameState(true)
-		})
+		userAuthenticate.socket?.on("launchGame", handleLaunchGame)
 		return () =>{
 			userAuthenticate.socket?.off("launchGame")
 			userAuthenticate.socket?.off("spectate")
@@ -209,7 +217,7 @@ function PongWrapper({social}: any) {
 								<Loader size={loaderSize} />
 								<div style={{ height: "8%"}} />
 								<Button
-									onClick={handlePlayButton}
+									onClick={handleCancelButton}
 									type="button" fontSize={"2.25vw"}
 									alt="" title=""
 									style={{width: "17.5%"}}>
