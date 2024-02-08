@@ -21,7 +21,8 @@ export class PongService {
 	(
 		private prisma: PrismaService,
 		private appGateway: AppGateway,
-		private userService: UsersService
+		private userService: UsersService,
+		private appService: AppService,
 		) {}
 	
 
@@ -60,6 +61,7 @@ export class PongService {
 		console.log("NEW game: ", game);
 		return game.id; 
 	}
+
 
 	// patch pour dire que la game est finie
 	async updateGameStatus(gameId: number, newStatus: GameStatus): Promise<Game | null> {
@@ -357,7 +359,9 @@ export class PongService {
 //         throw new Error(`Failed to remove game`);
 //     }
 // }
+// data[0] senderID
+// data[1] enemyID
 
-  
+
 
 }
