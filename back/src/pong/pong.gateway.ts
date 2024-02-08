@@ -62,13 +62,13 @@ export class PongGateway {
 		});
 		this.searchingUsersMedium.forEach((value, key) => {
 			if (value === client) {
-					this.searchingUsersEz.delete(key);
+				this.searchingUsersEz.delete(key);
 				return; 
 			}
 		});
 		this.searchingUsersHard.forEach((value, key) => {
 			if (value === client) {
-					this.searchingUsersEz.delete(key);
+				this.searchingUsersEz.delete(key);
 				return; 
 			}
 		});
@@ -143,7 +143,7 @@ export class PongGateway {
 
 			this.toSearchingArray(client, data[0], data[1])
 
-			this.checkToLaunchGame(client, data[1])
+			await this.checkToLaunchGame(client, data[1])
 
 		} catch (error) {
 			//throw error
