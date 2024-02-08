@@ -1,12 +1,24 @@
 (Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
-GLOBAL/ : A faire sur tout les fichiers un par un
+CAS/ :
 
 	(!!!!!)
 	Clavier indisponible quand pong display
+	Close les invites a jouer si le user se deco
+	Re organiser les emits des sockets
+	Fix social pour le pong
+	(!!!)
+	Verifier qu'une invite n'existe pas deja
+
+
+
+GLOBAL/ : A faire sur tout les fichiers un par un
+
+	(!!!!!)
 	Fix les erreurs ts
 
 	(!!!)
+	Faire DTO pour verifier les status envoye au back
 	Set corectement tout les titles et alts
 
 	(!!)
@@ -29,18 +41,3 @@ SettingsMenu/ :
 Signup42/ :
 	Faire select Avatar si le temps
 
-(============================= SOSO ============================)
-
-Messages/ :
-	Checker fonction invitation (gestion d'erreurs, doublon ect) (soso)
-
-channels.service/ :
--findChannelWithRelations:
-	Vérifier la fonction pour mapper les messages (soso)
-
-ContextualMenu/ : à faire après merge
-	Checker handleChallengeClickEvent et mute avec soso + gestion d'erreur
-
-(============================= CLAIRE ============================)
-
-	Update Win Draw Loose du joueur

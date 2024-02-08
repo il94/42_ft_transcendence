@@ -6,16 +6,18 @@ export class Player {
 
 	private socket: Socket;
 	public id: number;
+	public name: string;
 	public winner: boolean;
 
 	private Pos: {top: number, bottom: number}
 	private score: number
 
-	constructor(socket: Socket, Id:number)
+	constructor(socket: Socket, Id:number, name: string)
 	{
 		this.socket = socket;
-		this.winner = false;
 		this.id = Id;
+		this.name = name;
+		this.winner = false;
 		this.Pos = {top : 486, bottom: 594} // middle 540 == 50% de 1080
 		this.score = 0
 	}
@@ -121,7 +123,9 @@ export class Ball {
 export class PongGame {
 
 	private Players: Socket[]
+	public watcher: Socket[]
 	public	id: number
+	public difficulty: number
 
 	private state: boolean
 
@@ -137,14 +141,16 @@ export class PongGame {
 	public paddleMargin: number
 
 
-	constructor(Id: number, host: Socket, hostId:number,  guest: Socket, guestId: number) {
+	constructor(Id: number, dif: number, host: Socket, hostId:number, hostName:string, guest: Socket, guestId: number, guestName: string) {
 
 		this.id = Id;
+		this.difficulty = dif
 		this.state = true
 
-		this.LeftPlayer = new Player(host, hostId)
-		this.RightPlayer = new Player(guest, guestId)
+		this.LeftPlayer = new Player(host, hostId, hostName)
+		this.RightPlayer = new Player(guest, guestId, guestName)
 		this.Players = [host, guest]
+		this.watcher = []
 		this.Speed = 7
 		this.Ball = new Ball(this.Speed)
 
@@ -252,6 +258,30 @@ export class PongGame {
 		else if (this.RightPlayer.getSocket() === socket)
 			return true
 		return false
+	}
+
+	isMyPlayerById(n: number){
+		if(this.LeftPlayer.id === n)
+			return true
+		else if (this.RightPlayer.id === n)
+			return true
+		return false
+	}
+
+	addWatcher(s: Socket)
+	{
+		console.log("addWatcher")
+		if (!s)
+			console.log("in addWatcher client socket is empty")
+		else
+			this.watcher.push(s)
+	}
+
+	removeWatcher(s: Socket)
+	{
+		const index = this.watcher.indexOf(s)
+		if (index != -1)
+			this.watcher.splice(index, 1)
 	}
 
 	isMyHost(socket: Socket){

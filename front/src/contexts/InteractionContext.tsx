@@ -4,7 +4,11 @@ import {
 	SetStateAction
 } from 'react'
 
-import { Channel, User, UserAuthenticate } from '../utils/types'
+import {
+	Channel,
+	User,
+	UserAuthenticate
+} from '../utils/types'
 
 const InteractionContext = createContext<{
 	userAuthenticate: UserAuthenticate,

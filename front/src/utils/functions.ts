@@ -46,10 +46,12 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 	let size: number = 0
 
 	// Invite section
-	if (userAuthenticate.channels.length > 0)
+	if (userAuthenticate.channels.length > 0 &&
+		!userIsBlocked(userAuthenticate, userTarget.id))
 		size += sectionSize
 
 	// Contact section
+	if (!userIsBlocked(userAuthenticate, userTarget.id))
 		size += sectionSize
 
 	// Challenge section

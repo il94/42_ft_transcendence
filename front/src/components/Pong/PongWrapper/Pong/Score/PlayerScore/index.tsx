@@ -3,11 +3,11 @@
 import styled from 'styled-components';
 
 
-const Style = styled.div<{ $Hposition: number }>`
+const Style = styled.div<{ $Hposition: number; $size: number}>`
 	
 	position: absolute;
 
-	font-size:50px;
+	font-size:${(props) => props.$size}px;
 
 	top: 10%;
 	left: ${(props) => props.$Hposition}%;
@@ -18,10 +18,10 @@ const Style = styled.div<{ $Hposition: number }>`
 `
 
 
-function PlayerScore({Hposition, Score} : {Hposition: number, Score: number}){
+function PlayerScore({Hposition, Score, size} : {Hposition: number, Score: number, size: number}){
 
 	return (
-		<Style $Hposition={Hposition}>
+		<Style $Hposition={Hposition} $size={size}>
 			<p>{Score}</p>
 		</Style>
 	);

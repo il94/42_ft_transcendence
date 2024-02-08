@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto/';
-import { Channel, User ,ChannelStatus, Role, Prisma, messageStatus, challengeStatus  } from '@prisma/client';
+import { Channel, User ,ChannelStatus, Role, Prisma, messageStatus, challengeStatus, UserStatus  } from '@prisma/client';
 import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
@@ -115,6 +115,30 @@ export class ChannelsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 
+			// Verifie si le user auth n'a pas bloque le user target
+			const userTargetIsBlocked = !!await this.prisma.blocked.findUnique({
+				where: {
+					userId_blockedId: {
+						userId: userAuthId,
+						blockedId: userTargetId
+					}
+				}
+			})
+			if (userTargetIsBlocked)
+				throw new ForbiddenException("You have blocked this user")
+
+			// Verifie si le user target n'a pas bloque le user auth
+			const userAuthIsBlocked = !!await this.prisma.blocked.findUnique({
+				where: {
+					userId_blockedId: {
+						userId: userTargetId,
+						blockedId: userAuthId
+					}
+				}
+			})
+			if (userAuthIsBlocked)
+				throw new ForbiddenException("You are blocked")
+
 			// Crée le nouveau channel MP sans nom ni avatar et y inclut le user target
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
@@ -158,7 +182,7 @@ export class ChannelsService {
 			return channelMP
 		}
 		catch (error) {
-			if (error instanceof NotFoundException || error instanceof ConflictException)
+			if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
@@ -183,23 +207,11 @@ export class ChannelsService {
 			})
 			if (!channelToJoin)
 				throw new NotFoundException("Channel not found")
-			else if ((channelToJoin.type === ChannelStatus.PRIVATE || channelToJoin.type === ChannelStatus.MP) && !inviterId)
+			else if ((channelToJoin.type === ChannelStatus.PRIVATE ||
+				channelToJoin.type === ChannelStatus.MP) && !inviterId)
 				throw new ForbiddenException("You dont have permissions for this action")
-
-			// Verifie si le user qui aurait lancé l'invitation est dans le channel
-			if (inviterId)
-			{
-				const inviter = !!await this.prisma.usersOnChannels.findUnique({
-					where: {
-						userId_channelId: {
-							userId: inviterId,
-							channelId: channelId
-						}
-					}
-				})
-				if (!inviter)
-					throw new NotFoundException("User not found")
-			}
+			else if (channelToJoin.type === ChannelStatus.MP && inviterId)
+				throw new ForbiddenException("Invitations forbidden for channel MP")
 
 			// Verifie si le user existe et récupère son username
 			const user = await this.prisma.user.findUnique({
@@ -212,6 +224,45 @@ export class ChannelsService {
 			})
 			if (!user)
 				throw new NotFoundException("User not found")
+
+			if (inviterId)
+			{
+				// Verifie si le user invite n'a pas bloque le user
+				const userTargetIsBlocked = !!await this.prisma.blocked.findUnique({
+					where: {
+						userId_blockedId: {
+							userId: inviterId,
+							blockedId: userId
+						}
+					}
+				})
+				if (userTargetIsBlocked)
+					throw new ForbiddenException("You have blocked this user")
+
+				// Verifie si le user n'a pas bloque le user invite
+				const userAuthIsBlocked = !!await this.prisma.blocked.findUnique({
+					where: {
+						userId_blockedId: {
+							userId: userId,
+							blockedId: inviterId
+						}
+					}
+				})
+				if (userAuthIsBlocked)
+					throw new ForbiddenException("You are blocked")
+
+				// Verifie si le user qui aurait lancé l'invitation est dans le channel
+				const inviter = !!await this.prisma.usersOnChannels.findUnique({
+					where: {
+						userId_channelId: {
+							userId: inviterId,
+							channelId: channelId
+						}
+					}
+				})
+				if (!inviter)
+					throw new NotFoundException("User not found")
+			}
 
 			// Verifie si le user n'est pas déjà dans le channel et retourne son role
 			const isInChannel = await this.prisma.usersOnChannels.findUnique({
@@ -279,6 +330,171 @@ export class ChannelsService {
 			else
 				throw new BadRequestException()
 		}
+	}
+
+    /****************************** gestion message ***********************/
+
+	// Cree un message
+	async addContent(channelId: number, userId: number, msgContent: string, msgStatus: messageStatus) {
+		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
+
+			// Verifie si le user est dans le channel et retourne ses donnees
+			const userDatas = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true,
+					mute: true
+				}
+			})
+			if (!userDatas)
+				throw new NotFoundException("User not found")
+			else if (userDatas.role === Role.BANNED)
+				throw new ForbiddenException("You are banned from this channel")
+			else if (new Date(userDatas.mute) > new Date())
+				throw new ForbiddenException("You are muted from this channel")
+
+			// Verifie si le message n'est pas vide
+			if (!msgContent)
+				throw new ForbiddenException("Empty message")
+
+			// Cree le message
+			const textDatas = await this.prisma.message.create({
+				data: {
+					author: {
+						connect: {
+							id: userId
+						}
+					},
+					channel: {
+						connect: {
+							id: channelId
+						}
+					},
+					content: msgContent,
+					isInvit: false,
+					type: msgStatus
+				}
+			})
+
+			// Emit
+			await this.emitOnChannel("postText", channelId, userId, textDatas)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
+	// Cree une invitation a jouer
+	async addContentInvitation(channelId: number, userTargetId : number, userAuthId : number, msgStatus : messageStatus) {
+		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
+
+			// Verifie si le user auth est dans le channel et retourne son role
+			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userAuthId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (!userAuthRole)
+				throw new NotFoundException("User not found")
+			else if (userAuthRole.role === Role.BANNED)
+				throw new ForbiddenException(`You are banned from this channel`)
+
+			// Verifie si le user target existe et retourne son username et son statut
+			const userTargetDatas = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true,
+					status: true
+				}
+			})
+			if (!userTargetDatas)
+				throw new NotFoundException("User not found")
+			else if (userTargetDatas.status === UserStatus.OFFLINE)
+				throw new ConflictException(`${userTargetDatas.username} is disconnected`)
+
+			// Verifie si le user target est dans le channel et retourne son role
+			const userTargetRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userTargetId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (!userTargetRole)
+				throw new NotFoundException("User not found")
+			else if (userTargetRole.role === Role.BANNED)
+				throw new ForbiddenException(`${userTargetDatas.username} is banned from this channel`)
+
+			// Cree l'invitation
+			const invitationDatas = await this.prisma.message.create({
+				data: {
+					author: {
+						connect: {
+							id: userAuthId
+						}
+					},
+					channel: {
+						connect: {
+							id: channelId
+						}
+					},
+					isInvit: true,
+					targetId: userTargetId,
+					status: challengeStatus.PENDING,
+					type: msgStatus
+				}
+			})
+
+			await this.emitOnChannel("postInvitation", channelId, userAuthId, userTargetId, invitationDatas)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+
+
 	}
 
   // Retourne tout les channels
@@ -414,16 +630,13 @@ export class ChannelsService {
 			const cleanedMessages = await Promise.all(content.map(async (message) => {
 				if (message.type === "TEXT") {
 					const { status, author, ...rest } = message;
-					// console.log("TEXT = ", message);
 					return {
 						...rest,
 						sender: author
 					};
 				}
-
 				else {
 					const { author, targetId, ...rest } = message;
-					// console.log("INVITATION = ", message);
 					const target = await this.prisma.user.findUnique({
 						where: {
 							id: targetId
@@ -445,16 +658,17 @@ export class ChannelsService {
 				}
 			}
 
-    async function getUserMuted() { // en cours soso
-      const muteInfo: Record<number, string> = {};
-      for (const user of channelDatas.users)
-      {
-        if (user.mute !== undefined) {
-          muteInfo[user.user.id] = user.mute.toISOString();
-        }
-      }
-      return muteInfo;
-    }
+			// Recupere les users mutes
+			async function getUserMuted() {
+				const muteInfo: Record<number, string> = {};
+				for (const user of channelDatas.users)
+				{
+					if (user.mute !== undefined) {
+						muteInfo[user.user.id] = user.mute.toISOString();
+					}
+				}
+				return muteInfo;
+			}
       
 			// Objet contenant les données du channel avec ses relations
 			const channelWithRelations = {
@@ -484,8 +698,8 @@ export class ChannelsService {
 				// Owner mappé
 				owner: channelDatas.users.find((user) => user.role === Role.OWNER)?.user,
 
-        //mutedUsers: [], // en attendant de pouvoir recup les users mutes 
-        muteInfo: await getUserMuted(),
+				// Users mutes
+				muteInfo: await getUserMuted(),
 
 				// Users bannis mappés
 				banneds: channelDatas.users.map((user) => {
@@ -532,31 +746,7 @@ export class ChannelsService {
 	// console.log("sockets", sockets)
 
     return sockets;
-  }
-
-  async updateUserMute(channelId: number, userTargetId: number, userAuthId: number) {
-    try {
-      const userAuthMute = await this.prisma.usersOnChannels.update({
-        where: {
-          userId_channelId: {
-            userId: userTargetId,
-            channelId: channelId
-          }
-        },
-        data: {
-          mute: new Date(new Date().getTime() + 5 * 60000)
-        }
-      })
-
-      // verifier que le muteur et admin ou owner
-      // verifier que le muteur a un grade superieur a sa target
-      // verifier que le muteur et la target sont dans le sallon
-      //const socket = AppService.connectedUsers[userTargetId];
-      const socket = AppService.connectedUsers.get(userTargetId.toString())
-      socket.emit("updateUserMute",channelId, userAuthMute.mute.toISOString());
-    } catch (error) { }    
-  }
-  
+  }  
 
   // Retourne les sockets (string) des users du channel sauf celui du user
   async getAllSocketsChannelExceptUser(channelId: number, userId: number)
@@ -773,7 +963,160 @@ export class ChannelsService {
 			else
 				throw new BadRequestException()
 		}
-  }
+	}
+
+	// Mute un user du channel
+	async updateUserMute(channelId: number, userTargetId: number, userAuthId: number) {
+		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
+
+			// Verifie si le user existe
+			const userTarget = await this.prisma.user.findUnique({
+				where: {
+					id: userTargetId
+				},
+				select: {
+					username: true
+				}
+			})
+			if (!userTarget)
+				throw new NotFoundException("User not found")
+
+			// Verifie si le user target est dans le channel et recupere son role
+			const userTargetRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userTargetId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+			if (!userTargetRole)
+				throw new NotFoundException("User not found")
+
+			// Recupere le role du user authentifie
+			const userAuthRole = await this.prisma.usersOnChannels.findUnique({
+				where: {
+					userId_channelId: {
+						userId: userAuthId,
+						channelId: channelId
+					}
+				},
+				select: {
+					role: true
+				}
+			})
+
+			// Vérifie si le user authentifie a les permissions necessaires
+			if (userTargetId !== userAuthId &&
+				(userTargetRole.role === Role.OWNER ||
+					(userAuthRole.role !== Role.OWNER
+					&& userAuthRole.role !== Role.ADMIN)))
+				throw new ForbiddenException("You dont have permissions for this action")
+
+			// Mute le user
+			const muteDuration = await this.prisma.usersOnChannels.update({
+				where: {
+					userId_channelId: {
+						userId: userTargetId,
+						channelId: channelId
+					}
+				},
+				data: {
+					mute: new Date(new Date().getTime() + 5 * 60000)
+				},
+				select: {
+					mute: true
+				}
+			})
+
+			// Emit
+			const userTargetSocket: Socket = AppService.connectedUsers.get(userTargetId.toString())
+			userTargetSocket.emit("updateUserMute", channelId, muteDuration.mute.toISOString())
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
+	// Change le statut d'une invitation
+	async updateMessageStatus(channelId: number, messageId: number, userAuthId: number, newStatus: challengeStatus) { 
+		try {
+			// Verifie si le channel existe
+			const channelExist = !!await this.prisma.channel.findUnique({
+				where: {
+					id: channelId
+				}
+			})
+			if (!channelExist)
+				throw new NotFoundException("Channel not found")
+
+			// Verifie si le message existe et recupere ses donnees
+			const messageDatas = await this.prisma.message.findUnique({
+				where: {
+					id: messageId
+				},
+				select: {
+					authorId: true,
+					targetId: true,
+					isInvit: true,
+					status: true
+				}
+			})
+			if (!messageDatas)
+				throw new NotFoundException("Message not found")
+
+			// Verifie si le message est bien une invitation
+			else if (!messageDatas.isInvit)
+				throw new ForbiddenException("Message is not an invitation")
+
+			// Verifie si l'invitation est destinee au user auth ou si il en est l'auteur
+			else if (messageDatas.targetId !== userAuthId &&
+				messageDatas.authorId !== userAuthId)
+				throw new ForbiddenException("You dont have permissions for this action")
+
+			// Verifie si le nouveau statut est accepte ou refuse
+			else if (newStatus !== challengeStatus.ACCEPTED &&
+				newStatus !== challengeStatus.CANCELLED)
+				throw new ForbiddenException("You dont have permissions for this action")
+
+			// Update l'invitation
+			await this.prisma.message.update({
+				where: {
+					id: messageId
+				},
+				data: {
+					status: newStatus
+				}
+			})
+
+			// Emit
+			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
 
 	// Supprime un channel
 	async remove(channelId: number) {
@@ -952,69 +1295,6 @@ export class ChannelsService {
     return (user)
   }
 
-    /****************************** gestion message ***********************/
-
-    async addContent(chanId: number, msg:string, userId :number, msgStatus : messageStatus) {
-      try {
-        if (!(await this.checkIfChannelExist(chanId))) {
-          console.log(`Channel ${chanId} does not exist`);
-          throw new NotFoundException(`Channel ${chanId} does not exist.`);
-        }
-
-        if (!(await this.checkIfUserExist(userId))) {
-          console.log(`User ${userId} does not exist`);
-          throw new NotFoundException(`User ${userId} does not exist`);
-        }
-
-        const userInChannel = await this.isInChannel(userId, chanId);
-
-        if (!userInChannel) {
-          console.log(`User ${userId} is not in the channel ${chanId}.`);
-          throw new ForbiddenException(`User ${userId} is not in the channel ${chanId}.`);
-        }
-
-        if (new Date(userInChannel.mute) > new Date()) {
-          console.log(`User ${userId} is muted.`);
-          throw new ForbiddenException(`User ${userId} is muted and cannot perform this action.`);
-        }
-        if (msg === "")
-          return
-        
-        const newMessage = await this.prisma.message.create({
-          data: {
-            author: { connect: { id: userId} },  // Connectez le message à l'utilisateur existant
-            channel: { connect: { id: chanId } }, 
-            content: msg,
-            isInvit: true,
-            type: msgStatus,
-          },
-        });
-        return newMessage.id; 
-    }
-    catch (error) {
-      if (error instanceof ForbiddenException || error instanceof NotFoundException)
-        throw error
-      else if (error instanceof Prisma.PrismaClientKnownRequestError)
-        throw new ForbiddenException("The provided user data is not allowed")
-      else
-          throw new BadRequestException()
-      }
-  }
-  
-    async addContentInvitation(id: number, userId : number, targetId : number, msgStatus : messageStatus) {
-      const newMessage = await this.prisma.message.create({
-        data: {
-          author: { connect: { id: userId } },  // Connectez le message à l'utilisateur existant
-          channel: { connect: { id: id } },
-          isInvit: true,
-          targetId: targetId,
-          status:  challengeStatus.PENDING,
-          type: msgStatus,
-        },
-      });
-      return newMessage.id;
-    }
-
     async getAllMessage(id: number) {
       try {
         const channel = await this.prisma.channel.findUnique({
@@ -1042,20 +1322,6 @@ export class ChannelsService {
         return null; // Retournez une valeur ou utilisez une exception appropriée
       }
     }
-
-
-    async updateMessageStatus(idMsg: number, newStatus: challengeStatus)
-    { 
-      try {
-        const updatedMessage = await this.prisma.message.update({
-          where: { id: idMsg },
-          data: { status: newStatus },
-        });
-        return updatedMessage;
-      } catch (error) { 
-        throw error;
-    }
-  }
 
 /* =============================== UTILS ==================================== */
 

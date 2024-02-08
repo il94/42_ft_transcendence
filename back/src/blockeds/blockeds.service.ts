@@ -3,10 +3,12 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, RequestStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ChannelsService } from 'src/channels/channels.service';
 
 @Injectable()
 export class BlockedsService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService,
+		private channelService: ChannelsService) {}
 
 	// Bloque un user
 	async addBlocked(userAuthId: number, userTargetId: number) {
@@ -63,13 +65,16 @@ export class BlockedsService {
 				}
 			})
 
+			// Verifie si un channel MP existe et le supprime
+			const channelMP = await this.channelService.findChannelMP(userAuthId, userTargetId)
+			if (channelMP)
+				await this.channelService.remove(channelMP.id)
+
 			console.log(`User ${userAuthId} blocked user ${userTargetId}`)
 			return newBlocked
 		}
 		catch (error) {
-			if (error instanceof ForbiddenException
-				|| error instanceof NotFoundException
-				|| error instanceof ConflictException)
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")

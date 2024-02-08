@@ -5,7 +5,9 @@ import {
 } from "react"
 import axios, { AxiosError, AxiosResponse } from "axios"
 
-import { Style } from "./style"
+import {
+	Style
+} from "./style"
 
 import ScrollBar from "../../../componentsLibrary/ScrollBar"
 import Section, { SectionName } from "../../../componentsLibrary/Section"
@@ -16,6 +18,7 @@ import AuthContext from "../../../contexts/AuthContext"
 
 import {
 	userIsBanned,
+	userIsBlocked,
 	userIsInChannel
 } from "../../../utils/functions"
 
@@ -23,6 +26,10 @@ import {
 	Channel,
 	ErrorResponse
 } from "../../../utils/types"
+
+import {
+	ChannelType
+} from "../../../utils/status"
 
 type PropsSecondaryContextualMenu = {
 	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
@@ -39,8 +46,15 @@ type PropsSecondaryContextualMenu = {
 function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryContextualMenuPosition, secondaryContextualMenuHeight, channels }: PropsSecondaryContextualMenu) {
 
 	const { token, url } = useContext(AuthContext)!
-	const { userTarget } = useContext(InteractionContext)!
+	const { userAuthenticate, userTarget } = useContext(InteractionContext)!
 	const { displayPopupError } = useContext(DisplayContext)!
+
+	function channelCanBeJoined(channel: Channel): boolean {
+		if (channel.type === ChannelType.MP
+			|| userIsBlocked(userAuthenticate, userTarget.id))
+			return (false)
+		return (true)
+	}
 
 	async function handleInviteClickEvent(channel: Channel) {
 		try {
@@ -87,15 +101,16 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			height={secondaryContextualMenuHeight}>
 			<ScrollBar visible>
 				{
-					channels.map((channel) => (
-						<Section
-							key={"channelSection" + channel.id}
-							onClick={() => handleInviteClickEvent(channel)}>
-							<SectionName>
-								{channel.name}
-							</SectionName>
-						</Section>
-					))
+					channels.filter((channel) => channelCanBeJoined(channel))
+						.map((channel) => (
+							<Section
+								key={"channelSection" + channel.id}
+								onClick={() => handleInviteClickEvent(channel)}>
+								<SectionName>
+									{channel.name}
+								</SectionName>
+							</Section>
+						))
 				}
 			</ScrollBar>
 		</Style>
