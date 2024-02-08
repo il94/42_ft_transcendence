@@ -252,8 +252,8 @@ function Game() {
 	const isSmallDesktop = useMediaQuery({ query: breakpoints.smallDesktop })
 
 	useEffect(() => {
-		displaySocial(isSmallDesktop)
-		if (!social)
+		displaySocial(!isSmallDesktop)
+		if (isSmallDesktop)
 			displayCard(false)
 	}, [isSmallDesktop])
 
@@ -458,8 +458,7 @@ function Game() {
 									displaySettingsMenu={displaySettingsMenu} />
 							</TopGameWrapper>
 							<BottomGameWrapper>
-								{<PongWrapper social={social}/> }
-								{/* <Pong /> */}
+								<PongWrapper social={social}/>
 								{
 									card &&
 									<Card

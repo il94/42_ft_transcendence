@@ -50,8 +50,9 @@ function Social({ social, displaySocial, friends, displayContextualMenu, setCont
 	const { loaderFriends } = useContext(DisplayContext)!
 
 	function reduceSocial() {
-		displaySocial(!social)
-		if (!social)
+		const newState = !social
+		displaySocial(newState)
+		if (newState === false)
 			displayCard(false)
 	}
 
@@ -81,11 +82,11 @@ function Social({ social, displaySocial, friends, displayContextualMenu, setCont
 							{
 								social ?
 								<>
-									&gt;&gt;
+									&lt;&lt; 
 								</>
 								:
 								<>
-									&lt;&lt;
+									&gt;&gt;
 								</>
 							}
 							</ReduceButton>

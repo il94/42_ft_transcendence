@@ -103,7 +103,6 @@ function PongWrapper({social}: any) {
 
 
 	function handlePlayButton(){
-		console.log('user socket', userAuthenticate)
 		setSearching(!searching)
 		if(difficultyChoose)
 			setDifficultyChoose(false)
