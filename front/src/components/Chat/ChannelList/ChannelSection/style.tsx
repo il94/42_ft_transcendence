@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import colors from "../../../../utils/colors"
 
-export const Style = styled.div<{ $id: number }>`
+export const Style = styled.div<{ $sectionIndex: number }>`
 
 	display: flex;
 	align-items: center;
@@ -12,14 +12,14 @@ export const Style = styled.div<{ $id: number }>`
 
 	cursor: pointer;
 
-	background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionTransparent : colors.sectionAltTransparent};
+	background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionTransparent : colors.sectionAltTransparent};
 
 	&:hover {
-		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
 	}
 	&:focus-visible {
 		outline: none;	
-		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
 
 `

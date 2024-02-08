@@ -5,7 +5,7 @@ import styled from "styled-components"
 
 import colors from "../../../utils/colors"
 
-export const Style = styled.div<{ $id: number, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
+export const Style = styled.div<{ $sectionIndex: number, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
 
 	display: flex;
 	justify-content: center;
@@ -22,14 +22,14 @@ export const Style = styled.div<{ $id: number, $isBlocked: boolean, ref: RefObje
 
 	opacity: ${(props) => props.$isBlocked && 0.5};
 
-	background-color: ${(props) => props.$id % 2 === 0 ? colors.section : colors.sectionAlt};
+	background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.section : colors.sectionAlt};
 
 	&:hover {
-		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
 	}
 	&:focus-visible {
 		outline: none;	
-		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
 
 `

@@ -45,10 +45,11 @@ type PropsFriendSection = {
 		left?: number,
 		top?: number,
 		bottom?: number
-	}>>
+	}>>,
+	sectionIndex: number
 }
 
-function FriendSection({ friend, social, displayContextualMenu, setContextualMenuPosition }: PropsFriendSection) {
+function FriendSection({ friend, social, displayContextualMenu, setContextualMenuPosition, sectionIndex }: PropsFriendSection) {
 
 	const { userTarget, setUserTarget, userAuthenticate } = useContext(InteractionContext)!
 	const { card, displayCard, setCardPosition } = useContext(CardContext)!
@@ -112,7 +113,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 			onAuxClick={showContextualMenu}
 			onContextMenu={handleContextMenu}
 			tabIndex={0}
-			$id={friend.id}
+			$sectionIndex={sectionIndex}
 			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
 			<Avatar src={friend.avatar} />
