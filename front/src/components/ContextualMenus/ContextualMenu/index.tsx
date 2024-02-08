@@ -449,7 +449,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			$top={contextualMenuPosition.top}
 			$bottom={contextualMenuPosition.bottom}>
 			{
-				channelToDisplay > 0 &&
+				(channelToDisplay > 0 && !userIsBlocked(userAuthenticate, userTarget.id)) &&
 				<Section onMouseEnter={showSecondaryContextualMenu}>
 					<SectionName>
 						Invite
@@ -457,11 +457,14 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				</Section>
 			}
 			<div onMouseEnter={() => displaySecondaryContextualMenu(false)}>
-				<Section onClick={handleContactClickEvent}>
-					<SectionName>
-						Contact
-					</SectionName>
-				</Section>
+				{
+					!userIsBlocked(userAuthenticate, userTarget.id) &&
+					<Section onClick={handleContactClickEvent}>
+						<SectionName>
+							Contact
+						</SectionName>
+					</Section>
+				}
 				{
 					userTarget.status !== userStatus.OFFLINE &&
 					<Section onClick={handleChallengeClickEvent}>

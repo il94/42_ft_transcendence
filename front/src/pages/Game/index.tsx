@@ -362,8 +362,8 @@ function Game() {
 
 	// GAME
 	useEffect(() => {
-		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		// userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+		// 	refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
@@ -376,7 +376,7 @@ function Game() {
 		// 	refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
 
 		return () => {
-			userAuthenticate.socket?.off("updateUserStatus")
+			// userAuthenticate.socket?.off("updateUserStatus")
 
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
@@ -387,6 +387,23 @@ function Game() {
 	}, [userAuthenticate.socket])
 
 	/* ========================================================================== */
+
+
+
+	// GAME
+	useEffect(() => {
+		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+
+
+		return () => {
+			userAuthenticate.socket?.off("updateUserStatus")
+
+		}
+
+	}, [userAuthenticate])
+
+
 
 	return (
 		<GamePage
