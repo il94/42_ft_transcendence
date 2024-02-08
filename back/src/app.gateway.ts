@@ -7,7 +7,7 @@ import { UserStatus } from "@prisma/client";
 @WebSocketGateway()
 export class AppGateway implements OnModuleInit {
 
-	@WebSocketServer() server: Server;
+	@WebSocketServer() public server: Server;
 
 	onModuleInit() {
 		this.server.on('connection', (socket: Socket) => {
