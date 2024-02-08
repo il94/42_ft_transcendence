@@ -10,7 +10,8 @@ import Loader from "../../../componentsLibrary/Loader"
 import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
-	Channel
+	Channel,
+	ChannelData
 } from "../../../utils/types"
 
 import colors from "../../../utils/colors"
@@ -29,7 +30,7 @@ const Style = styled.div`
 `
 
 type PropsChannelList = {
-	channels: Channel[]
+	channels: (Channel | ChannelData)[]
 }
 
 function ChannelList({ channels }: PropsChannelList) {
@@ -46,8 +47,8 @@ function ChannelList({ channels }: PropsChannelList) {
 				{
 					channels.map((channel) => (
 						<ChannelSection
-						key={"channel" + channel.id}
-						channel={channel}
+							key={"channel" + channel.id}
+							channel={channel}
 						/>
 					))
 				}

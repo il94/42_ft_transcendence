@@ -104,12 +104,13 @@ export class ChannelsService {
 			if (channelMPAlreadyExist)
 				throw new ConflictException("MP channel already exist")
 
-			// Verifie si le user target existe et retourne son username et son avatar
+			// Verifie si le user target existe et retourne son id username et avatar
 			const userTarget = await this.prisma.user.findUnique({
 				where: {
 					id: userTargetId
 				},
 				select: {
+					id: true,
 					username: true,
 					avatar: true
 				}
@@ -172,15 +173,31 @@ export class ChannelsService {
 
 			// Ajoute les données du user target pour le front
 			const channelMP: ChannelMP = {
+				...newChannelMP,
 				name: userTarget.username,
-				avatar: userTarget.avatar,
-				...newChannelMP
+				avatar: userTarget.avatar
 			}
 
+			// Recupere l'id username et avatar du user auth 
+			const userAuth = await this.prisma.user.findUnique({
+				where: {
+					id: userAuthId
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true
+				}
+			})
+
 			// Emit
-			await this.emitOnChannel("createChannelMP", channelMP.id, userTargetId)
+			const socket: Socket = AppService.connectedUsers.get(userTarget.id.toString())
+			socket.emit("createChannelMP", channelMP.id, userAuth)
 
 			console.log(`Channel MP ${channelMP.id} was created`)
+
+			console.log(channelMP)
+
 			return channelMP
 		}
 		catch (error) {
@@ -196,15 +213,10 @@ export class ChannelsService {
 	// Ajoute un user dans un channel
 	async joinChannel(channelId: number, userId: number, hash?: string, inviterId?: number) {
 		try {
-			// Verifie si le channel existe et retourne son role
+			// Verifie si le channel existe et le retourne
 			const channelToJoin = await this.prisma.channel.findUnique({
 				where: {
 					id: channelId
-				},
-				select: {
-					id: true,
-					type: true,
-					hash: true
 				}
 			})
 			if (!channelToJoin)
@@ -215,13 +227,19 @@ export class ChannelsService {
 			else if (channelToJoin.type === ChannelStatus.MP && inviterId)
 				throw new ForbiddenException("Invitations forbidden for channel MP")
 
-			// Verifie si le user existe et récupère son username
+			// Verifie si le user existe et le récupère
 			const user = await this.prisma.user.findUnique({
 				where: {
 					id: userId
 				},
 				select: {
-					username: true
+					id: true,
+					username: true,
+					avatar: true,
+					wins: true,
+					draws: true,
+					losses: true,
+					status: true
 				}
 			})
 			if (!user)
@@ -316,11 +334,11 @@ export class ChannelsService {
 
 				// Si le user a été invité dans le channel, emit à tout les users du channel 
 				if (inviterId)
-					await this.emitOnChannel("joinChannel", channelId, userId)
+					await this.emitOnChannel("joinChannel", channelId, userId, channelToJoin, user)
 
 				// Si le user a rejoint le channel de lui même, emit à tout les users du channel sauf lui
 				else
-					await this.emitOnChannelExceptUser("joinChannel", userId, channelId, userId)
+					await this.emitOnChannelExceptUser("joinChannel", userId, channelId, userId, null, user)
 
 				console.log(`User ${userId} joined channel ${channelId}`)
 		}
@@ -515,9 +533,7 @@ export class ChannelsService {
 			return accessibleChannels
 		}
 		catch (error) {
-			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
-				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
 			else
 				throw new BadRequestException()

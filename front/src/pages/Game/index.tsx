@@ -10,7 +10,7 @@ import {
 import {
 	useMediaQuery
 } from 'react-responsive'
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import {
 	io
 } from 'socket.io-client'
@@ -62,6 +62,8 @@ import AuthContext from '../../contexts/AuthContext'
 
 import {
 	Channel,
+	ChannelData,
+	ErrorResponse,
 	User,
 	UserAuthenticate
 } from '../../utils/types'
@@ -203,12 +205,21 @@ function Game() {
 				setLoaderFriends(false)
 			}
 			catch (error) {
-				navigate("/error", {
-					state: {
-						disconnect: true
+				if (axios.isAxiosError(error)) {
+					const axiosError = error as AxiosError<ErrorResponse>
+					const { statusCode, message } = axiosError.response?.data!
+					if (statusCode === 403)
+					{
+						navigate("/error", { state: {
+							message: message
+						}})	
 					}
-				})
-			}
+					else
+						navigate("/error")
+				}
+				else
+					navigate("/error")
+			}	
 		}
 		if (!token)
 			navigate("/error")
@@ -306,8 +317,8 @@ function Game() {
 
 			
 
-		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
-			refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
+		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number, channelDatas: ChannelData, newMember: User) =>
+			refreshJoinChannel({ channelId, userId, channelDatas, newMember, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 
 
 
@@ -369,9 +380,11 @@ function Game() {
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("createChannelMP", (channelId: number, recipientId: number) =>
-			recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget, displayChat }))
+		userAuthenticate.socket?.on("createChannelMP", (channelId: number, authorDatas: any) =>
+			recieveChannelMP({ channelId, authorDatas, setUserAuthenticate }))
 
+
+			
 		// userAuthenticate.socket?.on("joinChannel2", (channelId: number, userId: number) =>
 		// 	refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
 
@@ -384,7 +397,7 @@ function Game() {
 			// userAuthenticate.socket?.off("joinChannel2")
 		}
 
-	}, [userAuthenticate.socket])
+	}, [userAuthenticate])
 
 	/* ========================================================================== */
 
@@ -427,7 +440,7 @@ function Game() {
 								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
 								secondaryContextualMenuPosition={secondaryContextualMenuPosition}
 								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-								channels={userAuthenticate.channels} />
+								channels={userAuthenticate.channels as Channel[]} />
 						}
 						{
 							popupError.display &&

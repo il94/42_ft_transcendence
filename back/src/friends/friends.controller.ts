@@ -19,8 +19,8 @@ export class FriendsController {
 
 	// Retourne les amis du user
 	@Get()
-	async getUserFriends(@getUser() user: User) {
-		return await this.friendsService.getUserFriends(user.id)
+	async getUserFriends(@getUser('id') userId: number) {
+		return await this.friendsService.getUserFriends(userId)
 	}
 
 	// Supprime un ami

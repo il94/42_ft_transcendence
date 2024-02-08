@@ -15,11 +15,12 @@ import DisplayContext from "../../../../contexts/DisplayContext"
 
 import {
 	Channel,
+	ChannelData,
 	ErrorResponse
 } from "../../../../utils/types"
 
 type PropsChannel = {
-	channel: Channel,
+	channel: Channel | ChannelData,
 }
 
 function ChannelSection({ channel }: PropsChannel) {
