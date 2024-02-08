@@ -15,12 +15,11 @@ const Style = styled.div<{ $backgroundColor: string }>`
 
 position: absolute;
 
-width: 95%;
+width: 83.5%; //83.5%
+
+/* min-width: 95%; */
 /* height: 95%; */
 aspect-ratio: 16/9;
-
-max-width: 100%;
-max-height: 100%;
 
 
 
