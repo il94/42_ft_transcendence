@@ -29,6 +29,7 @@ export class FriendsController {
 	@Param('id', ParseIntPipe) userTargetId: number) {
 		return this.friendsService.removeFriend(userAuthId, userTargetId)
     }
+}
 
 /* =========================== PAS UTILISEES ================================ */
 
@@ -52,6 +53,3 @@ export class FriendsController {
   //   @Body() dto: RelationDto) {
   //       return this.friendsService.updateRelation(id, dto);
   //   }
-
-
-}

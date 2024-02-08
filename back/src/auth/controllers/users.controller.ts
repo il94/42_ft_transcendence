@@ -13,32 +13,28 @@ import { User } from '@prisma/client';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-	// Renvoie tout les users
+	// Renvoie les donnees publiaues de tout les users
 	@Get()
 	findAll() {
 		return this.usersService.findAll()
 	}
-  
-  @Get('me')
-  async getMe(@getUser() user: User) {
-    return user;
-  }
 
-  // RQPR touts les channels d'un user 
-  @Get('channels')
-  async getUserChannels(@getUser() user: User) {
-    return this.usersService.findUserChannel(user);
-  }
+	// Renvoie le user authentifie
+	@Get('me')
+	async getMe(@getUser() user: User) {
+		return user
+	}
+
+	// Renvoie les channels du user auth sauf ceux dans lesquels il est ban
+	@Get('channels')
+	async getUserChannels(@getUser('id') userId: number) {
+		return this.usersService.findUserChannel(userId)
+	}
 
   // historique de matches du user (retourne null si aucun matchs joues)
   @Get('matchs/:id')
   async getUserMatchs(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getMatchHistory(id);
-  }
-
-  @Get(':id')
-  async findById(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findById(id);
   }
 
   	// Modifie le user authentifie
@@ -47,11 +43,16 @@ export class UsersController {
 	@Body() updateUserDto: UpdateUserDto) {
 		return this.usersService.updateUser(userId, updateUserDto)
 	}
-
-  @Delete()
-  async remove(@getUser('id') userId: number) {
-    return this.usersService.remove(userId);
-  }
-
 }
 
+/* =========================== PAS UTILISEES ================================ */
+
+// @Get(':id')
+// async findById(@Param('id', ParseIntPipe) id: number) {
+//   return this.usersService.findById(id);
+// }
+
+// @Delete()
+// async remove(@getUser('id') userId: number) {
+//   return this.usersService.remove(userId);
+// }

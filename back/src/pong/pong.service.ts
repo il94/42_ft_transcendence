@@ -106,7 +106,7 @@ export class PongService {
 		  });
 		  console.log(`User ${userId} game stats updated successfully.`);
 		  this.updateStatusUser(userId, UserStatus.ONLINE);
-		  this.userService.setResult(userId, result); // set user match history  
+		  this.setResult(userId, result); // set user match history  
 		  return updatedUserGame;
 		} catch (error) {
 		  console.error(`Error updating user ${userId} game stats:`, error);
@@ -114,6 +114,49 @@ export class PongService {
 		}
 	  }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	  async setResult(userId: number, result: MatchResult): Promise<void> {
+		try {
+			const user = await this.prisma.user.findUnique({where: { id: userId }})	
+			if (result == MatchResult.WINNER) {
+				await this.prisma.user.update({ where: { id: userId },
+					data: { wins: { increment: 1 } }
+				})
+				user.wins++
+			}
+			else if (result == MatchResult.LOOSER) {
+				await this.prisma.user.update({ where: { id: userId },
+					data: { losses: { increment: 1 } }
+				})
+				user.losses++
+			}
+		} catch (error) {
+			throw error
+		}
+	}
 
 // 		// util
 // 		async connectGame(userId: number, gameId: number, userRole: roleInGame): Promise<Game> {

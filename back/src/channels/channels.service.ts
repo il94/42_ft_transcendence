@@ -499,14 +499,6 @@ export class ChannelsService {
 
 	}
 
-  // Retourne tout les channels
-  async findAllChannels() {
-    const channels = await this.prisma.channel.findMany()
-
-    // console.log("Channels :", channels)
-    return channels;
-  }
-
 	// Retourne tout les channels PUBLIC et PROTECTED
 	async findAllChannelsAccessibles() {
 		try {
@@ -531,48 +523,6 @@ export class ChannelsService {
 				throw new BadRequestException()
 		}
 	}
-
-  // Retourne un channel
-  async findChannel(chanId: number, userId: number) {
-    const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
-    if (!channel)
-      throw new NotFoundException(`Channel id ${chanId} not found`);
-
-    if (channel.type === ChannelStatus.MP)
-    {
-      const recipientId = await this.prisma.usersOnChannels.findUnique({
-        where: {
-          userId_channelId: {
-            userId: userId,
-            channelId: chanId
-          }
-        },
-        select: {
-          userId: true
-        }
-      })
-
-      const recipient = await this.prisma.user.findUnique({
-        where: {
-          id: recipientId.userId
-        },
-        select: {
-          username: true,
-          avatar: true
-        }
-      })
-
-      const channelMP = {
-        ...channel,
-        name: recipient.username,
-        avatar: recipient.avatar
-      }
-
-      return channelMP
-    }
-    else
-      return channel;
-  }
 
 	// Retourne un channel avec ses relations
 	async findChannelWithRelations(chanId: number, userId: number) {
@@ -722,62 +672,6 @@ export class ChannelsService {
 				throw new BadRequestException()
 		}
 	}
-
-  // Retourne les sockets (string) des users du channel
-  async getAllSocketsChannel(id: number)
-  {
-    const usersOnChannels = await this.prisma.usersOnChannels.findMany({
-      where: {
-        channelId: id,
-      },
-      select: {
-        userId: true,
-
-      },
-    });
-
-    const sockets = usersOnChannels.map((userOnChannel) => {
-      const socket = AppService.connectedUsers.get(userOnChannel.userId?.toString())
-      if (socket)
-        return socket.id
-      else
-        return undefined
-    })
-
-	// console.log("usersOnChannels", usersOnChannels)
-	// console.log("sockets", sockets)
-
-    return sockets;
-  }  
-
-  // Retourne les sockets (string) des users du channel sauf celui du user
-  async getAllSocketsChannelExceptUser(channelId: number, userId: number)
-  {
-    const usersOnChannels = await this.prisma.usersOnChannels.findMany({
-      where: {
-        channelId: channelId,
-		NOT: {
-			userId: userId
-		}
-      },
-      select: {
-        userId: true,
-      },
-    });
-
-    const sockets = usersOnChannels.map((userOnChannel) => {
-      const socket = AppService.connectedUsers.get(userOnChannel.userId?.toString())
-      if (socket)
-        return socket.id
-      else
-        return undefined
-    })
-
-	// console.log("usersOnChannels", usersOnChannels)
-	// console.log("sockets", sockets)
-
-    return sockets;
-  }
 
 	// Modifie un channel
 	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
@@ -1276,59 +1170,63 @@ export class ChannelsService {
 		}
 	}
 
-
-   /*
-       Renvoie le channel si il existe 
-   */
-  async checkIfChannelExist(chanId : number)
-  {
-    const channel = await this.prisma.channel.findUnique({
-      where: { id: chanId },
-    });
-    return (channel)
-  }
-
-  /*
-       Renvoie le user si il existe dans le serveur
-   */
-
-  async checkIfUserExist(chanId : number)
-  {
-    const user = await this.prisma.user.findUnique({
-      where: { id: chanId},
-    });
-    return (user)
-  }
-
-    async getAllMessage(id: number) {
-      try {
-        const channel = await this.prisma.channel.findUnique({
-          where: { id: id },
-          include: { content: true },
-        });
-    
-        if (!channel) {
-          console.error("Le canal n'existe pas.");
-          return null; // Retournez une valeur ou utilisez une exception appropriée
-        }
-        
-        const messages = channel.content;
-    
-        if (!messages) { 
-          console.error("Aucun message trouvé dans le canal.");
-          return null; // Retournez une valeur ou utilisez une exception appropriée
-        }
-    
-        //console.log(messages);
-    
-        return messages;
-      } catch (error) {
-        console.error("Une erreur s'est produite lors de la récupération des messages.", error);
-        return null; // Retournez une valeur ou utilisez une exception appropriée
-      }
-    }
-
 /* =============================== UTILS ==================================== */
+
+  // Retourne les sockets (string) des users du channel
+  async getAllSocketsChannel(id: number)
+  {
+    const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+      where: {
+        channelId: id,
+      },
+      select: {
+        userId: true,
+
+      },
+    });
+
+    const sockets = usersOnChannels.map((userOnChannel) => {
+      const socket = AppService.connectedUsers.get(userOnChannel.userId?.toString())
+      if (socket)
+        return socket.id
+      else
+        return undefined
+    })
+
+	// console.log("usersOnChannels", usersOnChannels)
+	// console.log("sockets", sockets)
+
+    return sockets;
+  }  
+
+  // Retourne les sockets (string) des users du channel sauf celui du user
+  async getAllSocketsChannelExceptUser(channelId: number, userId: number)
+  {
+    const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+      where: {
+        channelId: channelId,
+		NOT: {
+			userId: userId
+		}
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const sockets = usersOnChannels.map((userOnChannel) => {
+      const socket = AppService.connectedUsers.get(userOnChannel.userId?.toString())
+      if (socket)
+        return socket.id
+      else
+        return undefined
+    })
+
+	// console.log("usersOnChannels", usersOnChannels)
+	// console.log("sockets", sockets)
+
+    return sockets;
+  }
 
     // Emit a tout les users d'un channel
     async emitOnChannel(route: string, ...args: any[]) {
@@ -1383,6 +1281,29 @@ export class ChannelsService {
     return channel;
   }
   
+   /*
+       Renvoie le channel si il existe 
+   */
+	   async checkIfChannelExist(chanId : number)
+	   {
+		 const channel = await this.prisma.channel.findUnique({
+		   where: { id: chanId },
+		 });
+		 return (channel)
+	   }
+	 
+	   /*
+			Renvoie le user si il existe dans le serveur
+		*/
+	 
+	   async checkIfUserExist(chanId : number)
+	   {
+		 const user = await this.prisma.user.findUnique({
+		   where: { id: chanId},
+		 });
+		 return (user)
+	   }
+
   async isInChannel(userId: number, chanId: number) {
     
     const inChannel = await this.prisma.usersOnChannels.findUnique({
@@ -1491,18 +1412,97 @@ async countMembersInChannel(chanId: number): Promise<number> {
 
 			console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
 			return (newOwner)
-	}
-	catch (error) {
-		if (error instanceof NotFoundException || error instanceof ConflictException)
-			throw error
-		else if (error instanceof Prisma.PrismaClientKnownRequestError)
-			throw new ForbiddenException("The provided user data is not allowed")
-		else
-			throw new BadRequestException()
+		}
+		catch (error) {
+			if (error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 }
 
 /* =========================== PAS UTILISEES ================================ */
+
+//   // Retourne tout les channels
+//   async findAllChannels() {
+//     const channels = await this.prisma.channel.findMany()
+
+//     // console.log("Channels :", channels)
+//     return channels;
+//   }
+
+//   // Retourne un channel
+//   async findChannel(chanId: number, userId: number) {
+//     const channel = await this.prisma.channel.findUnique({where: { id: chanId }},)
+//     if (!channel)
+//       throw new NotFoundException(`Channel id ${chanId} not found`);
+
+//     if (channel.type === ChannelStatus.MP)
+//     {
+//       const recipientId = await this.prisma.usersOnChannels.findUnique({
+//         where: {
+//           userId_channelId: {
+//             userId: userId,
+//             channelId: chanId
+//           }
+//         },
+//         select: {
+//           userId: true
+//         }
+//       })
+
+//       const recipient = await this.prisma.user.findUnique({
+//         where: {
+//           id: recipientId.userId
+//         },
+//         select: {
+//           username: true,
+//           avatar: true
+//         }
+//       })
+
+//       const channelMP = {
+//         ...channel,
+//         name: recipient.username,
+//         avatar: recipient.avatar
+//       }
+
+//       return channelMP
+//     }
+//     else
+//       return channel;
+//   }
+
+//   async getAllMessage(id: number) {
+// 	try {
+// 	  const channel = await this.prisma.channel.findUnique({
+// 		where: { id: id },
+// 		include: { content: true },
+// 	  });
+  
+// 	  if (!channel) {
+// 		console.error("Le canal n'existe pas.");
+// 		return null; // Retournez une valeur ou utilisez une exception appropriée
+// 	  }
+	  
+// 	  const messages = channel.content;
+  
+// 	  if (!messages) { 
+// 		console.error("Aucun message trouvé dans le canal.");
+// 		return null; // Retournez une valeur ou utilisez une exception appropriée
+// 	  }
+  
+// 	  //console.log(messages);
+  
+// 	  return messages;
+// 	} catch (error) {
+// 	  console.error("Une erreur s'est produite lors de la récupération des messages.", error);
+// 	  return null; // Retournez une valeur ou utilisez une exception appropriée
+// 	}
+//   }
 
 // async addUserInChannel(friendId: number, member: User, chanId: number) {
 //   if (friendId === member.id)
@@ -1536,9 +1536,6 @@ async countMembersInChannel(chanId: number): Promise<number> {
 //   }   
 // }
 
-
-
-
   /****************************** CRUD USER ON CHANNEL ***********************/
 
 
@@ -1548,6 +1545,3 @@ async countMembersInChannel(chanId: number): Promise<number> {
   // ROLE ADMIN : BLOCK, LEAVE, KICK, BAN, MUTE /!\ if target is not owner
 
   // ROLE OWNER : SET_PASSWORD, SET_ADMINS
-
-
-}

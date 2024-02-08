@@ -10,8 +10,6 @@ import { authenticator } from "otplib";
 export class UsersService {
 	constructor(private prisma: PrismaService) {}
 
-	/*********************** General CRUD ******************************************/
-
 	// Cree un user
 	async createUser(userDatas: CreateUserDto): Promise<User> {
 		try {
@@ -59,7 +57,7 @@ export class UsersService {
 		}
 	}
 
-	// Renvoie tout les users
+	// Renvoie les donnees publiques de tout les users
 	findAll() {
 		try {
 			// Récupère tout les users
@@ -84,27 +82,103 @@ export class UsersService {
 		}
 	}
 
-	async findById(id: number): Promise<Partial<User>>  {
-		const user = await this.prisma.user.findUnique({
-			where: { id: id },
-			select: {  id: true,
-				  username: true,
-				  avatar: true,
-				  status: true,
-				  wins: true,
-				  draws: true,
-				  losses: true, }})
-		if (!user)
-			throw new NotFoundException(`User with ${id} does not exist.`);
-		return user;
+	// Renvoie les channels du user auth sauf ceux dans lesquels il est ban
+	async findUserChannel(userId: number) {
+		try {
+			// Recupere les ids des channels du user
+			const channelsId = await this.prisma.usersOnChannels.findMany({
+				where: {
+					userId: userId,
+					role: {
+						not: Role.BANNED
+					}
+				},
+				select: {
+					channelId: true
+				}
+			})
+
+			// Recupere les channels par leurs ids sauf les MP
+			const userChannels = await this.prisma.channel.findMany({
+				where: {
+					id: {
+						in: channelsId.map((channelId) => (channelId.channelId))
+					},
+					AND: {
+						type: {
+							in: [ChannelStatus.PUBLIC, ChannelStatus.PROTECTED, ChannelStatus.PRIVATE]
+						}
+					}
+				}
+			})
+
+			// Recupere les channels MP par leurs ids
+			const userChannelsMP = await this.prisma.channel.findMany({
+				where: {
+					id: {
+						in: channelsId.map((channelId) => (channelId.channelId))
+					},
+					AND: {
+						type: ChannelStatus.MP
+					}
+				},
+				include: {
+					users: {
+						select: {
+							user: {
+								select: {
+									id: true,
+									username: true,
+									avatar: true
+								}
+							},
+						}
+					}
+				}
+			})
+
+			// Regroupe les channels et MPs avec les bonnes datas
+			const userAllChannels = [
+				...userChannels,
+				...userChannelsMP.map((channelMP) => {
+					const { users, ...rest } = channelMP
+
+					return {
+						...rest,
+						name: users.find((user) => user.user.id !== userId).user.username,
+						avatar: users.find((user) => user.user.id !== userId).user.avatar
+					}
+				})
+			]
+
+			return userAllChannels
+		}
+		catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
-	async findUser(id: number): Promise<User>  {
-		const user = await this.prisma.user.findUnique({
-			where: { id: id },})
-		if (!user)
-			throw new NotFoundException(`User with ${id} does not exist.`);
-		return user;
+  // historique de matches du user (retourne null si aucun matchs joues)
+	async getMatchHistory(userId: number): Promise<Array<any>> {
+		try {
+			const matchTab = await this.prisma.usersOnGames.findMany({ where: { userId: userId, role: roleInGame.PLAYER }})
+				if (!matchTab)
+					return null;
+			let tab: any[] = [];
+			for (let i = 0; i < matchTab.length; i++) {
+				const challengerData = await this.getChallenger(matchTab[i].gameId, userId);
+				if (challengerData)
+					tab.push({match: matchTab[i], challengerData})
+			}
+			console.log(" TAB: ", tab)
+			const res = tab;
+			return res;
+		} catch (error) {
+			throw error;
+		}
 	}
 
   	// Modifie le user authentifie
@@ -139,198 +213,21 @@ export class UsersService {
 		}
 	}
 
-	async remove(id: number): Promise<User> {
-		const deleteFriends =  this.prisma.friend.deleteMany({
-			where: { userId: id }});
-		const deleteChannels = this.prisma.usersOnChannels.deleteMany({
-			where: { userId: id }})
-		const deleteGames = this.prisma.usersOnGames.deleteMany({
-			where: { userId: id }})
-		const transaction = await this.prisma.$transaction([deleteFriends, deleteChannels, deleteGames])
-		
-		const userExists = await this.prisma.user.findUnique({
-			where: { id: id },});
-		if (userExists) {
-			const deleteUser = this.prisma.user.delete({
-				where: { id: id },});
-			return deleteUser;
-		} else {
-			throw new Error(`User with ID ${id} not found`);
-		}
-	}
+/* =============================== UTILS ==================================== */
 
-	/*********************** TwoFA settings ******************************************/
-
-	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
-		try {
-			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
-			if (!getUser)
-				throw new NotFoundException('User not found');
-			if (getUser.twoFA)
-				throw new ConflictException('2FA already enabled');
-
-			const isCodeValid = authenticator.verify({
-				token: twoFACode,
-				secret: getUser.twoFASecret,
-			});
-			if (!isCodeValid)
-				throw new ForbiddenException('Wrong authentication code');
-			
-				const setUser = await this.prisma.user.update({
-				where: { id: user.id, },
-				data: { twoFA: true, },
-			});
-			return setUser;
-		}
-		catch (error) {
-			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
-				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
-			else
-				throw new BadRequestException()
-		}
-	}
-
-	async setTwoFASecret(secret: string, userId: number): Promise<void> {
-		try {
-		const user = await this.prisma.user.update({
-			where: { id: userId,},
-			data: { twoFASecret: secret },
-		});
+	async findById(id: number): Promise<Partial<User>>  {
+		const user = await this.prisma.user.findUnique({
+			where: { id: id },
+			select: {  id: true,
+				  username: true,
+				  avatar: true,
+				  status: true,
+				  wins: true,
+				  draws: true,
+				  losses: true, }})
 		if (!user)
-			throw new NotFoundException("User not found");
-		} catch (error) { throw error; }
-	}
-
-	async disableTwoFA(user: User, code: string) {
-		try {
-			const otpCode = await this.prisma.user.findUnique({
-				where: { id: user.id, twoFASecret:  code }
-			})
-			if (!otpCode)
-				throw new NotFoundException(`Failed to disable TwoFA`);
-			const setUser = await this.prisma.user.update({
-				where: { id: user.id },
-				data: { twoFA: false },
-			});
-			return setUser.twoFA;
-		}
-		catch (error) { // a check
-			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
-				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
-			else
-				throw new BadRequestException()
-		}
-	}
-
-	/*********************** Channels ******************************************/
-
-	async findUserChannel(member: User) {
-
-		const channelsId = await this.prisma.usersOnChannels.findMany({
-			where: {
-				userId: member.id,
-				role: {
-					not: Role.BANNED
-				}
-			}
-		})
-
-		const userChannels = await this.prisma.channel.findMany({
-			where: {
-				id: {
-					in: channelsId.map((channelId) => (channelId.channelId))
-				},
-				AND: {
-					type: {
-						in: [ChannelStatus.PUBLIC, ChannelStatus.PROTECTED, ChannelStatus.PRIVATE]
-					}
-				}
-			}
-		})
-
-		const userChannelsMP = await this.prisma.channel.findMany({
-			where: {
-				id: {
-					in: channelsId.map((channelId) => (channelId.channelId))
-				},
-				AND: {
-					type: ChannelStatus.MP
-				}
-			},
-			include: {
-				users: {
-					select: {
-						user: {
-							select: {
-								id: true,
-								username: true,
-								avatar: true
-							}
-						},
-					}
-				}
-			}
-		})
-
-		const userAllChannels = [
-			...userChannels,
-			...userChannelsMP.map((channelMP) => {
-				const { users, ...rest } = channelMP
-
-				return {
-					...rest,
-					name: users.find((user) => user.user.id !== member.id).user.username,
-					avatar: users.find((user) => user.user.id !== member.id).user.avatar
-				}
-			})
-		]
-
-		return userAllChannels;
-	}
-
-	/*********************** Matchs history ******************************************/
-
-	async setResult(userId: number, result: MatchResult): Promise<void> {
-		try {
-			const user = await this.prisma.user.findUnique({where: { id: userId }})	
-			if (result == MatchResult.WINNER) {
-				await this.prisma.user.update({ where: { id: userId },
-					data: { wins: { increment: 1 } }
-				})
-				user.wins++
-			}
-			else if (result == MatchResult.LOOSER) {
-				await this.prisma.user.update({ where: { id: userId },
-					data: { losses: { increment: 1 } }
-				})
-				user.losses++
-			}
-		} catch (error) {
-			throw error
-		}
-	}
-
-	async getMatchHistory(userId: number): Promise<Array<any>> {
-		try {
-			const matchTab = await this.prisma.usersOnGames.findMany({ where: { userId: userId, role: roleInGame.PLAYER }})
-				if (!matchTab)
-					return null;
-			let tab: any[] = [];
-			for (let i = 0; i < matchTab.length; i++) {
-				const challengerData = await this.getChallenger(matchTab[i].gameId, userId);
-				if (challengerData)
-					tab.push({match: matchTab[i], challengerData})
-			}
-			console.log(" TAB: ", tab)
-			const res = tab;
-			return res;
-		} catch (error) {
-			throw error;
-		}
+			throw new NotFoundException(`User with ${id} does not exist.`);
+		return user;
 	}
 
 	async getChallenger(gameId: number, userId: number): Promise <{challenger: string, challengerScore: number}> {
@@ -359,4 +256,34 @@ export class UsersService {
 		} 
 		return null;
 	}
+
+/* =========================== PAS UTILISEES ================================ */
+
+	// async findUser(id: number): Promise<User>  {
+	// 	const user = await this.prisma.user.findUnique({
+	// 		where: { id: id },})
+	// 	if (!user)
+	// 		throw new NotFoundException(`User with ${id} does not exist.`);
+	// 	return user;
+	// }
+
+	// async remove(id: number): Promise<User> {
+	// 	const deleteFriends =  this.prisma.friend.deleteMany({
+	// 		where: { userId: id }});
+	// 	const deleteChannels = this.prisma.usersOnChannels.deleteMany({
+	// 		where: { userId: id }})
+	// 	const deleteGames = this.prisma.usersOnGames.deleteMany({
+	// 		where: { userId: id }})
+	// 	const transaction = await this.prisma.$transaction([deleteFriends, deleteChannels, deleteGames])
+		
+	// 	const userExists = await this.prisma.user.findUnique({
+	// 		where: { id: id },});
+	// 	if (userExists) {
+	// 		const deleteUser = this.prisma.user.delete({
+	// 			where: { id: id },});
+	// 		return deleteUser;
+	// 	} else {
+	// 		throw new Error(`User with ID ${id} not found`);
+	// 	}
+	// }
 }
