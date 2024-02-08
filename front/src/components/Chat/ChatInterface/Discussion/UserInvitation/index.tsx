@@ -16,6 +16,7 @@ import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
 
 import AuthContext from "../../../../../contexts/AuthContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
+import DisplayContext from "../../../../../contexts/DisplayContext"
 
 import {
 	User,
@@ -39,6 +40,7 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	return (
 		<Style>
@@ -51,6 +53,7 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 					<ButtonChallenge
 						onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan, {
 							userAuthenticate,
+							displayPopupError,
 							token,
 							url
 						})}

@@ -24,6 +24,10 @@ import {
 	ErrorResponse
 } from "../../../utils/types"
 
+import {
+	ChannelType
+} from "../../../utils/status"
+
 type PropsSecondaryContextualMenu = {
 	displaySecondaryContextualMenu: Dispatch<SetStateAction<boolean>>,
 	secondaryContextualMenuPosition: {
@@ -87,15 +91,16 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			height={secondaryContextualMenuHeight}>
 			<ScrollBar visible>
 				{
-					channels.map((channel) => (
-						<Section
-							key={"channelSection" + channel.id}
-							onClick={() => handleInviteClickEvent(channel)}>
-							<SectionName>
-								{channel.name}
-							</SectionName>
-						</Section>
-					))
+					channels.filter((channel) => channel.type !== ChannelType.MP)
+						.map((channel) => (
+							<Section
+								key={"channelSection" + channel.id}
+								onClick={() => handleInviteClickEvent(channel)}>
+								<SectionName>
+									{channel.name}
+								</SectionName>
+							</Section>
+						))
 				}
 			</ScrollBar>
 		</Style>

@@ -26,7 +26,6 @@ import {
 import {
 	Channel,
 	ChannelData,
-	Message,
 	MessageInvitation,
 	MessageText,
 	User,
@@ -35,71 +34,93 @@ import {
 
 // Fonctions appellées uniquement lors d'emits de socekts. Ces fonctions servent à mettre à jour des données en temps réel chez l'ensemble des utilisateurs 
 
-type PropsUpdateDiscussion = {
-	idSend: number,
-	idChannel: number,
-	idTargetOrMsg: number | string,
-	idMsg: number
+type PropsPostText = {
+	channelId: number,
+	userId: number,
+	textDatas: any
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
 }
 
-export function updateDiscussion(props: PropsUpdateDiscussion) {
+export function postText(props: PropsPostText) {
 	
-	if (props.channelTarget?.id === props.idChannel)
+	if (props.channelTarget?.id === props.channelId)
 	{
-		// console.log("here");
-
-		let messageContent: Message;
-		const userSend = findUserInChannel(props.channelTarget, props.idSend);
+		const userSend = findUserInChannel(props.channelTarget, props.userId)
 		if (!userSend)
 			throw new Error
-		console.log("USERSEND = ", userSend)
-		if (typeof props.idTargetOrMsg === 'number')
-		{
 
-			const userTarget = findUserInChannel(props.channelTarget , props.idTargetOrMsg);
-			if (!userTarget)
-			throw new Error
-			messageContent = {
-				id: props.idMsg,
-				sender: userSend,
-				type: messageType.INVITATION,
-				target: userTarget,
-				status: challengeStatus.PENDING
-			} as MessageInvitation
+		const messageContent: MessageText = {
+			id: props.textDatas.id,
+			sender: userSend,
+			type: messageType.TEXT,
+			content: props.textDatas.content
+		}
 		
-		}
-		else {
-			messageContent ={
-				id: props.idMsg,
-				sender: userSend,
-				type: messageType.TEXT,
-				content: props.idTargetOrMsg
-			} as MessageText
-		}
-		if (props.idChannel === props.channelTarget.id)
+		props.setChannelTarget((prevState: Channel | undefined) => {
+		if (prevState)
 		{
-			props.setChannelTarget((prevState: Channel | undefined) => {
-			if (prevState)
-			{
-				return {
-					...prevState,
-					messages: [
-						...prevState.messages,
-						messageContent
-					]
-				}
+			return {
+				...prevState,
+				messages: [
+					...prevState.messages,
+					messageContent
+				]
 			}
-			else
-				return (undefined)
-			});
-		};
+		}
+		else
+			return (undefined)
+		})
 	}
-};
+}
 
+type PropsPostInvitation = {
+	channelId: number,
+	userAuthId: number,
+	userTargetId: number,
+	invitationDatas: any
 
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+export function postInvitation(props: PropsPostInvitation) {
+	
+	if (props.channelTarget?.id === props.channelId)
+	{
+		const userSend = findUserInChannel(props.channelTarget, props.userAuthId)
+		if (!userSend)
+			throw new Error
+
+		const userTarget = findUserInChannel(props.channelTarget, props.userTargetId)
+		if (!userTarget)
+			throw new Error
+
+		const messageContent: MessageInvitation = {
+			id: props.invitationDatas.id,
+			sender: userSend,
+			type: messageType.INVITATION,
+			target: userTarget,
+			status: challengeStatus.PENDING
+		}
+		
+		props.setChannelTarget((prevState: Channel | undefined) => {
+		if (prevState)
+		{
+			return {
+				...prevState,
+				messages: [
+					...prevState.messages,
+					messageContent
+				]
+			}
+		}
+		else
+			return (undefined)
+		})
+	}
+}
 
 type PropsRefreshJoinChannel = {
 	channelId: number,
@@ -137,7 +158,7 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 			members: [],
 			administrators: [],
 			owner: undefined,
-			mutedUsers: [],
+			muteInfo: [],
 			banneds: []
 		}
 
@@ -469,24 +490,23 @@ export async function refreshUserMute(props : RefreshUserMuteProps) {
 	}
 }
 
-	
 type RefreshStatusChallengeProps = {
-	idMsg: number,
-	status: challengeStatus,
-	idChan: number,
+	channelId: number,
+	messageId: number,
+	newStatus: challengeStatus,
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
-
 }
 
+// Met a jour le statut d'une invitation
 export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
-	if (props.idChan === props.channelTarget?.id)
+	if (props.channelId === props.channelTarget?.id)
 	{
 		props.setChannelTarget((prevState: Channel | undefined) => {
 		if (prevState) {
 			const updatedMessages = prevState.messages.map((message) =>
-			message.id === props.idMsg ? { ...message, status: props.status } : message
+			message.id === props.messageId ? { ...message, status: props.newStatus } : message
 			);
 			return {
 			...prevState,

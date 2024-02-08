@@ -4,10 +4,17 @@ import {
 	useRef,
 	useState
 } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useMediaQuery } from 'react-responsive'
+import {
+	useNavigate
+} from 'react-router-dom'
+import {
+	useMediaQuery
+} from 'react-responsive'
 import axios, { AxiosResponse } from 'axios'
-import { io } from 'socket.io-client'
+import {
+	io
+} from 'socket.io-client'
+import Cookies from 'js-cookie'
 
 import {
 	GamePage,
@@ -24,29 +31,28 @@ import {
 	refreshLeaveChannel,
 	refreshUpdateChannel,
 	refreshUserStatus,
-	updateDiscussion,
+	postInvitation,
 	refreshUserRole,
 	refreshNewOwner,
 	refreshJoinChannel,
 	refreshStatusChallenge,
-	refreshUserMute
+	refreshUserMute,
+	postText
 } from './sockets'
 
 import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
-import Pong from '../../components/Pong'
 import PongWrapper from '../../components/Pong/PongWrapper'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
-import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
 import TwoFaMenu from '../../components/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
 import PopupError from '../../components/PopupError'
-import Cookies from 'js-cookie'
+
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
 import ContextualMenuContext from '../../contexts/ContextualMenuContext'
@@ -61,6 +67,7 @@ import {
 } from '../../utils/types'
 
 import {
+	ChannelType,
 	challengeStatus,
 	chatWindowStatus,
 	contextualMenuStatus
@@ -149,7 +156,6 @@ function Game() {
 						members: [],
 						administrators: [],
 						owner: undefined,
-						mutedUsers: [],
 						banneds: [],
 						muteInfo: []
 					}
@@ -211,7 +217,7 @@ function Game() {
 	}, [])
 
 	useEffect(() => {
-		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
+		getSecondaryContextualMenuHeight(userAuthenticate.channels.filter((channel) => channel.type !== ChannelType.MP).length)
 	}, [userAuthenticate.channels.length])
 
 	/* ========================== COMPONENTS STATES ============================= */
@@ -305,18 +311,19 @@ function Game() {
 
 
 
-		// console.log("CHANNEL TARGET = ", channelTarget)
 
-		userAuthenticate.socket?.on("updateDiscussion", (idSend: number, idChannel: number, idTargetOrMsg: number | string, idMsg: number) => 
-			updateDiscussion({ idSend, idChannel, idTargetOrMsg, idMsg, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("postText", (channelId: number, userId: number, textDatas: any) => 
+			postText({ channelId, userId, textDatas, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("postInvitation", (channelId: number, userAuthId: number, userTargetId: number, invitationDatas: any) => 
+			postInvitation({ channelId, userAuthId, userTargetId, invitationDatas, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
 			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
 		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
 			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
-		userAuthenticate.socket?.on("updateStatusChallenge", (idMsg: number, status: challengeStatus, idChan: number) => 
-			refreshStatusChallenge({ idMsg, status, idChan, channelTarget, setChannelTarget }));
+		userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus) => 
+			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }));
 		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string) => 
 			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }));
 
@@ -341,11 +348,12 @@ function Game() {
 
 
 
-			userAuthenticate.socket?.off("updateDiscussion")
+			userAuthenticate.socket?.off("postText")
+			userAuthenticate.socket?.off("postInvitation")
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
 			userAuthenticate.socket?.off("setNewOwner")
-			userAuthenticate.socket?.off("updateStatusChallenge");
+			userAuthenticate.socket?.off("updateChallenge");
 			userAuthenticate.socket?.off("updateUserMute");
 		}
 

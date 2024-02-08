@@ -41,17 +41,23 @@ export class ChannelController {
 		return this.channelsService.joinChannel(channelId, userTargetId, undefined, userAuthId)
 	}
 
-    /* ajout de message  avec l'id du channel  */
-
-    @Post(':id/message') // à accorder
-    async addMessage( 
-      @getUser('id') userId: number,
-      @Param('id', ParseIntPipe) id: number,
-      @Body('msg') msg: string, 
-      @Body('msgStatus') msgStatus: messageStatus,
-    ) {
-      return await this.channelsService.addContent(id, msg, userId, msgStatus);
+	// Cree un message dans un channel
+    @Post(':id/message')
+    async addMessage(@getUser('id') userId: number,
+	@Param('id', ParseIntPipe) channelId: number,
+	@Body('msg') msgContent: string, 
+	@Body('msgStatus') msgStatus: messageStatus) {
+		return await this.channelsService.addContent(channelId, userId, msgContent, msgStatus)
     } 
+
+	// Cree une invitation a jouer dans un channel
+	@Post(':id/invitation')
+	async addInvitation(@getUser('id') userAuthId: number,
+	@Param('id', ParseIntPipe) channelId: number,
+	@Body('msgStatus') msgStatus: messageStatus,
+	@Body('targetId') userTargetId: number) {
+		return await this.channelsService.addContentInvitation(channelId, userTargetId, userAuthId, msgStatus)
+	}
 
   // Retourne tout les channels
   @Get()
@@ -104,25 +110,22 @@ export class ChannelController {
 		return this.channelsService.updateUserRole(channelId, userAuthId, userTargetId, newRole)
 	}
 
-  // Change l'etat mute d'un user du channel
-  @Patch(':channelId/mute/:userTargetId')
-  updateMute(
-    @Param('channelId', ParseIntPipe) channelId: number,
-    @Param('userTargetId', ParseIntPipe) userTargetId: number,
-    @getUser('id') userAuthId: number,
-  ){
-    return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId);
-  }
+	// Mute un user du channel
+	@Patch(':channelId/mute/:userTargetId')
+	updateMute(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
+		return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId)
+	}
 
-  // Change le challenge status d'un channel par son id
-
-  @Patch('message/:id')
-  updateStatusChannel(
-  @Param('id', ParseIntPipe) idMsg: number, 
-  @Body('msgStatus') newStatus: challengeStatus,
-  ) {
-  return this.channelsService.updateMessageStatus(idMsg, newStatus);
-}
+	// Change le statut d'une invitation
+	@Patch(':channelId/message/:messageId')
+	updateStatusChannel(@getUser('id') userAuthId: number,
+	@Param('channelId', ParseIntPipe) channelId: number,
+	@Param('messageId', ParseIntPipe) messageId: number,
+	@Body('newStatus') newStatus: challengeStatus) {
+		return this.channelsService.updateMessageStatus(channelId, messageId, userAuthId, newStatus)
+	}
 
 	// Supprime un channel
 	@Delete(':id')
@@ -137,18 +140,6 @@ export class ChannelController {
 	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
 		return this.channelsService.leaveChannel(channelId, userAuthId, userTargetId)
 	}
-
-
-@Post(':id/invitation') // à accorder
-async addInvitation( 
-  @getUser() user: User,
-  @Param('id', ParseIntPipe) id: number,
-  @Body('msgStatus') msgStatus: messageStatus,
-  @Body('targetId') targetId: number, 
-) {
-  return await this.channelsService.addContentInvitation(id, user.id, targetId, msgStatus);
-}
-
 
 
   /* soso obtenir tout les messages  edit : format de renvoie pas encore confirmer */
