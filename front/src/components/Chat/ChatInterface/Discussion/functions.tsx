@@ -117,7 +117,7 @@ type handleClickChallengeStatusProps = {
 
 export async function handleClickChallengeStatus(status : challengeStatus, idMsg: number, idChan : number, props: handleClickChallengeStatusProps) {
 	try {
-		await axios.patch(`http://${props.url}:3333/channel/${idChan}/message/${idMsg}`, {
+		await axios.patch(`https://${props.url}:3333/channel/${idChan}/message/${idMsg}`, {
 			newStatus : status
 		},
 		{

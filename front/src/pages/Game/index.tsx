@@ -114,7 +114,7 @@ function Game() {
 
 		async function fetchFriends(): Promise<User[]> {
 			try {
-				const friendsResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/friends`, {
+				const friendsResponse: AxiosResponse<User[]> = await axios.get(`https://${url}:3333/friends`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -128,7 +128,7 @@ function Game() {
 
 		async function fetchBlockedUsers(): Promise<User[]> {
 			try {
-				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/blockeds`, {
+				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`https://${url}:3333/blockeds`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -143,7 +143,7 @@ function Game() {
 
 		async function fetchChannels(): Promise<Channel[]> {
 			try {
-				const channelsResponse: AxiosResponse<[]> = await axios.get(`http://${url}:3333/user/channels`, {
+				const channelsResponse: AxiosResponse<[]> = await axios.get(`https://${url}:3333/user/channels`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -172,7 +172,7 @@ function Game() {
 			try {
 				setLoaderFriends(true)
 				setLoaderChannels(true)
-				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
+				const meResponse: AxiosResponse = await axios.get(`https://${url}:3333/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -180,7 +180,7 @@ function Game() {
 				const friends: User[] = await fetchFriends()
 				const blockeds: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
-				const socket = io(`http://${url}:3333`, {
+				const socket = io(`https://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
 						id: meResponse.data.id,

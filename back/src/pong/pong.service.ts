@@ -22,7 +22,6 @@ export class PongService {
 		private prisma: PrismaService,
 		private appGateway: AppGateway,
 		private userService: UsersService
-		private userService: UsersService
 		) {}
 	
 

@@ -13,6 +13,6 @@ COPY ./start.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/start.sh
 
 
-# RUN npm run build
+#RUN npm run build
 
 ENTRYPOINT ["start.sh"]
