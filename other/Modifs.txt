@@ -5,8 +5,8 @@ CAS/ :
 	(!!!!!)
 	Clavier indisponible quand pong display
 	Close les invites a jouer si le user se deco
-
-
+	Re organiser les emits des sockets
+	Fix social pour le pong
 	(!!!)
 	Verifier qu'une invite n'existe pas deja
 
@@ -16,7 +16,6 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 
 	(!!!!!)
 	Fix les erreurs ts
-	Fix invite dans MP
 
 	(!!!)
 	Faire DTO pour verifier les status envoye au back
