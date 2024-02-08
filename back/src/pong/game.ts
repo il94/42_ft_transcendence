@@ -102,6 +102,10 @@ export class Ball {
 			x: Math.cos(phi) * 5,
 			y: Math.sin(phi) * 5
 		}
+		// this.Dir = {
+		// 	x: 5,
+		// 	y: 0
+		// }
 	}
 
 	move(){
@@ -110,7 +114,7 @@ export class Ball {
 			y: this.Pos.y + this.Dir.y
 		}
 	}
-
+	
 	resetPos(){
 		this.Pos = {
 			x: 960,
@@ -134,7 +138,7 @@ export class PongGame {
 
 	public	Ball: Ball
 	public 	BallSize: number	
-	private Speed: number   // degager quand niveau de dificuliter ajouter (sera juste dans le constructor pour la ball)
+	private Speed: number
 	
 	public LeftPlayer: Player
 	public RightPlayer: Player
@@ -177,10 +181,6 @@ export class PongGame {
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
 				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 10)
-
-				// console.log("col on paddle", CollisionOnPaddle)
-				// console.log("left paddle pos", this.LeftPlayer.getPos())
-				// console.log("ball pos", this.Ball.getPos())
 			}
 		}
 
@@ -195,10 +195,6 @@ export class PongGame {
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
 				this.Ball.setDir(balldir.x * -1 -1, -veloY * 10)
-
-				// console.log("col on paddle", CollisionOnPaddle)
-				// console.log("left paddle pos", this.RightPlayer.getPos())
-				// console.log("ball pos", this.Ball.getPos())
 			}
 		}
 	}
@@ -271,9 +267,7 @@ export class PongGame {
 	addWatcher(s: Socket)
 	{
 		console.log("addWatcher")
-		if (!s)
-			console.log("in addWatcher client socket is empty")
-		else
+		if (s)
 			this.watcher.push(s)
 	}
 

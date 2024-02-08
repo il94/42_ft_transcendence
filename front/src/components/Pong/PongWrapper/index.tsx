@@ -36,53 +36,6 @@ const Style = styled.div<{ $backgroundColor: string }>`
 
 `
 
-// const PlayButtonStyle = styled.div`
-    
-//     position: absolute;
-//       top: 20px;
-//       left: 50%;
-//       transform: translateX(-50%);
-//       padding: 10px 20px;
-//       font-size: 16px;
-//     background-color: black;
-//       cursor: pointer;
-// `
-
-// const SpectateButtonStyle = styled.div`
-	
-// 	position: absolute;
-//   	top: 75%;
-//   	left: 75%;
-//   	transform: translateX(-50%);
-//   	padding: 2% 4%;
-//   	font-size: 16px;
-// 	background-color: black;
-//   	cursor: pointer;
-// `
-
-// const PlayButtonStyle = styled.div`
-	
-// 	/* position: absolute; */
-//   	/* top: 50%;
-//   	left: 50%; */
-//   	/* transform: translateX(-50%); */
-// 	width: 350px;
-//   	padding: 2% 4%;
-//   	font-size: 16px;
-// 	background-color: black;
-//   	cursor: pointer;
-// `
-// const DisconnectTextStyle = styled.div`
-// 	position: absolute;
-//   	top: 50%;
-//   	left: 50%;
-//   	transform: translateX(-50%);
-//   	padding: 2% 4%;
-//   	font-size: 16px;
-// 	background-color: black;
-//   	cursor: pointer;
-// `
-
 function PongWrapper({social}: any) {
 
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
@@ -126,9 +79,13 @@ function PongWrapper({social}: any) {
 		setGameState(true)
 	}
 
-	function handleDisconnect(){
+	function handleDisconnect(role: string){
 		setGameState(false)
-		displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
+		if (role === "player")
+			displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
+		else if(role === "watcher")
+			displayPongPopupError({ display: true, message: "A player has Disconnect" })
+
 		setBackgroundColor(colors.pongWrapperBackground)
 	}
 

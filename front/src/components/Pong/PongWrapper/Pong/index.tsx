@@ -48,7 +48,7 @@ transition: background-color 1s ease;
 const NameStyle = styled.div<{ $Hpos: number }>`
 	position: absolute;
 
-	font-size:${10}px;
+	font-size:10px;
 
 	top: 10%;
 	left: ${(props) => props.$Hpos}%;
@@ -56,11 +56,18 @@ const NameStyle = styled.div<{ $Hpos: number }>`
 	transform: translate(-50%, -50%);
 
 	color: white;
-
 `
+const ResultStyle = styled.div<{ $Hpos: number }>`
+	position: absolute;
 
-const SpectateButton = styled.div`
-	
+	font-size:50px;
+
+	top: 50%;
+	left: ${(props) => props.$Hpos}%;
+
+	transform: translate(-50%, -50%);
+
+	color: white;
 `
 
 type PongProps = {
@@ -79,15 +86,12 @@ type PongProps = {
 
 function Pong({score, setScore, setGameState, setSpectate, spectate, social}: PongProps){
 	
-	const user = useContext(InteractionContext)!																// !!!! object pour les sockets
+	const user = useContext(InteractionContext)!
 
 	const PongRef = useRef<HTMLDivElement | null>(null)
-	// const [PongBounds, setPongBounds] = useState<DOMRect | undefined>(undefined)
-	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongBackground)
 	
-	// const [players, setPlayers] = useState<{left: Socket, }>
-
-	// const [gameState, setGameState] = useState<status>(status.SOLO)											// neum moyen ilyes a mieux
+	const [convertionFactor, setConvertionFactor] = useState<number>(0)
+	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongBackground)
 
 	const [PaddlePos, setPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0}) //en px
 	const [EnemyPaddlePos, setEnemyPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
@@ -100,9 +104,7 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 	const [gameId, setGameId] = useState(0)
 	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
 
-	// const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
-
-	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); //tableau de key,    enfoncer = true; else false
+	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); 
 
 	const [endMessage, setEndMesage] = useState<{display: boolean, message: string}>({display: false, message: "hihi"})
 
@@ -122,21 +124,17 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 	};
 	
 	const updatePositionOnKey = () => {
-	
-		let ConvertionFactor: number = 0;
-		let move: number = 0;
 		
 		if (!PongRef.current?.getBoundingClientRect())
 			return
-
-		ConvertionFactor = PongRef.current.getBoundingClientRect().height / 1080; // 1080 = base of pong in back
-		move = 10.8 * ConvertionFactor
 		
 		if (keysPressed['ArrowUp']) {
 			user.userAuthenticate.socket?.emit("paddlemove", "up")
+			setTimeout(() => {}, 10)
 		}
 		if (keysPressed['ArrowDown']) {
 			user.userAuthenticate.socket?.emit("paddlemove", "down")
+			setTimeout(() => {}, 10)
 		}
 	};
 
@@ -145,18 +143,6 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		setGameState(false)
 		setSpectate(false)
 	}
-
-	const [convertionFactor, setConvertionFactor] = useState<number>(0)
-
-	useEffect(() => {
-
-		const PongContainer = PongRef.current
-		
-		if (PongContainer)
-			setConvertionFactor(PongContainer.getBoundingClientRect().height / 1080)
-
-	}, [window.innerHeight, window.innerWidth, social])
-
 
 	const updatePong = (gameID: number, ballPosition: any, myName: string, myPos: any, enemyName: string, enemyPos: any , myScore: number, enemyScore: number) => {
 		
@@ -182,16 +168,18 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		setScore({left: myScore, right: enemyScore})
 		setName({left: myName, right: enemyName})
 		setGameId(gameID)
-		if ((myScore === 11 || enemyScore === 11) && !spectate)
+		if ((myScore === 11 || enemyScore === 11))
 		{
+			if (spectate){
+				setGameState(false)
+				return;
+			}
 			const msg = myScore === 11 ? "Victory !" : "Defeat"
 			setEndMesage({display: true, message: msg})
 			setTimeout(() => {
 				setEndMesage({...endMessage, display: false})
 				setGameState(false);
 			}, 3000)
-			// setTimeout(() => {
-			// }, 1000);
 		}
 	}
 
@@ -220,10 +208,16 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		}
 		
 	}, [keysPressed, PaddlePos]);
-
-	useEffect(() => {
-	}, [])		
 	
+	useEffect(() => {
+
+		const PongContainer = PongRef.current
+		
+		if (PongContainer)
+			setConvertionFactor(PongContainer.getBoundingClientRect().height / 1080)
+
+	}, [window.innerHeight, window.innerWidth, social])
+
 	useEffect(() => {
 		if (!spectate)
 		{
@@ -240,7 +234,7 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 	return (
 		<Style $backgroundColor={backgroundColor} ref={PongRef}>
 			{
-					!endMessage.display && PongRef.current ? (
+				!endMessage.display && PongRef.current ? (
 					<>
 					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)}/>
 					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
@@ -249,15 +243,15 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 					{/* {spectate && <button onClick={handleStopSpectate}>Spectate</button>} */}
 					{spectate && <Button
 						onClick={handleStopSpectate}
-						type="button" fontSize={"5.5vw"}
+						type="button" fontSize={"20 px"}
 						style={{width: "5%"}}
-						title="spectate"
+						title=""
 						alt=""
 					>Spectate</Button>}
 					<Score LeftScore={score.left} RightScore={score.right} size={scoreSize}/>
 					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)}/>
 				</> ) :
-				<p style={{fontSize:"10vw", top:"50%", left: "50%"}}>{endMessage.message}</p>
+				<ResultStyle $Hpos={50}>{endMessage.message}</ResultStyle>
 			}
 		</Style>
 	);

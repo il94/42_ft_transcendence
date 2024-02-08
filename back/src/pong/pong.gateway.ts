@@ -1,5 +1,4 @@
 import {WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket} from "@nestjs/websockets";
-import { ConflictException, Search } from "@nestjs/common";
 
 import { Server, Socket } from "socket.io";
 
@@ -8,10 +7,8 @@ import { PongGame, Player, Ball } from "./game";
 
 import { UsersService } from "src/auth/services/users.service";
 
-import { disconnect } from "process";
 import { AppService } from "src/app.service";
 import { GameStatus, MatchResult, UserStatus } from "@prisma/client";
-import { subscribe } from "diagnostics_channel";
 
 
 @WebSocketGateway()
@@ -47,7 +44,10 @@ export class PongGateway {
 			// console.log("gonna delete game because of disconnect")
 			const enemy = game.LeftPlayer.getSocket() === client ? game.RightPlayer : game.LeftPlayer 
 			// this.server.to(client.id).emit("decoInGame", "you")
-			this.server.to(enemy.getSocket().id).emit("decoInGame")
+			this.server.to(enemy.getSocket().id).emit("decoInGame", "player")
+			game.watcher.forEach((e) =>{
+				this.server.to(e.id).emit("decoInGame", "watcher")
+			})
 			enemy.setWinner()
 			game.setState(false)
 			return
@@ -81,6 +81,9 @@ export class PongGateway {
 		async handleCancelSearching(client: Socket, userId: number)
 		{
 			this.delUserFromSearchingUser(client)
+
+			if (!userId)
+				return
 			await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
 		}
 	
@@ -150,7 +153,8 @@ export class PongGateway {
 	@SubscribeMessage('searchGame')
 	async addSearchingPlayer(client: Socket, data: any) {
 		try {			
-
+			if( !data || !data[0] || !data[1])
+				return
 			this.toSearchingArray(client, data[0], data[1])
 
 			await this.checkToLaunchGame(client, data[1])
@@ -204,8 +208,10 @@ export class PongGateway {
 	@SubscribeMessage("paddlemove")
 		handlePaddleMove(client: Socket, args: string)
 		{
+			if (!args)
+				return
 			let game: PongGame;
-
+			
 			this.PongService.activeGames.forEach((element) => {
 				if (element.isMyPlayer(client)){
 					game = element;
@@ -221,6 +227,8 @@ export class PongGateway {
 		@SubscribeMessage("spectate")
 			async handleSpectate(client: Socket, data: any)
 			{
+				if(!data || !data[0] || !data[1])
+					return
 				let game: PongGame
 				this.PongService.activeGames.forEach((element) => {
 					if (element.isMyPlayerById(data[1])){
@@ -240,6 +248,8 @@ export class PongGateway {
 		@SubscribeMessage("stopSpectate")
 			async handleStopSpectate(client: Socket, data: number)
 			{
+				if(!data || !data[0] || !data[1])
+					return
 				let game: PongGame
 				this.PongService.activeGames.forEach((element) => {
 					if (element.id === data[0]){
@@ -262,12 +272,7 @@ export class PongGateway {
 
 	// cooldown at start ? 
 
-	// ...
-
-	// enlever le waiting quand on cherche plus
-
-	// cherche une game, cancel, bien delete des tableau userSearching
-	
+	// ...	
 
 // bugs :
 

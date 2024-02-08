@@ -23,7 +23,7 @@ const Style = styled.div.attrs<{ $Hposition: number ; $Vposition: number }>((pro
 	
 
 	transform: translate(-50%, -50%);
-	transition: top 0.1s linear, left 0.1s linear;
+	/* transition: top 0.1s linear, left 0.1s linear; */
 
 	background-color: white;
 	`
