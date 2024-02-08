@@ -46,6 +46,9 @@ export class PongGateway {
 		{
 			// console.log("gonna delete game because of disconnect")
 			const enemy = game.LeftPlayer.getSocket() === client ? game.RightPlayer : game.LeftPlayer 
+			//const other = game.LeftPlayer.getSocket() === client ?  game.LeftPlayer  :  game.RightPlayer
+
+			//this.PongService.updateStatusUser(other.id, UserStatus.OFFLINE)
 			// this.server.to(client.id).emit("decoInGame", "you")
 			this.server.to(enemy.getSocket().id).emit("decoInGame")
 			enemy.setWinner()
@@ -109,7 +112,8 @@ export class PongGateway {
 		const rightUser = this.UserService.findById(enemyId)
 
 		const newgame = await this.PongService.createGame(id, enemyId);
-
+		if (leftSocket && rightSocket)
+		{
 		this.server.to(leftSocket.id).emit("launchGame")
 		this.server.to(rightSocket.id).emit("launchGame")
 
@@ -119,6 +123,12 @@ export class PongGateway {
 
 		this.delUserFromSearchingUser(leftSocket)
 		this.delUserFromSearchingUser(rightSocket)
+		}
+		else
+		{
+			console.log("error launchGame")
+			return
+		}
 	}
 
 	async checkToLaunchGame(client: Socket, dif: number)
@@ -150,9 +160,7 @@ export class PongGateway {
 	@SubscribeMessage('searchGame')
 	async addSearchingPlayer(client: Socket, data: any) {
 		try {			
-
 			this.toSearchingArray(client, data[0], data[1])
-
 			await this.checkToLaunchGame(client, data[1])
 
 		} catch (error) {
