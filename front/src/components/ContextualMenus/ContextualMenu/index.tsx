@@ -424,6 +424,9 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		}
 	}, [])
 
+	// Compte le nombre de channels du user qui ne sont pas des MP
+	const channelToDisplay: number = userAuthenticate.channels.filter((channel) => channel.type !== ChannelType.MP).length
+
 	/* ========================================================================== */
 
 	return (
@@ -434,7 +437,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			$top={contextualMenuPosition.top}
 			$bottom={contextualMenuPosition.bottom}>
 			{
-				userAuthenticate.channels.length > 0 &&
+				channelToDisplay > 0 &&
 				<Section onMouseEnter={showSecondaryContextualMenu}>
 					<SectionName>
 						Invite

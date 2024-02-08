@@ -4,10 +4,17 @@ import {
 	useRef,
 	useState
 } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useMediaQuery } from 'react-responsive'
+import {
+	useNavigate
+} from 'react-router-dom'
+import {
+	useMediaQuery
+} from 'react-responsive'
 import axios, { AxiosResponse } from 'axios'
-import { io } from 'socket.io-client'
+import {
+	io
+} from 'socket.io-client'
+import Cookies from 'js-cookie'
 
 import {
 	GamePage,
@@ -36,18 +43,16 @@ import {
 import Logo from '../../components/Logo'
 import SearchBarWrapper from '../../components/SearchBar/SearchBarWrapper'
 import Social from '../../components/Social'
-import Pong from '../../components/Pong'
 import PongWrapper from '../../components/Pong/PongWrapper'
 import Profile from '../../components/Profile'
 import Chat from '../../components/Chat'
 import Card from '../../components/Card'
-import TestsBack from '../../components/TestsBack'
 import SettingsMenu from '../../components/SettingsMenu'
 import TwoFaMenu from '../../components/TwoFaMenu'
 import ContextualMenu from '../../components/ContextualMenus/ContextualMenu'
 import SecondaryContextualMenu from '../../components/ContextualMenus/SecondaryContextualMenu'
 import PopupError from '../../components/PopupError'
-import Cookies from 'js-cookie'
+
 import CardContext from '../../contexts/CardContext'
 import ChatContext from '../../contexts/ChatContext'
 import ContextualMenuContext from '../../contexts/ContextualMenuContext'
@@ -62,6 +67,7 @@ import {
 } from '../../utils/types'
 
 import {
+	ChannelType,
 	challengeStatus,
 	chatWindowStatus,
 	contextualMenuStatus
@@ -211,7 +217,7 @@ function Game() {
 	}, [])
 
 	useEffect(() => {
-		getSecondaryContextualMenuHeight(userAuthenticate.channels.length)
+		getSecondaryContextualMenuHeight(userAuthenticate.channels.filter((channel) => channel.type !== ChannelType.MP).length)
 	}, [userAuthenticate.channels.length])
 
 	/* ========================== COMPONENTS STATES ============================= */

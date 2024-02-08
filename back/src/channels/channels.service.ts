@@ -183,8 +183,11 @@ export class ChannelsService {
 			})
 			if (!channelToJoin)
 				throw new NotFoundException("Channel not found")
-			else if ((channelToJoin.type === ChannelStatus.PRIVATE || channelToJoin.type === ChannelStatus.MP) && !inviterId)
+			else if ((channelToJoin.type === ChannelStatus.PRIVATE ||
+				channelToJoin.type === ChannelStatus.MP) && !inviterId)
 				throw new ForbiddenException("You dont have permissions for this action")
+			else if (channelToJoin.type === ChannelStatus.MP && inviterId)
+				throw new ForbiddenException("Invitations forbidden for channel MP")
 
 			// Verifie si le user qui aurait lancé l'invitation est dans le channel
 			if (inviterId)
