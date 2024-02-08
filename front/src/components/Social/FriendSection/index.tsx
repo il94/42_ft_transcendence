@@ -117,7 +117,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 			ref={friendContainerRef}>
 			<Avatar src={friend.avatar} />
 			{
-				!social &&
+				social &&
 				<ProfileInfo $offline={friend.status === userStatus.OFFLINE}>
 					<ProfileName>
 						{friend.username}

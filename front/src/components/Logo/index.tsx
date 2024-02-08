@@ -26,15 +26,15 @@ function Logo({ social }: PropsLogo) {
 		<Style onClick={() => navigate("/")}>
 			{
 				social ?
+				<LogoFull tabIndex={0}>
+					Transcendence
+				</LogoFull>
+				:
 				<LogoReduced
 					onFocus={() => setHomeIcon(YellowHomeIcon)}
 					onBlur={() => setHomeIcon(HomeIcon)}
 					src={homeIcon}
 					tabIndex={0} />
-				:
-				<LogoFull tabIndex={0}>
-					Transcendence
-				</LogoFull>
 			}
 		</Style>
 	)
