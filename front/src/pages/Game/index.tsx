@@ -300,29 +300,16 @@ function Game() {
 		}
 	}, [])
 
-	/* ========================= DISPLAY WITH SOCKETS =========================== */
-
+	/* =========================== HANDLE SOCKETS =============================== */
 
 	// CHAT
 	useEffect(() => {
-
-		// userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-		// 	refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-
-
-			
-
 		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number, channelDatas: ChannelData, newMember: User) =>
 			refreshJoinChannel({ channelId, userId, channelDatas, newMember, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
-
-
-
 		userAuthenticate.socket?.on("postText", (channelId: number, userId: number, textDatas: any) => 
 			postText({ channelId, userId, textDatas, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("postInvitation", (channelId: number, userAuthId: number, userTargetId: number, invitationDatas: any) => 
@@ -330,93 +317,49 @@ function Game() {
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
-			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
-			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus) => 
-			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }));
+			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string) => 
-			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }));
-
-
-
+			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }))
 
 		return () => {
-
-			// userAuthenticate.socket?.off("updateUserStatus")
-
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
-
-
-
-
-
 			userAuthenticate.socket?.off("joinChannel")
-
-
-
-
-
-
 			userAuthenticate.socket?.off("postText")
 			userAuthenticate.socket?.off("postInvitation")
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
 			userAuthenticate.socket?.off("setNewOwner")
-			userAuthenticate.socket?.off("updateChallenge");
-			userAuthenticate.socket?.off("updateUserMute");
+			userAuthenticate.socket?.off("updateChallenge")
+			userAuthenticate.socket?.off("updateUserMute")
 		}
 
 	}, [userAuthenticate.socket, channelTarget])
 
-
-	// GAME
 	useEffect(() => {
-		// userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-		// 	refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
+		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("createChannelMP", (channelId: number, authorDatas: any) =>
 			recieveChannelMP({ channelId, authorDatas, setUserAuthenticate }))
-
-
-			
-		// userAuthenticate.socket?.on("joinChannel2", (channelId: number, userId: number) =>
-		// 	refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
-
+		
 		return () => {
-			// userAuthenticate.socket?.off("updateUserStatus")
-
+			userAuthenticate.socket?.off("updateUserStatus")
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
 			userAuthenticate.socket?.off("createChannelMP")
-			// userAuthenticate.socket?.off("joinChannel2")
 		}
 
 	}, [userAuthenticate])
 
 	/* ========================================================================== */
-
-
-
-	// GAME
-	useEffect(() => {
-		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
-
-		return () => {
-			userAuthenticate.socket?.off("updateUserStatus")
-
-		}
-
-	}, [userAuthenticate])
-
-
 
 	return (
 		<GamePage
