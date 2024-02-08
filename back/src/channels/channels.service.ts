@@ -115,6 +115,30 @@ export class ChannelsService {
 			if (!userTarget)
 				throw new NotFoundException("User not found")
 
+			// Verifie si le user auth n'a pas bloque le user target
+			const userTargetIsBlocked = !!await this.prisma.blocked.findUnique({
+				where: {
+					userId_blockedId: {
+						userId: userAuthId,
+						blockedId: userTargetId
+					}
+				}
+			})
+			if (userTargetIsBlocked)
+				throw new ForbiddenException("You have blocked this user")
+
+			// Verifie si le user target n'a pas bloque le user auth
+			const userAuthIsBlocked = !!await this.prisma.blocked.findUnique({
+				where: {
+					userId_blockedId: {
+						userId: userTargetId,
+						blockedId: userAuthId
+					}
+				}
+			})
+			if (userAuthIsBlocked)
+				throw new ForbiddenException("You are blocked")
+
 			// Crée le nouveau channel MP sans nom ni avatar et y inclut le user target
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
@@ -158,7 +182,7 @@ export class ChannelsService {
 			return channelMP
 		}
 		catch (error) {
-			if (error instanceof NotFoundException || error instanceof ConflictException)
+			if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
@@ -189,21 +213,6 @@ export class ChannelsService {
 			else if (channelToJoin.type === ChannelStatus.MP && inviterId)
 				throw new ForbiddenException("Invitations forbidden for channel MP")
 
-			// Verifie si le user qui aurait lancé l'invitation est dans le channel
-			if (inviterId)
-			{
-				const inviter = !!await this.prisma.usersOnChannels.findUnique({
-					where: {
-						userId_channelId: {
-							userId: inviterId,
-							channelId: channelId
-						}
-					}
-				})
-				if (!inviter)
-					throw new NotFoundException("User not found")
-			}
-
 			// Verifie si le user existe et récupère son username
 			const user = await this.prisma.user.findUnique({
 				where: {
@@ -215,6 +224,45 @@ export class ChannelsService {
 			})
 			if (!user)
 				throw new NotFoundException("User not found")
+
+			if (inviterId)
+			{
+				// Verifie si le user invite n'a pas bloque le user
+				const userTargetIsBlocked = !!await this.prisma.blocked.findUnique({
+					where: {
+						userId_blockedId: {
+							userId: inviterId,
+							blockedId: userId
+						}
+					}
+				})
+				if (userTargetIsBlocked)
+					throw new ForbiddenException("You have blocked this user")
+
+				// Verifie si le user n'a pas bloque le user invite
+				const userAuthIsBlocked = !!await this.prisma.blocked.findUnique({
+					where: {
+						userId_blockedId: {
+							userId: userId,
+							blockedId: inviterId
+						}
+					}
+				})
+				if (userAuthIsBlocked)
+					throw new ForbiddenException("You are blocked")
+
+				// Verifie si le user qui aurait lancé l'invitation est dans le channel
+				const inviter = !!await this.prisma.usersOnChannels.findUnique({
+					where: {
+						userId_channelId: {
+							userId: inviterId,
+							channelId: channelId
+						}
+					}
+				})
+				if (!inviter)
+					throw new NotFoundException("User not found")
+			}
 
 			// Verifie si le user n'est pas déjà dans le channel et retourne son role
 			const isInChannel = await this.prisma.usersOnChannels.findUnique({
