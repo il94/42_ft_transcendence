@@ -6,6 +6,7 @@ import * as argon from 'argon2';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
 import { AppService } from 'src/app.service';
+import { PongGateway } from 'src/pong/pong.gateway';
 
 type ChannelMP = {
 	id: number,
@@ -19,7 +20,8 @@ type ChannelMP = {
 @UseGuards(JwtGuard)
 @Injectable()
 export class ChannelsService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService,
+				private pongGateway: PongGateway) {}
 
 	// Cree un channel
 	async createChannel(newChannel: CreateChannelDto, userId: number): Promise<{ id: number }> {
@@ -1104,9 +1106,12 @@ export class ChannelsService {
 					status: newStatus
 				}
 			})
-
 			// Emit
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
+
+			if (newStatus === challengeStatus.ACCEPTED)
+				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
+			
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
