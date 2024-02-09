@@ -17,7 +17,10 @@ const InteractionContext = createContext<{
 	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
-
+	gameState: boolean,
+	setGameState: Dispatch<SetStateAction<boolean>>,
+	searching: boolean,
+	setSearching: Dispatch<SetStateAction<boolean>>
 } | undefined>(undefined)
 
 export default InteractionContext

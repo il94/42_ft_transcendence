@@ -88,12 +88,12 @@ function PongWrapper({social}: any) {
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
 
 	const { token, url } = useContext(AuthContext)!
-	const { userAuthenticate } = useContext(InteractionContext)!
+	const { userAuthenticate, gameState, setGameState, searching, setSearching } = useContext(InteractionContext)!
 
 
-	const [searching, setSearching] = useState<boolean>(false)
+	// const [searching, setSearching] = useState<boolean>(false)
 
-	const [gameState, setGameState] = useState<boolean>(false)
+	// const [gameState, setGameState] = useState<boolean>(false)
 	const [spectate, setSpectate] = useState<boolean>(false)
 	const [difficultyChoose, setDifficultyChoose] = useState<boolean>(false)
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})

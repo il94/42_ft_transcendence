@@ -56,7 +56,7 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 		size += sectionSize
 
 	// Challenge section
-	if (userTarget.status !== userStatus.OFFLINE)
+	if (userTarget.status === userStatus.ONLINE)
 		size += sectionSize
 
 	// Spectate section
@@ -151,6 +151,7 @@ export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName:
 		channel.name === recipientName && channel.type === ChannelType.MP))
 	)
 }
+
 
 export function userIsFriend(userAuthenticate: UserAuthenticate, userId: number): boolean {
 	return (
