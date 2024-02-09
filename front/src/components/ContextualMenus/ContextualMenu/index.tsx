@@ -4,12 +4,13 @@ import {
 	SetStateAction,
 	useContext,
 	useEffect,
-	useRef,
 	useState
 } from "react"
 import axios, { AxiosError, AxiosResponse } from "axios"
 
-import { Style } from "./style"
+import {
+	Style
+} from "./style"
 
 import Section, { SectionName } from "../../../componentsLibrary/Section"
 
@@ -478,7 +479,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					</Section>
 				}
 				{
-					userTarget.status !== userStatus.OFFLINE &&
+					userTarget.status === userStatus.ONLINE &&
 					<Section onClick={handleChallengeClickEvent}>
 						<SectionName>
 							Challenge

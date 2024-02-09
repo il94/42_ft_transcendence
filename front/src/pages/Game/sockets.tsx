@@ -141,26 +141,6 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 	// Valide si le user auth est invité dans le channel
 	if (props.userId === props.userAuthenticate.id)
 	{
-<<<<<<< HEAD
-		// Récupère les données du channel dans lequel il a été ajouté
-		const newChannelResponse: AxiosResponse<ChannelData> = await axios.get(`https://${props.url}:3333/channel/${props.channelId}`, {
-			headers: {
-				'Authorization': `Bearer ${props.token}`
-			}
-		})
-		
-		const newChannel: Channel = {
-			...newChannelResponse.data,
-			messages: [],
-			members: [],
-			administrators: [],
-			owner: undefined,
-			muteInfo: [],
-			banneds: []
-		}
-
-=======
->>>>>>> main
 		props.setUserAuthenticate((prevState: UserAuthenticate) => ({
 			...prevState,
 			channels: [ ...prevState.channels, props.channelDatas ]
@@ -170,15 +150,6 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 	// Valide si le user auth déjà présent dans le channel a la fenêtre de chat ouverte
 	else if (props.channelTarget?.id === props.channelId)
 	{
-<<<<<<< HEAD
-		const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${props.userId}`, {
-			headers: {
-				'Authorization': `Bearer ${props.token}`
-			}
-		})
-
-=======
->>>>>>> main
 		props.setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState)
 			{
@@ -553,21 +524,12 @@ type PropsRecieveChannelMP = {
 	
 // Crée un channel MP chez le destinataire
 export async function recieveChannelMP(props: PropsRecieveChannelMP) {
-<<<<<<< HEAD
-
-	const channelMPResponse: AxiosResponse<Channel> = await axios.get(`https://${props.url}:3333/channel/${props.channelId}/relations`, {
-		headers: {
-			'Authorization': `Bearer ${props.token}`
-		}
-	})
-=======
 	const newChannelMP: ChannelData = {
 		id: props.channelId,
 		name: props.authorDatas.username,
 		avatar: props.authorDatas.avatar,
 		type: ChannelType.MP
 	}
->>>>>>> main
 
 	props.setUserAuthenticate((prevState) => ({
 		...prevState,
