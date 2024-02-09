@@ -22,7 +22,7 @@ function MatchHistory() {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
-	const { loaderMatchsHistory, setLoaderMatchsHistory } = useContext(DisplayContext)!
+	const { loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError } = useContext(DisplayContext)!
 
 	const [matchs, setMatchs] = useState<any[]>([])
 	const [historyHeight, setHistoryHeight] = useState<number>(0)
@@ -40,8 +40,7 @@ function MatchHistory() {
 				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
-				// temporaire en attendant gestion d'erreur
-				setMatchs([])
+				displayPopupError({ display: true })
 			}
 		}
 		fetchMatchs()
