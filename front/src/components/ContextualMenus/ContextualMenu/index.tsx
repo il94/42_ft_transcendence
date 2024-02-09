@@ -101,9 +101,9 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			const channelMP = findChannelMP(userAuthenticate, userTarget.username)
 			if (channelMP) {
-				setChannelTarget(channelMP)
+				setChannelTarget(channelMP as Channel)
 				displayChat(true)
-				return (channelMP)
+				return (channelMP as Channel)
 			}
 			else {
 				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`https://${url}:3333/channel/mp/${userTarget.id}`, {}, {

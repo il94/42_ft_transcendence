@@ -82,6 +82,7 @@ function ContactText({ sender, content }: PropsContactText) {
 							onAuxClick={(event) => showContextualMenu(event, sender, {
 								setContextualMenuPosition,
 								displayContextualMenu,
+								displayCard,
 								userAuthenticate,
 								userTarget,
 								setUserTarget,
