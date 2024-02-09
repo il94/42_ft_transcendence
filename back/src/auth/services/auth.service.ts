@@ -193,14 +193,14 @@ export class AuthService {
 				// Stocke les donnees necessaires a l'authentification dans des
 				// cookies de 5 mins  et redirige vers la page de creation de compte
 				const fiveMin = Date.now() + 5 * 60 * 1000;
-				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
+				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin) })
 				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
 				.redirect(`http://${process.env.IP}:5173/signup42`)
 			}
 		}
 		catch (error) {
-			res.cookie("error_message", error.message).
-			redirect(`http://${process.env.IP}:5173/error`)
+			res.cookie("error_message", error.message)
+			.redirect(`http://${process.env.IP}:5173/error`)
 		}
 	}
 

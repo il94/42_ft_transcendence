@@ -8,6 +8,7 @@ import { json } from 'express';
 import cookieParser from 'cookie-parser';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 import * as fs from 'fs';
+import * as helmet from 'helmet';
 
 async function bootstrap() {
 	const httpsOptions: HttpsOptions = {
@@ -28,7 +29,10 @@ async function bootstrap() {
 		  secret: process.env.SESSION_SECRET,
 		  resave: false,
 		  saveUninitialized: false,
-		  cookie: { maxAge: 60000, }
+		  cookie: { maxAge: 60000, 
+					sameSite: 'none',
+		  			secure: true
+				}
 		}),
 	  );
 	  
@@ -36,6 +40,10 @@ async function bootstrap() {
 		origin: '*',
 		credentials: true,
 	})
+
+	app.use(helmet({
+		referrerPolicy: { policy: 'no-referrer' }
+	}));
 
 	app.use(passport.initialize());
 	app.use(passport.session());
