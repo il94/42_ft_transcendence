@@ -31,6 +31,12 @@ export class UsersController {
 		return this.usersService.findUserChannel(userId)
 	}
 
+	// Renvoie les donnees publiques d'un user
+	@Get(':id')
+	async findById(@Param('id', ParseIntPipe) userId: number): Promise<Partial<User>> {
+		return this.usersService.findById(userId)
+	}
+
   // historique de matches du user (retourne null si aucun matchs joues)
   @Get('matchs/:id')
   async getUserMatchs(@Param('id', ParseIntPipe) id: number) {

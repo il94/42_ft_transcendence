@@ -10,7 +10,8 @@ import {
 	setUserToBanned,
 	setUserToMember,
 	setUserToOwner,
-	updateUserInChannel,
+	updateUserDatasInChannel,
+	updateUserStatusInChannel,
 	userIsFriend,
 	userIsInChannel
 } from "../../utils/functions"
@@ -311,7 +312,48 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 	}
 }
 
+type PropsRefreshUserDatas = {
+	userId: number,
+	newDatas: any,
 
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+// Met à jour les datas d'un user
+export function refreshUserDatas(props: PropsRefreshUserDatas) {
+
+	if (props.userId === props.userAuthenticate.id) {
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				username: props.newDatas.username,
+				avatar: props.newDatas.avatar
+			}
+		})
+	}
+	else if (userIsFriend(props.userAuthenticate, props.userId)) {
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				friends: prevState.friends.map((friend) => {
+					if (friend.id === props.userId) {
+						return {
+							...friend,
+							username: props.newDatas.username,
+							avatar: props.newDatas.avatar
+						}
+					}
+					else
+						return (friend)
+				})
+			}
+		})
+
+	}
+}
 
 type PropsRefreshUserStatus = {
 	userId: number,
@@ -350,13 +392,6 @@ export function refreshUserStatus(props: PropsRefreshUserStatus) {
 				})
 			}
 		})
-
-		if (props.channelTarget && userIsInChannel(props.channelTarget, props.userId)) {
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-					return updateUserInChannel(prevState, props.userId, props.newStatus)
-			})
-		}
 	}
 }
 

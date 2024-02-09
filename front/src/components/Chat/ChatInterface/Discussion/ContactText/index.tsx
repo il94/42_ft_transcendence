@@ -22,6 +22,7 @@ import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext
 import CardContext from "../../../../../contexts/CardContext"
 import DisplayContext from "../../../../../contexts/DisplayContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
+import AuthContext from "../../../../../contexts/AuthContext"
 
 import {
 	userIsBlocked
@@ -38,9 +39,10 @@ type PropsContactText = {
 
 function ContactText({ sender, content }: PropsContactText) {
 
+	const { token, url } = useContext(AuthContext)!
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
-	const { setZCardIndex, zMaxIndex, GameWrapperRef } = useContext(DisplayContext)!
+	const { setZCardIndex, zMaxIndex, displayPopupError, GameWrapperRef } = useContext(DisplayContext)!
 	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(InteractionContext)!
 
 	/* =========================== BLOCK MESSAGES =============================== */
@@ -67,21 +69,27 @@ function ContactText({ sender, content }: PropsContactText) {
 						<Avatar
 							src={sender.avatar}
 							onClick={(event) => showCard(event, sender, {
-								GameWrapperRef,
-								setUserTarget,
-								setCardPosition,
+								displayCard,
 								setZCardIndex,
+								setCardPosition,
+								setUserTarget,
+								url,
+								token,
+								displayPopupError,
 								zMaxIndex,
-								displayCard
+								GameWrapperRef
 							})}
 							onAuxClick={(event) => showContextualMenu(event, sender, {
-								GameWrapperRef,
-								channelTarget,
-								setUserTarget,
-								userTarget,
-								userAuthenticate,
 								setContextualMenuPosition,
-								displayContextualMenu
+								displayContextualMenu,
+								userAuthenticate,
+								userTarget,
+								setUserTarget,
+								channelTarget,
+								url,
+								token,
+								displayPopupError,
+								GameWrapperRef
 							})}
 							tabIndex={0} />
 						<MessageContent

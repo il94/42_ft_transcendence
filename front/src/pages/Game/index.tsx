@@ -37,7 +37,8 @@ import {
 	refreshJoinChannel,
 	refreshStatusChallenge,
 	refreshUserMute,
-	postText
+	postText,
+	refreshUserDatas
 } from './sockets'
 
 import Logo from '../../components/Logo'
@@ -304,6 +305,8 @@ function Game() {
 
 	// CHAT
 	useEffect(() => {
+		userAuthenticate.socket?.on("updateUserDatas", (userId: number, newDatas: any) => 
+			refreshUserDatas({ userId, newDatas, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
@@ -326,6 +329,7 @@ function Game() {
 			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }))
 
 		return () => {
+			userAuthenticate.socket?.off("updateUserDatas")
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
 			userAuthenticate.socket?.off("joinChannel")
@@ -338,7 +342,7 @@ function Game() {
 			userAuthenticate.socket?.off("updateUserMute")
 		}
 
-	}, [userAuthenticate.socket, channelTarget])
+	}, [userAuthenticate, channelTarget])
 
 	useEffect(() => {
 		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
@@ -356,7 +360,7 @@ function Game() {
 			userAuthenticate.socket?.off("deleteChannel")
 			userAuthenticate.socket?.off("createChannelMP")
 		}
-
+		
 	}, [userAuthenticate])
 
 	/* ========================================================================== */

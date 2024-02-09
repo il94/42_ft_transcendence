@@ -5,10 +5,12 @@ import { PrismaClient, User, Prisma, Role, UserStatus, Game, ChannelStatus, User
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 import { authenticator } from "otplib";
+import { AppGateway } from 'src/app.gateway';
 
 @Injectable()
 export class UsersService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService,
+				private appGateway: AppGateway) {}
 
 	// Cree un user
 	async createUser(userDatas: CreateUserDto): Promise<User> {
@@ -58,10 +60,10 @@ export class UsersService {
 	}
 
 	// Renvoie les donnees publiques de tout les users
-	findAll() {
+	async findAll() {
 		try {
 			// Récupère tout les users
-			const users = this.prisma.user.findMany({
+			const users = await this.prisma.user.findMany({
 				select: {
 					id: true,
 					username: true,
@@ -76,6 +78,37 @@ export class UsersService {
 		}
 		catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
+	// Renvoie les donnees publiques d'un user
+	async findById(userId: number): Promise<Partial<User>>  {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
+				}
+			})
+			if (!user)
+				throw new NotFoundException("User not found")
+			return user
+		}
+		catch (error) {
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
 			else
 				throw new BadRequestException()
@@ -192,14 +225,21 @@ export class UsersService {
 			} : updateUserDto
 
 			// Modifie le user auth
-			await this.prisma.user.update({
+			const newDatas = await this.prisma.user.update({
 				where: {
 					id: userId
 				},
 				data: {
 					...userNewDatas
+				},
+				select: {
+					username: true,
+					avatar: true
 				}
 			})
+
+			// Emit
+			this.appGateway.server.emit("updateUserDatas", userId, newDatas)
 
 			console.log(`User ${userId} has been updated`)
 		}
@@ -214,21 +254,6 @@ export class UsersService {
 	}
 
 /* =============================== UTILS ==================================== */
-
-	async findById(id: number): Promise<Partial<User>>  {
-		const user = await this.prisma.user.findUnique({
-			where: { id: id },
-			select: {  id: true,
-				  username: true,
-				  avatar: true,
-				  status: true,
-				  wins: true,
-				  draws: true,
-				  losses: true, }})
-		if (!user)
-			throw new NotFoundException(`User with ${id} does not exist.`);
-		return user;
-	}
 
 	async getChallenger(gameId: number, userId: number): Promise <{challenger: string, challengerScore: number}> {
 		const game = await this.prisma.game.findFirst({ where: { AND: [ {id: gameId}, {status: GameStatus.FINISHED} ] },
