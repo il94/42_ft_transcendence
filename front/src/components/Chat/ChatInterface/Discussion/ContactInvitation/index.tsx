@@ -70,6 +70,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 				onAuxClick={(event) => showContextualMenu(event, sender, {
 					setContextualMenuPosition,
 					displayContextualMenu,
+					displayCard,
 					userAuthenticate,
 					userTarget,
 					setUserTarget,
