@@ -19,7 +19,7 @@ import {
 	User,
 	UserAuthenticate
 } from "../../../../utils/types"
-import axios, { AxiosError } from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 
 type ShowCardProps = {
 	displayCard: Dispatch<SetStateAction<boolean>>,
@@ -31,32 +31,58 @@ type ShowCardProps = {
 		bottom?: number
 	}>>,
 
-	zMaxIndex: number,
-
 	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 
+	url: string,
+	token: string,
+
+	displayPopupError: Dispatch<SetStateAction<{
+		display: boolean,
+		message?: string
+	}>>,
+	zMaxIndex: number,
 	GameWrapperRef: any
 }
 
-export function showCard(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowCardProps) {
+export async function showCard(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowCardProps) {
+	try {
+		const gameWrapperContainer = props.GameWrapperRef.current
 
-	const gameWrapperContainer = props.GameWrapperRef.current
+		if (gameWrapperContainer) {
 
-	if (gameWrapperContainer) {
-		props.setUserTarget(sender)
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${sender.id}`, {
+				headers: {
+					'Authorization': `Bearer ${props.token}`
+				}
+			})
 
-		const heightCard = 371 // height de la carte
-		const { height: GameWrapperHeight, width: GameWrapperWidth } = gameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
-		const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
-		const verticalBorder = window.innerWidth - GameWrapperWidth // height des bordures verticales autour du jeu
-		const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
+			props.setUserTarget(userResponse.data)
 
-		const resultX = window.innerWidth - event.clientX - verticalBorder / 2 // resultat horizontal par defaut (taille de la fenetre - position du clic - bordure de droite)
-		const resultY = event.clientY - heightCard - horizontalBorder / 2 - heightNavBar // resultat vertical par defaut (position du clic - height de la carte - bordure du haut - navbar)
+			const heightCard = 371 // height de la carte
+			const { height: GameWrapperHeight, width: GameWrapperWidth } = gameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
+			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
+			const verticalBorder = window.innerWidth - GameWrapperWidth // height des bordures verticales autour du jeu
+			const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
 
-		props.setCardPosition({ right: resultX, top: resultY })
-		props.setZCardIndex(props.zMaxIndex + 1)
-		props.displayCard(true)
+			const resultX = window.innerWidth - event.clientX - verticalBorder / 2 // resultat horizontal par defaut (taille de la fenetre - position du clic - bordure de droite)
+			const resultY = event.clientY - heightCard - horizontalBorder / 2 - heightNavBar // resultat vertical par defaut (position du clic - height de la carte - bordure du haut - navbar)
+
+			props.setCardPosition({ right: resultX, top: resultY })
+			props.setZCardIndex(props.zMaxIndex + 1)
+			props.displayCard(true)
+		}
+	}
+	catch (error) {
+		if (axios.isAxiosError(error)) {
+			const axiosError = error as AxiosError<ErrorResponse>
+			const { statusCode, message } = axiosError.response?.data!
+			if (statusCode === 403 || statusCode === 404)
+				props.displayPopupError({ display: true, message: message })
+			else
+				props.displayPopupError({ display: true })
+		}
+		else
+			props.displayPopupError({ display: true })
 	}
 }
 
@@ -77,30 +103,56 @@ type ShowContextualMenuProps = {
 	setUserTarget: Dispatch<SetStateAction<User | UserAuthenticate>>,
 	channelTarget: Channel | undefined,
 
+	url: string,
+	token: string,
+
+	displayPopupError: Dispatch<SetStateAction<{
+		display: boolean,
+		message?: string
+	}>>,
 	GameWrapperRef: any,
 }
 
 export async function showContextualMenu(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowContextualMenuProps) {
+	try {
+		const gameWrapperContainer = props.GameWrapperRef.current
 
-	const gameWrapperContainer = props.GameWrapperRef.current
+		if (gameWrapperContainer && props.channelTarget) {
 
-	if (gameWrapperContainer && props.channelTarget) {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${sender.id}`, {
+				headers: {
+					'Authorization': `Bearer ${props.token}`
+				}
+			})
 
-		props.setUserTarget(sender)
+			props.setUserTarget(userResponse.data)
 
-		const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, sender, props.userAuthenticate, props.channelTarget) // height du menu contextuel du chat
-		const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
-		const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
-		const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
+			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, sender, props.userAuthenticate, props.channelTarget) // height du menu contextuel du chat
+			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
+			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
+			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas
 
-		const resultX = window.innerWidth - event.clientX // resultat horizontal par defaut (position du clic)
-		let resultY = event.clientY // resultat vertical par defaut (position du clic)
+			const resultX = window.innerWidth - event.clientX // resultat horizontal par defaut (position du clic)
+			let resultY = event.clientY // resultat vertical par defaut (position du clic)
 
-		if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
-			resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
+			if (event.clientY - horizontalBorder / 2 > maxBottom) // verifie si le menu depasse sur l'axe vertical
+				resultY -= event.clientY - horizontalBorder / 2 - maxBottom // ajuste le resultat vertical
 
-		props.setContextualMenuPosition({ right: resultX, top: resultY })
-		props.displayContextualMenu({ display: true, type: contextualMenuStatus.CHAT })
+			props.setContextualMenuPosition({ right: resultX, top: resultY })
+			props.displayContextualMenu({ display: true, type: contextualMenuStatus.CHAT })
+		}
+	}
+	catch (error) {
+		if (axios.isAxiosError(error)) {
+			const axiosError = error as AxiosError<ErrorResponse>
+			const { statusCode, message } = axiosError.response?.data!
+			if (statusCode === 403 || statusCode === 404)
+				props.displayPopupError({ display: true, message: message })
+			else
+				props.displayPopupError({ display: true })
+		}
+		else
+			props.displayPopupError({ display: true })
 	}
 }
 

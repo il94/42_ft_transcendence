@@ -25,7 +25,7 @@ export class ChannelController {
 		return this.channelsService.createChannelMP(userAuthId, userTargetId)
 	}
 
-	// Ajoute le user auth dans un channel
+	// Ajoute un user dans un channel
 	@Post(':id/join')
 	join(@getUser('id') userId: number,
 	@Param('id', ParseIntPipe) channelId: number,
@@ -59,25 +59,11 @@ export class ChannelController {
 		return await this.channelsService.addContentInvitation(channelId, userTargetId, userAuthId, msgStatus)
 	}
 
-  // Retourne tout les channels
-  @Get()
-  async findAll() {
-    const channels = await this.channelsService.findAllChannels();
-    return channels;
-  }
-
 	// Retourne tout les channels PUBLIC et PROTECTED
 	@Get('accessibles')
 	async findAllAccessibles() {
 		return await this.channelsService.findAllChannelsAccessibles()
 	}
-
-  // Retourne un channel
-  @Get(':id')
-  find(@Param('id', ParseIntPipe) channelId: number,
-    @getUser('id') userId: number) {
-    return this.channelsService.findChannel(channelId, userId);
-  }
 
 	// Retourne un channel avec ses relations
 	@Get(':id/relations')
@@ -85,13 +71,6 @@ export class ChannelController {
 	@Param('id', ParseIntPipe) channelId: number) {
 		return this.channelsService.findChannelWithRelations(channelId, userId)
 	}
-
-  // Retourne les sockets (string) des users
-  @Get(':id/sockets')
-  async findSockets(
-    @Param('id', ParseIntPipe) id: number) {
-    return await this.channelsService.getAllSocketsChannel(id);
-  }
 
 	// Modifie un channel
 	@Patch(':id')
@@ -140,7 +119,23 @@ export class ChannelController {
 	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
 		return this.channelsService.leaveChannel(channelId, userAuthId, userTargetId)
 	}
+}
 
+/* =========================== PAS UTILISEES ================================ */
+
+//   // Retourne tout les channels
+//   @Get()
+//   async findAll() {
+//     const channels = await this.channelsService.findAllChannels();
+//     return channels;
+//   }
+
+//   // Retourne un channel
+//   @Get(':id')
+//   find(@Param('id', ParseIntPipe) channelId: number,
+//     @getUser('id') userId: number) {
+//     return this.channelsService.findChannel(channelId, userId);
+//   }
 
   /* soso obtenir tout les messages  edit : format de renvoie pas encore confirmer */
 
@@ -150,8 +145,12 @@ export class ChannelController {
   //   return this.channelsService.getAllMessage(id);
   // }
 
-
-/* =========================== PAS UTILISEES ================================ */
+//   // Retourne les sockets (string) des users
+//   @Get(':id/sockets')
+//   async findSockets(
+//     @Param('id', ParseIntPipe) id: number) {
+//     return await this.channelsService.getAllSocketsChannel(id);
+//   }
 
 //   @Patch('add/:user/in/:chan')
 //   addUser(@Param('user', ParseIntPipe) user: number,
@@ -159,6 +158,3 @@ export class ChannelController {
 //   @Request() member: User) {
 //     return this.channelsService.addUserInChannel(user, member, chan);
 //   }
-
-
-}

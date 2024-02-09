@@ -123,6 +123,18 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					banneds: [],
 					muteInfo: []
 				}
+
+				setUserAuthenticate((prevState) => ({
+					...prevState,
+					channels: [
+						...prevState.channels,
+						newChannelMP
+					]
+				}))
+	
+				setChannelTarget(newChannelMP)
+				displayChat(true)
+
 				return (newChannelMP)
 			}
 		}

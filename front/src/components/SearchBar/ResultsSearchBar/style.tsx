@@ -46,7 +46,7 @@ export const ResultsWrapper = styled.div`
 
 `
 
-export const Result = styled.div<{ $index: number, $noAvatar?: boolean }>`
+export const Result = styled.div<{ $sectionIndex: number, $noAvatar?: boolean }>`
 
 	display: flex;
 	align-items: center;
@@ -56,14 +56,14 @@ export const Result = styled.div<{ $index: number, $noAvatar?: boolean }>`
 
 	cursor: pointer;
 
-	background-color: ${(props) => props.$index % 2 === 0 ? colors.searchBarResult : colors.searchBarResultAlt };
+	background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.searchBarResult : colors.searchBarResultAlt };
 
 	&:hover {
-		background-color: ${(props) => props.$index % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
 	}
 	&:focus-visible {
 		outline: none;	
-		background-color: ${(props) => props.$index % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
 
 `
@@ -91,5 +91,8 @@ export const AvatarResult = styled.img`
 	margin-left: 10px;
 
 	border-radius: 50%;
+
+	object-fit: cover; 
+	object-position: center;
 
 `

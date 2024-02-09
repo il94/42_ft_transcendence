@@ -40,6 +40,7 @@ function MatchHistory() {
 				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
+				// temporaire en attendant gestion d'erreur
 				setMatchs([])
 			}
 		}

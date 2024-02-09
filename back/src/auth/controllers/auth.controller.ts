@@ -84,7 +84,7 @@ export class AuthController {
 		try {
 			if (!body.twoFACode)
 				throw new BadRequestException('Empty 2FA code');
-			const tfaUser = await this.userService.turnOnTwoFA(user, body.twoFACode);
+			const tfaUser = await this.authService.turnOnTwoFA(user, body.twoFACode);
 			return  tfaUser.twoFA 
 		} catch (error) {
 			throw new BadRequestException(error.message);
@@ -103,7 +103,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async disable(@getUser() user: User, @Body() body): Promise <boolean> {
 		try {
-			const disable: boolean =  await this.userService.disableTwoFA(user, body.TwoFA)
+			const disable: boolean =  await this.authService.disableTwoFA(user, body.TwoFA)
 			return disable;
 		} catch (error) {
 			throw new BadRequestException(error.message);

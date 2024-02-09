@@ -19,8 +19,8 @@ export class FriendsController {
 
 	// Retourne les amis du user
 	@Get()
-	async getUserFriends(@getUser() user: User) {
-		return await this.friendsService.getUserFriends(user.id)
+	async getUserFriends(@getUser('id') userId: number) {
+		return await this.friendsService.getUserFriends(userId)
 	}
 
 	// Supprime un ami
@@ -29,6 +29,7 @@ export class FriendsController {
 	@Param('id', ParseIntPipe) userTargetId: number) {
 		return this.friendsService.removeFriend(userAuthId, userTargetId)
     }
+}
 
 /* =========================== PAS UTILISEES ================================ */
 
@@ -52,6 +53,3 @@ export class FriendsController {
   //   @Body() dto: RelationDto) {
   //       return this.friendsService.updateRelation(id, dto);
   //   }
-
-
-}

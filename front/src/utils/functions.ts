@@ -6,6 +6,7 @@ import {
 
 import {
 	Channel,
+	ChannelData,
 	User,
 	UserAuthenticate
 } from "./types"
@@ -144,7 +145,7 @@ export function findUserInChannel(channel: Channel, userId: number): User | User
 		return (undefined)
 }
 
-export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | undefined {
+export function findChannelMP(userAuthenticate: UserAuthenticate, recipientName: string): Channel | ChannelData | undefined {
 	return (
 		userAuthenticate.channels.find((channel) => (
 		channel.name === recipientName && channel.type === ChannelType.MP))
@@ -226,38 +227,6 @@ export function channelIsEmpty(channel: Channel): boolean {
 		channel.owner === undefined
 	)
 }
-
-export function updateUserInChannel(channel: Channel, userId: number, newStatus: userStatus): Channel {
-	return {
-		...channel,
-		members: channel.members.map((member) => {
-			if (member.id === userId)
-			{
-				return {
-					...member,
-					status: newStatus
-				}
-			}
-			else
-				return (member)
-		}),
-		administrators: channel.administrators.map((administrator) => {
-			if (administrator.id === userId)
-			{
-				return {
-					...administrator,
-					status: newStatus
-				}
-			}
-			else
-				return (administrator)
-		}),
-		owner: channel.owner?.id === userId ? channel.owner as User : {
-			...(channel.owner as User), status: newStatus
-		}
-	}
-}
-
 
 export function setUserToMember(channel: Channel, user: User | UserAuthenticate): Channel {
 	const isAlreadyMember = userIsMember(channel, user.id)

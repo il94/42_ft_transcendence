@@ -34,7 +34,7 @@ export function generateResults(results: User[] | Channel[], type: resultSearchB
 									addFunction(result.id)
 							}}
 							tabIndex={0}
-							$index={index}
+							$sectionIndex={index}
 							$noAvatar={littleResults}>
 							{
 								!littleResults &&

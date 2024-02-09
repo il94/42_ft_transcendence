@@ -82,63 +82,54 @@ export class BlockedsService {
 				throw new BadRequestException()
 		}
 	}
-	
-	async getBlockeds(userId: number) {
-		const user = await this.prisma.user.findFirst({ 
-			where: { id: userId },
-			include: { blockeds: true, },
-		})
-		return user;
-	}
 
+	// Retourne les users bloques
 	async getUserBlockeds(userId: number) {
-		const relations = await this.prisma.user.findUnique({
-			where: {
-				id: userId
-			},
-			select: {
-				blockeds: {
-					select: {
-						blockedId: true
+		try {
+			// Retourne les relations blockeds du user
+			const relations = await this.prisma.user.findUnique({
+				where: {
+					id: userId
+				},
+				select: {
+					blockeds: {
+						select: {
+							blockedId: true
+						}
 					}
 				}
-			}
-		})
+			})
 
-		const blockedsIds = relations.blockeds.map((relation) => relation.blockedId)
+			// Retourne les ids des users bloques pqr le user
+			const blockedsIds = relations.blockeds.map((relation) => relation.blockedId)
 
-		const blockeds = await this.prisma.user.findMany({
-			where: {
-				id: {
-					in: blockedsIds
+			// Retourne les users bloques avec leurs donnees publiques
+			const blockeds = await this.prisma.user.findMany({
+				where: {
+					id: {
+						in: blockedsIds
+					}
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
 				}
-			},
-			select: {
-				id: true,
-				username: true,
-				avatar: true,
-				status: true,
-				wins: true,
-				draws: true,
-				losses: true
-			}
-		})
+			})
 
-		const blockedsMapped = blockeds.map((blocked) => {
-
-			const { wins, draws, losses, ...rest } = blocked
-
-			return {
-				...rest,
-				scoreResume: {
-					wins,
-					draws,
-					losses
-				}
-			}
-		})
-
-		return blockedsMapped;
+			// console.log(`User ${userId} blockeds : `, blockeds)
+			return blockeds
+		}
+		catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	// Debloque un user
@@ -194,13 +185,17 @@ export class BlockedsService {
 				throw new BadRequestException()
 		}
 	}
+}
 
 /* =========================== PAS UTILISEES ================================ */
 
-
-	async getNonBlockeds(UserId: number) {
-		//TODO ?
-	}
+// async getBlockeds(userId: number) {
+// 	const user = await this.prisma.user.findFirst({ 
+// 		where: { id: userId },
+// 		include: { blockeds: true, },
+// 	})
+// 	return user;
+// }
 
 	// OK de passer RelationDTO en parametre ?
 	// async updateRelation(userId: number, dto: RelationDto) {
@@ -278,5 +273,3 @@ export class BlockedsService {
 	// 		return blockedRequest.request; 
 	// 	return { error : 'blocked request not sent'};
 	// }
-
-}
