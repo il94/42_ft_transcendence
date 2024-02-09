@@ -57,3 +57,10 @@ export enum resultSearchBarType {
 	USER = "USER",
 	CHANNEL = "CHANNEL"
 }
+
+export enum ranks {
+	NORANK = "NO RANK",
+	BRONZE = "BRONZE",
+	SILVER = "SILVER",
+	GOLD = "GOLD",
+}

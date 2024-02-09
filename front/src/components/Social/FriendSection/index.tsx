@@ -83,7 +83,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 				setUserTarget(userResponse.data)
 
-				const heightCard = 371 // height de la carte
+				const heightCard = 390 // height de la carte
 				const horizontalBorder = window.innerHeight - gameWrapperContainer.getBoundingClientRect().height // height des bordures horizontales autour du jeu
 				const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
 				const maxBottom = window.innerHeight - horizontalBorder - heightNavBar - heightCard // valeur max avant que la carte ne depasse par le bas
@@ -134,6 +134,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 			setContextualMenuPosition({ left: resultX, top: resultY })
 			displayContextualMenu({ display: true, type: contextualMenuStatus.SOCIAL })
+			displayCard(false)
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
