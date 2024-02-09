@@ -324,7 +324,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							$error={name.error}
 							ref={nameInputTextRef} />
 						<ErrorMessage
-							fontSize={10}>
+							fontSize={10}
+							$textAlign="end">
 							{name.error && name.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>
