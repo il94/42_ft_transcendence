@@ -27,6 +27,9 @@ export const Avatar = styled.img`
 
 	cursor: pointer;
 
+	object-fit: cover; 
+	object-position: center;
+
 	&:hover {
 		transform: translate(0px, -2px);
 	}

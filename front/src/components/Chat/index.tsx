@@ -33,7 +33,8 @@ import {
 } from "../../utils/functions"
 
 import {
-	Channel
+	Channel,
+	ChannelData
 } from "../../utils/types"
 
 import {
@@ -45,7 +46,7 @@ import ChatIcon from "../../assets/chat.png"
 type PropsChat = {
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
-	channels: Channel[],
+	channels: (Channel | ChannelData)[],
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 }

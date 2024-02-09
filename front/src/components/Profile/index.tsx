@@ -21,9 +21,12 @@ import Icon from "../../componentsLibrary/Icon"
 import AuthContext from "../../contexts/AuthContext"
 import InteractionContext from "../../contexts/InteractionContext"
 
+import {
+	ErrorResponse
+} from '../../utils/types'
+
 import deconnexionIcon from "../../assets/deconnexion.png"
 import settingsIcon from "../../assets/settings.png"
-import { ErrorResponse, SettingData } from '../../utils/types'
 
 type PropsProfile = {
 	card: boolean,
@@ -80,8 +83,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 			}
 			else
 				navigate("/error")
-		}
-		
+		}	
 	}
 
 	return (

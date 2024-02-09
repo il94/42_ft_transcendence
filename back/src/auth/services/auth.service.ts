@@ -92,18 +92,6 @@ export class AuthService {
 		}
 	}
 
-	// Genere un token d'authentification
-	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
-		const payload = {
-			sub: userId,
-			username
-		};
-		const token =  await this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET })
-		if (!token)
-			throw new BadRequestException("Failed to generate access_token")
-		return { access_token: token, }
-	}
-
 	// Set le statut du user a deconnecte
 	async logout(userId: number) {
 		try {
@@ -218,23 +206,46 @@ export class AuthService {
 
 	/*********************** TwoFA Authentication ******************************************/
 
+	async generateTwoFASecret(user: User): Promise <{ secret:string, otpAuthURL: string}> {
+		const secret = authenticator.generateSecret();
+		const otpAuthURL = authenticator.keyuri(user.username, process.env.AUTH_APP_NAME, secret);
+		await this.setTwoFASecret(secret, user.id);
+		return { secret, otpAuthURL };
+	}
+
 	async generateQrCodeDataURL(otpAuthUrl: string): Promise<string> {
 		return toDataURL(otpAuthUrl);
 	}
 
-	async generateTwoFASecret(user: User): Promise <{ secret:string, otpAuthURL: string}> {
-		const secret = authenticator.generateSecret();
-		const otpAuthURL = authenticator.keyuri(user.username, process.env.AUTH_APP_NAME, secret);
-		await this.userService.setTwoFASecret(secret, user.id);
-		return { secret, otpAuthURL };
-	}
+	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
+		try {
+			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
+			if (!getUser)
+				throw new NotFoundException('User not found');
+			if (getUser.twoFA)
+				throw new ConflictException('2FA already enabled');
 
-	// Verifie si le code fourni est correct avec l'api de google
-	async verifyCode(userTwoFASecret: string, twoFACode: string): Promise <boolean> {
-		return authenticator.verify({
-			token: twoFACode,
-			secret: userTwoFASecret
-		  });
+			const isCodeValid = authenticator.verify({
+				token: twoFACode,
+				secret: getUser.twoFASecret,
+			});
+			if (!isCodeValid)
+				throw new ForbiddenException('Wrong authentication code');
+			
+				const setUser = await this.prisma.user.update({
+				where: { id: user.id, },
+				data: { twoFA: true, },
+			});
+			return setUser;
+		}
+		catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	// Verifie le code envoye avec l'api de google et renvoie un token d'authentification
@@ -281,4 +292,59 @@ export class AuthService {
 		}
 	}
 
+	async disableTwoFA(user: User, code: string) {
+		try {
+			const otpCode = await this.prisma.user.findUnique({
+				where: { id: user.id, twoFASecret:  code }
+			})
+			if (!otpCode)
+				throw new NotFoundException(`Failed to disable TwoFA`);
+			const setUser = await this.prisma.user.update({
+				where: { id: user.id },
+				data: { twoFA: false },
+			});
+			return setUser.twoFA;
+		}
+		catch (error) { // a check
+			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
+/* =============================== UTILS ==================================== */
+
+	// Genere un token d'authentification
+	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
+		const payload = {
+			sub: userId,
+			username
+		};
+		const token =  await this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET })
+		if (!token)
+			throw new BadRequestException("Failed to generate access_token")
+		return { access_token: token, }
+	}
+
+	async setTwoFASecret(secret: string, userId: number): Promise<void> {
+		try {
+		const user = await this.prisma.user.update({
+			where: { id: userId,},
+			data: { twoFASecret: secret },
+		});
+		if (!user)
+			throw new NotFoundException("User not found");
+		} catch (error) { throw error; }
+	}
+
+	// Verifie si le code fourni est correct avec l'api de google
+	async verifyCode(userTwoFASecret: string, twoFACode: string): Promise <boolean> {
+		return authenticator.verify({
+			token: twoFACode,
+			secret: userTwoFASecret
+		  });
+	}
 }

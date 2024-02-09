@@ -15,14 +15,16 @@ import DisplayContext from "../../../../contexts/DisplayContext"
 
 import {
 	Channel,
+	ChannelData,
 	ErrorResponse
 } from "../../../../utils/types"
 
 type PropsChannel = {
-	channel: Channel,
+	channel: Channel | ChannelData,
+	sectionIndex: number
 }
 
-function ChannelSection({ channel }: PropsChannel) {
+function ChannelSection({ channel, sectionIndex }: PropsChannel) {
 
 	const { token, url } = useContext(AuthContext)!
 	const { setChannelTarget } = useContext(InteractionContext)!
@@ -59,7 +61,7 @@ function ChannelSection({ channel }: PropsChannel) {
 		<Style
 			onClick={handleClickEvent}
 			tabIndex={0}
-			$id={channel.id}>
+			$sectionIndex={sectionIndex}>
 			<Avatar src={channel.avatar} />
 			<ChannelName>
 				{channel.name}

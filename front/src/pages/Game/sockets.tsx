@@ -2,7 +2,6 @@ import {
 	Dispatch,
 	SetStateAction
 } from "react"
-import axios, { AxiosResponse } from "axios"
 
 import {
 	findUserInChannel,
@@ -11,12 +10,14 @@ import {
 	setUserToBanned,
 	setUserToMember,
 	setUserToOwner,
-	updateUserInChannel,
+	updateUserDatasInChannel,
+	updateUserStatusInChannel,
 	userIsFriend,
 	userIsInChannel
 } from "../../utils/functions"
 
 import {
+	ChannelType,
 	challengeStatus,
 	channelRole,
 	messageType,
@@ -125,26 +126,22 @@ export function postInvitation(props: PropsPostInvitation) {
 type PropsRefreshJoinChannel = {
 	channelId: number,
 	userId: number,
+	channelDatas: ChannelData,
+	newMember: User,
 
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 	channelTarget: Channel | undefined,
-	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
-
-	token: string,
-	url: string
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>
 
 }
 
 export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 
-
-	console.log("JOIN PROPS", props)
-
-
 	// Valide si le user auth est invité dans le channel
 	if (props.userId === props.userAuthenticate.id)
 	{
+<<<<<<< HEAD
 		// Récupère les données du channel dans lequel il a été ajouté
 		const newChannelResponse: AxiosResponse<ChannelData> = await axios.get(`https://${props.url}:3333/channel/${props.channelId}`, {
 			headers: {
@@ -162,21 +159,26 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 			banneds: []
 		}
 
+=======
+>>>>>>> main
 		props.setUserAuthenticate((prevState: UserAuthenticate) => ({
 			...prevState,
-			channels: [ ...prevState.channels, newChannel ]
+			channels: [ ...prevState.channels, props.channelDatas ]
 		}))
 	}
 
 	// Valide si le user auth déjà présent dans le channel a la fenêtre de chat ouverte
 	else if (props.channelTarget?.id === props.channelId)
 	{
+<<<<<<< HEAD
 		const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${props.userId}`, {
 			headers: {
 				'Authorization': `Bearer ${props.token}`
 			}
 		})
 
+=======
+>>>>>>> main
 		props.setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState)
 			{
@@ -184,7 +186,7 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 					...prevState,
 					members: [
 						...prevState.members,
-						userResponse.data
+						props.newMember
 					]
 				}
 			}
@@ -316,9 +318,9 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 		props.setUserAuthenticate((prevState: UserAuthenticate) => {
 			return {
 				...prevState,
-				channels: prevState.channels.map((channel: Channel) => {
+				channels: prevState.channels.map((channel: Channel | ChannelData) => {
 					if (channel.id === props.channelId)
-						return (setUserToOwner(channel, prevState))
+						return (setUserToOwner(channel as Channel, prevState))
 					else
 						return (channel)
 				})
@@ -339,7 +341,48 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 	}
 }
 
+type PropsRefreshUserDatas = {
+	userId: number,
+	newDatas: any,
 
+	userAuthenticate: UserAuthenticate,
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+	channelTarget: Channel | undefined,
+	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+}
+
+// Met à jour les datas d'un user
+export function refreshUserDatas(props: PropsRefreshUserDatas) {
+
+	if (props.userId === props.userAuthenticate.id) {
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				username: props.newDatas.username,
+				avatar: props.newDatas.avatar
+			}
+		})
+	}
+	else if (userIsFriend(props.userAuthenticate, props.userId)) {
+		props.setUserAuthenticate((prevState: UserAuthenticate) => {
+			return {
+				...prevState,
+				friends: prevState.friends.map((friend) => {
+					if (friend.id === props.userId) {
+						return {
+							...friend,
+							username: props.newDatas.username,
+							avatar: props.newDatas.avatar
+						}
+					}
+					else
+						return (friend)
+				})
+			}
+		})
+
+	}
+}
 
 type PropsRefreshUserStatus = {
 	userId: number,
@@ -378,13 +421,6 @@ export function refreshUserStatus(props: PropsRefreshUserStatus) {
 				})
 			}
 		})
-
-		if (props.channelTarget && userIsInChannel(props.channelTarget, props.userId)) {
-			props.setChannelTarget((prevState: Channel | undefined) => {
-				if (prevState)
-					return updateUserInChannel(prevState, props.userId, props.newStatus)
-			})
-		}
 	}
 }
 
@@ -448,17 +484,6 @@ export function refreshDeleteChannel(props: PropsRefreshDeleteChannel) {
 		props.setChannelTarget(undefined)
 }
 
-type PropsRecieveChannelMP = {
-	channelId: number,
-	recipientId: number,
-
-	token: string,
-	url: string,
-	userAuthenticate: UserAuthenticate,
-	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
-	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
-	displayChat: Dispatch<SetStateAction<boolean>>,
-}
 
 type RefreshUserMuteProps = {
 	idChan: number,
@@ -519,27 +544,36 @@ export async function refreshStatusChallenge(props : RefreshStatusChallengeProps
 	}
 	}  
 
+type PropsRecieveChannelMP = {
+	channelId: number,
+	authorDatas: any,
 
-// Crée un channel MP
+	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
+}
+	
+// Crée un channel MP chez le destinataire
 export async function recieveChannelMP(props: PropsRecieveChannelMP) {
+<<<<<<< HEAD
 
 	const channelMPResponse: AxiosResponse<Channel> = await axios.get(`https://${props.url}:3333/channel/${props.channelId}/relations`, {
 		headers: {
 			'Authorization': `Bearer ${props.token}`
 		}
 	})
+=======
+	const newChannelMP: ChannelData = {
+		id: props.channelId,
+		name: props.authorDatas.username,
+		avatar: props.authorDatas.avatar,
+		type: ChannelType.MP
+	}
+>>>>>>> main
 
 	props.setUserAuthenticate((prevState) => ({
 		...prevState,
 		channels: [
 			...prevState.channels,
-			channelMPResponse.data
+			newChannelMP
 		]
 	}))
-
-	if (props.userAuthenticate.id !== props.recipientId)
-	{
-		props.setChannelTarget(channelMPResponse.data)
-		props.displayChat(true)
-	}
 }

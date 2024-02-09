@@ -56,11 +56,11 @@ function LockedInterface() {
 			await axios.post(`https://${url}:3333/channel/${channelTarget.id}/join`, {
 				hash: password.value
 			},
-				{
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
 
 			setUserAuthenticate((prevState: UserAuthenticate) => ({
 				...prevState,
@@ -73,7 +73,6 @@ function LockedInterface() {
 			}))
 		}
 		catch (error) {
-			console.log(error)
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!

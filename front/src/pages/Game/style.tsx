@@ -34,8 +34,8 @@ export const LeftGameWrapper = styled.div<{ $social: boolean }>`
 	display: flex;
 	flex-direction: column;
 
-	width: ${(props) => props.$social ? 58 : 250}px;
-	min-width: ${(props) => props.$social ? 58 : 250}px;
+	width: ${(props) => props.$social ? 250 : 58}px;
+	min-width: ${(props) => props.$social ? 250 : 58}px;
 	height: 100%;
 
 `
@@ -55,9 +55,9 @@ export const TopGameWrapper = styled.div`
 	
 	display: flex;
 
-	width: 100%;
+	width: inherit;
 	height: 53px;
-	min-width: 373px;
+	min-width: inherit;
 	min-height: 53px;
 
 `
@@ -66,8 +66,8 @@ export const BottomGameWrapper = styled.div`
 	
 	position: relative;
 
-	width: 100%;
-	height: 100%;
+	width: inherit;
+	height: inherit;
 	min-width: 373px;
 	min-height: 475px;
 

@@ -88,14 +88,6 @@ export class FriendsService {
 		}
 	}
 
-	async getFriends(userId: number) {
-		const user = await this.prisma.user.findFirst({ 
-			where: { id: userId },
-			include: { friends: true, },
-		})
-		return user;
-	}
-
 	// Retourne les amis du user
 	async getUserFriends(userId: number): Promise<UserDatas[]> {
 		try {
@@ -198,14 +190,17 @@ export class FriendsService {
 				throw new BadRequestException()
 		}
 	}
+}
 
 /* =========================== PAS UTILISEES ================================ */
 
-
-
-async getNonFriends(UserId: number) {
-	//TODO ?
-}
+// async getFriends(userId: number) {
+// 	const user = await this.prisma.user.findFirst({ 
+// 		where: { id: userId },
+// 		include: { friends: true, },
+// 	})
+// 	return user;
+// }
 
 // OK de passer RelationDTO en parametre ?
 // async updateRelation(userId: number, dto: RelationDto) {
@@ -283,5 +278,3 @@ async getNonFriends(UserId: number) {
 	// 		return friendRequest.request; 
 	// 	return { error : 'friend request not sent'};
 	// }
-
-}
