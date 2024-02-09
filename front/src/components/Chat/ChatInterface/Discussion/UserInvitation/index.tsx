@@ -13,6 +13,7 @@ import {
 } from "../functions"
 
 import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
+import ButtonChallengeLocked from "../../../../../componentsLibrary/ButtonChallengeLocked"
 
 import AuthContext from "../../../../../contexts/AuthContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
@@ -57,7 +58,8 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 							token,
 							url
 						})}
-						color={colors.buttonRed}>
+						color={colors.buttonRed}
+						alt="Cancel button" title="Cancel">
 						Cancel
 					</ButtonChallenge>
 				</ButtonsWrapper>
@@ -65,37 +67,41 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 			{
 				initialStatus === challengeStatus.ACCEPTED &&
 				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.buttonGreen}>
+					<ButtonChallengeLocked
+						color={colors.buttonGreen}
+						title="Accepted">
 						Accepted !
-					</ButtonChallenge>
+					</ButtonChallengeLocked>
 				</ButtonsWrapper>
 			}
 			{
 				initialStatus === challengeStatus.CANCELLED &&
 				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.buttonGray}>
+					<ButtonChallengeLocked
+						color={colors.buttonGray}
+						title="Cancelled">
 						Cancelled
-					</ButtonChallenge>
+					</ButtonChallengeLocked>
 				</ButtonsWrapper>
 			}
 			{
 				initialStatus === challengeStatus.IN_PROGRESS &&
 				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.button}>
+					<ButtonChallengeLocked
+						color={colors.button}
+						title="In progress">
 						In progress
-					</ButtonChallenge>
+					</ButtonChallengeLocked>
 				</ButtonsWrapper>
 			}
 			{
 				initialStatus === challengeStatus.FINISHED &&
 				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.button}>
+					<ButtonChallengeLocked
+						color={colors.button}
+						title="Finished">
 						Finished
-					</ButtonChallenge>
+					</ButtonChallengeLocked>
 				</ButtonsWrapper>
 			}
 		</Style>
