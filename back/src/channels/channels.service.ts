@@ -980,8 +980,8 @@ export class ChannelsService {
 	
 			if (!user)
 				throw new NotFoundException("user not exist");
-
-			return user.status !== status;
+			const userstatus : UserStatus = user.status;
+			return userstatus !== status
 		} catch (error) {
 			if (error instanceof NotFoundException)
 				throw error
@@ -1047,10 +1047,12 @@ export class ChannelsService {
 
 			if (newStatus === challengeStatus.ACCEPTED)
 			{
-				if ( !this.checkIfUserExist(messageDatas.targetId) || !this.checkIfUserExist(messageDatas.authorId))
+				if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
 					throw new NotFoundException("user not exist");
-				// if ( this.checkStatus(messageDatas.targetId, UserStatus.ONLINE) || this.checkStatus(messageDatas.authorId, UserStatus.ONLINE))
-				// 	throw new ConflictException("There is not ONLINE");
+				if ((await this.checkStatus(messageDatas.targetId, UserStatus.ONLINE)))
+					throw new ConflictException("There is not ONLINE");
+				if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
+					throw new ConflictException("There is not ONLINE");
 				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
 			}
 		}
