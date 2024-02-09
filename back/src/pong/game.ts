@@ -171,7 +171,7 @@ export class PongGame {
 		const ball = this.Ball.getPos()
 		const balldir = this.Ball.getDir()
 	
-		if (ball.x + balldir.x - (this.BallSize/2) <= this.paddleMargin) // rebond paddle gauche
+		if (ball.x - (this.BallSize/2) <= this.paddleMargin) // rebond paddle gauche
 		{
 			if((ball.y + (this.BallSize/2) >= this.LeftPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.LeftPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.LeftPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.LeftPlayer.getPos().top))
 			{
@@ -179,11 +179,16 @@ export class PongGame {
 				const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
-				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 10)
+				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 5)
+			}
+			else{
+				this.Ball.resetPos()
+				this.Ball.setRandomDir()
+				this.RightPlayer.addScore()
 			}
 		}
 
-		if (ball.x + balldir.x + (this.BallSize/2) >= 1920 - this.paddleMargin)
+		if (ball.x + (this.BallSize/2) >= 1920 - this.paddleMargin)
 		{
 			if((ball.y + (this.BallSize/2) >= this.RightPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.RightPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.RightPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.RightPlayer.getPos().top))
 			{
@@ -191,32 +196,97 @@ export class PongGame {
 				const CollisionOnPaddle: number = (this.RightPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
-				this.Ball.setDir(balldir.x * -1 -1, -veloY * 10)
+				this.Ball.setDir(balldir.x * -1 -1, -veloY * 5)
+			}
+			else{
+				this.Ball.resetPos()
+				this.Ball.setRandomDir()
+				this.LeftPlayer.addScore()
 			}
 		}
+
+		// if (ball.x + balldir.x - (this.BallSize/2) <= this.paddleMargin) // rebond paddle gauche
+		// {
+		// 	if((ball.y + (this.BallSize/2) >= this.LeftPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.LeftPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.LeftPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.LeftPlayer.getPos().top))
+		// 	{
+		// 		const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
+		// 		const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
+		// 		const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
+
+		// 		this.Ball.setDir(balldir.x * -1 + 1, -veloY * 5)
+		// 	}
+		// }
+
+		// if (ball.x + balldir.x + (this.BallSize/2) >= 1920 - this.paddleMargin)
+		// {
+		// 	if((ball.y + (this.BallSize/2) >= this.RightPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.RightPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.RightPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.RightPlayer.getPos().top))
+		// 	{
+		// 		const PaddleSizePx: number = this.RightPlayer.getPos().bottom - this.RightPlayer.getPos().top 
+		// 		const CollisionOnPaddle: number = (this.RightPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
+		// 		const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
+
+		// 		this.Ball.setDir(balldir.x * -1 -1, -veloY * 5)
+		// 	}
+		// }
 	}
 	
 	checkWallCollision(){
 
 		const ball = this.Ball.getPos()
 		const balldir = this.Ball.getDir()
-		
-		if (ball.y + balldir.y - (this.BallSize/2) < 0 || ball.y + balldir.y + (this.BallSize/2) > 1080)
+
+		if (ball.y - (this.BallSize/2) < 0 || ball.y + (this.BallSize/2) > 1080)
 			this.Ball.setDir(balldir.x, -balldir.y)
 
-		if (ball.x + balldir.x - (this.BallSize/2) < this.paddleMargin)
-		{
-			this.Ball.resetPos()
-			this.Ball.setRandomDir()
-			this.RightPlayer.addScore()
-		}
-		if (ball.x + balldir.x + (this.BallSize/2) > 1920 - this.paddleMargin)
-		{
-			this.Ball.resetPos()
-			this.Ball.setRandomDir()
-			this.LeftPlayer.addScore()
-		}
+		// if (ball.y + balldir.y - (this.BallSize/2) < 0 || ball.y + balldir.y + (this.BallSize/2) > 1080)
+		// 	this.Ball.setDir(balldir.x, -balldir.y)
+
+		// if (ball.x + balldir.x - (this.BallSize/2) < this.paddleMargin)
+		// {
+		// 	this.Ball.resetPos()
+		// 	this.Ball.setRandomDir()
+		// 	this.RightPlayer.addScore()
+		// }
+		// if (ball.x + balldir.x + (this.BallSize/2) > 1920 - this.paddleMargin)
+		// {
+		// 	this.Ball.resetPos()
+		// 	this.Ball.setRandomDir()
+		// 	this.LeftPlayer.addScore()
+		// }
 	}
+
+	// checkFuturMove(){
+	// 	const ball = this.Ball.getPos()
+	// 	const balldir = this.Ball.getDir()
+
+	// 	const futureX = ball.x + balldir.x 
+	// 	const futureY = ball.y + balldir.y 
+
+	// 	if (ball.x + balldir.x - (this.BallSize/2) <= this.paddleMargin) // rebond paddle gauche
+	// 	{
+	// 		const collisionY = ball.y + (futureY - ball.y) * ((this.paddleMargin - ball.x) / balldir.x);
+	// 		if((ball.y + (this.BallSize/2) >= this.LeftPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.LeftPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.LeftPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.LeftPlayer.getPos().top))
+	// 		{
+	// 			const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
+	// 			const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
+	// 			const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
+
+	// 			this.Ball.setDir(balldir.x * -1 + 1, -veloY * 5)
+	// 		}
+	// 	}
+
+	// 	if (ball.x + balldir.x + (this.BallSize/2) >= 1920 - this.paddleMargin)
+	// 	{
+	// 		if((ball.y + (this.BallSize/2) >= this.RightPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.RightPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.RightPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.RightPlayer.getPos().top))
+	// 		{
+	// 			const PaddleSizePx: number = this.RightPlayer.getPos().bottom - this.RightPlayer.getPos().top 
+	// 			const CollisionOnPaddle: number = (this.RightPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
+	// 			const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
+
+	// 			this.Ball.setDir(balldir.x * -1 -1, -veloY * 5)
+	// 		}
+
+	// }
 
 	checkScore(){
 		if (this.LeftPlayer.getScore() === 11 || this.RightPlayer.getScore() === 11)
@@ -231,9 +301,9 @@ export class PongGame {
 	}
 
 	moveBall(){
-
 		this.checkPaddleCollision()
 		this.checkWallCollision()
+		// this.checkFuturMove()
 		this.Ball.move()
 	}
 
@@ -263,7 +333,6 @@ export class PongGame {
 
 	addWatcher(s: Socket)
 	{
-		console.log("addWatcher")
 		if (s)
 			this.watcher.push(s)
 	}

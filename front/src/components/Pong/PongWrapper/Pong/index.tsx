@@ -10,17 +10,22 @@ import Button from "../../../../componentsLibrary/Button"
 import effects from '../../../../utils/effects'
 import colors from '../../../../utils/colors'
 import CloseButton from '../../../../componentsLibrary/CloseButton'
+import ChatContext from '../../../../contexts/ChatContext'
 
 
-const Style = styled.div<{ $backgroundColor: string }>`
+const Style = styled.div<{ $backgroundColor: string, w:number, h:number}>`
 
 position: absolute;
 
-width: 83.5%; //83.5%
+	width: ${(props) => props.w}px; //83.5%
+	height: ${(props) => props.h}px; //83.5%
+/* max-width: 83.5%; //83.5% */
+
+/* max-height: 100%; */
 
 /* min-width: 95%; */
-/* height: 95%; */
-aspect-ratio: 16/9;
+/* height: 56.25%; */
+/* aspect-ratio: 16/9; */
 
 /* border: 5px;
 border-color: white;
@@ -67,6 +72,8 @@ const ResultStyle = styled.div<{ $Hpos: number }>`
 `
 
 type PongProps = {
+	width: number,
+	height: number,
 	score: {
 		left: number, right: number
 	},
@@ -80,7 +87,7 @@ type PongProps = {
 	social: any;
 }
 
-function Pong({score, setScore, setGameState, setSpectate, spectate, social, focusPaddle, setFocusPaddle}: PongProps){
+function Pong({ width, height, score, setScore, setGameState, setSpectate, spectate, social}: PongProps){
 	
 	const user = useContext(InteractionContext)!
 
@@ -122,11 +129,8 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social, foc
 		setKeysPressed((prevKeys) => ({ ...prevKeys, [event.key]: false }));
 	};
 	
-	const handlemousMove = () => {
-
-	}
 	const updatePositionOnKey = () => {
-		
+
 		if (keysPressed['ArrowUp']) {
 			user.userAuthenticate.socket?.emit("paddlemove", "up")
 			setTimeout(() => {}, 10)
@@ -232,8 +236,13 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social, foc
 		}
 	}, [score])
 
+	useEffect(() => {
+		console.log("in pong width", width)
+		console.log("in pong height", height)
+	}, [])
+
 	return (
-		<Style $backgroundColor={backgroundColor} ref={PongRef}>
+		<Style $backgroundColor={backgroundColor} w={width} h={height} ref={PongRef}>
 			{
 				!endMessage.display && PongRef.current ? (
 					<>
@@ -241,7 +250,7 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social, foc
 						spectate &&
 						<CloseButton closeFunctionAlt={handleStopSpectate} />
 					}
-					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)} handleKeyDown={handleKeyDown} handleKeyUp={handleKeyUp} focusPaddle={focusPaddle} setFocusPaddle={setFocusPaddle} tabIndex={spectate ? -1 : 0} />
+					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)} handleKeyDown={handleKeyDown} handleKeyUp={handleKeyUp} tabIndex={spectate ? -1 : 0} />
 					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
 					<NameStyle $Hpos={10}>{Name.left}</NameStyle>
 					<NameStyle $Hpos={90}>{Name.right}</NameStyle>

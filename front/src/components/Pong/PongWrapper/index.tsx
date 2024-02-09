@@ -13,6 +13,8 @@ import colors from "../../../utils/colors"
 import Button from "../../../componentsLibrary/Button"
 import Loader from "../../../componentsLibrary/Loader"
 import PongPopupError from "./PongPopupError"
+
+import PongContext from "../../../contexts/PongContext"
 // import colors from "../../utils/colors"
 
 const Style = styled.div<{ $backgroundColor: string }>`
@@ -40,11 +42,11 @@ function PongWrapper({social}: any) {
 
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
 
-	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate } = useContext(InteractionContext)!
 
-
 	const [searching, setSearching] = useState<boolean>(false)
+
+	const [PongSize, setPongSize] = useState<{width: number, height: number}>({width: 0, height: 0})
 
 	const [gameState, setGameState] = useState<boolean>(false)
 	const [spectate, setSpectate] = useState<boolean>(false)
@@ -110,8 +112,18 @@ function PongWrapper({social}: any) {
 	useEffect(() => {
 
 		const PongWrapperContainer = wrapperRef.current
+		const ratio = 16/9
 		if (PongWrapperContainer)
+		{
+			let maxWidth = Math.min(PongWrapperContainer.getBoundingClientRect().width, PongWrapperContainer.getBoundingClientRect().height * ratio)
+			let maxHeight = Math.min(PongWrapperContainer.getBoundingClientRect().height, PongWrapperContainer.getBoundingClientRect().width / ratio)
+
+			console.log("width", maxWidth)
+			console.log("height", maxHeight)
+
+			setPongSize({width: maxWidth, height: maxHeight})
 			setLoaderSize(PongWrapperContainer.getBoundingClientRect().width * 30 / 100)
+		}
 
 	}, [window.innerWidth, window.innerHeight, social])
 
@@ -140,61 +152,62 @@ function PongWrapper({social}: any) {
 	const [focusPaddle, setFocusPaddle] = useState<boolean>(false)
 
 	return (
-		<Style $backgroundColor={backgroundColor} ref={wrapperRef} onClick={() => {if(!spectate) setFocusPaddle(true)}}>
-			{
-			pongPopupError.display ? (
-				<PongPopupError
-					displayPongPopupError={displayPongPopupError}
-					message={pongPopupError.message}/>
-				)
-			:
-			(
-			<>
-			{
-				!gameState ?
+		<PongContext.Provider value={{ focusPaddle, setFocusPaddle }}>
+			<Style $backgroundColor={backgroundColor} ref={wrapperRef} onClick={() => {if(!spectate) setFocusPaddle(true)}}>
+				{
+				pongPopupError.display ? (
+					<PongPopupError
+						displayPongPopupError={displayPongPopupError}
+						message={pongPopupError.message}/>
+					)
+				:
+				(
 				<>
-					{
-						!searching ?
-						<Button
-							onClick={handlePlayButton}
-							type="button" fontSize={"5.5vw"}
-							alt="" title=""
-							style={{width: "35%"}}>
-							Play !
-						</Button>
-						:
-						(
-							!difficultyChoose ?
-								<>
-									<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
-									<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
-									<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
-									{/* handleChooseDifficulty */}
-								</>
+				{
+					!gameState ?
+					<>
+						{
+							!searching ?
+							<Button
+								onClick={handlePlayButton}
+								type="button" fontSize={"5.5vw"}
+								alt="" title=""
+								style={{width: "35%"}}>
+								Play !
+							</Button>
 							:
-							<>
-								<Loader size={loaderSize} />
-								<div style={{ height: "8%"}} />
-								<Button
-									onClick={handleCancelButton}
-									type="button" fontSize={"2.25vw"}
-									alt="" title=""
-									style={{width: "17.5%"}}>
-									Cancel
-								</Button>
-							</>
-						)
+							(
+								!difficultyChoose ?
+									<>
+										<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
+										<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
+										<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
+										{/* handleChooseDifficulty */}
+									</>
+								:
+								<>
+									<Loader size={loaderSize} />
+									<div style={{ height: "8%"}} />
+									<Button
+										onClick={handleCancelButton}
+										type="button" fontSize={"2.25vw"}
+										alt="" title=""
+										style={{width: "17.5%"}}>
+										Cancel
+									</Button>
+								</>
+							)
+						}
+					</>
+					:
+					<Pong width={PongSize.width} height={PongSize.height} score={score} setScore={setScore} setGameState={setGameState} setSpectate={setSpectate} spectate={spectate}
+							social={social} />
 					}
 				</>
-				:
-
-				<Pong score={score} setScore={setScore} setGameState={setGameState} setSpectate={setSpectate} spectate={spectate}
-						social={social} focusPaddle={focusPaddle} setFocusPaddle={setFocusPaddle} />
-				}
-			</>
-			)
-		}
-		</Style>
+				)
+			}
+			</Style>
+		</PongContext.Provider>
 		);
 }
 

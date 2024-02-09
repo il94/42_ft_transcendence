@@ -2,13 +2,17 @@
 //import { useState, useEffect } from 'react';
 
 
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components'
 import colors from '../../../../../utils/colors';
+import PongContext from '../../../../../contexts/PongContext';
 
 type PropsPaddle = {
 	Hposition: number;
 	Vposition: number;
+	handleKeyDown?: any;
+	handleKeyUp?: any;
+	tabIndex: number
 }
 
 const Style = styled.div.attrs<{ $Hposition: number ; $Vposition: number }>((props) => ({
@@ -37,29 +41,21 @@ const Style = styled.div.attrs<{ $Hposition: number ; $Vposition: number }>((pro
 
 	`
 
-function Paddle({ Hposition, Vposition, handleKeyDown, handleKeyUp, focusPaddle, setFocusPaddle, tabIndex } : PropsPaddle) {
+function Paddle({ Hposition, Vposition, handleKeyDown, handleKeyUp, tabIndex } : PropsPaddle) {
 
-	function test() {
-		console.log("DJSHAKFHASKHFJKSD")
-	}
 
 	const paddleRef = useRef<HTMLDivElement>(null)
+	const {focusPaddle, setFocusPaddle} = useContext(PongContext)! 
 
 	useEffect(() => {
 		const PaddleContainer = paddleRef.current
-		if (PaddleContainer && tabIndex !== -1 && focusPaddle)
-		{
-			console.log("FOCUS")
+		if (PaddleContainer && tabIndex !== -1 && focusPaddle){
 			PaddleContainer.focus()
 		}
 	}, [focusPaddle])
 
-	useEffect(() => {
-		console.log("HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-	}, [focusPaddle])
-
 	return (
-		<Style onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onBlur={() => setFocusPaddle(false)} tabIndex={tabIndex} $Hposition={Hposition} $Vposition={Vposition} ref={paddleRef} />
+		<Style onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onBlur={() => {setFocusPaddle(false)}} tabIndex={tabIndex} $Hposition={Hposition} $Vposition={Vposition} ref={paddleRef} />
 	);
 }
 
