@@ -103,7 +103,7 @@ export class PongGateway {
 
 	}
 
-	async launchGame(id: number, enemyId: number)
+	async launchGame(id: number, enemyId: number, dif:number)
 	{
 		const leftSocket = AppService.connectedUsers.get(id.toString())
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
@@ -116,7 +116,7 @@ export class PongGateway {
 		this.server.to(leftSocket.id).emit("launchGame")
 		this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, 2, leftSocket, id, (await leftUser).username, rightSocket, enemyId, (await rightUser).username))
+		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, (await leftUser).username, rightSocket, enemyId, (await rightUser).username))
 
 		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
@@ -145,7 +145,7 @@ export class PongGateway {
 			let firstsocket = array.get(firstkey)
 			let secondsocket = array.get(secondkey)
 
-			this.launchGame(firstkey, secondkey)
+			this.launchGame(firstkey, secondkey, dif)
 		}
 
 	}

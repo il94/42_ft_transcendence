@@ -9,6 +9,7 @@ import { User } from '../../../../utils/types'
 import Button from "../../../../componentsLibrary/Button"
 import effects from '../../../../utils/effects'
 import colors from '../../../../utils/colors'
+import CloseButton from '../../../../componentsLibrary/CloseButton'
 
 
 const Style = styled.div<{ $backgroundColor: string }>`
@@ -20,11 +21,6 @@ width: 83.5%; //83.5%
 /* min-width: 95%; */
 /* height: 95%; */
 aspect-ratio: 16/9;
-
-
-
-// ICI
-
 
 /* border: 5px;
 border-color: white;
@@ -84,7 +80,7 @@ type PongProps = {
 	social: any;
 }
 
-function Pong({score, setScore, setGameState, setSpectate, spectate, social}: PongProps){
+function Pong({score, setScore, setGameState, setSpectate, spectate, social, focusPaddle, setFocusPaddle}: PongProps){
 	
 	const user = useContext(InteractionContext)!
 
@@ -110,23 +106,26 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 
 	const handleKeyDown = (event: KeyboardEvent) => {
 		
-		event.preventDefault();
+		// console.log("down")
+		// event.preventDefault();
 		event.stopPropagation();
 		
 		setKeysPressed((prevKeys) => ({ ...prevKeys, [event.key]: true }));
 	};
 	
 	const handleKeyUp = (event: KeyboardEvent) => {
-		event.preventDefault();
+		
+		// console.log("up")
+		// event.preventDefault();
 		event.stopPropagation();
 		
 		setKeysPressed((prevKeys) => ({ ...prevKeys, [event.key]: false }));
 	};
 	
+	const handlemousMove = () => {
+
+	}
 	const updatePositionOnKey = () => {
-		
-		if (!PongRef.current?.getBoundingClientRect())
-			return
 		
 		if (keysPressed['ArrowUp']) {
 			user.userAuthenticate.socket?.emit("paddlemove", "up")
@@ -192,20 +191,23 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 	}, [BallPos, PaddlePos, EnemyPaddlePos])
 
 	useEffect(() => {
-		
-		if (!spectate)
-		{
-			document.addEventListener('keydown', handleKeyDown, true);
-			document.addEventListener('keyup', handleKeyUp, true);
+
+	// 	const PongContainer = PongRef.current
+
+	// 	if (!spectate && PongContainer)
+	// 	{
+	// 		PongContainer.addEventListener('mousemove', handlemousMove, true)
+	// 		PongContainer.addEventListener('keydown', handleKeyDown, true);
+	// 		PongContainer.addEventListener('keyup', handleKeyUp, true);
 			
 			const animationPaddleId = requestAnimationFrame(updatePositionOnKey);
-			
 			return () => {
-				document.removeEventListener('keydown', handleKeyDown, true);
-				document.removeEventListener('keyup', handleKeyUp, true);
+	// 			PongContainer.removeEventListener('mousemove', handlemousMove, true)
+	// 			PongContainer.removeEventListener('keydown', handleKeyDown, true);
+	// 			PongContainer.removeEventListener('keyup', handleKeyUp, true);
 				cancelAnimationFrame(animationPaddleId);
 			};
-		}
+		// }
 		
 	}, [keysPressed, PaddlePos]);
 	
@@ -230,26 +232,29 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		}
 	}, [score])
 
-
 	return (
 		<Style $backgroundColor={backgroundColor} ref={PongRef}>
 			{
 				!endMessage.display && PongRef.current ? (
 					<>
-					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)}/>
+					{
+						spectate &&
+						<CloseButton closeFunctionAlt={handleStopSpectate} />
+					}
+					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)} handleKeyDown={handleKeyDown} handleKeyUp={handleKeyUp} focusPaddle={focusPaddle} setFocusPaddle={setFocusPaddle} tabIndex={spectate ? -1 : 0} />
 					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
 					<NameStyle $Hpos={10}>{Name.left}</NameStyle>
 					<NameStyle $Hpos={90}>{Name.right}</NameStyle>
 					{/* {spectate && <button onClick={handleStopSpectate}>Spectate</button>} */}
-					{spectate && <Button
+					{/* {spectate && <Button
 						onClick={handleStopSpectate}
 						type="button" fontSize={"20 px"}
 						style={{width: "5%"}}
 						title=""
 						alt=""
-					>Spectate</Button>}
+					>Spectate</Button>} */}
 					<Score LeftScore={score.left} RightScore={score.right} size={scoreSize}/>
-					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)}/>
+					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)} tabIndex={-1} />
 				</> ) :
 				<ResultStyle $Hpos={50}>{endMessage.message}</ResultStyle>
 			}

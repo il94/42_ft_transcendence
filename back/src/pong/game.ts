@@ -171,11 +171,10 @@ export class PongGame {
 		const ball = this.Ball.getPos()
 		const balldir = this.Ball.getDir()
 	
-		if (ball.x + balldir.x - (this.BallSize/2) < this.paddleMargin) // rebond paddle gauche
+		if (ball.x + balldir.x - (this.BallSize/2) <= this.paddleMargin) // rebond paddle gauche
 		{
 			if((ball.y + (this.BallSize/2) >= this.LeftPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.LeftPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.LeftPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.LeftPlayer.getPos().top))
 			{
-
 				const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
 				const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
@@ -184,12 +183,10 @@ export class PongGame {
 			}
 		}
 
-		if (ball.x + balldir.x + (this.BallSize/2) > 1920 - this.paddleMargin)
+		if (ball.x + balldir.x + (this.BallSize/2) >= 1920 - this.paddleMargin)
 		{
 			if((ball.y + (this.BallSize/2) >= this.RightPlayer.getPos().top && ball.y + (this.BallSize/2) <= this.RightPlayer.getPos().bottom) || (ball.y - (this.BallSize/2) <= this.RightPlayer.getPos().bottom && ball.y - (this.BallSize/2) >= this.RightPlayer.getPos().top))
 			{
-
-
 				const PaddleSizePx: number = this.RightPlayer.getPos().bottom - this.RightPlayer.getPos().top 
 				const CollisionOnPaddle: number = (this.RightPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)

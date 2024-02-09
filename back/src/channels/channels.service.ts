@@ -1110,7 +1110,7 @@ export class ChannelsService {
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
 
 			if (newStatus === challengeStatus.ACCEPTED)
-				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
+				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId, 2);
 			
 		}
 		catch (error) {

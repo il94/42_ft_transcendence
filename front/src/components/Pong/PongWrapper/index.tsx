@@ -137,8 +137,10 @@ function PongWrapper({social}: any) {
 		}
 	}, [score])
 
+	const [focusPaddle, setFocusPaddle] = useState<boolean>(false)
+
 	return (
-		<Style $backgroundColor={backgroundColor} ref={wrapperRef}>
+		<Style $backgroundColor={backgroundColor} ref={wrapperRef} onClick={() => {if(!spectate) setFocusPaddle(true)}}>
 			{
 			pongPopupError.display ? (
 				<PongPopupError
@@ -187,7 +189,7 @@ function PongWrapper({social}: any) {
 				:
 
 				<Pong score={score} setScore={setScore} setGameState={setGameState} setSpectate={setSpectate} spectate={spectate}
-						social={social}/>
+						social={social} focusPaddle={focusPaddle} setFocusPaddle={setFocusPaddle} />
 				}
 			</>
 			)
