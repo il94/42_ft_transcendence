@@ -1,5 +1,5 @@
 import {WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket} from "@nestjs/websockets";
-import { ConflictException, Search } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, NotFoundException, Search } from "@nestjs/common";
 
 import { Server, Socket } from "socket.io";
 
@@ -10,7 +10,7 @@ import { UsersService } from "src/auth/services/users.service";
 
 import { disconnect } from "process";
 import { AppService } from "src/app.service";
-import { GameStatus, MatchResult, UserStatus } from "@prisma/client";
+import { GameStatus, MatchResult, Prisma, UserStatus } from "@prisma/client";
 import { subscribe } from "diagnostics_channel";
 
 
@@ -156,16 +156,31 @@ export class PongGateway {
 		}
 
 	}
+
+	/*
+		data[0] = id user
+		data[1] = niveau difficulter entre 1 et 3
+	*/
 	
 	@SubscribeMessage('searchGame')
 	async addSearchingPlayer(client: Socket, data: any) {
 		try {			
+			// check si data[0]
+			
+			if ( data[1] < 1 && data[1] > 3)
+				throw new ForbiddenException('dif invalide');
+			
 			this.toSearchingArray(client, data[0], data[1])
 			await this.checkToLaunchGame(client, data[1])
 
 		} catch (error) {
-			//throw error
-		}
+            if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+                throw error
+            else if (error instanceof Prisma.PrismaClientKnownRequestError)
+                throw new ForbiddenException("The provided user data is not allowed")
+            else
+                throw new BadRequestException()
+        }
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
