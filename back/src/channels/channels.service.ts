@@ -1049,8 +1049,8 @@ export class ChannelsService {
 			{
 				if ( !this.checkIfUserExist(messageDatas.targetId) || !this.checkIfUserExist(messageDatas.authorId))
 					throw new NotFoundException("user not exist");
-				if ( this.checkStatus(messageDatas.targetId, UserStatus.ONLINE) || this.checkStatus(messageDatas.authorId, UserStatus.ONLINE))
-					throw new ConflictException("There is not ONLINE");
+				// if ( this.checkStatus(messageDatas.targetId, UserStatus.ONLINE) || this.checkStatus(messageDatas.authorId, UserStatus.ONLINE))
+				// 	throw new ConflictException("There is not ONLINE");
 				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
 			}
 		}
