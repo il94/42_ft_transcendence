@@ -45,6 +45,9 @@ export const Avatar = styled.img<{ src: string }>`
 
 	border-radius: 50%;
 	
+	object-fit: cover; 
+	object-position: center;
+
 `
 
 export const ProfileInfo = styled.div<{ $offline: boolean }>`

@@ -33,6 +33,9 @@ export const Avatar = styled.img`
 	
 	border-radius: 50%;
 
+	object-fit: cover; 
+	object-position: center;
+
 `
 
 export const ChannelName = styled.p`
