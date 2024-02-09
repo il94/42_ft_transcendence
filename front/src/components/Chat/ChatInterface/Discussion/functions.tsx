@@ -127,7 +127,7 @@ export async function showContextualMenu(event: MouseEvent<HTMLDivElement>, send
 
 			props.setUserTarget(userResponse.data)
 
-			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, sender, props.userAuthenticate, props.channelTarget) // height du menu contextuel du chat
+			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, userResponse.data, props.userAuthenticate, props.channelTarget) // height du menu contextuel du chat
 			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const maxBottom = window.innerHeight - horizontalBorder - heightContextualMenu // valeur max avant que le menu ne depasse par le bas

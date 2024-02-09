@@ -49,7 +49,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 	const { displayContextualMenu, setContextualMenuPosition } = useContext(ContextualMenuContext)!
 	const { displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zMaxIndex, displayPopupError, GameWrapperRef } = useContext(DisplayContext)!
-	const { userTarget, setUserTarget, userAuthenticate, channelTarget } = useContext(InteractionContext)!
+	const { userTarget, setUserTarget, userAuthenticate, channelTarget, gameState, searching } = useContext(InteractionContext)!
 
 	return (
 		<Style>
@@ -86,16 +86,24 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 				{
 					initialStatus === challengeStatus.PENDING && target.id === userAuthenticate.id &&
 					<ButtonsWrapper>
-						<ButtonChallenge
-							onClick={() => handleClickChallengeStatus(challengeStatus.ACCEPTED, idMsg, idChan, {
-								userAuthenticate,
-								displayPopupError,
-								token,
-								url
-							})}
-							color={colors.buttonGreen}>
-							Accept
-						</ButtonChallenge>
+						{
+							(!gameState && !searching) ?
+							<ButtonChallenge
+								onClick={() => handleClickChallengeStatus(challengeStatus.ACCEPTED, idMsg, idChan, {
+									userAuthenticate,
+									displayPopupError,
+									token,
+									url
+								})}
+								color={colors.buttonGreen}>
+								Accept
+							</ButtonChallenge>
+							:
+							<ButtonChallenge
+								color={colors.buttonGray}>
+								Accept
+							</ButtonChallenge>
+						}
 						<ButtonChallenge
 							onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan, {
 								userAuthenticate,

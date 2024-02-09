@@ -110,6 +110,8 @@ function Game() {
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
+	const [gameState, setGameState] = useState<boolean>(false)
+	const [searching, setSearching] = useState<boolean>(false)
 
 	const navigate = useNavigate()
 
@@ -368,7 +370,7 @@ function Game() {
 	return (
 		<GamePage
 			onClick={closeContextualMenus}>
-			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget, gameState, setGameState, searching, setSearching }}>
 				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, loaderChat, setLoaderChat, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, loaderChannels, setLoaderChannels, loaderFriends, setLoaderFriends, loaderResultsSearchBar, setLoaderResultsSearchBar, loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError, GameWrapperRef }}>
 					<GameWrapper ref={GameWrapperRef}>
 						{
