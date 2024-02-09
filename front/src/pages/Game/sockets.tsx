@@ -10,10 +10,7 @@ import {
 	setUserToBanned,
 	setUserToMember,
 	setUserToOwner,
-	updateUserDatasInChannel,
-	updateUserStatusInChannel,
-	userIsFriend,
-	userIsInChannel
+	userIsFriend
 } from "../../utils/functions"
 
 import {

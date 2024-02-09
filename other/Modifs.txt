@@ -4,9 +4,6 @@ CAS/ :
 
 GLOBAL/ : A faire sur tout les fichiers un par un
 
-	(!!!!!)
-	Fix les erreurs ts
-
 	(!!!)
 	Faire DTO pour verifier les status envoye au back
 
@@ -26,4 +23,3 @@ SettingsMenu/ :
 
 Signup42/ :
 	Faire select Avatar si le temps
-
