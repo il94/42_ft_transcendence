@@ -966,6 +966,32 @@ export class ChannelsService {
 		}
 	}
 
+	// check si user.status =  status : userStatus
+	// renvoie true si user.status !=  status false sinon
+
+	async  checkStatus(userId: number, status: UserStatus): Promise<boolean> {
+		try {
+			// Recherche de l'utilisateur avec l'ID donné
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId,
+				},
+			});
+	
+			if (!user)
+				throw new NotFoundException("user not exist");
+
+			return user.status !== status;
+		} catch (error) {
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided user data is not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
 	// Change le statut d'une invitation
 	async updateMessageStatus(channelId: number, messageId: number, userAuthId: number, newStatus: challengeStatus) { 
 		try {
@@ -1020,11 +1046,16 @@ export class ChannelsService {
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
 
 			if (newStatus === challengeStatus.ACCEPTED)
+			{
+				if ( !this.checkIfUserExist(messageDatas.targetId) || !this.checkIfUserExist(messageDatas.authorId))
+					throw new NotFoundException("user not exist");
+				if ( this.checkStatus(messageDatas.targetId, UserStatus.ONLINE) || this.checkStatus(messageDatas.authorId, UserStatus.ONLINE))
+					throw new ConflictException("There is not ONLINE");
 				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
-			
+			}
 		}
 		catch (error) {
-			if (error instanceof ForbiddenException || error instanceof NotFoundException)
+			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
