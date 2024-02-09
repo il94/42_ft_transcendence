@@ -9,6 +9,7 @@ import { ESLint } from 'eslint';
 import { PongGame } from './game'
 import { AppGateway } from 'src/app.gateway';
 import { UsersService } from 'src/auth/services/users.service';
+import { ChannelsService } from 'src/channels/channels.service';
 
 
 @UseGuards(JwtGuard)
@@ -22,7 +23,8 @@ export class PongService {
 		private prisma: PrismaService,
 		private appGateway: AppGateway,
 		private userService: UsersService,
-		private appService: AppService,
+		private appService : AppService,
+		//private channelService: ChannelsService
 		) {}
 	
 
@@ -31,7 +33,10 @@ export class PongService {
 		await this.prisma.user.update({ where: { id: idUser},
 			data: { status: newStatus }
 		 })
+		 if (newStatus !== UserStatus.ONLINE)
+		 	await this.cancelAllInvitation(idUser)
 		 this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
+		
 	}
 
 	async createGame(userOneId: number, userTwoId: number): Promise<number> {
@@ -85,8 +90,8 @@ export class PongService {
 		  throw error;
 		}
 	  }
-		
-
+	
+	  
 	  async updateUserGameStats(userId: number, gameId: number, score: number, result: MatchResult) {
 		try {
 		// check si game exist
@@ -138,6 +143,7 @@ export class PongService {
 
 
 
+
 	  async setResult(userId: number, result: MatchResult): Promise<void> {
 		try {
 			const user = await this.prisma.user.findUnique({where: { id: userId }})	
@@ -157,6 +163,68 @@ export class PongService {
 			throw error
 		}
 	}
+
+	  async challengeStatusMessage(idMsg: number, idChan: number) {
+		try {
+			const existingMessage = await this.prisma.message.findUnique({
+				where: {
+					id: idMsg,
+				},
+			});
+	
+			if (!existingMessage) {
+				throw new Error(`Message with ID ${idMsg} does not exist.`);
+			}
+	
+			const updateMessage = await this.prisma.message.update({
+				where: {
+					id: idMsg,
+				},
+				data: {
+					status: challengeStatus.CANCELLED,
+				},
+			});
+			//userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus)
+			await this.appService.emitOnChannel("updateChallenge", idChan, idMsg, challengeStatus.CANCELLED)
+			// await this.emitOnChannel("updateChallenge", idChan, idMsg, challengeStatus.CANCELLED)
+			if (!updateMessage)
+				throw new Error(`Failed to update message with ID ${idMsg}.`);
+
+		} catch (error) {
+			throw new Error(`An error occurred while updating message with ID ${idMsg}: ${error}`);
+		}
+	}
+	
+	
+	  async	cancelAllInvitation(userId : number)
+	  {
+		const messageAuthor = await this.prisma.message.findMany({
+			where: {
+				authorId: userId,
+				isInvit: true,
+				NOT: {
+					status: challengeStatus.CANCELLED,
+				},
+			},
+		});
+		
+		const messageTarget = await this.prisma.message.findMany({
+			where: {
+				targetId: userId,
+				NOT: {
+					status: challengeStatus.CANCELLED,
+				},
+			},
+		});
+		messageAuthor.forEach(async message => {
+			await this.challengeStatusMessage(message.id, message.channelId)
+		});
+		messageTarget.forEach(async message => {
+			await this.challengeStatusMessage(message.id, message.channelId)
+		});
+		}
+	  
+
 
 // 		// util
 // 		async connectGame(userId: number, gameId: number, userRole: roleInGame): Promise<Game> {

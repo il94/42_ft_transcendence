@@ -9,6 +9,7 @@ import { BlockedsModule } from './blockeds/blockeds.module';
 import { PongModule } from './pong/pong.module';
 import { AppGateway } from './app.gateway';
 import { AppService } from './app.service';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AppService } from './app.service';
   ],
   providers: [
     AppGateway,
-    AppService
+    AppService,
+    PrismaService
   ]
 })
 export class AppModule {}
