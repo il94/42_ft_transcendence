@@ -1,23 +1,21 @@
 import { HttpAdapterHost, NestFactory, Reflector,  } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import session from 'express-session';
 import passport from 'passport'
 import { json } from 'express';
 import cookieParser from 'cookie-parser';
+import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
+import * as fs from 'fs';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const httpsOptions: HttpsOptions = {
+		key: fs.readFileSync('./secrets/private.key'),
+		cert: fs.readFileSync('./secrets/public-certificate.crt'),
+	  };
+	const app = await NestFactory.create(AppModule, { httpsOptions });
 	app.use(json({ limit: '5mb' }))
-	// const config = new DocumentBuilder()
-    // .setTitle('Median')
-    // .setDescription('The Median API description')
-    // .setVersion('0.1')
-    // .build();
-	// const document = SwaggerModule.createDocument(app, config);
-	// SwaggerModule.setup('api', app, document);
 	
 	app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true,}));
 	app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
@@ -44,6 +42,5 @@ async function bootstrap() {
 	app.use(cookieParser());
 	
 	await app.listen(process.env.PORT);
-	console.log(`Server listening on ${process.env.IP}:${process.env.PORT}`)
 }
 bootstrap();

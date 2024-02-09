@@ -106,7 +106,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				return (channelMP)
 			}
 			else {
-				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`http://${url}:3333/channel/mp/${userTarget.id}`, {}, {
+				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`https://${url}:3333/channel/mp/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -178,7 +178,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			else
 				throw new Error
 
-			await axios.post(`http://${url}:3333/channel/${channel.id}/invitation`, {
+			await axios.post(`https://${url}:3333/channel/${channel.id}/invitation`, {
 				msgStatus: messageType.INVITATION,
 				targetId: userTarget.id
 			},
@@ -219,7 +219,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleManageFriendClickEvent() {
 		try {
 			if (!userIsFriend(userAuthenticate, userTarget.id)) {
-				await axios.post(`http://${url}:3333/friends/${userTarget.id}`, {}, {
+				await axios.post(`https://${url}:3333/friends/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -230,7 +230,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				}))
 			}
 			else {
-				await axios.delete(`http://${url}:3333/friends/${userTarget.id}`, {
+				await axios.delete(`https://${url}:3333/friends/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -260,7 +260,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	async function handleBlockClickEvent() {
 		try {
 			if (!userIsBlocked(userAuthenticate, userTarget.id)) {
-				await axios.post(`http://${url}:3333/blockeds/${userTarget.id}`, {}, {
+				await axios.post(`https://${url}:3333/blockeds/${userTarget.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -271,7 +271,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 				}))
 			}
 			else {
-				await axios.delete(`http://${url}:3333/blockeds/${userTarget.id}`, {
+				await axios.delete(`https://${url}:3333/blockeds/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -303,7 +303,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			if (!channelTarget)
 				throw new Error
 			if (!userIsAdministrator(channelTarget, userTarget.id)) {
-				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+				await axios.patch(`https://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.ADMIN
 				},
 					{
@@ -313,7 +313,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					})
 			}
 			else {
-				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+				await axios.patch(`https://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.MEMBER
 				},
 					{
@@ -344,7 +344,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			if (!channelTarget)
 				throw new Error
 	
-			await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/mute/${userTarget.id}`, {}, {
+			await axios.patch(`https://${url}:3333/channel/${channelTarget.id}/mute/${userTarget.id}`, {}, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -371,7 +371,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			if (!channelTarget)
 				throw new Error
-			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}/leave/${userTarget.id}`, {
+			await axios.delete(`https://${url}:3333/channel/${channelTarget.id}/leave/${userTarget.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -398,7 +398,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 			if (!channelTarget)
 				throw new Error
 			if (!userIsBanned(channelTarget, userTarget.id)) {
-				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+				await axios.patch(`https://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.BANNED
 				},
 					{
@@ -408,7 +408,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					})
 			}
 			else {
-				await axios.patch(`http://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
+				await axios.patch(`https://${url}:3333/channel/${channelTarget.id}/role/${userTarget.id}`, {
 					role: channelRole.UNBANNED
 				},
 					{

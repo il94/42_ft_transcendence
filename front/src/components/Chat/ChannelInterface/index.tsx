@@ -101,7 +101,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					newDatas.avatar = avatar
 
 				if (Object.keys(newDatas).length !== 0) {
-					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, newDatas, {
+					await axios.patch(`https://${url}:3333/channel/${channelTarget.id}`, newDatas, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -119,7 +119,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					avatar: avatar
 				}
 
-				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas, {
+				const postChannelResponse = await axios.post(`https://${url}:3333/channel`, newDatas, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
