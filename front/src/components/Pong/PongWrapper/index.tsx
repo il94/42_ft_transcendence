@@ -199,7 +199,7 @@ function PongWrapper({social}: any) {
 						<Button
 							onClick={handlePlayButton}
 							type="button" fontSize={"5.5vw"}
-							alt="" title=""
+							alt="Play button" title="Play !"
 							style={{width: "35%"}}>
 							Play !
 						</Button>
@@ -207,9 +207,9 @@ function PongWrapper({social}: any) {
 						(
 							!difficultyChoose ?
 								<>
-									<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
-									<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
-									<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
+									<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"4.5vw"} alt="Ez button" title="Ez (noob)" style={{width: "35%"}}>Ez</Button>
+									<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"4.5vw"} alt="Medium button" title="Medium" style={{width: "35%"}}>Medium</Button>
+									<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"4.5vw"} alt="Hard button" title="Hard" style={{width: "35%"}}>Hard</Button>
 									{/* handleChooseDifficulty */}
 								</>
 							:
@@ -219,7 +219,7 @@ function PongWrapper({social}: any) {
 								<Button
 									onClick={handleCancelButton}
 									type="button" fontSize={"2.25vw"}
-									alt="" title=""
+									alt="Cancel button" title="Cancel"
 									style={{width: "17.5%"}}>
 									Cancel
 								</Button>
