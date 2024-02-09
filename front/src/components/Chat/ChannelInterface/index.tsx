@@ -390,12 +390,12 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					<Button
 						onClick={() => setChatWindowState(chatWindowStatus.CHANNEL)}
 						type="button" fontSize={"14px"}
-						alt="Cancel icon" title="Cancel" >
+						alt="Cancel icon" title="Cancel">
 						Cancel
 					</Button>
 					<Button
 						type="submit" fontSize={"14px"}
-						alt="Create icon" title="Create" >
+						alt="Create icon" title="Create">
 						{
 							chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
 								"Create"
