@@ -17,7 +17,7 @@ export const VerticalSettingsForm = styled.form`
 
 `
 
-export const VerticalSetting = styled.div<{ fontSize?: number, $alignItems?: string }>`
+export const VerticalSetting = styled.div<{ height: string, fontSize?: number, $alignItems?: string }>`
 
 	display: flex;
 	flex-direction: column;
@@ -25,6 +25,7 @@ export const VerticalSetting = styled.div<{ fontSize?: number, $alignItems?: str
 	align-items: ${(props) => props.$alignItems ? props.$alignItems : "center" };
 
 	width: 90%;
+	height: ${(props) => props.height && props.height };
 
 	text-align: center;
 	font-size: ${(props) => props.fontSize && props.fontSize }px;
