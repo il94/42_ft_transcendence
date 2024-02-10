@@ -240,6 +240,7 @@ function Game() {
 	const [social, displaySocial] = useState<boolean>(true)
 
 	const [chat, displayChat] = useState<boolean>(false)
+	const [chatNotification, displayChatNotification] = useState<boolean>(false)
 	const [channelListScrollValue, setChannelListScrollValue] = useState<number>(0)
 	const [chatScrollValue, setChatScrollValue] = useState<number>(0)
 	const [chatRender, setChatRender] = useState<boolean>(false)
@@ -317,9 +318,9 @@ function Game() {
 		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number, channelDatas: ChannelData, newMember: User, log: MessageLog) =>
 			refreshJoinChannel({ channelId, userId, channelDatas, newMember, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("postText", (channelId: number, userId: number, textDatas: any) => 
-			postText({ channelId, userId, textDatas, channelTarget, setChannelTarget }))
+			postText({ channelId, userId, textDatas, channelTarget, setChannelTarget, displayChatNotification }))
 		userAuthenticate.socket?.on("postInvitation", (channelId: number, userAuthId: number, userTargetId: number, invitationDatas: any) => 
-			postInvitation({ channelId, userAuthId, userTargetId, invitationDatas, channelTarget, setChannelTarget }))
+			postInvitation({ channelId, userAuthId, userTargetId, invitationDatas, channelTarget, setChannelTarget, displayChatNotification }))
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number, log: MessageLog) => 
 			refreshLeaveChannel({ channelId, userId, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any, log: MessageLog) =>
@@ -442,7 +443,7 @@ function Game() {
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
-											<ChatContext.Provider value={{ chat, displayChat, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
+											<ChatContext.Provider value={{ chat, displayChat, chatNotification, displayChatNotification, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 												<Chat
 													chat={chat}
 													displayChat={displayChat}

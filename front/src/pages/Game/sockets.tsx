@@ -40,6 +40,7 @@ type PropsPostText = {
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	displayChatNotification: Dispatch<SetStateAction<boolean>>
 }
 
 export function postText(props: PropsPostText) {
@@ -58,20 +59,21 @@ export function postText(props: PropsPostText) {
 		}
 		
 		props.setChannelTarget((prevState: Channel | undefined) => {
-		if (prevState)
-		{
-			return {
-				...prevState,
-				messages: [
-					...prevState.messages,
-					messageContent
-				]
+			if (prevState)
+			{
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						messageContent
+					]
+				}
 			}
-		}
-		else
-			return (undefined)
+			else
+				return (undefined)
 		})
 	}
+	props.displayChatNotification(true)
 }
 
 type PropsPostInvitation = {
@@ -82,6 +84,7 @@ type PropsPostInvitation = {
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	displayChatNotification: Dispatch<SetStateAction<boolean>>
 }
 
 export function postInvitation(props: PropsPostInvitation) {
@@ -105,20 +108,21 @@ export function postInvitation(props: PropsPostInvitation) {
 		}
 		
 		props.setChannelTarget((prevState: Channel | undefined) => {
-		if (prevState)
-		{
-			return {
-				...prevState,
-				messages: [
-					...prevState.messages,
-					messageContent
-				]
+			if (prevState)
+			{
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						messageContent
+					]
+				}
 			}
-		}
-		else
-			return (undefined)
+			else
+				return (undefined)
 		})
 	}
+	props.displayChatNotification(true)
 }
 
 type PropsRefreshJoinChannel = {

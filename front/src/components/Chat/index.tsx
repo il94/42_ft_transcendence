@@ -13,8 +13,7 @@ import {
 	BottomChatWrapper,
 	ChannelCreateButton,
 	Interfaces,
-	// Notification,
-	// NotificationCount
+	Notification
 } from "./style"
 
 import ChannelList from "./ChannelList"
@@ -28,6 +27,7 @@ import Loader from "../../componentsLibrary/Loader"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
+import ChatContext from "../../contexts/ChatContext"
 
 import {
 	channelIsProtected,
@@ -57,6 +57,7 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 	const { zChatIndex, setZChatIndex, zMaxIndex, loaderChat } = useContext(DisplayContext)!   
+	const { chatNotification } = useContext(ChatContext)!   
       
 	/* ============================ CHAT STATE ================================== */
 
@@ -186,11 +187,8 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 					src={ChatIcon} size={38}
 					alt="Chat button" title="Chat" />
 				{
-					// <Notification>
-					// 	<NotificationCount $count={2} >
-					// 		{2}
-					// 	</NotificationCount>
-					// </Notification>
+					chatNotification &&
+					<Notification />
 				}
 			</ChatButton>
 	)
