@@ -88,7 +88,6 @@ type PropsPostInvitation = {
 }
 
 export function postInvitation(props: PropsPostInvitation) {
-	
 	if (props.channelTarget?.id === props.channelId)
 	{
 		const userSend = findUserInChannel(props.channelTarget, props.userAuthId)
@@ -564,6 +563,7 @@ type PropsRecieveChannelMP = {
 	channelId: number,
 	authorDatas: any,
 
+	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
 }
 	
@@ -576,11 +576,14 @@ export async function recieveChannelMP(props: PropsRecieveChannelMP) {
 		type: ChannelType.MP
 	}
 
-	props.setUserAuthenticate((prevState) => ({
-		...prevState,
-		channels: [
-			...prevState.channels,
-			newChannelMP
-		]
-	}))
+	if (props.userAuthenticate.id !== props.authorDatas.id)
+	{
+		props.setUserAuthenticate((prevState) => ({
+			...prevState,
+			channels: [
+				...prevState.channels,
+				newChannelMP
+			]
+		}))
+	}
 }

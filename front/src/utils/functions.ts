@@ -57,11 +57,13 @@ export async function getContextualMenuHeight(type: contextualMenuStatus, userTa
 		size += sectionSize
 
 	// Challenge section
-	if (userTarget.status === userStatus.ONLINE)
+	if (userAuthenticate.status === userStatus.ONLINE &&
+		userTarget.status === userStatus.ONLINE)
 		size += sectionSize
 
 	// Spectate section
-	if (userTarget.status === userStatus.PLAYING)
+	if (userAuthenticate.status === userStatus.ONLINE &&
+		userTarget.status === userStatus.PLAYING)
 		size += sectionSize
 
 	// Add / Delete section
