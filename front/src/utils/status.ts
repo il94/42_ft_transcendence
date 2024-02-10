@@ -42,6 +42,18 @@ export enum messageType {
 	INVITATION = "INVITATION"
 }
 
+export enum logType {
+	JOIN = "JOIN",
+	INVITE = "INVITE",
+	LEAVE = "LEAVE",
+	UPGRADE = "UPGRADE",
+	DOWNGRADE = "DOWNGRADE",
+	MUTE = "MUTE",
+	KICK = "KICK",
+	BAN = "BAN",
+	UNBAN = "UNBAN"
+}
+
 export enum matchResultStatus {
 	WINNER = "WINNER",
 	DRAW = "DRAW",

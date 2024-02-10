@@ -2,6 +2,8 @@
 
 CAS/ :
 
+	checker tout les "throw"
+
 GLOBAL/ : A faire sur tout les fichiers un par un
 
 	(!!!)

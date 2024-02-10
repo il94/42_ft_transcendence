@@ -25,6 +25,7 @@ import {
 	Channel,
 	ChannelData,
 	MessageInvitation,
+	MessageLog,
 	MessageText,
 	User,
 	UserAuthenticate
@@ -39,6 +40,7 @@ type PropsPostText = {
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	displayChatNotification: Dispatch<SetStateAction<boolean>>
 }
 
 export function postText(props: PropsPostText) {
@@ -57,20 +59,21 @@ export function postText(props: PropsPostText) {
 		}
 		
 		props.setChannelTarget((prevState: Channel | undefined) => {
-		if (prevState)
-		{
-			return {
-				...prevState,
-				messages: [
-					...prevState.messages,
-					messageContent
-				]
+			if (prevState)
+			{
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						messageContent
+					]
+				}
 			}
-		}
-		else
-			return (undefined)
+			else
+				return (undefined)
 		})
 	}
+	props.displayChatNotification(true)
 }
 
 type PropsPostInvitation = {
@@ -81,6 +84,7 @@ type PropsPostInvitation = {
 
 	channelTarget: Channel | undefined,
 	setChannelTarget: Dispatch<SetStateAction<Channel | undefined>>,
+	displayChatNotification: Dispatch<SetStateAction<boolean>>
 }
 
 export function postInvitation(props: PropsPostInvitation) {
@@ -104,20 +108,21 @@ export function postInvitation(props: PropsPostInvitation) {
 		}
 		
 		props.setChannelTarget((prevState: Channel | undefined) => {
-		if (prevState)
-		{
-			return {
-				...prevState,
-				messages: [
-					...prevState.messages,
-					messageContent
-				]
+			if (prevState)
+			{
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						messageContent
+					]
+				}
 			}
-		}
-		else
-			return (undefined)
+			else
+				return (undefined)
 		})
 	}
+	props.displayChatNotification(true)
 }
 
 type PropsRefreshJoinChannel = {
@@ -125,6 +130,7 @@ type PropsRefreshJoinChannel = {
 	userId: number,
 	channelDatas: ChannelData,
 	newMember: User,
+	log: MessageLog
 
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
@@ -155,6 +161,10 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 					members: [
 						...prevState.members,
 						props.newMember
+					],
+					messages: [
+						...prevState.messages,
+						props.log
 					]
 				}
 			}
@@ -168,6 +178,7 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 type PropsRefreshLeaveChannel = {
 	channelId: number,
 	userId: number,
+	log?: MessageLog,
 
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
@@ -194,12 +205,24 @@ export async function refreshLeaveChannel(props: PropsRefreshLeaveChannel) {
 		props.setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState)
 			{
-				return {
-					...prevState,
-					members: prevState.members.filter((member) => member.id !== props.userId),
-					administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
-					owner: prevState.owner?.id === props.userId ? undefined : prevState.owner
-				}
+				if (props.log)
+					return {
+						...prevState,
+						members: prevState.members.filter((member) => member.id !== props.userId),
+						administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
+						owner: prevState.owner?.id === props.userId ? undefined : prevState.owner,
+						messages: [
+							...prevState.messages,
+							props.log
+						]
+					}
+				else
+					return {
+						...prevState,
+						members: prevState.members.filter((member) => member.id !== props.userId),
+						administrators: prevState.administrators.filter((administrator) => administrator.id !== props.userId),
+						owner: prevState.owner?.id === props.userId ? undefined : prevState.owner
+					}
 			}
 			else
 				return (undefined)
@@ -211,6 +234,7 @@ type PropsRefreshUserRole = {
 	channelId: number,
 	userId: number,
 	newRole: any,
+	log: MessageLog,
 
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
@@ -237,7 +261,7 @@ export async function refreshUserRole(props : PropsRefreshUserRole) {
 
 			if (props.newRole === channelRole.UNBANNED) {
 				setChannel((prevState: Channel) => {
-					return (removeUserInChannel(prevState, props.userId))
+					return (removeUserInChannel(prevState, props.userId, props.log))
 				})
 			}
 			else
@@ -246,19 +270,20 @@ export async function refreshUserRole(props : PropsRefreshUserRole) {
 				if (!userTarget)
 					throw new Error
 
+				
 				if (props.newRole === channelRole.MEMBER) {
 					setChannel((prevState: Channel) => {
-						return (setUserToMember(prevState, userTarget))
+						return (setUserToMember(prevState, userTarget, props.log))
 					})
 				}
 				else if (props.newRole === channelRole.ADMIN) {	
 					setChannel((prevState: Channel) => {
-						return (setUserToAdministrator(prevState, userTarget))
+						return (setUserToAdministrator(prevState, userTarget, props.log))
 					})
 				}
 				else if (props.newRole === channelRole.BANNED) {	
 					setChannel((prevState: Channel) => {
-						return (setUserToBanned(prevState, userTarget))
+						return (setUserToBanned(prevState, userTarget, props.log))
 					})
 				}
 			}
@@ -455,7 +480,9 @@ export function refreshDeleteChannel(props: PropsRefreshDeleteChannel) {
 
 type RefreshUserMuteProps = {
 	idChan: number,
+	userTargetId: number,
 	time: string,
+	log: MessageLog,
 
 	userAuthenticate: UserAuthenticate,
 	channelTarget: Channel | undefined,
@@ -464,7 +491,7 @@ type RefreshUserMuteProps = {
 
 
 export async function refreshUserMute(props : RefreshUserMuteProps) {
-	if (props.idChan === props.channelTarget?.id)
+	if (props.idChan === props.channelTarget?.id && props.userAuthenticate.id === props.userTargetId)
 	{
 		props.setChannelTarget((prevState: Channel | undefined) => {
 		if (prevState) {
@@ -475,11 +502,32 @@ export async function refreshUserMute(props : RefreshUserMuteProps) {
 			return {
 			...prevState,
 			muteInfo: updatedMuteInfo,
+			messages: [
+				...prevState.messages,
+				props.log
+			]
 			};
 		} else {
 			return undefined;
 		}
 		});
+	}
+	else if (props.idChan === props.channelTarget?.id)
+	{
+		props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState) {
+				return {
+					...prevState,
+					messages: [
+						...prevState.messages,
+						props.log
+					]
+				}
+			}
+			else {
+				return undefined
+			}
+		})
 	}
 }
 
@@ -496,10 +544,10 @@ type RefreshStatusChallengeProps = {
 	export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
 		if (props.channelId === props.channelTarget?.id)
 		{
-						props.setChannelTarget((prevState: Channel | undefined) => {
+			props.setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState) {
 				const updatedMessages = prevState.messages.map((message) =>
-				message.id === props.messageId ? { ...message, status: props.newStatus } : message
+				('id' in message && message.id === props.messageId) ? { ...message, status: props.newStatus } : message
 				);
 				return {
 				...prevState,

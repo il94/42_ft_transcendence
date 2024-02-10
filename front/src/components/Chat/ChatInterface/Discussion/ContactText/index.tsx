@@ -68,7 +68,7 @@ function ContactText({ sender, content }: PropsContactText) {
 					<>
 						<Avatar
 							src={sender.avatar}
-							onClick={(event) => showCard(event, sender, {
+							onClick={(event) => showCard(event, sender.id, {
 								displayCard,
 								setZCardIndex,
 								setCardPosition,
@@ -79,7 +79,7 @@ function ContactText({ sender, content }: PropsContactText) {
 								zMaxIndex,
 								GameWrapperRef
 							})}
-							onAuxClick={(event) => showContextualMenu(event, sender, {
+							onAuxClick={(event) => showContextualMenu(event, sender.id, {
 								setContextualMenuPosition,
 								displayContextualMenu,
 								displayCard,

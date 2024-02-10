@@ -44,13 +44,13 @@ type ShowCardProps = {
 	GameWrapperRef: any
 }
 
-export async function showCard(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowCardProps) {
+export async function showCard(event: MouseEvent<HTMLDivElement | HTMLButtonElement>, userId: number, props: ShowCardProps) {
 	try {
 		const gameWrapperContainer = props.GameWrapperRef.current
 
 		if (gameWrapperContainer) {
 
-			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${sender.id}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${props.token}`
 				}
@@ -114,13 +114,13 @@ type ShowContextualMenuProps = {
 	GameWrapperRef: any,
 }
 
-export async function showContextualMenu(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowContextualMenuProps) {
+export async function showContextualMenu(event: MouseEvent<HTMLDivElement | HTMLButtonElement>, userId: number, props: ShowContextualMenuProps) {
 	try {
 		const gameWrapperContainer = props.GameWrapperRef.current
 
 		if (gameWrapperContainer && props.channelTarget) {
 
-			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${sender.id}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${props.token}`
 				}
