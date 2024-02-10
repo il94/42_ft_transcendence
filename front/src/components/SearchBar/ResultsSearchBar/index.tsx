@@ -171,12 +171,11 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					setChannelTarget(channelWithRelationsResponse.data)
 				}
 				else {
-					await axios.post(`https://${url}:3333/channel/${channelId}/join`, {},
-						{
-							headers: {
-								'Authorization': `Bearer ${token}`
-							}
-						})
+					await axios.post(`https://${url}:3333/channel/${channelId}/join`, {}, {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
 					setUserAuthenticate((prevState: UserAuthenticate) => ({
 						...prevState,
 						channels: [...prevState.channels, channelWithRelationsResponse.data]

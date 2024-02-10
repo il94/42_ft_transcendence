@@ -5,7 +5,6 @@ import colors from "../../../../../utils/colors"
 export const Style = styled.div`
 
 	display: flex;
-
 `
 
 export const Message = styled.p`

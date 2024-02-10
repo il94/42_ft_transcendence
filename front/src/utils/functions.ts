@@ -7,6 +7,7 @@ import {
 import {
 	Channel,
 	ChannelData,
+	MessageLog,
 	User,
 	UserAuthenticate
 } from "./types"
@@ -229,25 +230,33 @@ export function channelIsEmpty(channel: Channel): boolean {
 	)
 }
 
-export function setUserToMember(channel: Channel, user: User | UserAuthenticate): Channel {
+export function setUserToMember(channel: Channel, user: User | UserAuthenticate, log: MessageLog): Channel {
 	const isAlreadyMember = userIsMember(channel, user.id)
 	const members = isAlreadyMember ? channel.members : [ ...channel.members, user ]
 
 	return {
 		...channel,
 		members: members,
-		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id)
+		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
+		messages: [
+			...channel.messages,
+			log
+		]
 	}
 }
 
-export function setUserToAdministrator(channel: Channel, user: User | UserAuthenticate): Channel {
+export function setUserToAdministrator(channel: Channel, user: User | UserAuthenticate, log: MessageLog): Channel {
 	const isAlreadyAdministrator = userIsAdministrator(channel, user.id)
 	const administrators = isAlreadyAdministrator ? channel.administrators : [ ...channel.administrators, user ]
 
 	return {
 		...channel,
 		members: channel.members.filter((member) => member.id !== user.id),
-		administrators: administrators
+		administrators: administrators,
+		messages: [
+			...channel.messages,
+			log
+		]
 	}
 }
 
@@ -263,7 +272,7 @@ export function setUserToOwner(channel: Channel, user: User | UserAuthenticate):
 	}
 }
 
-export function setUserToBanned(channel: Channel, user: User | UserAuthenticate): Channel {
+export function setUserToBanned(channel: Channel, user: User | UserAuthenticate, log: MessageLog): Channel {
 	const isAlreadyBanned = userIsBanned(channel, user.id)
 	const banneds = isAlreadyBanned ? channel.banneds : [ ...channel.banneds, user ]
 
@@ -271,16 +280,34 @@ export function setUserToBanned(channel: Channel, user: User | UserAuthenticate)
 		...channel,
 		members: channel.members.filter((member) => member.id !== user.id),
 		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
-		banneds: banneds
+		banneds: banneds,
+		messages: [
+			...channel.messages,
+			log
+		]
 	}
 }
 
-export function removeUserInChannel(channel: Channel, userId: number): Channel {
-	return {
-		...channel,
-		members: channel.members.filter((member) => member.id !== userId),
-		administrators: channel.members.filter((member) => member.id !== userId),
-		owner: channel.owner?.id === userId ? undefined : channel.owner,
-		banneds: channel.banneds.filter((banned) => banned.id !== userId),
-	}
+export function removeUserInChannel(channel: Channel, userId: number, log?: MessageLog): Channel {
+
+	if (log)
+		return {
+			...channel,
+			members: channel.members.filter((member) => member.id !== userId),
+			administrators: channel.members.filter((member) => member.id !== userId),
+			owner: channel.owner?.id === userId ? undefined : channel.owner,
+			banneds: channel.banneds.filter((banned) => banned.id !== userId),
+			messages: [
+				...channel.messages,
+				log
+			]
+		}
+	else
+		return {
+			...channel,
+			members: channel.members.filter((member) => member.id !== userId),
+			administrators: channel.members.filter((member) => member.id !== userId),
+			owner: channel.owner?.id === userId ? undefined : channel.owner,
+			banneds: channel.banneds.filter((banned) => banned.id !== userId),
+		}
 }

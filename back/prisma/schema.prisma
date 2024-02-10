@@ -52,6 +52,17 @@ enum messageStatus {
 	INVITATION
 }
 
+enum LogStatus {
+	JOIN
+	INVITE
+	LEAVE
+	UPGRADE
+	DOWNGRADE
+	MUTE
+	KICK
+	BAN
+	UNBAN
+}
 
 enum challengeStatus {
 	PENDING
