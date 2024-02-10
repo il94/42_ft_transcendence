@@ -480,7 +480,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					</Section>
 				}
 				{
-					userTarget.status === userStatus.ONLINE &&
+					(userAuthenticate.status === userStatus.ONLINE &&
+						userTarget.status === userStatus.ONLINE) &&
 					<Section onClick={handleChallengeClickEvent}>
 						<SectionName>
 							Challenge
@@ -488,7 +489,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					</Section>
 				}
 				{
-					userTarget.status === userStatus.PLAYING &&
+					(userAuthenticate.status === userStatus.ONLINE &&
+						userTarget.status === userStatus.PLAYING) &&
 					<Section onClick={handleSpectateEvent}>
 						<SectionName>
 							Spectate

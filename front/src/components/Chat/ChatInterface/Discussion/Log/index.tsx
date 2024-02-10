@@ -88,19 +88,24 @@ function Log({ type, user1, user2 }: PropsLog) {
 							zMaxIndex,
 							GameWrapperRef
 						})}
-						onAuxClick={(event) => showContextualMenu(event, user1.id, {
-							setContextualMenuPosition,
-							displayContextualMenu,
-							displayCard,
-							userAuthenticate,
-							userTarget,
-							setUserTarget,
-							channelTarget,
-							url,
-							token,
-							displayPopupError,
-							GameWrapperRef
-						})}
+						onAuxClick={(event) => {
+							if (userAuthenticate.id !== user1.id)
+							{
+								showContextualMenu(event, user1.id, {
+									setContextualMenuPosition,
+									displayContextualMenu,
+									displayCard,
+									userAuthenticate,
+									userTarget,
+									setUserTarget,
+									channelTarget,
+									url,
+									token,
+									displayPopupError,
+									GameWrapperRef
+								})
+							}
+						}}
 						$fontSize={10}
 						color={colors.textAlt}>
 						{user1.username}&nbsp;
@@ -121,19 +126,24 @@ function Log({ type, user1, user2 }: PropsLog) {
 							zMaxIndex,
 							GameWrapperRef
 						})}
-						onAuxClick={(event) => showContextualMenu(event, user2.id, {
-							setContextualMenuPosition,
-							displayContextualMenu,
-							displayCard,
-							userAuthenticate,
-							userTarget,
-							setUserTarget,
-							channelTarget,
-							url,
-							token,
-							displayPopupError,
-							GameWrapperRef
-						})}
+						onAuxClick={(event) => {
+							if (userAuthenticate.id !== user2.id)
+							{
+								showContextualMenu(event, user2.id, {
+									setContextualMenuPosition,
+									displayContextualMenu,
+									displayCard,
+									userAuthenticate,
+									userTarget,
+									setUserTarget,
+									channelTarget,
+									url,
+									token,
+									displayPopupError,
+									GameWrapperRef
+								})
+							}
+						}}
 						$fontSize={10}
 						color={colors.textAlt}>
 						&nbsp;{user2.username}
