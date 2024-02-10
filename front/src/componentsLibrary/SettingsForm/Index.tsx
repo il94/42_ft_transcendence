@@ -17,7 +17,7 @@ export const VerticalSettingsForm = styled.form`
 
 `
 
-export const VerticalSetting = styled.div<{ height: string, fontSize?: number, $alignItems?: string }>`
+export const VerticalSetting = styled.div<{ height?: string, fontSize?: number, $alignItems?: string }>`
 
 	display: flex;
 	flex-direction: column;

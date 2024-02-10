@@ -140,11 +140,12 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 	/* ============================== QR CODE =================================== */
 
 	const [qrCode, setQRCode] = useState<string>('')
-	const [loader, setloader] = useState<boolean>(true)
+	const [loader, setLoader] = useState<boolean>(true)
 
 	useEffect(() => {
 		async function fetchTwoFAQRCode() {
 			try {
+				setLoader(true)
 				const generateQRCodeResponse: AxiosResponse<string> = await axios.get(`https://${url}:3333/auth/2fa/generate`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
@@ -152,7 +153,7 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 				})
 
 				setQRCode(generateQRCodeResponse.data)
-				setloader(false)
+				setLoader(false)
 			}
 			catch (error) {
 				if (axios.isAxiosError(error)) {

@@ -39,10 +39,11 @@ function Match({ username, opponentId, opponentName, result, scoreUser, scoreOpp
 
 	const { token, url } = useContext(AuthContext)!
 	const { setUserTarget } = useContext(InteractionContext)!
-	const { displayPopupError } = useContext(DisplayContext)!
+	const { displayPopupError, setLoaderMatchsHistory } = useContext(DisplayContext)!
 
 	async function showOpponentCard() {
 		try {
+			setLoaderMatchsHistory(true)
 			const userResponse: AxiosResponse<User> = await axios.get(`https://${url}:3333/user/${opponentId}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
@@ -50,6 +51,7 @@ function Match({ username, opponentId, opponentName, result, scoreUser, scoreOpp
 			})
 
 			setUserTarget(userResponse.data)
+			setLoaderMatchsHistory(false)
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
