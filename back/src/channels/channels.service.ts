@@ -1088,13 +1088,6 @@ export class ChannelsService {
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
 			if (newStatus === challengeStatus.IN_PROGRESS)
 			{
-				 if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
-				 	throw new NotFoundException("user not exist");
-				 if ((await this.checkStatus(messageDatas.targetId, UserStatus.ONLINE)))
-				 	throw new ConflictException("There is not ONLINE");
-				 if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
-				 	throw new ConflictException("There is not ONLINE");
-				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId, messageId);
 				if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
 					throw new NotFoundException("user not exist");
 				if ((await this.checkStatus(messageDatas.targetId, UserStatus.ONLINE)))
