@@ -35,10 +35,10 @@ export class ChannelController {
 
 	// Ajoute un user dans un channel
 	@Post(':channelId/add/:userTargetId')
-	addUser(@getUser('id') userAuthId: number,
+	addUser(@getUser() { id: inviterId, username: inviterName }: Partial<User>,
 	@Param('channelId', ParseIntPipe) channelId: number,
 	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
-		return this.channelsService.joinChannel(channelId, userTargetId, undefined, userAuthId)
+		return this.channelsService.joinChannel(channelId, userTargetId, undefined, inviterId, inviterName)
 	}
 
 	// Cree un message dans un channel
@@ -82,19 +82,19 @@ export class ChannelController {
 
 	// Change le role d'un user du channel
 	@Patch(':channelId/role/:userTargetId')
-	updateRole(@getUser('id') userAuthId: number,
+	updateRole(@getUser() { id: userAuthId, username: userAuthName }: Partial<User>,
 	@Param('channelId', ParseIntPipe) channelId: number,
 	@Param('userTargetId', ParseIntPipe) userTargetId: number,
 	@Body() { role: newRole }: UpdateRoleDto) {
-		return this.channelsService.updateUserRole(channelId, userAuthId, userTargetId, newRole)
+		return this.channelsService.updateUserRole(channelId, userAuthId, userAuthName, userTargetId, newRole)
 	}
 
 	// Mute un user du channel
 	@Patch(':channelId/mute/:userTargetId')
-	updateMute(@getUser('id') userAuthId: number,
+	updateMute(@getUser() { id: userAuthId, username: userAuthName }: Partial<User>,
 	@Param('channelId', ParseIntPipe) channelId: number,
 	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
-		return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId)
+		return this.channelsService.updateUserMute(channelId, userTargetId, userAuthId, userAuthName)
 	}
 
 	// Change le statut d'une invitation
@@ -114,10 +114,10 @@ export class ChannelController {
 
 	// Retire un user d'un channel
 	@Delete(':channelId/leave/:userTargetId')
-	leave(@getUser('id') userAuthId: number,
+	leave(@getUser() { id: userAuthId, username: userAuthName }: Partial<User>,
 	@Param('channelId', ParseIntPipe) channelId: number,
 	@Param('userTargetId', ParseIntPipe) userTargetId: number) {
-		return this.channelsService.leaveChannel(channelId, userAuthId, userTargetId)
+		return this.channelsService.leaveChannel(channelId, userAuthId, userAuthName, userTargetId)
 	}
 }
 

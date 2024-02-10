@@ -113,30 +113,32 @@ function LockedInterface() {
 
 	return (
 		<Style>
-			<VerticalSettingsForm
-				onSubmit={handleSubmit}
-				autoComplete="off"
-				spellCheck="false">
-				<VerticalSetting>
-					Password
-					<VerticalSettingWrapper>
-						<InputText
-							onChange={handleInputPasswordChange}
-							onBlur={handleInputPasswordBlur}
-							value={password.value as string}
-							width={200}
-							$error={password.error} />
-						<ErrorMessage>
-							{password.error && password.errorMessage}
-						</ErrorMessage>
-					</VerticalSettingWrapper>
-				</VerticalSetting>
-				<Button
-					type="submit" width={200}
-					alt="Submit button" title="Submit">
-					Submit
-				</Button>
-			</VerticalSettingsForm>
+			<div style={{ height: "75%" }}>
+				<VerticalSettingsForm
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					spellCheck="false">
+					<VerticalSetting fontSize={22} height={"100%"} >
+						Password
+						<VerticalSettingWrapper>
+							<InputText
+								onChange={handleInputPasswordChange}
+								onBlur={handleInputPasswordBlur}
+								value={password.value as string}
+								width={200}
+								$error={password.error} />
+							<ErrorMessage>
+								{password.error && password.errorMessage}
+							</ErrorMessage>
+						</VerticalSettingWrapper>
+					</VerticalSetting>
+					<Button
+						type="submit" width={200}
+						alt="Submit button" title="Submit">
+						Submit
+					</Button>
+				</VerticalSettingsForm>
+			</div>
 		</Style>
 	)
 }

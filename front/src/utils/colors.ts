@@ -61,6 +61,7 @@ const colors = {
 	focusButton: "#ffe600",
 	shadowFocusButton: "#cc8502",
 	focusText: "#ffff52",
+	focusTextAlt: "#e79e00",
 	focusBorderText: "#ffff52",
 	menuTextSelection: "#d38040",
 

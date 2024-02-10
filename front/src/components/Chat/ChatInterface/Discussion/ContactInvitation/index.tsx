@@ -56,7 +56,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 		<Style>
 			<Avatar
 				src={sender.avatar}
-				onClick={(event) => showCard(event, sender, {
+				onClick={(event) => showCard(event, sender.id, {
 					displayCard,
 					setZCardIndex,
 					setCardPosition,
@@ -67,7 +67,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					zMaxIndex,
 					GameWrapperRef
 				})}
-				onAuxClick={(event) => showContextualMenu(event, sender, {
+				onAuxClick={(event) => showContextualMenu(event, sender.id, {
 					setContextualMenuPosition,
 					displayContextualMenu,
 					displayCard,
