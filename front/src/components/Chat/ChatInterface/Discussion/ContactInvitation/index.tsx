@@ -91,7 +91,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 						{
 							(!gameState && !searching) ?
 							<ButtonChallenge
-								onClick={() => handleClickChallengeStatus(challengeStatus.ACCEPTED, idMsg, idChan, {
+								onClick={() => handleClickChallengeStatus(challengeStatus.IN_PROGRESS, idMsg, idChan, {
 									userAuthenticate,
 									displayPopupError,
 									token,
@@ -122,13 +122,20 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					</ButtonsWrapper>
 				}
 				{
-					initialStatus === challengeStatus.ACCEPTED &&
+					initialStatus === challengeStatus.IN_PROGRESS &&
 					<ButtonsWrapper>
-						<ButtonChallengeLocked
-							color={colors.buttonGreen}
-							title="Accepted">
-							Accepted !
-						</ButtonChallengeLocked>
+						{
+							target.id === userAuthenticate.id ?
+							<ButtonChallenge
+								color={colors.buttonGreen}>
+								Accepted !
+							</ButtonChallenge>
+							:
+							<ButtonChallenge
+								color={colors.button}>
+								Spectate
+							</ButtonChallenge>
+						}
 					</ButtonsWrapper>
 				}
 				{
@@ -139,18 +146,6 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 							title="Cancelled">
 							Cancelled
 						</ButtonChallengeLocked>
-					</ButtonsWrapper>
-				}
-				{
-					initialStatus === challengeStatus.IN_PROGRESS &&
-					<ButtonsWrapper>
-						<ButtonChallenge
-						onClick={() =>
-							userAuthenticate.socket?.emit("spectate", userAuthenticate.id, sender.id)}
-							color={colors.button}
-							alt="Spectate button" title="Spectate">
-							Spectate
-						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
 				{

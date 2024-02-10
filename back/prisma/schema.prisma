@@ -55,7 +55,6 @@ enum messageStatus {
 
 enum challengeStatus {
 	PENDING
-	ACCEPTED
 	CANCELLED
 	IN_PROGRESS
 	FINISHED
