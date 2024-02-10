@@ -1,10 +1,24 @@
 import {
+	useContext
+} from "react"
+import axios, { AxiosError, AxiosResponse } from "axios"
+
+import {
 	Opponent,
 	Style,
 	Username
 } from "./style"
 
 import Score from "./Score"
+
+import AuthContext from "../../../../contexts/AuthContext"
+import InteractionContext from "../../../../contexts/InteractionContext"
+import DisplayContext from "../../../../contexts/DisplayContext"
+
+import {
+	ErrorResponse,
+	User
+} from "../../../../utils/types"
 
 import {
 	matchResultStatus
@@ -14,13 +28,42 @@ import colors from "../../../../utils/colors"
 
 type PropsMatch = {
 	username: string,
-	opponent: string,
+	opponentId: number,
+	opponentName: string,
 	result: matchResultStatus,
 	scoreUser: number,
 	scoreOpponent: number
 }
 
-function Match({ username, opponent, result, scoreUser, scoreOpponent }: PropsMatch) {
+function Match({ username, opponentId, opponentName, result, scoreUser, scoreOpponent }: PropsMatch) {
+
+	const { token, url } = useContext(AuthContext)!
+	const { setUserTarget } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
+
+	async function showOpponentCard() {
+		try {
+			const userResponse: AxiosResponse<User> = await axios.get(`https://${url}:3333/user/${opponentId}`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+
+			setUserTarget(userResponse.data)
+		}
+		catch (error) {
+			if (axios.isAxiosError(error)) {
+				const axiosError = error as AxiosError<ErrorResponse>
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 403 || statusCode === 404)
+					displayPopupError({ display: true, message: message })
+				else
+					displayPopupError({ display: true })
+			}
+			else
+				displayPopupError({ display: true })
+		}
+	}
 
 	const backgroundColor =
 		result === matchResultStatus.WINNER ?
@@ -35,8 +78,8 @@ function Match({ username, opponent, result, scoreUser, scoreOpponent }: PropsMa
 				{username}
 			</Username>
 			<Score scoreUser={scoreUser} scoreOpponent={scoreOpponent} />
-			<Opponent>
-				{opponent}
+			<Opponent onClick={showOpponentCard}>
+				{opponentName}
 			</Opponent>
 		</Style>
 	)

@@ -1,8 +1,8 @@
 (Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
 CAS/ :
-
 	checker tout les "throw"
+	capper taille des messages
 
 GLOBAL/ : A faire sur tout les fichiers un par un
 
@@ -14,7 +14,6 @@ GLOBAL/ : A faire sur tout les fichiers un par un
 	Image 42 en blanc pour sign up 42
 
 	(!)
-	Formulaires styles
 	Corriger l'anglais du bled
 	Checker les contextes
 	Checker les noms de routes (s pas s)
