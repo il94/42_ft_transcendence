@@ -83,6 +83,7 @@ const colors = {
 	messageUser: "#FAD7A3",
 	messageBanner: "#FFCB9A",
 	messageFriend: "#FFD6B0",
+	// chatNotification: "red",
 
 	/* History */
 	history: "#D9D9D9",
