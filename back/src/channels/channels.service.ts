@@ -1156,7 +1156,7 @@ export class ChannelsService {
 					throw new ConflictException("There is not ONLINE");
 				if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
 					throw new ConflictException("There is not ONLINE");
-				this.pongGateway.launchGame(messageDatas.targetId, 2, messageDatas.authorId);
+				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId, 2, messageId);
 			}
 		}
 		catch (error) {

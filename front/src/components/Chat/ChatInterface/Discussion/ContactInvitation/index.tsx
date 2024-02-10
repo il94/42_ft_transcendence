@@ -131,7 +131,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 								Accepted !
 							</ButtonChallenge>
 							:
-							<ButtonChallenge
+							<ButtonChallenge onClick={() => userAuthenticate.socket?.emit("spectate", userAuthenticate.id, target.id)}
 								color={colors.button}>
 								Spectate
 							</ButtonChallenge>
