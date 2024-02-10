@@ -32,6 +32,12 @@ const colors = {
 	sectionProfileFocus: "#ffc400",
 	navbar: "#C9783C",
 
+	/* Status */
+	statusBorder: "#945f41",
+	online: "#6cff67",
+	busy: "#ffd45d",
+	offline: "#b9b9b9",
+
 	/* Texts */
 	text: "#FFFFFF",
 	textAlt: "#000000",

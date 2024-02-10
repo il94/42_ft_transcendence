@@ -13,7 +13,8 @@ import {
 	ProfileName,
 	Avatar,
 	ProfileInfo,
-	ProfileStatus
+	ProfileStatus,
+	Status
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
@@ -163,6 +164,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 			$sectionIndex={sectionIndex}
 			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
+			<Status $sectionIndex={sectionIndex} $status={friend.status} />
 			<Avatar src={friend.avatar} />
 			{
 				social &&
