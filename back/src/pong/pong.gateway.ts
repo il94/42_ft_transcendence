@@ -269,6 +269,13 @@ export class PongGateway {
 					});
 					if(game)
 					{
+            const oldStatus = await this.PongService.getUserStatus(data[0])
+					if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
+					{
+						console.log("oldStatus2 = ", oldStatus)
+						throw new Error('incapacity spectate')
+						return
+					}
 						const tmp = client
 						game.addWatcher(tmp)
 						await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
