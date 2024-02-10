@@ -205,13 +205,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	/* ========================== CHALLENGE SECTION ============================= */
 
 	async function handleSpectateEvent() {
-		try {
-			userAuthenticate.socket?.emit("spectate", userAuthenticate.id, userTarget.id)
-		}
-		catch (error) {
-			console.log(error);
-			// displayPopupError(true)
-		}
+		userAuthenticate.socket?.emit("spectate", userAuthenticate.id, userTarget.id)
 	}
 
 	/* ============================ FRIEND SECTION ============================== */

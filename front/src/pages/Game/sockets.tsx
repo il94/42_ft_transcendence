@@ -537,23 +537,23 @@ type RefreshStatusChallengeProps = {
 }
 
 // Met a jour le statut d'une invitation
-export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
-	if (props.channelId === props.channelTarget?.id)
-	{
-		props.setChannelTarget((prevState: Channel | undefined) => {
-		if (prevState) {
-			const updatedMessages = prevState.messages.map((message) =>
-			('id' in message && message.id === props.messageId) ? { ...message, status: props.newStatus } : message
-			);
-			return {
-			...prevState,
-			messages:updatedMessages,
-			};
-		} else {
-			return undefined;
+	export async function refreshStatusChallenge(props : RefreshStatusChallengeProps) {
+		if (props.channelId === props.channelTarget?.id)
+		{
+						props.setChannelTarget((prevState: Channel | undefined) => {
+			if (prevState) {
+				const updatedMessages = prevState.messages.map((message) =>
+				message.id === props.messageId ? { ...message, status: props.newStatus } : message
+				);
+				return {
+				...prevState,
+				messages:updatedMessages,
+				};
+			} else {
+				return undefined;
+			}
+			});
 		}
-		});
-	}
 	}  
 
 type PropsRecieveChannelMP = {
