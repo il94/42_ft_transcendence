@@ -13,12 +13,12 @@ import CloseButton from '../../../../componentsLibrary/CloseButton'
 import ChatContext from '../../../../contexts/ChatContext'
 
 
-const Style = styled.div<{ $backgroundColor: string, w:number, h:number}>`
+const Style = styled.div<{ $backgroundColor: string, $w:number, $h:number}>`
 
 position: absolute;
 
-	width: ${(props) => props.w}px; //83.5%
-	height: ${(props) => props.h}px; //83.5%
+	width: ${(props) => props.$w}px; //83.5%
+	height: ${(props) => props.$h}px; //83.5%
 /* max-width: 83.5%; //83.5% */
 
 /* max-height: 100%; */
@@ -242,7 +242,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	}, [])
 
 	return (
-		<Style $backgroundColor={backgroundColor} w={width} h={height} ref={PongRef}>
+		<Style $backgroundColor={backgroundColor} $w={width} $h={height} ref={PongRef}>
 			{
 				!endMessage.display && PongRef.current ? (
 					<>

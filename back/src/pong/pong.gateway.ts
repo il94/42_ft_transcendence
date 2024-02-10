@@ -1,4 +1,5 @@
 import {WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket} from "@nestjs/websockets";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 
 import { Server, Socket } from "socket.io";
 
@@ -41,9 +42,7 @@ export class PongGateway {
 			});
 		if (game)
 		{
-			// console.log("gonna delete game because of disconnect")
-			const enemy = game.LeftPlayer.getSocket() === client ? game.RightPlayer : game.LeftPlayer 
-			// this.server.to(client.id).emit("decoInGame", "you")
+			const enemy = game.LeftPlayer.getSocket() === client ? game.RightPlayer : game.LeftPlayer
 			this.server.to(enemy.getSocket().id).emit("decoInGame", "player")
 			game.watcher.forEach((e) =>{
 				this.server.to(e.id).emit("decoInGame", "watcher")
@@ -75,15 +74,12 @@ export class PongGateway {
 				return; 
 			}
 		});
-	} // fct degeu :/
+	}
 
 	@SubscribeMessage("cancelSearching")
 		async handleCancelSearching(client: Socket, userId: number)
 		{
 			this.delUserFromSearchingUser(client)
-
-			if (!userId)
-				return
 			await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
 		}
 	
@@ -98,9 +94,12 @@ export class PongGateway {
 		if (dif === 3)
 			array = this.searchingUsersHard
 
-		array.set(userId, client)
-		await this.PongService.updateStatusUser(userId, UserStatus.WAITING)
+		if (!array)
+			throw new Error("wrong difficulty")
 
+		array.set(userId, client)
+
+		await this.PongService.updateStatusUser(userId, UserStatus.WAITING) // need protect
 	}
 
 	async launchGame(id: number, enemyId: number, dif:number)
@@ -108,15 +107,18 @@ export class PongGateway {
 		const leftSocket = AppService.connectedUsers.get(id.toString())
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
 
-		const leftUser = this.UserService.findById(id)
-		const rightUser = this.UserService.findById(enemyId)
+		if (leftSocket === undefined || rightSocket === undefined)
+			throw new Error("One of the player is not connected")
+
+		const leftUser = await this.UserService.findById(id)
+		const rightUser = await this.UserService.findById(enemyId)
 
 		const newgame = await this.PongService.createGame(id, enemyId);
 
 		this.server.to(leftSocket.id).emit("launchGame")
 		this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, (await leftUser).username, rightSocket, enemyId, (await rightUser).username))
+		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username))
 
 		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
@@ -133,6 +135,9 @@ export class PongGateway {
 			array = this.searchingUsersMedium 
 		if (dif === 3)
 			array = this.searchingUsersHard
+
+		if(!array)
+			throw new Error("wrong difficulty")
 
 		let keysIterator  = array.keys()
 		let keysArray = Array.from(keysIterator);
@@ -151,22 +156,25 @@ export class PongGateway {
 	}
 	
 	@SubscribeMessage('searchGame')
-	async addSearchingPlayer(client: Socket, data: any) {
-		try {			
+	async addSearchingPlayer(client: Socket, data: number) {
+		try {	
 			if( !data || !data[0] || !data[1])
-				return
+				throw new Error("an Error occur from the WebSocket")	
+
 			this.toSearchingArray(client, data[0], data[1])
 
 			await this.checkToLaunchGame(client, data[1])
 
-		} catch (error) {
-			//throw error
+		}
+		catch (error: any) {
+			this.server.to(client.id).emit("error", error.message)
 		}
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
 		const speed = 30 / game.difficulty
 		setTimeout(() =>{
+			
 			game.moveBall()
 			
 			const ball = game.Ball.getPos()
@@ -208,69 +216,79 @@ export class PongGateway {
 	@SubscribeMessage("paddlemove")
 		handlePaddleMove(client: Socket, args: string)
 		{
-			if (!args)
-				return
-			let game: PongGame;
-			
-			this.PongService.activeGames.forEach((element) => {
-				if (element.isMyPlayer(client)){
-					game = element;
+			try{
+				if (args !== "up" && args !== "down")
+					throw new Error("wrong Mouvement")
+				let game: PongGame;
+				
+				this.PongService.activeGames.forEach((element) => {
+					if (element.isMyPlayer(client)){
+						game = element;
+					}
+				});
+	
+				if (game) {
+					const player = game.isMyHost(client) ? game.LeftPlayer : game.RightPlayer
+					args === "up" ? player.moveUp() : player.moveDown()
 				}
-			});
-
-			if (game) {
-				const player = game.isMyHost(client) ? game.LeftPlayer : game.RightPlayer
-				args === "up" ? player.moveUp() : player.moveDown()
+			}
+			catch(error){
+				this.server.to(client.id).emit("error", error.message)
 			}
 		}
 
 		@SubscribeMessage("spectate")
 			async handleSpectate(client: Socket, data: any)
 			{
-				if(!data || !data[0] || !data[1])
-					return
-				let game: PongGame
-				this.PongService.activeGames.forEach((element) => {
-					if (element.isMyPlayerById(data[1])){
-						game = element;
+				try {
+					if(!data || !data[0] || !data[1])
+						throw new Error("wrong")
+					let game: PongGame
+					this.PongService.activeGames.forEach((element) => {
+						if (element.isMyPlayerById(data[1])){
+							game = element;
+						}
+					});
+					if(game)
+					{
+						const tmp = client
+						game.addWatcher(tmp)
+						await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
+						this.server.to(client.id).emit("spectate")
 					}
-				});
-				if(game)
-				{
-					const tmp = client
-					game.addWatcher(tmp)
-					await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
-					this.server.to(client.id).emit("spectate")
 				}
-				// this.watchingUsers.set(data[0], client)
+				catch(error){
+					this.server.to(client.id).emit("error", error.message)
+				}
 			}
 
 		@SubscribeMessage("stopSpectate")
 			async handleStopSpectate(client: Socket, data: number)
 			{
-				if(!data || !data[0] || !data[1])
-					return
-				let game: PongGame
-				this.PongService.activeGames.forEach((element) => {
-					if (element.id === data[0]){
-						game = element;
+				try {
+					if(!data || !data[0] || !data[1])
+						throw new Error("wrong")
+					let game: PongGame
+					this.PongService.activeGames.forEach((element) => {
+						if (element.id === data[0]){
+							game = element;
+						}
+					});
+					if (game)
+					{
+						await this.PongService.updateStatusUser(data[1], UserStatus.ONLINE)
+						const index = game.watcher.indexOf(client)
+						if(index != -1)
+							game.watcher.splice(index,1)
 					}
-				});
-				if (game)
-				{
-					await this.PongService.updateStatusUser(data[1], UserStatus.ONLINE)
-					const index = game.watcher.indexOf(client)
-					if(index != -1)
-						game.watcher.splice(index,1)
+				}
+				catch(error: any){
+					this.server.to(client.id).emit("error", error.message)
 				}
 			}
 }
 
 // need : 
-
-	// winner and looser screen at end need style
-
-	// cooldown at start ? 
 
 	// ...	
 
@@ -278,8 +296,11 @@ export class PongGateway {
 
 	// les possible element du pongWrapper peuvent se voir si on retrecie bcp le pong
 
-	// le inspect de la page clc
 
-	// bug status peut etre moi
+// protect :
 
+	// matchmaking
 
+	// spectate
+
+	//challenge

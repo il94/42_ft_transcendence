@@ -58,10 +58,7 @@ function PongWrapper({social}: any) {
 
 
 	function handlePlayButton(){
-		console.log('user socket', userAuthenticate)
 		setSearching(true)
-		if(difficultyChoose)
-			setDifficultyChoose(false)
 	}
 
 	function handleChooseDifficulty(dif: number){
@@ -72,6 +69,7 @@ function PongWrapper({social}: any) {
 	function handleCancelButton()
 	{
 		setSearching(false)
+		setDifficultyChoose(false)
 		userAuthenticate.socket?.emit('cancelSearching', userAuthenticate.id)
 	}
 
@@ -96,11 +94,18 @@ function PongWrapper({social}: any) {
 		setGameState(true)
 	}
 
+	function handleError(error: any){
+		console.log("error: ", error)
+		displayPongPopupError({ display: true, message: error.message })
+	}
+
 	useEffect(() => {
+		userAuthenticate.socket?.on("error", handleError)
 		userAuthenticate.socket?.on("decoInGame", handleDisconnect)
 		userAuthenticate.socket?.on("spectate", handleSpectate)
 		userAuthenticate.socket?.on("launchGame", handleLaunchGame)
 		return () =>{
+			userAuthenticate.socket?.off("error")
 			userAuthenticate.socket?.off("launchGame")
 			userAuthenticate.socket?.off("spectate")
 			userAuthenticate.socket?.off("decoInGame")
@@ -117,9 +122,6 @@ function PongWrapper({social}: any) {
 		{
 			let maxWidth = Math.min(PongWrapperContainer.getBoundingClientRect().width, PongWrapperContainer.getBoundingClientRect().height * ratio)
 			let maxHeight = Math.min(PongWrapperContainer.getBoundingClientRect().height, PongWrapperContainer.getBoundingClientRect().width / ratio)
-
-			console.log("width", maxWidth)
-			console.log("height", maxHeight)
 
 			setPongSize({width: maxWidth, height: maxHeight})
 			setLoaderSize(PongWrapperContainer.getBoundingClientRect().width * 30 / 100)
@@ -182,7 +184,6 @@ function PongWrapper({social}: any) {
 										<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
 										<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
 										<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
-										{/* handleChooseDifficulty */}
 									</>
 								:
 								<>
