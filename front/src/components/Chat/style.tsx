@@ -1,4 +1,5 @@
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
+
 import effects from "../../utils/effects"
 import colors from "../../utils/colors"
 
@@ -76,41 +77,41 @@ export const ChatButton = styled.div<{ $zIndex: number }>`
 	bottom: 4.5px;
 	z-index: ${(props) => props.$zIndex};
 
-	/* &:hover {
+	&:hover {
 		transform: scale(1.035);
-	} */
+	}
 
 `
 
-// export const Notification = styled.div`
+const bounceAnimation = keyframes`
+	0%, 20%, 50%, 80%, 100% {
+		transform: translate(-50%, -50%);
+	}
+	40% {
+		transform: translate(-50%, -80%);
+	}
+	50% {
+		background-color: ${colors.chatNotificationEffect};
+	}
+	60% {
+		transform: translate(-50%, -40%);
+	}
+`
 
-// 	position: absolute;
-// 	top: 2px;
-// 	left: 35px;
-// 	transform: translate(-50%, -50%);
+export const Notification = styled.div`
 
-// 	width: 17.5px;
-// 	height: 17.5px;
+	position: absolute;
+	top: 2px;
+	left: 35px;
+	transform: translate(-50%, -50%);
 
-// 	border-radius: 50%;
+	width: 13px;
+	height: 13px;
 
-// 	background-color: ${colors.chatNotification};
+	border-radius: 50%;
 
-// `
+	background-color: ${colors.chatNotification};
 
-// export const NotificationCount = styled.p<{ $count: number }>`
-	
-// 	display: ${(props) => props.$count < 100 ? "flex" : "none" };
+	animation: ${bounceAnimation} 1s ease;
 
-// 	justify-content: center;
-// 	align-items: center;
-
-// 	width: 100%;
-// 	height: 100%;
-
-// 	text-align: center;
-// 	font-size: 10px;
-// 	font-size: ${(props) => props.$count < 10 ? "10px" :
-// 				(props.$count >= 10 && props.$count < 100) && "10px"};
-
-// `
+`
