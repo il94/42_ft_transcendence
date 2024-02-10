@@ -54,7 +54,7 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 			if (!channelTarget)
 				throw new Error
 
-			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}`, {
+			await axios.delete(`https://${url}:3333/channel/${channelTarget.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -78,7 +78,7 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 		try {
 			if (!channelTarget)
 				throw new Error
-			await axios.delete(`http://${url}:3333/channel/${channelTarget.id}/leave/${userAuthenticate.id}`, {
+			await axios.delete(`https://${url}:3333/channel/${channelTarget.id}/leave/${userAuthenticate.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

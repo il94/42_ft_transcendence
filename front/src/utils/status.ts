@@ -1,8 +1,8 @@
 export enum userStatus {
 	ONLINE = "ONLINE",
-	PLAYING = "PLAYING",
-	WAITING = "LOOKING FOR A GAME...",
 	WATCHING = "SPECTATOR",
+	WAITING = "WAITING",
+	PLAYING = "PLAYING",
 	OFFLINE = "OFFLINE"
 }
 
@@ -56,4 +56,11 @@ export enum contextualMenuStatus {
 export enum resultSearchBarType {
 	USER = "USER",
 	CHANNEL = "CHANNEL"
+}
+
+export enum ranks {
+	NORANK = "NO RANK",
+	BRONZE = "BRONZE",
+	SILVER = "SILVER",
+	GOLD = "GOLD",
 }

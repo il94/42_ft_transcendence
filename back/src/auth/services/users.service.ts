@@ -206,7 +206,6 @@ export class UsersService {
 				if (challengerData)
 					tab.push({match: matchTab[i], challengerData})
 			}
-			console.log(" TAB: ", tab)
 			const res = tab;
 			return res;
 		} catch (error) {

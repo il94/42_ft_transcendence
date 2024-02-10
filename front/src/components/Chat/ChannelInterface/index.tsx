@@ -101,7 +101,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					newDatas.avatar = avatar
 
 				if (Object.keys(newDatas).length !== 0) {
-					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, newDatas, {
+					await axios.patch(`https://${url}:3333/channel/${channelTarget.id}`, newDatas, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -119,7 +119,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					avatar: avatar
 				}
 
-				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas, {
+				const postChannelResponse = await axios.post(`https://${url}:3333/channel`, newDatas, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -324,7 +324,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							$error={name.error}
 							ref={nameInputTextRef} />
 						<ErrorMessage
-							fontSize={10}>
+							fontSize={10}
+							$textAlign="end">
 							{name.error && name.errorMessage}
 						</ErrorMessage>
 					</VerticalSettingWrapper>
@@ -390,12 +391,12 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					<Button
 						onClick={() => setChatWindowState(chatWindowStatus.CHANNEL)}
 						type="button" fontSize={"14px"}
-						alt="Cancel icon" title="Cancel" >
+						alt="Cancel icon" title="Cancel">
 						Cancel
 					</Button>
 					<Button
 						type="submit" fontSize={"14px"}
-						alt="Create icon" title="Create" >
+						alt="Create icon" title="Create">
 						{
 							chatWindowState === chatWindowStatus.CREATE_CHANNEL ?
 								"Create"

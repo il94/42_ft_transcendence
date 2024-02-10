@@ -46,7 +46,7 @@ function TextInput() {
 				return
 			}
 
-			await axios.post(`http://${url}:3333/channel/${channelTarget.id}/message`, {
+			await axios.post(`https://${url}:3333/channel/${channelTarget.id}/message`, {
 				msg: message,
 				msgStatus : messageType.TEXT
 			},

@@ -76,4 +76,41 @@ export const ChatButton = styled.div<{ $zIndex: number }>`
 	bottom: 4.5px;
 	z-index: ${(props) => props.$zIndex};
 
+	/* &:hover {
+		transform: scale(1.035);
+	} */
+
 `
+
+// export const Notification = styled.div`
+
+// 	position: absolute;
+// 	top: 2px;
+// 	left: 35px;
+// 	transform: translate(-50%, -50%);
+
+// 	width: 17.5px;
+// 	height: 17.5px;
+
+// 	border-radius: 50%;
+
+// 	background-color: ${colors.chatNotification};
+
+// `
+
+// export const NotificationCount = styled.p<{ $count: number }>`
+	
+// 	display: ${(props) => props.$count < 100 ? "flex" : "none" };
+
+// 	justify-content: center;
+// 	align-items: center;
+
+// 	width: 100%;
+// 	height: 100%;
+
+// 	text-align: center;
+// 	font-size: 10px;
+// 	font-size: ${(props) => props.$count < 10 ? "10px" :
+// 				(props.$count >= 10 && props.$count < 100) && "10px"};
+
+// `

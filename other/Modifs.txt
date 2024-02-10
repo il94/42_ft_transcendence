@@ -2,18 +2,10 @@
 
 CAS/ :
 
-	(!!!!!)
-	Clavier indisponible quand pong display
-	Gestion d'erreur MatchHistory (attente)
-
 GLOBAL/ : A faire sur tout les fichiers un par un
-
-	(!!!!!)
-	Fix les erreurs ts
 
 	(!!!)
 	Faire DTO pour verifier les status envoye au back
-	Set corectement tout les titles et alts
 
 	(!!)
 	Fix focus bouton game dans home par navigate
@@ -31,4 +23,3 @@ SettingsMenu/ :
 
 Signup42/ :
 	Faire select Avatar si le temps
-

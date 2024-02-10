@@ -103,7 +103,7 @@ function SignupFT() {
 				avatar: avatar
 			}
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`https://${url}:3333/auth/signup`, newUser)
 
 			localStorage.setItem("access_token", signupResponse.data.access_token)
 

@@ -13,7 +13,8 @@ import {
 	ProfileName,
 	Avatar,
 	ProfileInfo,
-	ProfileStatus
+	ProfileStatus,
+	Status
 } from "./style"
 
 import CardContext from "../../../contexts/CardContext"
@@ -75,7 +76,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 			if (friendContainer && gameWrapperContainer) {
 
-				const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${friend.id}`, {
+				const userResponse: AxiosResponse<User> = await axios.get(`https://${url}:3333/user/${friend.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -83,7 +84,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 				setUserTarget(userResponse.data)
 
-				const heightCard = 371 // height de la carte
+				const heightCard = 390 // height de la carte
 				const horizontalBorder = window.innerHeight - gameWrapperContainer.getBoundingClientRect().height // height des bordures horizontales autour du jeu
 				const heightNavBar = 53 // height de la barre de navigation (logo, info, profil)
 				const maxBottom = window.innerHeight - horizontalBorder - heightNavBar - heightCard // valeur max avant que la carte ne depasse par le bas
@@ -114,7 +115,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 	async function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 		try {
-			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${friend.id}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`https://${url}:3333/user/${friend.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -134,6 +135,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 			setContextualMenuPosition({ left: resultX, top: resultY })
 			displayContextualMenu({ display: true, type: contextualMenuStatus.SOCIAL })
+			displayCard(false)
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
@@ -162,6 +164,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 			$sectionIndex={sectionIndex}
 			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
+			<Status $sectionIndex={sectionIndex} $status={friend.status} />
 			<Avatar src={friend.avatar} />
 			{
 				social &&

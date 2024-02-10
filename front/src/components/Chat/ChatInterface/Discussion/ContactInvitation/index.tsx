@@ -17,6 +17,7 @@ import {
 } from "../functions"
 
 import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
+import ButtonChallengeLocked from "../../../../../componentsLibrary/ButtonChallengeLocked"
 
 import ContextualMenuContext from "../../../../../contexts/ContextualMenuContext"
 import CardContext from "../../../../../contexts/CardContext"
@@ -69,6 +70,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 				onAuxClick={(event) => showContextualMenu(event, sender, {
 					setContextualMenuPosition,
 					displayContextualMenu,
+					displayCard,
 					userAuthenticate,
 					userTarget,
 					setUserTarget,
@@ -95,14 +97,16 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 									token,
 									url
 								})}
-								color={colors.buttonGreen}>
+								color={colors.buttonGreen}
+								alt="Accept button" title="Accept">
 								Accept
 							</ButtonChallenge>
 							:
-							<ButtonChallenge
-								color={colors.buttonGray}>
+							<ButtonChallengeLocked
+								color={colors.buttonGray}
+								title="Accept">
 								Accept
-							</ButtonChallenge>
+							</ButtonChallengeLocked>
 						}
 						<ButtonChallenge
 							onClick={() => handleClickChallengeStatus(challengeStatus.CANCELLED, idMsg, idChan, {
@@ -111,7 +115,8 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 								token,
 								url
 							})}
-							color={colors.buttonRed}>
+							color={colors.buttonRed}
+							alt="Decline button" title="Decline">
 							Decline
 						</ButtonChallenge>
 					</ButtonsWrapper>
@@ -136,19 +141,21 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 				{
 					initialStatus === challengeStatus.CANCELLED &&
 					<ButtonsWrapper>
-						<ButtonChallenge
-							color={colors.buttonGray}>
+						<ButtonChallengeLocked
+							color={colors.buttonGray}
+							title="Cancelled">
 							Cancelled
-						</ButtonChallenge>
+						</ButtonChallengeLocked>
 					</ButtonsWrapper>
 				}
 				{
 					initialStatus === challengeStatus.FINISHED &&
 					<ButtonsWrapper>
-						<ButtonChallenge
-							color={colors.button}>
+						<ButtonChallengeLocked
+							color={colors.button}
+							title="Finished">
 							Finished
-						</ButtonChallenge>
+						</ButtonChallengeLocked>
 					</ButtonsWrapper>
 				}
 			</InvitationContent>

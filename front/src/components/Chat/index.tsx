@@ -12,7 +12,9 @@ import {
 	TopChatWrapper,
 	BottomChatWrapper,
 	ChannelCreateButton,
-	Interfaces
+	Interfaces,
+	// Notification,
+	// NotificationCount
 } from "./style"
 
 import ChannelList from "./ChannelList"
@@ -52,7 +54,6 @@ type PropsChat = {
 }
 
 function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState }: PropsChat) {
-
 
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 	const { zChatIndex, setZChatIndex, zMaxIndex, loaderChat } = useContext(DisplayContext)!   
@@ -184,6 +185,11 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 					onClick={handleCickChatButton}
 					src={ChatIcon} size={38}
 					alt="Chat button" title="Chat" />
+				// <Notification>
+				// 	<NotificationCount $count={2} >
+				// 		{2}
+				// 	</NotificationCount>
+				// </Notification>
 			</ChatButton>
 	)
 }
