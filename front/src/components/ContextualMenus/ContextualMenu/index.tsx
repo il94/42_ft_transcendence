@@ -101,9 +101,16 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			const channelMP = findChannelMP(userAuthenticate, userTarget.username)
 			if (channelMP) {
-				setChannelTarget(channelMP as Channel)
+
+				const channelMPResponse: AxiosResponse<Channel> = await axios.get(`https://${url}:3333/channel/${channelMP.id}/relations`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				setChannelTarget(channelMPResponse.data)
 				displayChat(true)
-				return (channelMP as Channel)
+				return (channelMPResponse.data)
 			}
 			else {
 				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`https://${url}:3333/channel/mp/${userTarget.id}`, {}, {
