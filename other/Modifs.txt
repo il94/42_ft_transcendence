@@ -2,30 +2,13 @@
 
 CAS/ :
 
-	(!!!!!)
-	Clavier indisponible quand pong display
-	Close les invites a jouer si le user se deco
-	Re organiser les emits des sockets
-	Fix social pour le pong
-	(!!!)
-	Verifier qu'une invite n'existe pas deja
-
-
-
 GLOBAL/ : A faire sur tout les fichiers un par un
-
-	(!!!!!)
-	Fix les erreurs ts
 
 	(!!!)
 	Faire DTO pour verifier les status envoye au back
-	Set corectement tout les titles et alts
 
 	(!!)
 	Fix focus bouton game dans home par navigate
-	Fix contextual menu display dans le chat
-	Redisplay avatars 42
-	Créer des fichiers fonctions si necessaire
 	Image 42 en blanc pour sign up 42
 
 	(!)
@@ -40,4 +23,3 @@ SettingsMenu/ :
 
 Signup42/ :
 	Faire select Avatar si le temps
-

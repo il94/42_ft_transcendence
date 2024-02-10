@@ -13,6 +13,7 @@ import {
 } from "../functions"
 
 import ButtonChallenge from "../../../../../componentsLibrary/ButtonChallenge"
+import ButtonChallengeLocked from "../../../../../componentsLibrary/ButtonChallengeLocked"
 
 import AuthContext from "../../../../../contexts/AuthContext"
 import InteractionContext from "../../../../../contexts/InteractionContext"
@@ -57,45 +58,40 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 							token,
 							url
 						})}
-						color={colors.buttonRed}>
+						color={colors.buttonRed}
+						alt="Cancel button" title="Cancel">
 						Cancel
-					</ButtonChallenge>
-				</ButtonsWrapper>
-			}
-			{
-				initialStatus === challengeStatus.ACCEPTED &&
-				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.buttonGreen}>
-						Accepted !
-					</ButtonChallenge>
-				</ButtonsWrapper>
-			}
-			{
-				initialStatus === challengeStatus.CANCELLED &&
-				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.buttonGray}>
-						Cancelled
 					</ButtonChallenge>
 				</ButtonsWrapper>
 			}
 			{
 				initialStatus === challengeStatus.IN_PROGRESS &&
 				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.button}>
-						In progress
-					</ButtonChallenge>
+					<ButtonChallengeLocked
+						color={colors.buttonGreen}
+						title="Accepted">
+						Accepted !
+					</ButtonChallengeLocked>
+				</ButtonsWrapper>
+			}
+			{
+				initialStatus === challengeStatus.CANCELLED &&
+				<ButtonsWrapper>
+					<ButtonChallengeLocked
+						color={colors.buttonGray}
+						title="Cancelled">
+						Cancelled
+					</ButtonChallengeLocked>
 				</ButtonsWrapper>
 			}
 			{
 				initialStatus === challengeStatus.FINISHED &&
 				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.button}>
+					<ButtonChallengeLocked
+						color={colors.button}
+						title="Finished">
 						Finished
-					</ButtonChallenge>
+					</ButtonChallengeLocked>
 				</ButtonsWrapper>
 			}
 		</Style>

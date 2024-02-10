@@ -1,5 +1,9 @@
 import styled from "styled-components"
 
+import {
+	ranks
+} from "../../utils/status"
+
 import colors from "../../utils/colors"
 import effects from "../../utils/effects"
 
@@ -18,9 +22,9 @@ export const Style = styled.div<{ $left?: number, $right?: number, $top?: number
 	z-index: ${(props) => props.$zIndex};
 
 	width: 240px;
-	height: 371px;
+	height: 390px;
 	min-width: 240px;
-	min-height: 371px;
+	min-height: 390px;
 
 	clip-path: ${effects.pixelateWindow};
 
@@ -28,7 +32,7 @@ export const Style = styled.div<{ $left?: number, $right?: number, $top?: number
 	
 `
 
-export const Avatar = styled.img`
+export const Avatar = styled.img<{ $borderColor: string}>`
 
 	width: 92px;
 	height: 92px;
@@ -38,9 +42,16 @@ export const Avatar = styled.img`
 	margin-top: 9px;
 	margin-left: 64px;
 	margin-right: auto;
-	border: 10px solid ${colors.rankGold};
 
+	border: 10px solid;
 	border-radius: 50%;
+	border-color: ${(props) => props.$borderColor === ranks.NORANK ? colors.rankNull
+						: props.$borderColor === ranks.BRONZE ? colors.rankBronze
+						: props.$borderColor === ranks.SILVER ? colors.rankSilver
+						: props.$borderColor === ranks.GOLD ? colors.rankGold
+						: null};
+	object-fit: cover; 
+	object-position: center;
 
 `
 
@@ -50,4 +61,15 @@ export const UserName = styled.p`
 
 	font-size: 27px;
 
+`
+
+export const Rank = styled.p<{ $color: string}>`
+
+	font-size: 15px;
+	color: ${(props) => props.$color === ranks.NORANK ? colors.rankNull
+						: props.$color === ranks.BRONZE ? colors.rankBronze
+						: props.$color === ranks.SILVER ? colors.rankSilver
+						: props.$color === ranks.GOLD ? colors.rankGold
+						: null};
+			
 `

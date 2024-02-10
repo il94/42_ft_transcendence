@@ -1,11 +1,16 @@
 import {
 	RefObject
 } from "react"
+
 import styled from "styled-components"
+
+import {
+	userStatus
+} from "../../../utils/status"
 
 import colors from "../../../utils/colors"
 
-export const Style = styled.div<{ $id: number, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
+export const Style = styled.div<{ $sectionIndex: number, $isBlocked: boolean, ref: RefObject<HTMLElement> }>`
 
 	display: flex;
 	justify-content: center;
@@ -22,15 +27,34 @@ export const Style = styled.div<{ $id: number, $isBlocked: boolean, ref: RefObje
 
 	opacity: ${(props) => props.$isBlocked && 0.5};
 
-	background-color: ${(props) => props.$id % 2 === 0 ? colors.section : colors.sectionAlt};
+	background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.section : colors.sectionAlt};
 
 	&:hover {
-		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionHover : colors.sectionAltHover};
 	}
 	&:focus-visible {
 		outline: none;	
-		background-color: ${(props) => props.$id % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
+		background-color: ${(props) => props.$sectionIndex % 2 === 0 ? colors.sectionFocus : colors.sectionAltFocus};
 	}
+
+`
+
+export const Status = styled.div<{ $sectionIndex: number, $status: userStatus }>`
+
+	position: absolute;
+	bottom: 2.5px;
+	left: 35.5px;
+	transform: translate(-50%, -50%);
+
+	width: 8px;
+	height: 8px;
+
+	border: 2px solid ${colors.statusBorder};
+	border-radius: 50%;
+
+	background-color: ${(props) => props.$status === userStatus.ONLINE ? colors.online
+						: props.$status === userStatus.OFFLINE ? colors.offline
+						: colors.busy};
 
 `
 
@@ -45,6 +69,9 @@ export const Avatar = styled.img<{ src: string }>`
 
 	border-radius: 50%;
 	
+	object-fit: cover; 
+	object-position: center;
+
 `
 
 export const ProfileInfo = styled.div<{ $offline: boolean }>`

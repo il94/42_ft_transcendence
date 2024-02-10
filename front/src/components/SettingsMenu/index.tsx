@@ -47,7 +47,7 @@ type PropsSettingsMenu = {
 function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMenu) {
 
 	const { token, url } = useContext(AuthContext)!
-	const { userAuthenticate, setUserAuthenticate } = useContext(InteractionContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 	const { displayPopupError } = useContext(DisplayContext)!
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -78,17 +78,12 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 
 			if (Object.keys(newDatas).length !== 0)
 			{
-				await axios.patch(`http://${url}:3333/user/me`, newDatas,
+				await axios.patch(`https://${url}:3333/user/me`, newDatas,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				
-				setUserAuthenticate((prevState) => ({
-					...prevState,
-					...newDatas,
-				}))
 			}
 
 			displaySettingsMenu(false)

@@ -33,6 +33,7 @@ export const Avatar = styled.label<{ src: string }>`
 
 	background-image: url(${(props) => props.src});
 	background-size: cover;
+	background-position: center;
 
 	&:hover {
 		cursor: pointer;

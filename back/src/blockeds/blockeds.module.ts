@@ -6,7 +6,7 @@ import { ChannelsService } from 'src/channels/channels.service';
 import { PongModule } from 'src/pong/pong.module';
 
 @Module({
-  imports: [ PrismaModule, PongModule ],
+  imports: [ PrismaModule, PongModule],
   controllers: [BlockedsController],
   providers: [BlockedsService, ChannelsService],
   exports: [ BlockedsService ]

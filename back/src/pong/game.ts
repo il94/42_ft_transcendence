@@ -130,6 +130,7 @@ export class PongGame {
 	public watcher: Socket[]
 	public	id: number
 	public difficulty: number
+	public messageId? : number
 
 	private state: boolean
 
@@ -145,18 +146,19 @@ export class PongGame {
 	public paddleMargin: number
 
 
-	constructor(Id: number, dif: number, host: Socket, hostId:number, hostName:string, guest: Socket, guestId: number, guestName: string) {
+	constructor(Id: number, dif: number, host: Socket, hostId:number, hostName:string, guest: Socket, guestId: number, guestName: string, messageId? : number) {
 
 		this.id = Id;
 		this.difficulty = dif
 		this.state = true
-
 		this.LeftPlayer = new Player(host, hostId, hostName)
 		this.RightPlayer = new Player(guest, guestId, guestName)
 		this.Players = [host, guest]
 		this.watcher = []
 		this.Speed = 7
 		this.Ball = new Ball(this.Speed)
+		if (messageId)
+			this.messageId = messageId
 
 		this.width = 1920
 		this.height = 1080

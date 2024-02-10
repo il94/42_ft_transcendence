@@ -9,7 +9,9 @@ import { PongGame, Player, Ball } from "./game";
 import { UsersService } from "src/auth/services/users.service";
 
 import { AppService } from "src/app.service";
-import { GameStatus, MatchResult, UserStatus } from "@prisma/client";
+
+import { GameStatus, MatchResult, Prisma, UserStatus } from "@prisma/client";
+import { subscribe } from "diagnostics_channel";
 
 
 @WebSocketGateway()
@@ -102,7 +104,8 @@ export class PongGateway {
 		await this.PongService.updateStatusUser(userId, UserStatus.WAITING) // need protect
 	}
 
-	async launchGame(id: number, enemyId: number, dif:number)
+
+	async launchGame(id: number, enemyId: number, dif: number,  messageId? :number)
 	{
 		const leftSocket = AppService.connectedUsers.get(id.toString())
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
@@ -114,16 +117,23 @@ export class PongGateway {
 		const rightUser = await this.UserService.findById(enemyId)
 
 		const newgame = await this.PongService.createGame(id, enemyId);
-
+		if (leftSocket && rightSocket)
+		{
 		this.server.to(leftSocket.id).emit("launchGame")
 		this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username))
+		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
 
 		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
 		this.delUserFromSearchingUser(leftSocket)
 		this.delUserFromSearchingUser(rightSocket)
+		}
+		else
+		{
+			console.log("error launchGame")
+			return
+		}
 	}
 
 	async checkToLaunchGame(client: Socket, dif: number)
@@ -154,6 +164,11 @@ export class PongGateway {
 		}
 
 	}
+
+	/*
+		data[0] = id user
+		data[1] = niveau difficulter entre 1 et 3
+	*/
 	
 	@SubscribeMessage('searchGame')
 	async addSearchingPlayer(client: Socket, data: number) {
@@ -162,7 +177,6 @@ export class PongGateway {
 				throw new Error("an Error occur from the WebSocket")	
 
 			this.toSearchingArray(client, data[0], data[1])
-
 			await this.checkToLaunchGame(client, data[1])
 
 		}
@@ -173,8 +187,8 @@ export class PongGateway {
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
 		const speed = 30 / game.difficulty
-		setTimeout(() =>{
-			
+
+		 setTimeout(() =>{
 			game.moveBall()
 			
 			const ball = game.Ball.getPos()
@@ -203,13 +217,17 @@ export class PongGateway {
 				this.PongService.updateStatusUser(winner.id, UserStatus.ONLINE)
 				this.PongService.updateStatusUser(looser.id, UserStatus.ONLINE)
 				this.PongService.updateGameStatus(game.id, GameStatus.FINISHED)
-
+				if (game.messageId)
+				{
+					this.PongService.setInvitationAsFinished(game.messageId)
+					
+				}
 				const index = this.PongService.activeGames.indexOf(game)
 				if (index != -1)
 					this.PongService.activeGames.splice(index, 1)
 				console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
 			}
-		}, speed)
+		 }, speed)
 
 	}
 		

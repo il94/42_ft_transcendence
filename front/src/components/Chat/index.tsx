@@ -12,7 +12,9 @@ import {
 	TopChatWrapper,
 	BottomChatWrapper,
 	ChannelCreateButton,
-	Interfaces
+	Interfaces,
+	// Notification,
+	// NotificationCount
 } from "./style"
 
 import ChannelList from "./ChannelList"
@@ -33,7 +35,8 @@ import {
 } from "../../utils/functions"
 
 import {
-	Channel
+	Channel,
+	ChannelData
 } from "../../utils/types"
 
 import {
@@ -45,13 +48,12 @@ import ChatIcon from "../../assets/chat.png"
 type PropsChat = {
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
-	channels: Channel[],
+	channels: (Channel | ChannelData)[],
 	chatWindowState: chatWindowStatus,
 	setChatWindowState: Dispatch<SetStateAction<chatWindowStatus>>,
 }
 
 function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState }: PropsChat) {
-
 
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 	const { zChatIndex, setZChatIndex, zMaxIndex, loaderChat } = useContext(DisplayContext)!   
@@ -183,6 +185,11 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 					onClick={handleCickChatButton}
 					src={ChatIcon} size={38}
 					alt="Chat button" title="Chat" />
+				// <Notification>
+				// 	<NotificationCount $count={2} >
+				// 		{2}
+				// 	</NotificationCount>
+				// </Notification>
 			</ChatButton>
 	)
 }

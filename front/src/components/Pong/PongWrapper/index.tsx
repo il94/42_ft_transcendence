@@ -49,6 +49,7 @@ function PongWrapper({social}: any) {
 	const [PongSize, setPongSize] = useState<{width: number, height: number}>({width: 0, height: 0})
 
 	const [gameState, setGameState] = useState<boolean>(false)
+
 	const [spectate, setSpectate] = useState<boolean>(false)
 	const [difficultyChoose, setDifficultyChoose] = useState<boolean>(false)
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})

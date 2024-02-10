@@ -22,7 +22,7 @@ function MatchHistory() {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
-	const { loaderMatchsHistory, setLoaderMatchsHistory } = useContext(DisplayContext)!
+	const { loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError } = useContext(DisplayContext)!
 
 	const [matchs, setMatchs] = useState<any[]>([])
 	const [historyHeight, setHistoryHeight] = useState<number>(0)
@@ -31,7 +31,7 @@ function MatchHistory() {
 		async function fetchMatchs() {
 			try {
 				setLoaderMatchsHistory(true)
-				const matchsResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/matchs/${userTarget.id}`, {
+				const matchsResponse: AxiosResponse = await axios.get(`https://${url}:3333/user/matchs/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -40,7 +40,7 @@ function MatchHistory() {
 				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
-				setMatchs([])
+				displayPopupError({ display: true })
 			}
 		}
 		fetchMatchs()

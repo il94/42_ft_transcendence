@@ -39,6 +39,7 @@
     "date-fns": "^3.3.1",
     "dotenv": "^16.3.1",
     "express-session": "^1.17.3",
+    "fs": "^0.0.1-security",
     "generate-password": "^1.7.1",
     "js-cookie": "^3.0.5",
     "otplib": "^12.0.1",

@@ -10,7 +10,7 @@ import {
 import {
 	useMediaQuery
 } from 'react-responsive'
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import {
 	io
 } from 'socket.io-client'
@@ -37,7 +37,8 @@ import {
 	refreshJoinChannel,
 	refreshStatusChallenge,
 	refreshUserMute,
-	postText
+	postText,
+	refreshUserDatas
 } from './sockets'
 
 import Logo from '../../components/Logo'
@@ -62,6 +63,8 @@ import AuthContext from '../../contexts/AuthContext'
 
 import {
 	Channel,
+	ChannelData,
+	ErrorResponse,
 	User,
 	UserAuthenticate
 } from '../../utils/types'
@@ -107,6 +110,8 @@ function Game() {
 	const [userTarget, setUserTarget] = useState<User | UserAuthenticate>(emptyUser)
 	const [userAuthenticate, setUserAuthenticate] = useState<UserAuthenticate>(emptyUserAuthenticate)
 	const [channelTarget, setChannelTarget] = useState<Channel | undefined>(undefined)
+	const [gameState, setGameState] = useState<boolean>(false)
+	const [searching, setSearching] = useState<boolean>(false)
 
 	const navigate = useNavigate()
 
@@ -114,7 +119,7 @@ function Game() {
 
 		async function fetchFriends(): Promise<User[]> {
 			try {
-				const friendsResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/friends`, {
+				const friendsResponse: AxiosResponse<User[]> = await axios.get(`https://${url}:3333/friends`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -128,7 +133,7 @@ function Game() {
 
 		async function fetchBlockedUsers(): Promise<User[]> {
 			try {
-				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/blockeds`, {
+				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`https://${url}:3333/blockeds`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -143,7 +148,7 @@ function Game() {
 
 		async function fetchChannels(): Promise<Channel[]> {
 			try {
-				const channelsResponse: AxiosResponse<[]> = await axios.get(`http://${url}:3333/user/channels`, {
+				const channelsResponse: AxiosResponse<[]> = await axios.get(`https://${url}:3333/user/channels`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -172,7 +177,7 @@ function Game() {
 			try {
 				setLoaderFriends(true)
 				setLoaderChannels(true)
-				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
+				const meResponse: AxiosResponse = await axios.get(`https://${url}:3333/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -180,7 +185,7 @@ function Game() {
 				const friends: User[] = await fetchFriends()
 				const blockeds: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
-				const socket = io(`http://${url}:3333`, {
+				const socket = io(`https://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
 						id: meResponse.data.id,
@@ -203,12 +208,21 @@ function Game() {
 				setLoaderFriends(false)
 			}
 			catch (error) {
-				navigate("/error", {
-					state: {
-						disconnect: true
+				if (axios.isAxiosError(error)) {
+					const axiosError = error as AxiosError<ErrorResponse>
+					const { statusCode, message } = axiosError.response?.data!
+					if (statusCode === 403)
+					{
+						navigate("/error", { state: {
+							message: message
+						}})	
 					}
-				})
-			}
+					else
+						navigate("/error")
+				}
+				else
+					navigate("/error")
+			}	
 		}
 		if (!token)
 			navigate("/error")
@@ -289,29 +303,18 @@ function Game() {
 		}
 	}, [])
 
-	/* ========================= DISPLAY WITH SOCKETS =========================== */
-
+	/* =========================== HANDLE SOCKETS =============================== */
 
 	// CHAT
 	useEffect(() => {
-
-		// userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-		// 	refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
+		userAuthenticate.socket?.on("updateUserDatas", (userId: number, newDatas: any) => 
+			refreshUserDatas({ userId, newDatas, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-
-
-			
-
-		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number) =>
-			refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
-
-
-
-
+		userAuthenticate.socket?.on("joinChannel", (channelId: number, userId: number, channelDatas: ChannelData, newMember: User) =>
+			refreshJoinChannel({ channelId, userId, channelDatas, newMember, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("postText", (channelId: number, userId: number, textDatas: any) => 
 			postText({ channelId, userId, textDatas, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("postInvitation", (channelId: number, userAuthId: number, userTargetId: number, invitationDatas: any) => 
@@ -319,96 +322,55 @@ function Game() {
 		userAuthenticate.socket?.on("leaveChannel", (channelId: number, userId: number) => 
 			refreshLeaveChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any) =>
-			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+			refreshUserRole({ channelId, userId, newRole, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
-			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }));
+			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus) => 
-			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }));
+			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string) => 
-			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }));
-
-
-
+			refreshUserMute({ idChan, time, userAuthenticate, channelTarget, setChannelTarget }))
 
 		return () => {
-
-			// userAuthenticate.socket?.off("updateUserStatus")
-
+			userAuthenticate.socket?.off("updateUserDatas")
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
-
-
-
-
-
 			userAuthenticate.socket?.off("joinChannel")
-
-
-
-
-
-
 			userAuthenticate.socket?.off("postText")
 			userAuthenticate.socket?.off("postInvitation")
 			userAuthenticate.socket?.off("leaveChannel")
 			userAuthenticate.socket?.off("updateUserRole")
 			userAuthenticate.socket?.off("setNewOwner")
-			userAuthenticate.socket?.off("updateChallenge");
-			userAuthenticate.socket?.off("updateUserMute");
+			userAuthenticate.socket?.off("updateChallenge")
+			userAuthenticate.socket?.off("updateUserMute")
 		}
 
-	}, [userAuthenticate.socket, channelTarget])
+	}, [userAuthenticate, channelTarget])
 
-
-	// GAME
 	useEffect(() => {
-		// userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-		// 	refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
+		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
+			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("createChannelMP", (channelId: number, recipientId: number) =>
-			recieveChannelMP({ channelId, recipientId, token, url, userAuthenticate, setUserAuthenticate, setChannelTarget, displayChat }))
-
-		// userAuthenticate.socket?.on("joinChannel2", (channelId: number, userId: number) =>
-		// 	refreshJoinChannel({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget, token, url }))
-
+		userAuthenticate.socket?.on("createChannelMP", (channelId: number, authorDatas: any) =>
+			recieveChannelMP({ channelId, authorDatas, setUserAuthenticate }))
+		
 		return () => {
-			// userAuthenticate.socket?.off("updateUserStatus")
-
+			userAuthenticate.socket?.off("updateUserStatus")
 			userAuthenticate.socket?.off("updateChannel")
 			userAuthenticate.socket?.off("deleteChannel")
 			userAuthenticate.socket?.off("createChannelMP")
-			// userAuthenticate.socket?.off("joinChannel2")
 		}
-
-	}, [userAuthenticate.socket])
-
-	/* ========================================================================== */
-
-
-
-	// GAME
-	useEffect(() => {
-		userAuthenticate.socket?.on("updateUserStatus", (userId: number, newStatus: any) => 
-			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-
-
-		return () => {
-			userAuthenticate.socket?.off("updateUserStatus")
-
-		}
-
+		
 	}, [userAuthenticate])
 
-
+	/* ========================================================================== */
 
 	return (
 		<GamePage
 			onClick={closeContextualMenus}>
-			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget }}>
+			<InteractionContext.Provider value={{ userAuthenticate, setUserAuthenticate, userTarget, setUserTarget, channelTarget, setChannelTarget, gameState, setGameState, searching, setSearching }}>
 				<DisplayContext.Provider value={{ zCardIndex, setZCardIndex, zChatIndex, setZChatIndex, loaderChat, setLoaderChat, zSettingsIndex, setZSettingsIndex, zMaxIndex, setZMaxIndex, loaderChannels, setLoaderChannels, loaderFriends, setLoaderFriends, loaderResultsSearchBar, setLoaderResultsSearchBar, loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError, GameWrapperRef }}>
 					<GameWrapper ref={GameWrapperRef}>
 						{
@@ -427,7 +389,7 @@ function Game() {
 								displaySecondaryContextualMenu={displaySecondaryContextualMenu}
 								secondaryContextualMenuPosition={secondaryContextualMenuPosition}
 								secondaryContextualMenuHeight={secondaryContextualMenuHeight}
-								channels={userAuthenticate.channels} />
+								channels={userAuthenticate.channels as Channel[]} />
 						}
 						{
 							popupError.display &&
@@ -476,7 +438,6 @@ function Game() {
 									<TwoFaMenu
 										displayTwoFAMenu={displayTwoFAMenu} />
 								}
-								{/* <TestsBack /> */}
 								{
 									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
 										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>

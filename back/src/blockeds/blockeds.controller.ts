@@ -18,17 +18,11 @@ export class BlockedsController {
 		return this.blockedsService.addBlocked(userAuthId, userTargetId)
 	}
 
-  @Get()
-  async getUserBlockeds(@getUser() user: User ) {
-    return await this.blockedsService.getUserBlockeds(user.id);
-  }
-
-  // @Patch('update/:id')
-  // updateRelation(
-  //   @Param('id', ParseIntPipe) id: number, 
-  //   @Body() dto: RelationDto) {
-  //       return this.blockedsService.updateRelation(id, dto);
-  //   }
+	// Retourne les users bloques
+	@Get()
+	async getUserBlockeds(@getUser('id') userId: number) {
+		return await this.blockedsService.getUserBlockeds(userId)
+	}
 
 	// Debloque un user
 	@Delete(':id')
@@ -37,3 +31,12 @@ export class BlockedsController {
 		return this.blockedsService.removeBlocked(userAuthId, userTargetId)
 	}
 }
+
+/* =========================== PAS UTILISEES ================================ */
+
+  // @Patch('update/:id')
+  // updateRelation(
+  //   @Param('id', ParseIntPipe) id: number, 
+  //   @Body() dto: RelationDto) {
+  //       return this.blockedsService.updateRelation(id, dto);
+  //   }

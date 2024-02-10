@@ -48,10 +48,16 @@ function TwoFA() {
 	const navigate = useNavigate()
 	const location = useLocation()
 
-	const userId: string | number = Cookies.get('userId') ? Cookies.get('userId') : location.state.userId
+	let userId: string | number | undefined;
+
+    if (Cookies.get('userId')) {
+        userId = Cookies.get('userId');
+    } else if (location.state && location.state.userId) {
+        userId = location.state.userId;
+	}
 
 	useEffect(() => {
-		if (token || !userId)
+		if (Cookies.get('userId') == undefined || token || !userId)
 			navigate("/error")
 	}, [])
 
@@ -77,7 +83,7 @@ function TwoFA() {
 			if (code.error)
 				return
 			
-			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${userId}`, {
+			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`https://${url}:3333/auth/2fa/authenticate/${userId}`, {
 				twoFACode: code.value
 			})
 			 
@@ -157,7 +163,7 @@ function TwoFA() {
 		const InputCodeContainer = inputCodeRef.current
 		if (InputCodeContainer)
 			InputCodeContainer.focus()
-	})
+	},[])
 
 	/* ========================================================================== */
 

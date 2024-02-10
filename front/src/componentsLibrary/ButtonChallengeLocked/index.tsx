@@ -2,7 +2,7 @@ import styled from "styled-components"
 
 import colors from "../../utils/colors"
 
-const ButtonChallenge = styled.button<{ alt: string, title: string }>`
+const ButtonChallengeLocked = styled.div<{ title: string }>`
 
 	width: 100%;
 	height: 100%;
@@ -21,4 +21,4 @@ const ButtonChallenge = styled.button<{ alt: string, title: string }>`
 
 `
 
-export default ButtonChallenge
+export default ButtonChallengeLocked

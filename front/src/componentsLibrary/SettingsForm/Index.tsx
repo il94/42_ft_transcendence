@@ -76,14 +76,14 @@ export const HorizontalSettingWrapper = styled.div<{ width?: number }>`
 
 `
 
-export const ErrorMessage = styled.p<{ width?: number, fontSize?: number }>`
+export const ErrorMessage = styled.p<{ width?: number, fontSize?: number, $textAlign?: string }>`
 
 	width: ${(props) => props.width ? props.width + "px" : "100%" };
 	height: 15px;
 	min-height: 15px;
 
 	font-size: ${(props) => props.fontSize ? props.fontSize : 12 }px;
-	text-align: center;
+	text-align: ${(props) => props.$textAlign ? props.$textAlign : "center" };
 
 	color: ${colors.textError};
 
