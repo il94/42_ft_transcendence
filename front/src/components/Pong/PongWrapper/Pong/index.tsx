@@ -217,12 +217,12 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	
 	useEffect(() => {
 
-		const PongContainer = PongRef.current
+		// const PongContainer = PongRef.current
 		
-		if (PongContainer)
-			setConvertionFactor(PongContainer.getBoundingClientRect().height / 1080)
+		// if (PongContainer)
+			setConvertionFactor(height / 1080)
 
-	}, [window.innerHeight, window.innerWidth, social])
+	}, [window.innerHeight, window.innerWidth, social, height, width])
 
 	useEffect(() => {
 		if (!spectate)

@@ -97,7 +97,7 @@ function PongWrapper({social}: any) {
 
 	function handleError(error: any){
 		console.log("error: ", error)
-		displayPongPopupError({ display: true, message: error.message })
+		displayPongPopupError({ display: true, message: error })
 	}
 
 	useEffect(() => {
