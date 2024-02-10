@@ -7,6 +7,7 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
 import { AppService } from 'src/app.service';
 import { PongGateway } from 'src/pong/pong.gateway';
+import { APP_FILTER } from '@nestjs/core';
 
 type ChannelMP = {
 	id: number,
@@ -992,6 +993,45 @@ export class ChannelsService {
 		}
 	}
 
+	async getAllSocketsChannelExceptUsers(channelId: number, userId: number[]) {
+		try {
+			const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+				where: {
+					channelId: channelId,
+					NOT: {
+						userId: {
+							in: userId
+						}
+					}
+				},
+				select: {
+					userId: true,
+				},
+			});
+			const userIds = usersOnChannels.map((userOnChannel) => userOnChannel.userId);
+			return(userIds)
+		} catch (error) {
+			console.error('Une erreur s\'est produite lors de la récupération des sockets des utilisateurs du canal, sauf ceux des utilisateurs spécifiés :', error);
+			throw error;
+		}
+	}
+
+
+	async emitOnChannelExceptUsers(route: string, userTargetId: number[], ...args: any[]) {
+		try {
+			const channelId = args[0];
+			const emitsId = await this.getAllSocketsChannelExceptUsers(channelId, userTargetId);
+
+			emitsId.forEach((emitId) => {
+				const socket = AppService.connectedUsers.get(emitId.toString())
+				socket.emit(route, ...args);
+			})
+		} catch (error) {
+			console.error('Une erreur s\'est produite lors de l\'émission des données sur le canal, à l\'exception des utilisateurs spécifiés :', error);
+			throw error;
+		}
+	}
+
 	// Change le statut d'une invitation
 	async updateMessageStatus(channelId: number, messageId: number, userAuthId: number, newStatus: challengeStatus) { 
 		try {
@@ -1029,11 +1069,12 @@ export class ChannelsService {
 				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Verifie si le nouveau statut est accepte ou refuse
-			else if (newStatus !== challengeStatus.ACCEPTED &&
+			else if (newStatus !== challengeStatus.IN_PROGRESS &&
 				newStatus !== challengeStatus.CANCELLED)
 				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Update l'invitation
+			
 			await this.prisma.message.update({
 				where: {
 					id: messageId
@@ -1043,16 +1084,19 @@ export class ChannelsService {
 				}
 			})
 			// Emit
+			//sofiane
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
-
-			if (newStatus === challengeStatus.ACCEPTED)
+			if (newStatus === challengeStatus.IN_PROGRESS)
 			{
-				if ( !this.checkIfUserExist(messageDatas.targetId) || !this.checkIfUserExist(messageDatas.authorId))
-					throw new NotFoundException("user not exist");
-				if ( this.checkStatus(messageDatas.targetId, UserStatus.ONLINE) || this.checkStatus(messageDatas.authorId, UserStatus.ONLINE))
-					throw new ConflictException("There is not ONLINE");
-				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
+				// if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
+				// 	throw new NotFoundException("user not exist");
+				// if ((await this.checkStatus(messageDatas.targetId, UserStatus.ONLINE)))
+				// 	throw new ConflictException("There is not ONLINE");
+				// if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
+				// 	throw new ConflictException("There is not ONLINE");
+				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId, messageId);
 			}
+				
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)

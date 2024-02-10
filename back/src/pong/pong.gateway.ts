@@ -103,7 +103,7 @@ export class PongGateway {
 
 	}
 
-	async launchGame(id: number, enemyId: number)
+	async launchGame(id: number, enemyId: number, messageId? :number)
 	{
 		const leftSocket = AppService.connectedUsers.get(id.toString())
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
@@ -117,7 +117,7 @@ export class PongGateway {
 		this.server.to(leftSocket.id).emit("launchGame")
 		this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, 2, leftSocket, id, (await leftUser).username, rightSocket, enemyId, (await rightUser).username))
+		this.PongService.activeGames.push(new PongGame(newgame, 2, leftSocket, id, (await leftUser).username, rightSocket, enemyId, (await rightUser).username, messageId))
 
 		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
@@ -185,7 +185,7 @@ export class PongGateway {
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
 		const speed = 30 / game.difficulty
-		setTimeout(() =>{
+		 setTimeout(() =>{
 			game.moveBall()
 			
 			const ball = game.Ball.getPos()
@@ -214,13 +214,17 @@ export class PongGateway {
 				this.PongService.updateStatusUser(winner.id, UserStatus.ONLINE)
 				this.PongService.updateStatusUser(looser.id, UserStatus.ONLINE)
 				this.PongService.updateGameStatus(game.id, GameStatus.FINISHED)
-
+				if (game.messageId)
+				{
+					this.PongService.setInvitationAsFinished(game.messageId)
+					
+				}
 				const index = this.PongService.activeGames.indexOf(game)
 				if (index != -1)
 					this.PongService.activeGames.splice(index, 1)
 				console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
 			}
-		}, speed)
+		 }, speed)
 
 	}
 		

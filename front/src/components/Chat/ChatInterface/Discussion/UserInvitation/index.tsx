@@ -63,7 +63,7 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 				</ButtonsWrapper>
 			}
 			{
-				initialStatus === challengeStatus.ACCEPTED &&
+				initialStatus === challengeStatus.IN_PROGRESS &&
 				<ButtonsWrapper>
 					<ButtonChallenge
 						color={colors.buttonGreen}>
@@ -77,15 +77,6 @@ function UserInvitation({ target, initialStatus, idMsg, idChan }: PropsUserInvit
 					<ButtonChallenge
 						color={colors.buttonGray}>
 						Cancelled
-					</ButtonChallenge>
-				</ButtonsWrapper>
-			}
-			{
-				initialStatus === challengeStatus.IN_PROGRESS &&
-				<ButtonsWrapper>
-					<ButtonChallenge
-						color={colors.button}>
-						In progress
 					</ButtonChallenge>
 				</ButtonsWrapper>
 			}

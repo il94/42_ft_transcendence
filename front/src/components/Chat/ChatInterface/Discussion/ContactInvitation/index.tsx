@@ -89,7 +89,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 						{
 							(!gameState && !searching) ?
 							<ButtonChallenge
-								onClick={() => handleClickChallengeStatus(challengeStatus.ACCEPTED, idMsg, idChan, {
+								onClick={() => handleClickChallengeStatus(challengeStatus.IN_PROGRESS, idMsg, idChan, {
 									userAuthenticate,
 									displayPopupError,
 									token,
@@ -117,12 +117,20 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					</ButtonsWrapper>
 				}
 				{
-					initialStatus === challengeStatus.ACCEPTED &&
+					initialStatus === challengeStatus.IN_PROGRESS &&
 					<ButtonsWrapper>
-						<ButtonChallenge
-							color={colors.buttonGreen}>
-							Accepted !
-						</ButtonChallenge>
+						{
+							target.id === userAuthenticate.id ?
+							<ButtonChallenge
+								color={colors.buttonGreen}>
+								Accepted !
+							</ButtonChallenge>
+							:
+							<ButtonChallenge
+								color={colors.button}>
+								Spectate
+							</ButtonChallenge>
+						}
 					</ButtonsWrapper>
 				}
 				{
@@ -131,15 +139,6 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 						<ButtonChallenge
 							color={colors.buttonGray}>
 							Cancelled
-						</ButtonChallenge>
-					</ButtonsWrapper>
-				}
-				{
-					initialStatus === challengeStatus.IN_PROGRESS &&
-					<ButtonsWrapper>
-						<ButtonChallenge
-							color={colors.button}>
-							Spectate
 						</ButtonChallenge>
 					</ButtonsWrapper>
 				}
