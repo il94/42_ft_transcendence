@@ -1086,6 +1086,7 @@ export class ChannelsService {
 			// Emit
 			//sofiane
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
+
 			if (newStatus === challengeStatus.IN_PROGRESS)
 			{
 				if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
@@ -1094,9 +1095,8 @@ export class ChannelsService {
 					throw new ConflictException("There is not ONLINE");
 				if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
 					throw new ConflictException("There is not ONLINE");
-				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
+				this.pongGateway.launchGame(messageDatas.targetId, 2, messageDatas.authorId);
 			}
-				
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)

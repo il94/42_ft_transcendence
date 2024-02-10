@@ -13,6 +13,8 @@ import colors from "../../../utils/colors"
 import Button from "../../../componentsLibrary/Button"
 import Loader from "../../../componentsLibrary/Loader"
 import PongPopupError from "./PongPopupError"
+
+import PongContext from "../../../contexts/PongContext"
 // import colors from "../../utils/colors"
 
 const Style = styled.div<{ $backgroundColor: string }>`
@@ -36,64 +38,18 @@ const Style = styled.div<{ $backgroundColor: string }>`
 
 `
 
-// const PlayButtonStyle = styled.div`
-    
-//     position: absolute;
-//       top: 20px;
-//       left: 50%;
-//       transform: translateX(-50%);
-//       padding: 10px 20px;
-//       font-size: 16px;
-//     background-color: black;
-//       cursor: pointer;
-// `
-
-// const SpectateButtonStyle = styled.div`
-	
-// 	position: absolute;
-//   	top: 75%;
-//   	left: 75%;
-//   	transform: translateX(-50%);
-//   	padding: 2% 4%;
-//   	font-size: 16px;
-// 	background-color: black;
-//   	cursor: pointer;
-// `
-
-// const PlayButtonStyle = styled.div`
-	
-// 	/* position: absolute; */
-//   	/* top: 50%;
-//   	left: 50%; */
-//   	/* transform: translateX(-50%); */
-// 	width: 350px;
-//   	padding: 2% 4%;
-//   	font-size: 16px;
-// 	background-color: black;
-//   	cursor: pointer;
-// `
-// const DisconnectTextStyle = styled.div`
-// 	position: absolute;
-//   	top: 50%;
-//   	left: 50%;
-//   	transform: translateX(-50%);
-//   	padding: 2% 4%;
-//   	font-size: 16px;
-// 	background-color: black;
-//   	cursor: pointer;
-// `
-
 function PongWrapper({social}: any) {
 
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
 
-	const { token, url } = useContext(AuthContext)!
-	const { userAuthenticate, gameState, setGameState, searching, setSearching } = useContext(InteractionContext)!
+	const { userAuthenticate } = useContext(InteractionContext)!
 
+	const [searching, setSearching] = useState<boolean>(false)
 
-	// const [searching, setSearching] = useState<boolean>(false)
+	const [PongSize, setPongSize] = useState<{width: number, height: number}>({width: 0, height: 0})
 
-	// const [gameState, setGameState] = useState<boolean>(false)
+	const [gameState, setGameState] = useState<boolean>(false)
+
 	const [spectate, setSpectate] = useState<boolean>(false)
 	const [difficultyChoose, setDifficultyChoose] = useState<boolean>(false)
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
@@ -103,10 +59,7 @@ function PongWrapper({social}: any) {
 
 
 	function handlePlayButton(){
-		console.log('user socket', userAuthenticate)
 		setSearching(true)
-		if(difficultyChoose)
-			setDifficultyChoose(false)
 	}
 
 	function handleChooseDifficulty(dif: number){
@@ -117,6 +70,7 @@ function PongWrapper({social}: any) {
 	function handleCancelButton()
 	{
 		setSearching(false)
+		setDifficultyChoose(false)
 		userAuthenticate.socket?.emit('cancelSearching', userAuthenticate.id)
 	}
 
@@ -126,9 +80,13 @@ function PongWrapper({social}: any) {
 		setGameState(true)
 	}
 
-	function handleDisconnect(){
+	function handleDisconnect(role: string){
 		setGameState(false)
-		displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
+		if (role === "player")
+			displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
+		else if(role === "watcher")
+			displayPongPopupError({ display: true, message: "A player has Disconnect" })
+
 		setBackgroundColor(colors.pongWrapperBackground)
 	}
 
@@ -137,11 +95,18 @@ function PongWrapper({social}: any) {
 		setGameState(true)
 	}
 
+	function handleError(error: any){
+		console.log("error: ", error)
+		displayPongPopupError({ display: true, message: error.message })
+	}
+
 	useEffect(() => {
+		userAuthenticate.socket?.on("error", handleError)
 		userAuthenticate.socket?.on("decoInGame", handleDisconnect)
 		userAuthenticate.socket?.on("spectate", handleSpectate)
 		userAuthenticate.socket?.on("launchGame", handleLaunchGame)
 		return () =>{
+			userAuthenticate.socket?.off("error")
 			userAuthenticate.socket?.off("launchGame")
 			userAuthenticate.socket?.off("spectate")
 			userAuthenticate.socket?.off("decoInGame")
@@ -153,8 +118,15 @@ function PongWrapper({social}: any) {
 	useEffect(() => {
 
 		const PongWrapperContainer = wrapperRef.current
+		const ratio = 16/9
 		if (PongWrapperContainer)
+		{
+			let maxWidth = Math.min(PongWrapperContainer.getBoundingClientRect().width, PongWrapperContainer.getBoundingClientRect().height * ratio)
+			let maxHeight = Math.min(PongWrapperContainer.getBoundingClientRect().height, PongWrapperContainer.getBoundingClientRect().width / ratio)
+
+			setPongSize({width: maxWidth, height: maxHeight})
 			setLoaderSize(PongWrapperContainer.getBoundingClientRect().width * 30 / 100)
+		}
 
 	}, [window.innerWidth, window.innerHeight, social])
 
@@ -180,62 +152,64 @@ function PongWrapper({social}: any) {
 		}
 	}, [score])
 
+	const [focusPaddle, setFocusPaddle] = useState<boolean>(false)
+
 	return (
-		<Style $backgroundColor={backgroundColor} ref={wrapperRef}>
-			{
-			pongPopupError.display ? (
-				<PongPopupError
-					displayPongPopupError={displayPongPopupError}
-					message={pongPopupError.message}/>
-				)
-			:
-			(
-			<>
-			{
-				!gameState ?
+		<PongContext.Provider value={{ focusPaddle, setFocusPaddle }}>
+			<Style $backgroundColor={backgroundColor} ref={wrapperRef} onClick={() => {if(!spectate) setFocusPaddle(true)}}>
+				{
+				pongPopupError.display ? (
+					<PongPopupError
+						displayPongPopupError={displayPongPopupError}
+						message={pongPopupError.message}/>
+					)
+				:
+				(
 				<>
-					{
-						!searching ?
-						<Button
-							onClick={handlePlayButton}
-							type="button" fontSize={"5.5vw"}
-							alt="Play button" title="Play !"
-							style={{width: "35%"}}>
-							Play !
-						</Button>
-						:
-						(
-							!difficultyChoose ?
-								<>
-									<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"4.5vw"} alt="Ez button" title="Ez (noob)" style={{width: "35%"}}>Ez</Button>
-									<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"4.5vw"} alt="Medium button" title="Medium" style={{width: "35%"}}>Medium</Button>
-									<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"4.5vw"} alt="Hard button" title="Hard" style={{width: "35%"}}>Hard</Button>
-									{/* handleChooseDifficulty */}
-								</>
+				{
+					!gameState ?
+					<>
+						{
+							!searching ?
+							<Button
+								onClick={handlePlayButton}
+								type="button" fontSize={"5.5vw"}
+								alt="" title=""
+								style={{width: "35%"}}>
+								Play !
+							</Button>
 							:
-							<>
-								<Loader size={loaderSize} />
-								<div style={{ height: "8%"}} />
-								<Button
-									onClick={handleCancelButton}
-									type="button" fontSize={"2.25vw"}
-									alt="Cancel button" title="Cancel"
-									style={{width: "17.5%"}}>
-									Cancel
-								</Button>
-							</>
-						)
+							(
+								!difficultyChoose ?
+									<>
+										<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
+										<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
+										<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
+									</>
+								:
+								<>
+									<Loader size={loaderSize} />
+									<div style={{ height: "8%"}} />
+									<Button
+										onClick={handleCancelButton}
+										type="button" fontSize={"2.25vw"}
+										alt="" title=""
+										style={{width: "17.5%"}}>
+										Cancel
+									</Button>
+								</>
+							)
+						}
+					</>
+					:
+					<Pong width={PongSize.width} height={PongSize.height} score={score} setScore={setScore} setGameState={setGameState} setSpectate={setSpectate} spectate={spectate}
+							social={social} />
 					}
 				</>
-				:
-
-				<Pong score={score} setScore={setScore} setGameState={setGameState} setSpectate={setSpectate} spectate={spectate}
-						social={social}/>
-				}
-			</>
-			)
-		}
-		</Style>
+				)
+			}
+			</Style>
+		</PongContext.Provider>
 		);
 }
 

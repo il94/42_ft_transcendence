@@ -18,16 +18,27 @@ const Style = styled.div`
 `
 
 type CloseButtonProps = {
-	closeFunction: Dispatch<SetStateAction<boolean>>
+	closeFunction?: Dispatch<SetStateAction<boolean>>,
+	closeFunctionAlt?: any,
 }
 
-function CloseButton({ closeFunction } : CloseButtonProps) {
+function CloseButton({ closeFunction, closeFunctionAlt } : CloseButtonProps) {
 	return (
 		<Style>
-			<Icon
-				onClick={() => closeFunction(false)}
-				src={CloseIcon} size={24}
-				alt="Close button" title="Close" />
+			{
+				closeFunction ?
+				<Icon
+					onClick={() => closeFunction(false)}
+					src={CloseIcon} size={24}
+					alt="Close button" title="Close" />
+				: closeFunctionAlt ?
+				<Icon
+					onClick={() => closeFunctionAlt()}
+					src={CloseIcon} size={24}
+					alt="Close button" title="Close" />
+				:
+				null
+			}
 		</Style>
 	)
 }
