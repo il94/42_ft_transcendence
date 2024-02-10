@@ -185,11 +185,6 @@ function Chat({ chat, displayChat, channels, chatWindowState, setChatWindowState
 					onClick={handleCickChatButton}
 					src={ChatIcon} size={38}
 					alt="Chat button" title="Chat" />
-				// <Notification>
-				// 	<NotificationCount $count={2} >
-				// 		{2}
-				// 	</NotificationCount>
-				// </Notification>
 			</ChatButton>
 	)
 }

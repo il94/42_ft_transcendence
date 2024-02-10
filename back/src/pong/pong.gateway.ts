@@ -248,7 +248,8 @@ export class PongGateway {
 		@SubscribeMessage("spectate")
 			async handleSpectate(client: Socket, data: any)
 			{
-				let game: PongGame
+				try {
+					let game: PongGame
 				this.PongService.activeGames.forEach((element) => {
 					if (element.isMyPlayerById(data[1])){
 						game = element;
@@ -256,12 +257,23 @@ export class PongGateway {
 				});
 				if(game)
 				{
+					const oldStatus = await this.PongService.getUserStatus(data[0])
+					if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
+					{
+						console.log("oldStatus2 = ", oldStatus)
+						throw new Error('incapacity spectate')
+						return
+					}
 					const tmp = client
 					game.addWatcher(tmp)
+					console.log("oldStatus1 = ", oldStatus)
 					await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
 					this.server.to(client.id).emit("spectate")
 				}
 				// this.watchingUsers.set(data[0], client)
+				} catch (error) {
+					//throw error
+				}
 			}
 
 		@SubscribeMessage("stopSpectate")

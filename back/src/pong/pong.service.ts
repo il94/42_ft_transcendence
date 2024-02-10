@@ -26,7 +26,26 @@ export class PongService {
 		private appService : AppService,
 		//private channelService: ChannelsService
 		) {}
-	
+		
+	async getUserStatus(idUser: number)
+	{
+		try {
+			const userStatus = await this.prisma.user.findUnique({
+				where: {
+					id : idUser
+				},
+				select: {
+					status : true
+				}
+			})
+			if (!userStatus)
+				throw new Error('userstatus not found')
+			return userStatus.status
+		} catch (error) {
+			throw error
+		}
+	}
+
 
 	async updateStatusUser(idUser : number, newStatus: UserStatus)
 	{

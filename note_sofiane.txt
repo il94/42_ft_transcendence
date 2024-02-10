@@ -10,3 +10,7 @@ quand fin de spectate changer le status
 
 peut accepter une game dans le chat qallor que deja en game 
 rajouter un si en playing pas pouvoir ce lancer dans une autre game 
+
+quand on fait contact ou challenge sur quelquun a qui on a deja des message les message disparraisse et ne sont pas charger
+
+le premier contact
