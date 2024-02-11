@@ -194,7 +194,6 @@ function Game() {
 				});
 
 				socket.on('connect_error', (error) => {
-					console.error('Erreur de connexion à la socket :', error.message);
 					throw new Error;
 				});
 

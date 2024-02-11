@@ -22,7 +22,7 @@ export class UsersService {
 				}
 			})
 			if (userExists)
-				throw new ConflictException("Username already taken")
+				throw new ConflictException("Username already exists")
 
 			// Hashe le mot de passe
 			const hash = await argon.hash(userDatas.hash)
@@ -53,7 +53,7 @@ export class UsersService {
 			if (error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -78,7 +78,7 @@ export class UsersService {
 		}
 		catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -109,7 +109,7 @@ export class UsersService {
 			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -188,7 +188,7 @@ export class UsersService {
 		}
 		catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -246,7 +246,7 @@ export class UsersService {
 			if (error instanceof ForbiddenException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}

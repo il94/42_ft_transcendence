@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         where: { id: payload.sub, },
       });
     if (!user)
-      throw new NotFoundException(`User with ${payload.sub} does not exist.`);
+      throw new NotFoundException(`User reference by ${payload.sub} does not exist.`);
     delete user.hash;
     delete user.twoFASecret;
     return user;

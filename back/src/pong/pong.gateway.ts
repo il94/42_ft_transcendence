@@ -97,7 +97,7 @@ export class PongGateway {
 			array = this.searchingUsersHard
 
 		if (!array)
-			throw new Error("wrong difficulty")
+			throw new Error("Incorrect value for difficulty")
 
 		array.set(userId, client)
 
@@ -111,7 +111,7 @@ export class PongGateway {
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
 
 		if (leftSocket === undefined || rightSocket === undefined)
-			throw new Error("One of the player is not connected")
+			throw new Error("One of the player is offline")
 
 		const leftUser = await this.UserService.findById(id)
 		const rightUser = await this.UserService.findById(enemyId)
@@ -147,7 +147,7 @@ export class PongGateway {
 			array = this.searchingUsersHard
 
 		if(!array)
-			throw new Error("wrong difficulty")
+			throw new Error("Incorrect value for difficulty")
 
 		let keysIterator  = array.keys()
 		let keysArray = Array.from(keysIterator);
@@ -241,7 +241,7 @@ export class PongGateway {
 		{
 			try{
 				if (args !== "up" && args !== "down")
-					throw new Error("wrong Mouvement")
+					throw new Error("wrong movement")
 				let game: PongGame;
 				
 				this.PongService.activeGames.forEach((element) => {
@@ -265,7 +265,7 @@ export class PongGateway {
 			{
 				try {
 					if(!data || !data[0] || !data[1])
-						throw new Error("need data")
+						throw new Error("Unable to retrive the needed data")
 					let game: PongGame
 					this.PongService.activeGames.forEach((element) => {
 						if (element.isMyPlayerById(data[1])){
@@ -278,7 +278,7 @@ export class PongGateway {
 						if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
 						{
 							console.log("oldStatus2 = ", oldStatus)
-							throw new Error('incapacity spectate')
+							throw new Error('Unable to process watching')
 							return
 						}
 						const tmp = client
@@ -297,7 +297,7 @@ export class PongGateway {
 			{
 				try {
 					if(!data || !data[0] || !data[1])
-						throw new Error("need data")
+						throw new Error("Unable to retrive the needed data")
 					let game: PongGame
 					this.PongService.activeGames.forEach((element) => {
 						if (element.id === data[0]){

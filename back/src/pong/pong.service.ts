@@ -139,7 +139,7 @@ export class PongService {
 
 		  return updatedGame;
 		} catch (error) {
-		  console.error('Error updating game status:', error);
+		  console.error('Error while updating game status:', error);
 		  throw error;
 		}
 	  }
@@ -162,12 +162,12 @@ export class PongService {
 			  result: result
 			} as Prisma.UsersOnGamesUpdateInput
 		  });
-		  console.log(`User ${userId} game stats updated successfully.`);
+		  console.log(`User ${userId} game stats has been updated successfully.`);
 		  this.updateStatusUser(userId, UserStatus.ONLINE);
 		  this.setResult(userId, result); // set user match history  
 		  return updatedUserGame;
 		} catch (error) {
-		  console.error(`Error updating user ${userId} game stats:`, error);
+		  console.error(`Error while updating user ${userId} game stats:`, error);
 		  throw error;
 		}
 	  }

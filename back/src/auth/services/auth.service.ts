@@ -86,7 +86,7 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -118,7 +118,7 @@ export class AuthService {
 			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -163,7 +163,7 @@ export class AuthService {
 		try {
 			// Verifie si le user possebe bien un compte 42
 			if (!user)
-				throw new BadRequestException("User not found from 42 intra")
+				throw new BadRequestException("User not found in 42 database")
 			
 			// Si le user possede deja un compte dans l'app
 			if ('id' in user)
@@ -242,7 +242,7 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -286,7 +286,7 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -309,7 +309,7 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
