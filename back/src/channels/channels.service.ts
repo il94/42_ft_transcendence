@@ -563,7 +563,6 @@ export class ChannelsService {
 				},
 			})
 
-			// console.log("Accessibles channels :", accessibleChannels)
 			return accessibleChannels
 		}
 		catch (error) {

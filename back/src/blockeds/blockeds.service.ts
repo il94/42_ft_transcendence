@@ -121,7 +121,6 @@ export class BlockedsService {
 				}
 			})
 
-			// console.log(`User ${userId} blockeds : `, blockeds)
 			return blockeds
 		}
 		catch (error) {

@@ -35,7 +35,6 @@ export class ChannelsGateway {
     for (const socket of args[0]) {
       this.server.to(socket).emit("updateDiscussion", args[1], args[2], args[3], args[4]);
     }
-	// console.log("HEEERE", args[0])
   }
 
   /*

@@ -34,9 +34,6 @@ export class AppService {
         return undefined
     })
 
-	// console.log("usersOnChannels", usersOnChannels)
-	// console.log("sockets", sockets)
-
     return sockets;
   }  
 

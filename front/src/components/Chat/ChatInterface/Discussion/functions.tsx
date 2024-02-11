@@ -50,7 +50,7 @@ export async function showCard(event: MouseEvent<HTMLDivElement | HTMLButtonElem
 
 		if (gameWrapperContainer) {
 
-			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${userId}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${props.token}`
 				}
@@ -120,7 +120,7 @@ export async function showContextualMenu(event: MouseEvent<HTMLDivElement | HTML
 
 		if (gameWrapperContainer && props.channelTarget) {
 
-			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${userId}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${props.url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${props.token}`
 				}
@@ -171,7 +171,7 @@ type handleClickChallengeStatusProps = {
 
 export async function handleClickChallengeStatus(status : challengeStatus, idMsg: number, idChan : number, props: handleClickChallengeStatusProps) {
 	try {
-		await axios.patch(`https://${props.url}:3333/channel/${idChan}/message/${idMsg}`, {
+		await axios.patch(`http://${props.url}:3333/channel/${idChan}/message/${idMsg}`, {
 			newStatus : status
 		},
 		{
