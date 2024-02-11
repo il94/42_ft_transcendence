@@ -244,7 +244,7 @@ export class AuthService {
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided credentials are not allowed")
 			else
-				throw new BadRequestException('')
+				throw new BadRequestException()
 		}
 	}
 
@@ -319,7 +319,6 @@ export class AuthService {
 			else
 				throw new BadRequestException()
 			}
-		}
 	}
 
 /* =============================== UTILS ==================================== */
