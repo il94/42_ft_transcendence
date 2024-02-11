@@ -1,9 +1,5 @@
 mettre jwt token sur les gateway @submessage
 
-quand user et en playing quil ne puissent pas spectate
-
-le spectate doit leave quand game fini 
-
 que le spectate cancel le waiting
 
 quand fin de spectate changer le status
@@ -14,3 +10,14 @@ rajouter un si en playing pas pouvoir ce lancer dans une autre game
 quand on fait contact ou challenge sur quelquun a qui on a deja des message les message disparraisse et ne sont pas charger
 
 le premier contact
+
+quand on veut changer le mot de passe mais finalement on enleve ce quon a ecrit on ne peut pas save
+
+les invitation se mettent au dessus des messages dans des cas ou il y a des erreurs
+
+accepted quand c'est bloque en back accept quand meme le message
+
+ne pas recevoir les message de type invitation quand on a bloquer quelqun
+
+
+quand un mec quitte un channel lui envoyer un challenge envoie une erreur dans la console

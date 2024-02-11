@@ -74,7 +74,9 @@ function TextInput() {
 	}
 
 	function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-		setMessage(event.target.value)
+		const value = event.target.value
+		if (value.length < 10000)
+			setMessage(event.target.value)
 	}
 
 	function removePlaceHolder(event: FocusEvent<HTMLInputElement>) {

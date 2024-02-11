@@ -390,6 +390,8 @@ export class ChannelsService {
 	// Cree un message
 	async addContent(channelId: number, userId: number, msgContent: string, msgStatus: messageStatus) {
 		try {
+			if (msgContent.length > 10000)
+				throw new ForbiddenException("Lenght message too long")
 			// Verifie si le channel existe
 			const channelExist = !!await this.prisma.channel.findUnique({
 				where: {
@@ -397,8 +399,7 @@ export class ChannelsService {
 				}
 			})
 			if (!channelExist)
-				throw new NotFoundException("Channel not found")
-
+				throw new ForbiddenException("You are muted from this channel")
 			// Verifie si le user est dans le channel et retourne ses donnees
 			const userDatas = await this.prisma.usersOnChannels.findUnique({
 				where: {

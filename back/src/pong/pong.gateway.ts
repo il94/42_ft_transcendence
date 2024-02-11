@@ -35,6 +35,9 @@ export class PongGateway {
 	}
 
 	handleDisconnect(client: Socket){
+
+		console.log('HEEEEEEEEEEE disconnectEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE')
+
 		let game: PongGame;
 
 			this.PongService.activeGames.forEach((element) => {

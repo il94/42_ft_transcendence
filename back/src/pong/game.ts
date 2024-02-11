@@ -291,14 +291,14 @@ export class PongGame {
 	// }
 
 	checkScore(){
-		if (this.LeftPlayer.getScore() === 11 || this.RightPlayer.getScore() === 11)
+		if (this.LeftPlayer.getScore() === 3 || this.RightPlayer.getScore() === 3)
 			this.setState(false)
 	}
 
 	SetTheWinner(){ // victory
-		if (this.LeftPlayer.getScore() === 11)
+		if (this.LeftPlayer.getScore() === 3)
 			this.LeftPlayer.setWinner()
-		if (this.RightPlayer.getScore() === 11)
+		if (this.RightPlayer.getScore() === 3)
 			this.RightPlayer.setWinner()
 	}
 
@@ -342,6 +342,7 @@ export class PongGame {
 	removeWatcher(key: number)
 	{
 		this.watcher.delete(key)
+		console.log("watcher map size: ", this.watcher.size)
 	}
 
 	isMyHost(socket: Socket){
