@@ -57,7 +57,14 @@ function TwoFA() {
 	}
 
 	useEffect(() => {
-		if (Cookies.get('userId') == undefined || token || !userId)
+		if (token)
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
+		else if (Cookies.get('userId') == undefined || token || !userId)
 			navigate("/error")
 	}, [])
 

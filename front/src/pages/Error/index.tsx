@@ -21,6 +21,8 @@ function Error() {
 	const message: string | undefined = location.state?.message ? location.state.message : Cookies.get("error_message")
 
 	useEffect(() => {
+		if (location.state?.keepConnect)
+			return
 		localStorage.removeItem("access_token")
 		Cookies.remove("error_message")
 	}, [])
