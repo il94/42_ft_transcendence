@@ -74,7 +74,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -105,7 +105,7 @@ export class ChannelsService {
 				}
 			})
 			if (channelMPAlreadyExist)
-				throw new ConflictException("MP channel already exist")
+				throw new ConflictException("MP channel already exists")
 
 			// Verifie si le user target existe et retourne son id username et avatar
 			const userTarget = await this.prisma.user.findUnique({
@@ -131,7 +131,7 @@ export class ChannelsService {
 				}
 			})
 			if (userTargetIsBlocked)
-				throw new ForbiddenException("You have blocked this user")
+				throw new ForbiddenException("This user has been blocked")
 
 			// Verifie si le user target n'a pas bloque le user auth
 			const userAuthIsBlocked = !!await this.prisma.blocked.findUnique({
@@ -143,7 +143,7 @@ export class ChannelsService {
 				}
 			})
 			if (userAuthIsBlocked)
-				throw new ForbiddenException("You are blocked")
+				throw new ForbiddenException("You have been blocked")
 
 			// Crée le nouveau channel MP sans nom ni avatar et y inclut le user target
 			const newChannelMP = await this.prisma.channel.create({
@@ -207,7 +207,7 @@ export class ChannelsService {
 			if (error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -226,9 +226,9 @@ export class ChannelsService {
 				throw new NotFoundException("Channel not found")
 			else if ((channelToJoin.type === ChannelStatus.PRIVATE ||
 				channelToJoin.type === ChannelStatus.MP) && !inviterId)
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 			else if (channelToJoin.type === ChannelStatus.MP && inviterId)
-				throw new ForbiddenException("Invitations forbidden for channel MP")
+				throw new ForbiddenException("Cannot create invitations for MP channel")
 
 			// Verifie si le user existe et le récupère
 			const user = await this.prisma.user.findUnique({
@@ -260,7 +260,7 @@ export class ChannelsService {
 					}
 				})
 				if (userTargetIsBlocked)
-					throw new ForbiddenException("You have blocked this user")
+					throw new ForbiddenException("This user has been blocked")
 
 				// Verifie si le user n'a pas bloque le user invite
 				const userAuthIsBlocked = !!await this.prisma.blocked.findUnique({
@@ -272,7 +272,7 @@ export class ChannelsService {
 					}
 				})
 				if (userAuthIsBlocked)
-					throw new ForbiddenException("You are blocked")
+					throw new ForbiddenException("You have been blocked")
 
 				// Verifie si le user qui aurait lancé l'invitation est dans le channel
 				const inviter = !!await this.prisma.usersOnChannels.findUnique({
@@ -304,7 +304,7 @@ export class ChannelsService {
 				if (isInChannel.role === Role.BANNED)
 					throw new ConflictException(`${user.username} is banned from this channel`)
 				else
-					throw new ConflictException(`${user.username} is already in channel`)
+					throw new ConflictException(`${user.username} is already in the channel`)
 			}
 
 			// Si il y a un mot de passe et que le user n'a pas été invité, vérifie que le mot de passe fourni soit correct
@@ -379,7 +379,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -416,9 +416,9 @@ export class ChannelsService {
 			if (!userDatas)
 				throw new NotFoundException("User not found")
 			else if (userDatas.role === Role.BANNED)
-				throw new ForbiddenException("You are banned from this channel")
+				throw new ForbiddenException("You have been banned from this channel")
 			else if (new Date(userDatas.mute) > new Date())
-				throw new ForbiddenException("You are muted from this channel")
+				throw new ForbiddenException("You have been muted in this channel")
 
 			// Verifie si le message n'est pas vide
 			if (!msgContent)
@@ -450,7 +450,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -483,7 +483,7 @@ export class ChannelsService {
 			if (!userAuthRole)
 				throw new NotFoundException("User not found")
 			else if (userAuthRole.role === Role.BANNED)
-				throw new ForbiddenException(`You are banned from this channel`)
+				throw new ForbiddenException(`You have been banned from this channel`)
 
 			// Verifie si le user target existe et retourne son username et son statut
 			const userTargetDatas = await this.prisma.user.findUnique({
@@ -515,7 +515,7 @@ export class ChannelsService {
 			if (!userTargetRole)
 				throw new NotFoundException("User not found")
 			else if (userTargetRole.role === Role.BANNED)
-				throw new ForbiddenException(`${userTargetDatas.username} is banned from this channel`)
+				throw new ForbiddenException(`${userTargetDatas.username} has been banned from this channel`)
 
 			// Cree l'invitation
 			const invitationDatas = await this.prisma.message.create({
@@ -543,7 +543,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -567,7 +567,7 @@ export class ChannelsService {
 		}
 		catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -716,7 +716,7 @@ export class ChannelsService {
 			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -749,7 +749,7 @@ export class ChannelsService {
 			if (!userRole)
 				throw new NotFoundException("User not found")
 			else if (userRole.role !== Role.OWNER)
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 
 			// Si le channel n'est pas de type protected
 			if (channelToUpdate.type !== ChannelStatus.PROTECTED &&
@@ -757,7 +757,7 @@ export class ChannelsService {
 			{
 				// Si un mot de passe est fourni
 				if (newChannelDatas.hash)
-					throw new ForbiddenException("Only protecteds channels can have a password")
+					throw new ForbiddenException("Password is only allowed for protected channel")
 
 				// Retire le mot de passe (si il y en avait un ou pas)
 				else
@@ -794,7 +794,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -814,7 +814,7 @@ export class ChannelsService {
 
 			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
-				throw new ForbiddenException("It is not possible to update your own role")
+				throw new ForbiddenException("Unauthorized to update your own role")
 
 			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
@@ -865,7 +865,7 @@ export class ChannelsService {
 			if (newRole === Role.UNBANNED)
 			{
 				if (userAuthRole.role !== Role.ADMIN && userAuthRole.role !== Role.OWNER)
-					throw new ForbiddenException("You dont have permissions for this action")
+					throw new ForbiddenException("You dont have the required permissions for this action")
 				await this.prisma.usersOnChannels.delete({
 					where: {
 						userId_channelId: {
@@ -881,7 +881,7 @@ export class ChannelsService {
 				if (((newRole === Role.ADMIN || newRole === Role.MEMBER)
 					&& userAuthRole.role !== Role.OWNER) ||
 						newRole === Role.BANNED && userAuthRole.role !== Role.OWNER && userAuthRole.role !== Role.ADMIN)
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 
 				await this.prisma.usersOnChannels.update({
 					where: {
@@ -920,7 +920,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -984,7 +984,7 @@ export class ChannelsService {
 				(userTargetRole.role === Role.OWNER ||
 					(userAuthRole.role !== Role.OWNER
 					&& userAuthRole.role !== Role.ADMIN)))
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 
 			// Mute le user
 			const muteDuration = await this.prisma.usersOnChannels.update({
@@ -1022,7 +1022,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -1041,14 +1041,14 @@ export class ChannelsService {
 			});
 	
 			if (!user)
-				throw new NotFoundException("user not exist");
+				throw new NotFoundException("user not found");
 			const userstatus : UserStatus = user.status;
 			return userstatus !== status
 		} catch (error) {
 			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -1072,7 +1072,6 @@ export class ChannelsService {
 			const userIds = usersOnChannels.map((userOnChannel) => userOnChannel.userId);
 			return(userIds)
 		} catch (error) {
-			console.error('Une erreur s\'est produite lors de la récupération des sockets des utilisateurs du canal, sauf ceux des utilisateurs spécifiés :', error);
 			throw error;
 		}
 	}
@@ -1088,7 +1087,6 @@ export class ChannelsService {
 				socket.emit(route, ...args);
 			})
 		} catch (error) {
-			console.error('Une erreur s\'est produite lors de l\'émission des données sur le canal, à l\'exception des utilisateurs spécifiés :', error);
 			throw error;
 		}
 	}
@@ -1127,12 +1125,12 @@ export class ChannelsService {
 			// Verifie si l'invitation est destinee au user auth ou si il en est l'auteur
 			else if (messageDatas.targetId !== userAuthId &&
 				messageDatas.authorId !== userAuthId)
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 
 			// Verifie si le nouveau statut est accepte ou refuse
 			else if (newStatus !== challengeStatus.IN_PROGRESS &&
 				newStatus !== challengeStatus.CANCELLED)
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 
 			// Update l'invitation
 			
@@ -1151,11 +1149,11 @@ export class ChannelsService {
 			if (newStatus === challengeStatus.IN_PROGRESS)
 			{
 				if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
-					throw new NotFoundException("user not exist");
+					throw new NotFoundException("User not found");
 				if ((await this.checkStatus(messageDatas.targetId, UserStatus.ONLINE)))
-					throw new ConflictException("There is not ONLINE");
+					throw new ConflictException("User is not ONLINE");
 				if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
-					throw new ConflictException("There is not ONLINE");
+					throw new ConflictException("User is not ONLINE");
 				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId, 2, messageId);
 			}
 		}
@@ -1163,7 +1161,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -1211,7 +1209,7 @@ export class ChannelsService {
 			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -1277,7 +1275,7 @@ export class ChannelsService {
 				(userTargetRole.role === Role.OWNER ||
 					(userAuthRole.role !== Role.OWNER
 					&& userAuthRole.role !== Role.ADMIN)))
-				throw new ForbiddenException("You dont have permissions for this action")
+				throw new ForbiddenException("You dont have the required permissions for this action")
 
 			// Log a envoyer au front
 			const newLog = userAuthId === userTargetId ?
@@ -1339,7 +1337,7 @@ export class ChannelsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -1540,7 +1538,7 @@ async countMembersInChannel(chanId: number): Promise<number> {
 				}
 			})
 			if (ownerFound)
-				throw new ConflictException("There is already an owner in the channel")
+				throw new ConflictException("The channel already have an owner")
 
 			// Cherche un admin dans le channel
 			const administratorFound = await this.prisma.usersOnChannels.findFirst({
@@ -1592,7 +1590,7 @@ async countMembersInChannel(chanId: number): Promise<number> {
 			if (error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}

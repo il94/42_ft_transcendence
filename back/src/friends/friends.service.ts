@@ -23,7 +23,7 @@ export class FriendsService {
 		try {		
 			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
-				throw new ForbiddenException("It is not possible to add yourself as a friend")
+				throw new ForbiddenException("Unauthorized to add yourself as a friend")
 
 			// Verifie si le user target existe et récupère son username
 			const userTarget = await this.prisma.user.findUnique({
@@ -82,7 +82,7 @@ export class FriendsService {
 				|| error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -131,7 +131,7 @@ export class FriendsService {
 		}
 		catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -142,7 +142,7 @@ export class FriendsService {
 		try {
 			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
-				throw new ForbiddenException("It is not possible to remove yourself as a friend")
+				throw new ForbiddenException("Unauthorized to remove yourself from friends")
 
 			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
@@ -185,7 +185,7 @@ export class FriendsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}

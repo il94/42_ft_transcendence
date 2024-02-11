@@ -342,6 +342,7 @@ export class PongGame {
 	removeWatcher(key: number)
 	{
 		this.watcher.delete(key)
+		console.log("watcher map size: ", this.watcher.size)
 	}
 
 	isMyHost(socket: Socket){
