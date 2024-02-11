@@ -63,14 +63,21 @@ const FTImage = styled.img`
 
 function SignupFT() {
 
-	const { url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	const usernameId = Cookies.get('usernameId')
 	const avatarCookie = Cookies.get('avatar')
 	
 	useEffect(() => {
-		if (!usernameId || !avatarCookie)
+		if (token)
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
+		else if (!usernameId || !avatarCookie)
 			navigate("/error")
 	}, [])
 

@@ -448,7 +448,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		else {
 			displayAdminSections(false)
 		}
-	}, [])
+	}, [type])
 
 	// Compte le nombre de channels du user qui ne sont pas des MP
 	const channelToDisplay: number = userAuthenticate.channels.filter((channel) => channel.type !== ChannelType.MP).length

@@ -67,7 +67,12 @@ function Signin() {
 
 	useEffect(() => {
 		if (token)
-			navigate("/error")
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
