@@ -194,12 +194,8 @@ export class ChannelsService {
 			})
 
 			// Emit
-			const socket: Socket = AppService.connectedUsers.get(userTarget.id.toString())
-			socket.emit("createChannelMP", channelMP.id, userAuth)
-
+			await this.emitOnChannel("createChannelMP", channelMP.id, userAuth)
 			console.log(`Channel MP ${channelMP.id} was created`)
-
-			console.log(channelMP)
 
 			return channelMP
 		}
