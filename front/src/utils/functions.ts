@@ -1,4 +1,10 @@
 import {
+	ChangeEvent,
+	Dispatch,
+	SetStateAction
+} from "react"
+
+import {
 	ChannelType,
 	contextualMenuStatus,
 	userStatus
@@ -22,6 +28,40 @@ import DefaultYellowAvatar from "../assets/default_yellow.png"
 
 export function capitalize(str: string): string {
 	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase())
+}
+
+function endsWithImageExtension(fileName: string): boolean {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif', '.tiff', '.webp', '.svg', '.heif', '.heic']
+    const lowerCaseFileName = fileName.toLowerCase()
+    return imageExtensions.some(ext => lowerCaseFileName.endsWith(ext))
+}
+
+export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvatar: Dispatch<SetStateAction<string>>, displayPopupError: Dispatch<SetStateAction<{ display: boolean, message?: string }>>) {
+	const avatar = event.target.files?.[0]
+
+	if (!avatar)
+	{
+		displayPopupError({ display: true, message: "No image" })
+		return
+	}
+	else if (!endsWithImageExtension(avatar.name))
+	{
+		displayPopupError({ display: true, message: "Bad image extension" })
+		return
+	}
+
+	const reader = new FileReader()
+
+	reader.onloadend = () => {
+		const imageDataUrl = reader.result
+		if (typeof imageDataUrl === 'string')
+			setAvatar(imageDataUrl)
+	}
+
+	reader.onerror = () => {
+		displayPopupError({ display: true, message: "Invalid image" })
+	}
+	reader.readAsDataURL(avatar)
 }
 
 export function getRandomDefaultAvatar(): string {
