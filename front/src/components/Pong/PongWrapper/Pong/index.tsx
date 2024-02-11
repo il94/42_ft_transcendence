@@ -59,12 +59,6 @@ const ResultStyle = styled.div<{ $height: number }>`
 
 	font-size: ${(props) => props.$height / 4}px;
 
-	/* top: 50%; */
-	/* left: ${(props) => props.$Hpos}%; */
-
-	/* transform: translate(-50%, -50%); */
-
-	/* color: white; */
 `
 
 type PongProps = {
@@ -167,13 +161,13 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		setScore({left: myScore, right: enemyScore})
 		setName({left: myName, right: enemyName})
 		setGameId(gameID)
-		if ((myScore === 3 || enemyScore === 3))
+		if ((myScore === 11 || enemyScore === 11))
 		{
 			if (spectate){
 				setGameState(false)
 				return;
 			}
-			const msg = myScore === 3 ? "Victory !" : "Defeat"
+			const msg = myScore === 11 ? "Victory !" : "Defeat"
 			setEndMesage({display: true, message: msg})
 			setTimeout(() => {
 				setEndMesage({...endMessage, display: false})

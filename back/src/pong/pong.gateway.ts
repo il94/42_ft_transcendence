@@ -35,9 +35,6 @@ export class PongGateway {
 	}
 
 	handleDisconnect(client: Socket){
-
-		console.log('HEEEEEEEEEEE disconnectEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE')
-
 		let game: PongGame;
 
 			this.PongService.activeGames.forEach((element) => {
@@ -122,20 +119,16 @@ export class PongGateway {
 		const newgame = await this.PongService.createGame(id, enemyId);
 		if (leftSocket && rightSocket)
 		{
-		this.server.to(leftSocket.id).emit("launchGame")
-		this.server.to(rightSocket.id).emit("launchGame")
+			this.server.to(leftSocket.id).emit("launchGame")
+			this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
+			if (dif)
+				this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
 
-		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
+			this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
-		this.delUserFromSearchingUser(leftSocket)
-		this.delUserFromSearchingUser(rightSocket)
-		}
-		else
-		{
-			console.log("error launchGame")
-			return
+			this.delUserFromSearchingUser(leftSocket)
+			this.delUserFromSearchingUser(rightSocket)
 		}
 	}
 
@@ -177,7 +170,7 @@ export class PongGateway {
 	async addSearchingPlayer(client: Socket, data: number) {
 		try {	
 			if( !data || !data[0] || !data[1])
-				throw new Error("an Error occur from the WebSocket")	
+				throw new Error("Need data from the emit")	
 
 			this.toSearchingArray(client, data[0], data[1])
 			await this.checkToLaunchGame(client, data[1])
@@ -189,8 +182,17 @@ export class PongGateway {
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
-		const speed = 30 / game.difficulty
-
+		// const speed = 20 / game.difficulty
+		let speed: number = 0
+		if (game.difficulty == 1)
+			speed = 10
+		else if (game.difficulty == 2)
+			speed = 6
+		else if (game.difficulty == 3) 
+			speed = 3
+		else
+			speed = 12
+		
 		 setTimeout(() =>{
 			game.moveBall()
 			
