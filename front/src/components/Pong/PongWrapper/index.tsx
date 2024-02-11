@@ -15,6 +15,7 @@ import Loader from "../../../componentsLibrary/Loader"
 import PongPopupError from "./PongPopupError"
 
 import PongContext from "../../../contexts/PongContext"
+import CloseButton from "../../../componentsLibrary/CloseButton"
 // import colors from "../../utils/colors"
 
 const Style = styled.div<{ $backgroundColor: string }>`
@@ -174,17 +175,17 @@ function PongWrapper({social}: any) {
 							<Button
 								onClick={handlePlayButton}
 								type="button" fontSize={"5.5vw"}
-								alt="" title=""
-								style={{width: "35%"}}>
+								alt="Play button" title="Play !">
 								Play !
 							</Button>
 							:
 							(
 								!difficultyChoose ?
 									<>
-										<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Ez</Button>
-										<Button  onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Medium</Button>
-										<Button  onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"5.5vw"} alt="" title=""style={{width: "35%"}}>Hard</Button>
+										<CloseButton closeFunction={setSearching} />
+										<Button onClick={() => handleChooseDifficulty(1)} type="button" fontSize={"3.5vw"} alt="Ez button" title="Ez (noob)"style={{width: "30%"}}>Ez</Button>
+										<Button onClick={() => handleChooseDifficulty(2)} type="button" fontSize={"3.5vw"} alt="Medium button" title="Medium"style={{width: "30%"}}>Medium</Button>
+										<Button onClick={() => handleChooseDifficulty(3)} type="button" fontSize={"3.5vw"} alt="Hard button" title="Hard"style={{width: "30%"}}>Hard</Button>
 									</>
 								:
 								<>
@@ -193,8 +194,7 @@ function PongWrapper({social}: any) {
 									<Button
 										onClick={handleCancelButton}
 										type="button" fontSize={"2.25vw"}
-										alt="" title=""
-										style={{width: "17.5%"}}>
+										alt="Cancel button" title="Cancel">
 										Cancel
 									</Button>
 								</>

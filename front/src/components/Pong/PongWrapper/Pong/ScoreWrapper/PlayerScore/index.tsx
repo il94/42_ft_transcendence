@@ -5,14 +5,14 @@ import styled from 'styled-components';
 
 const Style = styled.div<{ $Hposition: number; $size: number}>`
 	
-	position: absolute;
+	/* position: absolute; */
 
 	font-size:${(props) => props.$size}px;
 
-	top: 10%;
-	left: ${(props) => props.$Hposition}%;
+	/* top: 10%;
+	left: ${(props) => props.$Hposition}%; */
 
-	transform: translate(-50%, -50%);
+	/* transform: translate(-50%, -50%); */
 
 	color: white;
 `

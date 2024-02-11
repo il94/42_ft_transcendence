@@ -28,7 +28,7 @@ export const Username = styled.p`
 
 `
 
-export const Opponent = styled.p`
+export const Opponent = styled.div`
 
 	width: 70px; // ???
 

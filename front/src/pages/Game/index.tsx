@@ -356,7 +356,7 @@ function Game() {
 		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
 			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("createChannelMP", (channelId: number, authorDatas: any) =>
-			recieveChannelMP({ channelId, authorDatas, setUserAuthenticate }))
+			recieveChannelMP({ channelId, authorDatas, userAuthenticate, setUserAuthenticate }))
 		
 		return () => {
 			userAuthenticate.socket?.off("updateUserStatus")
@@ -421,28 +421,28 @@ function Game() {
 									settings={settings}
 									displaySettingsMenu={displaySettingsMenu} />
 							</TopGameWrapper>
-							<BottomGameWrapper>
-								<PongWrapper social={social}/>
-								{
-									card &&
-									<Card
-										cardPosition={cardPosition}
-										displayCard={displayCard} />
-								}
-								{
-									settings &&
-									<SettingsMenu
-										displaySettingsMenu={displaySettingsMenu}
-										displayTwoFAMenu={displayTwoFAMenu} />
-								}
-								{
-									twoFAMenu &&
-									<TwoFaMenu
-										displayTwoFAMenu={displayTwoFAMenu} />
-								}
-								{
-									<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
-										<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
+							<ContextualMenuContext.Provider value={{ contextualMenu, displayContextualMenu, contextualMenuPosition, setContextualMenuPosition, secondaryContextualMenuHeight, setSecondaryContextualMenuHeight }}>
+								<CardContext.Provider value={{ card, displayCard, cardPosition, setCardPosition }}>
+									<BottomGameWrapper>
+										<PongWrapper social={social}/>
+										{
+											card &&
+											<Card
+												cardPosition={cardPosition}
+												displayCard={displayCard} />
+										}
+										{
+											settings &&
+											<SettingsMenu
+												displaySettingsMenu={displaySettingsMenu}
+												displayTwoFAMenu={displayTwoFAMenu} />
+										}
+										{
+											twoFAMenu &&
+											<TwoFaMenu
+												displayTwoFAMenu={displayTwoFAMenu} />
+										}
+										{
 											<ChatContext.Provider value={{ chat, displayChat, chatNotification, displayChatNotification, channelListScrollValue, setChannelListScrollValue, chatScrollValue, setChatScrollValue, chatRender, setChatRender }}>
 												<Chat
 													chat={chat}
@@ -451,10 +451,10 @@ function Game() {
 													chatWindowState={chatWindowState}
 													setChatWindowState={setChatWindowState} />
 											</ChatContext.Provider>
-										</CardContext.Provider>
-									</ContextualMenuContext.Provider>
-								}
-							</BottomGameWrapper>
+										}
+									</BottomGameWrapper>
+								</CardContext.Provider>
+							</ContextualMenuContext.Provider>
 						</RightGameWrapper>
 					</GameWrapper>
 				</DisplayContext.Provider>

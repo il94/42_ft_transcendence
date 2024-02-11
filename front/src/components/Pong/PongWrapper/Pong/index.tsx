@@ -3,7 +3,7 @@ import  {useState, useEffect, KeyboardEvent, useRef, useContext, Dispatch, SetSt
 import styled from 'styled-components'
 import Paddle from './Paddle'
 import Ball from './Ball'
-import Score from './Score'
+import ScoreWrapper from './ScoreWrapper'
 import InteractionContext from "../../../../contexts/InteractionContext"
 import { User } from '../../../../utils/types'
 import Button from "../../../../componentsLibrary/Button"
@@ -15,7 +15,11 @@ import ChatContext from '../../../../contexts/ChatContext'
 
 const Style = styled.div<{ $backgroundColor: string, $w:number, $h:number}>`
 
-position: absolute;
+	display: flex;
+	justify-content: center;
+
+
+	position: absolute;
 
 	width: ${(props) => props.$w}px; //83.5%
 	height: ${(props) => props.$h}px; //83.5%
@@ -46,29 +50,21 @@ transition: background-color 1s ease;
 // 	ONGAME = "ongame"
 // }
 
-const NameStyle = styled.div<{ $Hpos: number }>`
-	position: absolute;
 
-	font-size:10px;
+const ResultStyle = styled.div<{ $height: number }>`
+	/* position: absolute; */
 
-	top: 10%;
-	left: ${(props) => props.$Hpos}%;
+	margin-top: auto;
+	margin-bottom: auto;
 
-	transform: translate(-50%, -50%);
+	font-size: ${(props) => props.$height / 4}px;
 
-	color: white;
-`
-const ResultStyle = styled.div<{ $Hpos: number }>`
-	position: absolute;
+	/* top: 50%; */
+	/* left: ${(props) => props.$Hpos}%; */
 
-	font-size:50px;
+	/* transform: translate(-50%, -50%); */
 
-	top: 50%;
-	left: ${(props) => props.$Hpos}%;
-
-	transform: translate(-50%, -50%);
-
-	color: white;
+	/* color: white; */
 `
 
 type PongProps = {
@@ -217,9 +213,8 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	
 	useEffect(() => {
 
-		// const PongContainer = PongRef.current
-		
-		// if (PongContainer)
+		const PongContainer = PongRef.current
+		if (PongContainer)
 			setConvertionFactor(height / 1080)
 
 	}, [window.innerHeight, window.innerWidth, social, height, width])
@@ -252,8 +247,9 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 					}
 					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)} handleKeyDown={handleKeyDown} handleKeyUp={handleKeyUp} tabIndex={spectate ? -1 : 0} />
 					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
-					<NameStyle $Hpos={10}>{Name.left}</NameStyle>
-					<NameStyle $Hpos={90}>{Name.right}</NameStyle>
+
+					{/* <NameStyle $Hpos={10} $height={height}>{Name.left}</NameStyle>
+					<NameStyle $Hpos={90} $height={height}>{Name.right}</NameStyle> */}
 					{/* {spectate && <button onClick={handleStopSpectate}>Spectate</button>} */}
 					{/* {spectate && <Button
 						onClick={handleStopSpectate}
@@ -262,10 +258,10 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 						title=""
 						alt=""
 					>Spectate</Button>} */}
-					<Score LeftScore={score.left} RightScore={score.right} size={scoreSize}/>
+					<ScoreWrapper LeftScore={score.left} RightScore={score.right} leftName={Name.left} rightName={Name.right} height={height}/>
 					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)} tabIndex={-1} />
 				</> ) :
-				<ResultStyle $Hpos={50}>{endMessage.message}</ResultStyle>
+				<ResultStyle $height={height}>{'Victory'}</ResultStyle>
 			}
 		</Style>
 	);

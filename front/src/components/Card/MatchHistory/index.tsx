@@ -31,12 +31,12 @@ function MatchHistory() {
 		async function fetchMatchs() {
 			try {
 				setLoaderMatchsHistory(true)
-				const matchsResponse: AxiosResponse = await axios.get(`https://${url}:3333/user/matchs/${userTarget.id}`, {
+				const matchsResponse: AxiosResponse<[]> = await axios.get(`https://${url}:3333/user/matchs/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				setMatchs(matchsResponse.data)
+				setMatchs(matchsResponse.data.reverse())
 				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
@@ -76,7 +76,8 @@ function MatchHistory() {
 							<Match
 								key={"match" + match.match.gameId}
 								username={userTarget.username}
-								opponent={match.challengerData.challenger}
+								opponentId={match.challengerData.challengerId}
+								opponentName={match.challengerData.challenger}
 								result={match.match.result}
 								scoreUser={match.match.score}
 								scoreOpponent={match.challengerData.challengerScore}
