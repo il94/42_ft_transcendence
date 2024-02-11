@@ -1,4 +1,5 @@
 import {
+	useContext,
 	useState
 } from "react"
 import {
@@ -11,6 +12,13 @@ import {
 	Style
 } from "./style"
 
+import InteractionContext from "../../contexts/InteractionContext"
+import DisplayContext from "../../contexts/DisplayContext"
+
+import {
+	userStatus
+} from "../../utils/status"
+
 import HomeIcon from "../../assets/home.png"
 import YellowHomeIcon from "../../assets/yellow_home.png"
 
@@ -20,10 +28,19 @@ type PropsLogo = {
 
 function Logo({ social }: PropsLogo) {
 
+	const { userAuthenticate } = useContext(InteractionContext)!
+	const { displayPopupError } = useContext(DisplayContext)!
+
 	const navigate = useNavigate()
 	const [homeIcon, setHomeIcon] = useState<string>(HomeIcon)
+
 	return (
-		<Style onClick={() => navigate("/")}>
+		<Style onClick={() => {
+			if (userAuthenticate.status === userStatus.ONLINE)
+				navigate("/")
+			else
+				displayPopupError({ display: true, message: "You can't go to Home when you are busy" })
+			}}>
 			{
 				social ?
 				<LogoFull tabIndex={0}>

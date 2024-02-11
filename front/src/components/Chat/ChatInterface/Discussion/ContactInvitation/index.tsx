@@ -26,7 +26,8 @@ import InteractionContext from "../../../../../contexts/InteractionContext"
 import AuthContext from "../../../../../contexts/AuthContext"
 
 import {
-	challengeStatus
+	challengeStatus,
+	userStatus
 } from "../../../../../utils/status"
 
 import {
@@ -126,15 +127,24 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					<ButtonsWrapper>
 						{
 							target.id === userAuthenticate.id ?
-							<ButtonChallenge
-								color={colors.buttonGreen}>
+							<ButtonChallengeLocked
+								color={colors.buttonGreen}
+								title="Accepted">
 								Accepted !
-							</ButtonChallenge>
-							:
-							<ButtonChallenge onClick={() => userAuthenticate.socket?.emit("spectate", userAuthenticate.id, target.id)}
-								color={colors.button}>
+							</ButtonChallengeLocked>
+							: userAuthenticate.status === userStatus.ONLINE ?
+							<ButtonChallenge
+								onClick={() => {userAuthenticate.socket?.emit("spectate", userAuthenticate.id, target.id)}}
+								color={colors.button}
+								alt="Spectate button" title="Accepted">
 								Spectate
 							</ButtonChallenge>
+							:
+							<ButtonChallengeLocked
+								color={colors.buttonGray}
+								title="Accepted">
+								Spectate
+							</ButtonChallengeLocked>
 						}
 					</ButtonsWrapper>
 				}
