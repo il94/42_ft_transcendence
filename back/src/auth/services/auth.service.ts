@@ -244,7 +244,7 @@ export class AuthService {
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
 			else
-				throw new BadRequestException()
+				throw new BadRequestException('')
 		}
 	}
 
@@ -292,26 +292,33 @@ export class AuthService {
 		}
 	}
 
-	async disableTwoFA(user: User, code: string) {
+	async disableTwoFA(user: User, twoFACode: string): Promise <User> {
 		try {
-			const otpCode = await this.prisma.user.findUnique({
-				where: { id: user.id, twoFASecret:  code }
-			})
-			if (!otpCode)
-				throw new NotFoundException(`Failed to disable TwoFA`);
+			const getUser = await this.prisma.user.findUnique({ where: {id: user.id, twoFA: true }});
+			if (!getUser)
+				throw new NotFoundException('User with 2FA not found');
+		
+			const codevalid = await this.verifyCode(getUser.twoFASecret, twoFACode)
+			if (!codevalid) 
+				throw new ForbiddenException("Wrong code")
+
 			const setUser = await this.prisma.user.update({
 				where: { id: user.id },
 				data: { twoFA: false },
 			});
-			return setUser.twoFA;
+			if  (!setUser)
+				throw new NotFoundException('Failed to update user');
+			
+			return setUser;
 		}
-		catch (error) { // a check
-			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+		catch (error) { 	
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided user data is not allowed")
-			else
+			else {
 				throw new BadRequestException()
+			}
 		}
 	}
 
