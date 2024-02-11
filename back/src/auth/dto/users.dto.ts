@@ -65,10 +65,10 @@ export class UpdateUserDto {
 	@ContainsSpecialCharacter()
 	hash: string;
 
-	@IsOptional()
-	@IsString()
-	@IsNotEmpty()
-	avatar: string;
+	// @IsOptional()
+	// @IsString()
+	// @IsNotEmpty()
+	// avatar: string;
 	
 	@IsOptional()
 	@IsBoolean()

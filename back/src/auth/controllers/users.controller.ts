@@ -1,17 +1,40 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, 
-  UseGuards, ParseIntPipe, Request } from '@nestjs/common';
+  UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, ParseFilePipeBuilder, ParseFilePipe,
+  HttpStatus, } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { JwtGuard } from '../guards/auth.guard';
-import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { UpdateUserDto } from '../dto/users.dto';
 import { getUser } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CustomUploadFileTypeValidator } from '../file.validdator';
+
+const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png'];
 
 @UseGuards(JwtGuard)
 @Controller('user')
-@ApiTags('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+	@Post('upload')
+	@UseInterceptors(FileInterceptor('file'))
+	async uploadFile(@getUser() user: User, @UploadedFile(
+		new ParseFilePipeBuilder()
+			.addValidator(
+			new CustomUploadFileTypeValidator({
+				fileType: VALID_UPLOADS_MIME_TYPES,
+			}),
+			)
+			.addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
+			.build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+	) file: Express.Multer.File) {
+		console.log(file.buffer.toString('base64'));
+		// return await this.usersService.uploadAvatar(user.id, file.buffer.toString())
+		// {
+		// 	file: file.buffer.toString(),
+		// 	};
+	}
 
 	// Renvoie les donnees publiaues de tout les users
 	@Get()
@@ -49,6 +72,16 @@ export class UsersController {
 	@Body() updateUserDto: UpdateUserDto) {
 		return this.usersService.updateUser(userId, updateUserDto)
 	}
+
+  	// Modifie le user authentifie
+	@Patch('avatar')
+	@UseInterceptors(FileInterceptor('image'))
+	async updateAvatar(@getUser('id') userId: number, 
+	@Body() updateUserDto: UpdateUserDto) {
+		return this.usersService.updateUser(userId, avatar)
+	}
+  
+
 }
 
 /* =========================== PAS UTILISEES ================================ */

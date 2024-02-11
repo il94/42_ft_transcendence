@@ -1,6 +1,8 @@
 import { Avatar, SettingTtile, Style } from "./style"
 import { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useContext } from "react"
+import axios from "axios"
+import AuthContext from "../../../contexts/AuthContext"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -19,23 +21,52 @@ type PropsSelectAvatar = {
 
 function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 
-	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
+	const { token, url } = useContext(AuthContext)!
 
-		const avatar = event.target.files?.[0]
-		if (avatar) {
+
+	async function uploadAvatar(avatarr: any) {
+		try {
+							
+			console.log("AVATAR  = ", avatarr)
+
+			const formData = new FormData();
+			formData.append('file', avatarr);
+			
+
+			await axios.post(`http://${url}:3333/user/upload`, formData,
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`,
+					'Content-Type': 'multipart/form-data'
+				}
+			})
+		}
+		catch (error) {
+			console.log(error)
+		}
+	}
+
+	async function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
+
+
+		const avatarr = event.target.files?.[0]
+		if (avatarr) {
 			const reader = new FileReader()
 
 			reader.onloadend = () => {
 				const imageDataUrl = reader.result
 				if (typeof imageDataUrl === 'string')
+				{
 					setAvatar(imageDataUrl);
+					uploadAvatar(avatarr)
+				}
 			}
 
 			reader.onerror = () => {
 				console.error("error")
 				setAvatar('');
 			}
-			reader.readAsDataURL(avatar)
+			reader.readAsDataURL(avatarr)
 		}
 
 	}

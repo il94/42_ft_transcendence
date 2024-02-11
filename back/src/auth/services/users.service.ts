@@ -223,6 +223,8 @@ export class UsersService {
 				hash: hash
 			} : updateUserDto
 
+			// const userNewDatas.avatar = avatar
+
 			// Modifie le user auth
 			const newDatas = await this.prisma.user.update({
 				where: {
@@ -236,14 +238,48 @@ export class UsersService {
 					avatar: true
 				}
 			})
-
+			if (!newDatas)
+				throw new NotFoundException("Failed tu update user")
 			// Emit
 			this.appGateway.server.emit("updateUserDatas", userId, newDatas)
-
 			console.log(`User ${userId} has been updated`)
 		}
 		catch (error) {
-			if (error instanceof ForbiddenException)
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided credentials are not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
+	async uploadAvatar(userId: number, file: string): Promise<Partial<User>> {
+		try {
+
+			console.log("ICI");
+
+			const newData = await this.prisma.user.update({
+				where: {
+					id: userId
+				},
+				data: {
+					avatar: file
+				},
+				select: {
+					username: true,
+					avatar: true
+				}
+			})
+			if (!newData)
+				throw new NotFoundException("Failed tu update user")
+
+			return newData
+		} catch (error) {
+
+			console.log("ERROR", error);
+
+			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided credentials are not allowed")
