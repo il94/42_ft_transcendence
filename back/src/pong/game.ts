@@ -291,14 +291,14 @@ export class PongGame {
 	// }
 
 	checkScore(){
-		if (this.LeftPlayer.getScore() === 3 || this.RightPlayer.getScore() === 3)
+		if (this.LeftPlayer.getScore() === 11 || this.RightPlayer.getScore() === 11)
 			this.setState(false)
 	}
 
 	SetTheWinner(){ // victory
-		if (this.LeftPlayer.getScore() === 3)
+		if (this.LeftPlayer.getScore() === 11)
 			this.LeftPlayer.setWinner()
-		if (this.RightPlayer.getScore() === 3)
+		if (this.RightPlayer.getScore() === 11)
 			this.RightPlayer.setWinner()
 	}
 
