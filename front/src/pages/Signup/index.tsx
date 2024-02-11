@@ -52,7 +52,12 @@ function Signup() {
 
 	useEffect(() => {
 		if (token)
-			navigate("/error")
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -83,7 +88,7 @@ function Signup() {
 				avatar: getRandomDefaultAvatar()
 			}
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`https://${url}:3333/auth/signup`, newUser)
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
 			localStorage.setItem("access_token", signupResponse.data.access_token)
 

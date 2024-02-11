@@ -15,7 +15,7 @@ export class BlockedsService {
 		try {
 			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
-				throw new ForbiddenException("It is not possible to block yourself")
+				throw new ForbiddenException("Unauthorized to block yourself")
 			
 			// Verifie si le user target existe et récupère son username
 			const userTarget = await this.prisma.user.findUnique({
@@ -77,7 +77,7 @@ export class BlockedsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -121,12 +121,11 @@ export class BlockedsService {
 				}
 			})
 
-			// console.log(`User ${userId} blockeds : `, blockeds)
 			return blockeds
 		}
 		catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -137,7 +136,7 @@ export class BlockedsService {
 		try {
 			// Verifie si le user target n'est pas le user auth
 			if (userAuthId === userTargetId)
-				throw new ForbiddenException("It is not possible to unblock yourself")
+				throw new ForbiddenException("Unauthorized to unblock yourself")
 
 			// Verifie si le user target existe
 			const userTarget = await this.prisma.user.findUnique({
@@ -180,7 +179,7 @@ export class BlockedsService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}

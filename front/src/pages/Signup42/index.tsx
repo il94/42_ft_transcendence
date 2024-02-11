@@ -63,14 +63,21 @@ const FTImage = styled.img`
 
 function SignupFT() {
 
-	const { url } = useContext(AuthContext)!
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
 	const usernameId = Cookies.get('usernameId')
 	const avatarCookie = Cookies.get('avatar')
 	
 	useEffect(() => {
-		if (!usernameId || !avatarCookie)
+		if (token)
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
+		else if (!usernameId || !avatarCookie)
 			navigate("/error")
 	}, [])
 
@@ -103,7 +110,7 @@ function SignupFT() {
 				avatar: avatar
 			}
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`https://${url}:3333/auth/signup`, newUser)
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
 
 			localStorage.setItem("access_token", signupResponse.data.access_token)
 

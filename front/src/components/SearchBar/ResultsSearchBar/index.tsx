@@ -66,7 +66,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 			try {
 				setLoaderResultsSearchBar(true)
 
-				const usersResponse: AxiosResponse<User[]> = await axios.get(`https://${url}:3333/user`, {
+				const usersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/user`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -77,7 +77,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					user.username != userAuthenticate.username
 				)).sort(sortUserByName))
 
-				const accessiblesChannelsResponse = await axios.get(`https://${url}:3333/channel/accessibles`, {
+				const accessiblesChannelsResponse = await axios.get(`http://${url}:3333/channel/accessibles`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -122,7 +122,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 	async function addUserToFriendList(user: User) {
 		try {
 			if (!userIsFriend(userAuthenticate, user.id)) {
-				await axios.post(`https://${url}:3333/friends/${user.id}`, {}, {
+				await axios.post(`http://${url}:3333/friends/${user.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -132,8 +132,6 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					friends: [...prevState.friends, user]
 				}))
 			}
-			else
-				displayPopupError({ display: true, message: `${user.username} is already your friend` })
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
@@ -154,7 +152,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 	// Si le user est déjà dans le channel, ouvre le channel dans le chat
 	async function addChannelToChannelList(channelId: number) {
 		try {
-			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`https://${url}:3333/channel/${channelId}/relations`, {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channelId}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -171,7 +169,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					setChannelTarget(channelWithRelationsResponse.data)
 				}
 				else {
-					await axios.post(`https://${url}:3333/channel/${channelId}/join`, {}, {
+					await axios.post(`http://${url}:3333/channel/${channelId}/join`, {}, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}

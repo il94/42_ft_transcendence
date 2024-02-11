@@ -56,7 +56,7 @@ function Home() {
 				// Si un token est trouve, verifie si'il est valide et le set
 				if (access_token)
 				{
-					await axios.post(`https://${url}:3333/auth/token`, {}, {
+					await axios.post(`http://${url}:3333/auth/token`, {}, {
 						headers: {
 							'Authorization': `Bearer ${access_token}`
 						}
@@ -92,7 +92,7 @@ function Home() {
 	// Déconnecte le user en supprimant son token des cookies et en local
 	async function handleDeconnexionClickText() {
 		try {
-			await axios.get(`https://${url}:3333/auth/logout`, {
+			await axios.get(`http://${url}:3333/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

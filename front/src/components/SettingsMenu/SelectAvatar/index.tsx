@@ -1,6 +1,24 @@
-import { Avatar, SettingTtile, Style } from "./style"
-import { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
-import { ChangeEvent, Dispatch, SetStateAction } from "react"
+import {
+	Dispatch,
+	SetStateAction,
+	useContext
+} from "react"
+
+import {
+	Avatar,
+	SettingTtile,
+	Style
+} from "./style"
+
+import {
+	handleAvatarUpload
+} from "../../../utils/functions"
+
+import {
+	HiddenInput
+} from "../../../componentsLibrary/IconUploadFile"
+
+import DisplayContext from "../../../contexts/DisplayContext"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -19,26 +37,7 @@ type PropsSelectAvatar = {
 
 function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 
-	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
-
-		const avatar = event.target.files?.[0]
-		if (avatar) {
-			const reader = new FileReader()
-
-			reader.onloadend = () => {
-				const imageDataUrl = reader.result
-				if (typeof imageDataUrl === 'string')
-					setAvatar(imageDataUrl);
-			}
-
-			reader.onerror = () => {
-				console.error("error")
-				setAvatar('');
-			}
-			reader.readAsDataURL(avatar)
-		}
-
-	}
+	const { displayPopupError } = useContext(DisplayContext)!
 
 	return (
 		<Style>
@@ -48,7 +47,7 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 			<Avatar
 				src={avatar} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
-			<HiddenInput onChange={handleAvatarUpload}
+			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
 				id="uploadAvatarUser" type="file" accept="image/*" />
 		</Style>
 	)

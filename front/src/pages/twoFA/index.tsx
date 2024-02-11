@@ -48,16 +48,25 @@ function TwoFA() {
 	const navigate = useNavigate()
 	const location = useLocation()
 
-	let userId: string | number | undefined;
-
-    if (Cookies.get('userId')) {
-        userId = Cookies.get('userId');
-    } else if (location.state && location.state.userId) {
-        userId = location.state.userId;
-	}
+	const [userId, setUserId] = useState<string | number | undefined>(undefined)
 
 	useEffect(() => {
-		if (Cookies.get('userId') == undefined || token || !userId)
+		if (token)
+		{
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
+		}
+		else if (Cookies.get('userId')) {
+			setUserId(Cookies.get('userId'))
+		}
+		else if (location.state && location.state.userId) {
+			setUserId(location.state.userId)
+		}	
+		else
 			navigate("/error")
 	}, [])
 
@@ -83,7 +92,7 @@ function TwoFA() {
 			if (code.error)
 				return
 			
-			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`https://${url}:3333/auth/2fa/authenticate/${userId}`, {
+			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${userId}`, {
 				twoFACode: code.value
 			})
 			 

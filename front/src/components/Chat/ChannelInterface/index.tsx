@@ -33,7 +33,8 @@ import AuthContext from "../../../contexts/AuthContext"
 import DisplayContext from "../../../contexts/DisplayContext"
 
 import {
-	capitalize
+	capitalize,
+	handleAvatarUpload
 } from "../../../utils/functions"
 
 import {
@@ -101,7 +102,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					newDatas.avatar = avatar
 
 				if (Object.keys(newDatas).length !== 0) {
-					await axios.patch(`https://${url}:3333/channel/${channelTarget.id}`, newDatas, {
+					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, newDatas, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -119,7 +120,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					avatar: avatar
 				}
 
-				const postChannelResponse = await axios.post(`https://${url}:3333/channel`, newDatas, {
+				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -285,25 +286,6 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 			DefaultChannelIcon
 	)
 
-	function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
-		const avatar = event.target.files?.[0]
-		if (avatar) {
-			const reader = new FileReader()
-
-			reader.onloadend = () => {
-				const imageDataUrl = reader.result
-				if (typeof imageDataUrl === 'string')
-					setAvatar(imageDataUrl);
-			}
-
-			reader.onerror = () => {
-				console.error("error")
-				setAvatar('');
-			}
-			reader.readAsDataURL(avatar)
-		}
-	}
-
 	/* ========================================================================== */
 
 	return (
@@ -383,7 +365,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 						<Avatar
 							src={avatar} htmlFor="uploadAvatarChannel" tabIndex={0}
 							title="Upload image" />
-						<HiddenInput onChange={handleAvatarUpload}
+						<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
 							id="uploadAvatarChannel" type="file" accept="image/*" />
 					</HorizontalSettingWrapper>
 				</HorizontalSetting>

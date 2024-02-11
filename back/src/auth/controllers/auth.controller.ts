@@ -80,15 +80,9 @@ export class AuthController {
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
 	@UseGuards(JwtGuard)
-	async turnOnTwoFA(@getUser() user: User, @Body() body: TwoFaDto): Promise <boolean> {
-		try {
-			if (!body.twoFACode)
-				throw new BadRequestException('Empty 2FA code');
-			const tfaUser = await this.authService.turnOnTwoFA(user, body.twoFACode);
-			return  tfaUser.twoFA 
-		} catch (error) {
-			throw new BadRequestException(error.message);
-		}
+	async turnOnTwoFA(@getUser() user: User, @Body() body: TwoFaDto): Promise <{success: boolean}> {
+		await this.authService.turnOnTwoFA(user, body.twoFACode);
+		return { success: true } 
 	}
 
 	// Verifie le code envoye avec l'api de google et renvoie un token d'authentification
@@ -99,15 +93,10 @@ export class AuthController {
   	}
 
 	@Patch('2fa/disable')
-	@HttpCode(200)
 	@UseGuards(JwtGuard)
-	async disable(@getUser() user: User, @Body() body): Promise <boolean> {
-		try {
-			const disable: boolean =  await this.authService.disableTwoFA(user, body.TwoFA)
-			return disable;
-		} catch (error) {
-			throw new BadRequestException(error.message);
-		}
+	async disable(@getUser() user: User, @Body() body: TwoFaDto): Promise <{success: boolean}> {
+		await this.authService.disableTwoFA(user, body.twoFACode)
+		return { success: true }
 	}
 
 }

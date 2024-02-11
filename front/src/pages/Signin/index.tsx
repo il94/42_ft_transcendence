@@ -67,7 +67,12 @@ function Signin() {
 
 	useEffect(() => {
 		if (token)
-			navigate("/error")
+			navigate("/error", {
+				state: {
+					message: "You are already authenticate",
+					keepConnect: true
+				}
+			})
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -97,7 +102,7 @@ function Signin() {
 				hash: password.value
 			}
 
-			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`https://${url}:3333/auth/signin`, user)
+			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}:3333/auth/signin`, user)
 
 			if ('twoFA' in signinResponse.data) {
 				navigate("/twofa", {
@@ -237,7 +242,7 @@ function Signin() {
 				</div>
 				<Separator />
 				<FTRedirectWrapper>
-					<LinkButtonImage to={`https://${url}:3333/auth/api42`}>
+					<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
 						<img src={FTButton} style={{ paddingRight: "7px" }} />
 						Continue with 42
 					</LinkButtonImage>

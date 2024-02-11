@@ -86,7 +86,7 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -118,7 +118,7 @@ export class AuthService {
 			if (error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -163,7 +163,7 @@ export class AuthService {
 		try {
 			// Verifie si le user possebe bien un compte 42
 			if (!user)
-				throw new BadRequestException("User not found from 42 intra")
+				throw new BadRequestException("User not found in 42 database")
 			
 			// Si le user possede deja un compte dans l'app
 			if ('id' in user)
@@ -175,7 +175,7 @@ export class AuthService {
 					const token = await this.signToken(user.id, user.username)
 						res.clearCookie('token', { httpOnly: true })
 						.cookie("access_token", token.access_token)
-						.redirect(`https://${process.env.IP}:5173`)
+						.redirect(`http://${process.env.IP}:5173`)
 				}
 			
 				// Si le user a active la twoFA
@@ -184,7 +184,7 @@ export class AuthService {
 					// Redirige vers la page twoFA avec les infos necessaires pour le front
 					res.cookie('two_FA', true)
 					.cookie('userId', user.id)
-					.redirect(`https://${process.env.IP}:5173/twofa`)	
+					.redirect(`http://${process.env.IP}:5173/twofa`)	
 				}
 			}
 			// Si le user ne possede pas de compte dans l'app
@@ -193,14 +193,14 @@ export class AuthService {
 				// Stocke les donnees necessaires a l'authentification dans des
 				// cookies de 5 mins  et redirige vers la page de creation de compte
 				const fiveMin = Date.now() + 5 * 60 * 1000;
-				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin), /*httpOnly: true*/ })
-				.cookie("avatar", user.avatar, { expires: new Date(fiveMin) })
-				.redirect(`https://${process.env.IP}:5173/signup42`)
+				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin) })
+				.cookie("avatar", user.avatar, { expires: new Date(fiveMin)})
+				.redirect(`http://${process.env.IP}:5173/signup42`)
 			}
 		}
 		catch (error) {
-			res.cookie("error_message", error.message).
-			redirect(`https://${process.env.IP}:5173/error`)
+			res.cookie("error_message", error.message)
+			.redirect(`http://${process.env.IP}:5173/error`)
 		}
 	}
 
@@ -242,7 +242,7 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
@@ -286,33 +286,39 @@ export class AuthService {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
 		}
 	}
 
-	async disableTwoFA(user: User, code: string) {
+	async disableTwoFA(user: User, twoFACode: string): Promise <User> {
 		try {
-			const otpCode = await this.prisma.user.findUnique({
-				where: { id: user.id, twoFASecret:  code }
-			})
-			if (!otpCode)
-				throw new NotFoundException(`Failed to disable TwoFA`);
+			const getUser = await this.prisma.user.findUnique({ where: {id: user.id, twoFA: true }});
+			if (!getUser)
+				throw new NotFoundException('User with 2FA not found');
+		
+			const codevalid = await this.verifyCode(getUser.twoFASecret, twoFACode)
+			if (!codevalid) 
+				throw new ForbiddenException("Wrong code")
+
 			const setUser = await this.prisma.user.update({
 				where: { id: user.id },
 				data: { twoFA: false },
 			});
-			return setUser.twoFA;
+			if  (!setUser)
+				throw new NotFoundException('Failed to update user');
+			
+			return setUser;
 		}
-		catch (error) { // a check
-			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
+		catch (error) { 	
+			if (error instanceof ForbiddenException || error instanceof NotFoundException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided user data is not allowed")
+				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
-		}
+			}
 	}
 
 /* =============================== UTILS ==================================== */

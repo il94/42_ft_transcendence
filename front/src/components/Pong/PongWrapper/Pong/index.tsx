@@ -5,12 +5,15 @@ import Paddle from './Paddle'
 import Ball from './Ball'
 import ScoreWrapper from './ScoreWrapper'
 import InteractionContext from "../../../../contexts/InteractionContext"
-import { User } from '../../../../utils/types'
+import { ErrorResponse, User } from '../../../../utils/types'
 import Button from "../../../../componentsLibrary/Button"
 import effects from '../../../../utils/effects'
 import colors from '../../../../utils/colors'
 import CloseButton from '../../../../componentsLibrary/CloseButton'
 import ChatContext from '../../../../contexts/ChatContext'
+import axios, { AxiosError } from 'axios'
+import AuthContext from '../../../../contexts/AuthContext'
+import DisplayContext from '../../../../contexts/DisplayContext'
 
 
 const Style = styled.div<{ $backgroundColor: string, $w:number, $h:number}>`
@@ -79,6 +82,8 @@ type PongProps = {
 
 function Pong({ width, height, score, setScore, setGameState, setSpectate, spectate, social}: PongProps){
 	
+	const { displayPopupError } = useContext(DisplayContext)!
+
 	const user = useContext(InteractionContext)!
 
 	const PongRef = useRef<HTMLDivElement | null>(null)
@@ -90,7 +95,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	const [EnemyPaddlePos, setEnemyPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
 
 	const [Name, setName] = useState<{left: string, right: string}>({left: "", right: ""})
-	
+	const { token, url } = useContext(AuthContext)!
 	const [ballSize, setBallSize] = useState(25);
 	const [scoreSize, setScoreSize] = useState(75);
 
@@ -131,10 +136,32 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		}
 	};
 
-	const handleStopSpectate = () => {
-		user.userAuthenticate.socket?.emit("stopSpectate", gameId, user.userAuthenticate.id)
-		setGameState(false)
-		setSpectate(false)
+	const handleStopSpectate = async () => {
+		console.log("u =", user.userAuthenticate.id, "gameid = ",  gameId)
+		try {
+
+			await axios.patch(`http://${url}:3333/pong/stopspectate/${user.userAuthenticate.id}`, 
+				{ gameId: gameId},
+				{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			setGameState(false)
+			setSpectate(false)
+		}
+		catch (error) {
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError<ErrorResponse>
+                const { statusCode, message } = axiosError.response?.data!
+                if (statusCode === 403)
+                    displayPopupError({ display: true, message: message })
+                else
+                    displayPopupError({ display: true })
+            }
+            else
+                displayPopupError({ display: true })
+        }
 	}
 
 	const updatePong = (gameID: number, ballPosition: any, myName: string, myPos: any, enemyName: string, enemyPos: any , myScore: number, enemyScore: number) => {
@@ -165,6 +192,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		{
 			if (spectate){
 				setGameState(false)
+				setSpectate(false)
 				return;
 			}
 			const msg = myScore === 11 ? "Victory !" : "Defeat"
