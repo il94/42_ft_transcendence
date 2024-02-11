@@ -22,6 +22,7 @@ function Error() {
 
 	useEffect(() => {
 		localStorage.removeItem("access_token")
+		Cookies.remove("error_message")
 	}, [])
 
 	return (

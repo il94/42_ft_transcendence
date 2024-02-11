@@ -1,8 +1,18 @@
 (Extension VSCode pour voir le .txt mis en page : ColorTXT)
 
 CAS/ :
-	checker tout les "throw"
-	capper taille des messages
+
+(===================== SOSO ========================)
+
+Taille des messages dans le back 9999 max
+
+(==================== CLAIRE =======================)
+
+Fix ou supprimer SSL
+
+(==================== EMILIE =======================)
+
+Corriger messages
 
 GLOBAL/ : A faire sur tout les fichiers un par un
 

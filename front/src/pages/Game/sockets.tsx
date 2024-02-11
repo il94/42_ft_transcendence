@@ -49,7 +49,7 @@ export function postText(props: PropsPostText) {
 	{
 		const userSend = findUserInChannel(props.channelTarget, props.userId)
 		if (!userSend)
-			throw new Error
+			return
 
 		const messageContent: MessageText = {
 			id: props.textDatas.id,
@@ -92,11 +92,11 @@ export function postInvitation(props: PropsPostInvitation) {
 	{
 		const userSend = findUserInChannel(props.channelTarget, props.userAuthId)
 		if (!userSend)
-			throw new Error
+			return
 
 		const userTarget = findUserInChannel(props.channelTarget, props.userTargetId)
 		if (!userTarget)
-			throw new Error
+		return
 
 		const messageContent: MessageInvitation = {
 			id: props.invitationDatas.id,
@@ -242,56 +242,50 @@ type PropsRefreshUserRole = {
 }
 
 export async function refreshUserRole(props : PropsRefreshUserRole) {
-	try {
-		if (props.newRole === channelRole.BANNED && props.userAuthenticate.id === props.userId)
-		{
-			await refreshLeaveChannel({
-				channelId: props.channelId,
-				userId: props.userId,
-				userAuthenticate: props.userAuthenticate,
-				setUserAuthenticate: props.setUserAuthenticate,
-				channelTarget: props.channelTarget,
-				setChannelTarget: props.setChannelTarget
+	if (props.newRole === channelRole.BANNED && props.userAuthenticate.id === props.userId)
+	{
+		await refreshLeaveChannel({
+			channelId: props.channelId,
+			userId: props.userId,
+			userAuthenticate: props.userAuthenticate,
+			setUserAuthenticate: props.setUserAuthenticate,
+			channelTarget: props.channelTarget,
+			setChannelTarget: props.setChannelTarget
+		})
+	}
+	else if (props.channelTarget?.id === props.channelId)
+	{
+		const setChannel = props.setChannelTarget as Dispatch<SetStateAction<Channel>> 
+
+		if (props.newRole === channelRole.UNBANNED) {
+			setChannel((prevState: Channel) => {
+				return (removeUserInChannel(prevState, props.userId, props.log))
 			})
 		}
-		else if (props.channelTarget?.id === props.channelId)
+		else
 		{
-			const setChannel = props.setChannelTarget as Dispatch<SetStateAction<Channel>> 
+			const userTarget = findUserInChannel(props.channelTarget, props.userId)
+			if (!userTarget)
+				return
 
-			if (props.newRole === channelRole.UNBANNED) {
+			
+			if (props.newRole === channelRole.MEMBER) {
 				setChannel((prevState: Channel) => {
-					return (removeUserInChannel(prevState, props.userId, props.log))
+					return (setUserToMember(prevState, userTarget, props.log))
 				})
 			}
-			else
-			{
-				const userTarget = findUserInChannel(props.channelTarget, props.userId)
-				if (!userTarget)
-					throw new Error
-
-				
-				if (props.newRole === channelRole.MEMBER) {
-					setChannel((prevState: Channel) => {
-						return (setUserToMember(prevState, userTarget, props.log))
-					})
-				}
-				else if (props.newRole === channelRole.ADMIN) {	
-					setChannel((prevState: Channel) => {
-						return (setUserToAdministrator(prevState, userTarget, props.log))
-					})
-				}
-				else if (props.newRole === channelRole.BANNED) {	
-					setChannel((prevState: Channel) => {
-						return (setUserToBanned(prevState, userTarget, props.log))
-					})
-				}
+			else if (props.newRole === channelRole.ADMIN) {	
+				setChannel((prevState: Channel) => {
+					return (setUserToAdministrator(prevState, userTarget, props.log))
+				})
+			}
+			else if (props.newRole === channelRole.BANNED) {	
+				setChannel((prevState: Channel) => {
+					return (setUserToBanned(prevState, userTarget, props.log))
+				})
 			}
 		}
 	}
-	catch (error) {
-		console.log(error)
-	}
-
 }
 
 type PropsRefreshNewOwner = {
@@ -323,7 +317,7 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 	{
 		const userTarget = findUserInChannel(props.channelTarget, props.userId)
 		if (!userTarget)
-			throw new Error
+			return
 		props.setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState)
 				return (setUserToOwner(prevState, userTarget))
