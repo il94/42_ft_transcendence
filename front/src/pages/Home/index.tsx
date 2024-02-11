@@ -78,6 +78,7 @@ function Home() {
 				Cookies.remove('avatar')
 				Cookies.remove('two_FA')
 				Cookies.remove('userId')
+				Cookies.remove('error_message')
 			}
 		}
 		getToken()
