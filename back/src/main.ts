@@ -6,16 +6,9 @@ import session from 'express-session';
 import passport from 'passport'
 import { json } from 'express';
 import cookieParser from 'cookie-parser';
-import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
-import * as fs from 'fs';
-import * as helmet from 'helmet';
 
 async function bootstrap() {
-	const httpsOptions: HttpsOptions = {
-		key: fs.readFileSync('./secrets/private.key'),
-		cert: fs.readFileSync('./secrets/public-certificate.crt'),
-	  };
-	const app = await NestFactory.create(AppModule, { httpsOptions });
+	const app = await NestFactory.create(AppModule);
 	app.use(json({ limit: '5mb' }))
 	
 	app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true,}));
@@ -24,6 +17,7 @@ async function bootstrap() {
 	const { httpAdapter } = app.get(HttpAdapterHost);
   	app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
+	app.use(cookieParser());
 	app.use(
 		session({
 		  secret: process.env.SESSION_SECRET,
@@ -41,14 +35,11 @@ async function bootstrap() {
 		credentials: true,
 	})
 
-	app.use(helmet({
-		referrerPolicy: { policy: 'no-referrer' }
-	}));
-
 	app.use(passport.initialize());
 	app.use(passport.session());
-	app.use(cookieParser());
 	
-	await app.listen(process.env.PORT);
+	await app.listen(process.env.PORT, () => {
+		console.log(`Server listening on ${process.env.IP}:${process.env.PORT}`)
+	});
 }
 bootstrap();

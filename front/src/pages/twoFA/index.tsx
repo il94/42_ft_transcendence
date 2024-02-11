@@ -83,7 +83,7 @@ function TwoFA() {
 			if (code.error)
 				return
 			
-			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`https://${url}:3333/auth/2fa/authenticate/${userId}`, {
+			const authTwoFAResponse: AxiosResponse<PropsTwoFAResponse> = await axios.post(`http://${url}:3333/auth/2fa/authenticate/${userId}`, {
 				twoFACode: code.value
 			})
 			 
