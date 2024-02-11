@@ -65,7 +65,7 @@ function SecondaryContextualMenu({ displaySecondaryContextualMenu, secondaryCont
 			})
 			
 			if (userIsInChannel(channelWithRelationsResponse.data, userTarget.id))
-				displayPopupError({ display: true, message: `${userTarget.username} is already in channel` })
+				displayPopupError({ display: true, message: `${userTarget.username} is already in this channel` })
 			else if (userIsBanned(channelWithRelationsResponse.data, userTarget.id))
 				displayPopupError({ display: true, message: `${userTarget.username} is banned from this channel` })
 			else
