@@ -167,13 +167,13 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		setScore({left: myScore, right: enemyScore})
 		setName({left: myName, right: enemyName})
 		setGameId(gameID)
-		if ((myScore === 11 || enemyScore === 11))
+		if ((myScore === 3 || enemyScore === 3))
 		{
 			if (spectate){
 				setGameState(false)
 				return;
 			}
-			const msg = myScore === 11 ? "Victory !" : "Defeat"
+			const msg = myScore === 3 ? "Victory !" : "Defeat"
 			setEndMesage({display: true, message: msg})
 			setTimeout(() => {
 				setEndMesage({...endMessage, display: false})
@@ -261,7 +261,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 					<ScoreWrapper LeftScore={score.left} RightScore={score.right} leftName={Name.left} rightName={Name.right} height={height}/>
 					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)} tabIndex={-1} />
 				</> ) :
-				<ResultStyle $height={height}>{'Victory'}</ResultStyle>
+				<ResultStyle $height={height}>{endMessage.message}</ResultStyle>
 			}
 		</Style>
 	);
