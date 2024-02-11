@@ -37,8 +37,6 @@ export class PongGateway {
 	}
 
 	handleDisconnect(client: Socket){
-
-
 		let game: PongGame;
 
 			this.PongService.activeGames.forEach((element) => {
@@ -134,15 +132,17 @@ export class PongGateway {
 		const newgame = await this.PongService.createGame(id, enemyId);
 		if (leftSocket && rightSocket)
 		{
-		this.server.to(leftSocket.id).emit("launchGame")
-		this.server.to(rightSocket.id).emit("launchGame")
+			this.server.to(leftSocket.id).emit("launchGame")
+			this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
+			if (dif)
+				this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
 
-		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
+			this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
-		this.delUserFromSearchingUser(leftSocket)
-		this.delUserFromSearchingUser(rightSocket)
+			this.delUserFromSearchingUser(leftSocket)
+			this.delUserFromSearchingUser(rightSocket)
+
 		}
 	}
 
@@ -177,9 +177,10 @@ export class PongGateway {
 
 	async addSearchingPlayer(userId: number, dif: number) {
 		try {	
+
 			if(!dif || dif < 1 || dif > 3)
 				throw new BadRequestException("an Error occur from the WebSocket")	
-
+      
 			this.toSearchingArray(userId, dif)
 			await this.checkToLaunchGame(userId, dif)
 
@@ -193,8 +194,17 @@ export class PongGateway {
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
-		const speed = 30 / game.difficulty
-
+		// const speed = 20 / game.difficulty
+		let speed: number = 0
+		if (game.difficulty == 1)
+			speed = 10
+		else if (game.difficulty == 2)
+			speed = 6
+		else if (game.difficulty == 3) 
+			speed = 3
+		else
+			speed = 12
+		
 		 setTimeout(() =>{
 			game.moveBall()
 			

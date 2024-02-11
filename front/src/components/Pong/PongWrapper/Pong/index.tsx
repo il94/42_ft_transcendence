@@ -62,12 +62,6 @@ const ResultStyle = styled.div<{ $height: number }>`
 
 	font-size: ${(props) => props.$height / 4}px;
 
-	/* top: 50%; */
-	/* left: ${(props) => props.$Hpos}%; */
-
-	/* transform: translate(-50%, -50%); */
-
-	/* color: white; */
 `
 
 type PongProps = {

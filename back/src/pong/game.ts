@@ -94,21 +94,22 @@ export class Ball {
 	}
 
 	setRandomDir(){
-		let phi: number; 
-			do {
-				phi = 2*Math.PI*Math.random();
-			} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
-		this.Dir = {
-			x: Math.cos(phi) * 5,
-			y: Math.sin(phi) * 5
-		}
+		// let phi: number; 
+		// 	do {
+		// 		phi = 2*Math.PI*Math.random();
+		// 	} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
 		// this.Dir = {
-		// 	x: 5,
-		// 	y: 0
+		// 	x: Math.cos(phi) * 5,
+		// 	y: Math.sin(phi) * 5
 		// }
+		this.Dir = {
+			x: 2,
+			y: 0
+		}
 	}
 
 	move(){
+		
 		this.Pos = {
 			x: this.Pos.x + this.Dir.x,
 			y: this.Pos.y + this.Dir.y
@@ -155,7 +156,7 @@ export class PongGame {
 		this.RightPlayer = new Player(guest, guestId, guestName)
 		this.Players = [host, guest]
 		this.watcher = new Map()
-		this.Speed = 7
+		this.Speed = 1
 		this.Ball = new Ball(this.Speed)
 		if (messageId)
 			this.messageId = messageId
@@ -180,13 +181,17 @@ export class PongGame {
 				const PaddleSizePx: number = this.LeftPlayer.getPos().bottom - this.LeftPlayer.getPos().top 
 				const CollisionOnPaddle: number = (this.LeftPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
-
-				this.Ball.setDir(balldir.x * -1 + 1, -veloY * 5)
+ 
+				this.Ball.setDir(balldir.x * -1 + 0.2, -veloY * 2)
 			}
 			else{
 				this.Ball.resetPos()
 				this.Ball.setRandomDir()
 				this.RightPlayer.addScore()
+				console.log("               ")
+				console.log("SCORE")
+				console.log("               ")
+
 			}
 		}
 
@@ -198,12 +203,16 @@ export class PongGame {
 				const CollisionOnPaddle: number = (this.RightPlayer.getPos().top + PaddleSizePx/2) - (this.Ball.getPos().y)
 				const veloY: number = CollisionOnPaddle / (PaddleSizePx/2)
 
-				this.Ball.setDir(balldir.x * -1 -1, -veloY * 5)
+				this.Ball.setDir(balldir.x * -1 -0.2, -veloY * 2)
+				this.Speed += 0.2
 			}
 			else{
 				this.Ball.resetPos()
 				this.Ball.setRandomDir()
 				this.LeftPlayer.addScore()
+				console.log("               ")
+				console.log("SCORE")
+				console.log("               ")
 			}
 		}
 
@@ -257,7 +266,7 @@ export class PongGame {
 		// }
 	}
 
-	// checkFuturMove(){
+	//checkFuturMove(){
 	// 	const ball = this.Ball.getPos()
 	// 	const balldir = this.Ball.getDir()
 
@@ -290,6 +299,27 @@ export class PongGame {
 
 	// }
 
+	checkFuturBallPos(){
+		const ball = this.Ball.getPos();
+		const ballDir = this.Ball.getDir();
+		const ballSize = this.BallSize;
+		const paddleMargin = this.paddleMargin;
+	
+		const futureX = ball.x + ballDir.x;
+		const futureY = ball.y + ballDir.y;
+	
+		if (futureX - (ballSize / 2) <= paddleMargin)
+		{
+			this.Ball.setPos(paddleMargin + ballSize/2 - 2, futureY)
+			return
+		}
+		if(futureX + (ballSize / 2) >= 1920 - paddleMargin){
+			this.Ball.setPos(1920 - paddleMargin - ballSize/2 + 1, futureY)
+			return
+		}
+		this.Ball.move()
+	}
+
 	checkScore(){
 		if (this.LeftPlayer.getScore() === 11 || this.RightPlayer.getScore() === 11)
 			this.setState(false)
@@ -305,8 +335,7 @@ export class PongGame {
 	moveBall(){
 		this.checkPaddleCollision()
 		this.checkWallCollision()
-		// this.checkFuturMove()
-		this.Ball.move()
+		this.checkFuturBallPos()
 	}
 
 	setState(s: boolean){
