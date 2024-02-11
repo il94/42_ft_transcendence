@@ -214,7 +214,6 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	useEffect(() => {
 
 		const PongContainer = PongRef.current
-		
 		if (PongContainer)
 			setConvertionFactor(height / 1080)
 

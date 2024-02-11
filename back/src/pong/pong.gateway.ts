@@ -216,6 +216,11 @@ export class PongGateway {
 				
 				this.PongService.updateStatusUser(winner.id, UserStatus.ONLINE)
 				this.PongService.updateStatusUser(looser.id, UserStatus.ONLINE)
+				let idOfWatcher  = game.watcher.keys()
+				let keysArray = Array.from(idOfWatcher);
+				keysArray.forEach((e) =>{
+					this.PongService.updateStatusUser(e, UserStatus.ONLINE)
+				})
 				this.PongService.updateGameStatus(game.id, GameStatus.FINISHED)
 				if (game.messageId)
 				{
@@ -250,7 +255,7 @@ export class PongGateway {
 					args === "up" ? player.moveUp() : player.moveDown()
 				}
 			}
-			catch(error){
+			catch(error: any){
 				this.server.to(client.id).emit("error", error.message)
 			}
 		}
@@ -260,7 +265,7 @@ export class PongGateway {
 			{
 				try {
 					if(!data || !data[0] || !data[1])
-						throw new Error("wrong")
+						throw new Error("need data")
 					let game: PongGame
 					this.PongService.activeGames.forEach((element) => {
 						if (element.isMyPlayerById(data[1])){
@@ -269,20 +274,20 @@ export class PongGateway {
 					});
 					if(game)
 					{
-            const oldStatus = await this.PongService.getUserStatus(data[0])
-					if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
-					{
-						console.log("oldStatus2 = ", oldStatus)
-						throw new Error('incapacity spectate')
-						return
-					}
+            			const oldStatus = await this.PongService.getUserStatus(data[0])
+						if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
+						{
+							console.log("oldStatus2 = ", oldStatus)
+							throw new Error('incapacity spectate')
+							return
+						}
 						const tmp = client
-						game.addWatcher(tmp)
+						game.addWatcher(data[0], tmp)
 						await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
 						this.server.to(client.id).emit("spectate")
 					}
 				}
-				catch(error){
+				catch(error: any){
 					this.server.to(client.id).emit("error", error.message)
 				}
 			}
@@ -292,7 +297,7 @@ export class PongGateway {
 			{
 				try {
 					if(!data || !data[0] || !data[1])
-						throw new Error("wrong")
+						throw new Error("need data")
 					let game: PongGame
 					this.PongService.activeGames.forEach((element) => {
 						if (element.id === data[0]){
@@ -302,9 +307,10 @@ export class PongGateway {
 					if (game)
 					{
 						await this.PongService.updateStatusUser(data[1], UserStatus.ONLINE)
-						const index = game.watcher.indexOf(client)
-						if(index != -1)
-							game.watcher.splice(index,1)
+						// const index = game.watcher.indexOf(client)
+						// if(index != -1)
+						// 	game.watcher.splice(index,1)
+						game.removeWatcher(data[1])
 					}
 				}
 				catch(error: any){

@@ -127,7 +127,7 @@ export class Ball {
 export class PongGame {
 
 	private Players: Socket[]
-	public watcher: Socket[]
+	public watcher: Map<number, Socket>
 	public	id: number
 	public difficulty: number
 	public messageId? : number
@@ -154,7 +154,7 @@ export class PongGame {
 		this.LeftPlayer = new Player(host, hostId, hostName)
 		this.RightPlayer = new Player(guest, guestId, guestName)
 		this.Players = [host, guest]
-		this.watcher = []
+		this.watcher = new Map()
 		this.Speed = 7
 		this.Ball = new Ball(this.Speed)
 		if (messageId)
@@ -333,17 +333,15 @@ export class PongGame {
 		return false
 	}
 
-	addWatcher(s: Socket)
+	addWatcher(id: number, s: Socket)
 	{
 		if (s)
-			this.watcher.push(s)
+			this.watcher.set(id, s)
 	}
 
-	removeWatcher(s: Socket)
+	removeWatcher(key: number)
 	{
-		const index = this.watcher.indexOf(s)
-		if (index != -1)
-			this.watcher.splice(index, 1)
+		this.watcher.delete(key)
 	}
 
 	isMyHost(socket: Socket){
