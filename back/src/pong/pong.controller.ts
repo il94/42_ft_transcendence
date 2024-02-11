@@ -6,48 +6,54 @@ import { getUser } from '../auth/decorators/users.decorator';
 
 import { User, challengeStatus, messageStatus, Game } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
+import { PongGateway } from './pong.gateway';
 
 @UseGuards(JwtGuard)
 @Controller('pong')
 export class PongController {
 
-    constructor(private readonly pongService: PongService) {}
+    constructor(private readonly pongService: PongService,
+        private readonly pongGateway: PongGateway
+        ) {}
 
-    @Post(':id')
-    create(
-        @Param('id', ParseIntPipe) userTwoId: number,
-        @getUser('id') userOneId: number
-        ): Promise<number> {
-        return this.pongService.createGame(userOneId, userTwoId)
+    // @Post(':id')
+    // create(
+    //     @Param('id', ParseIntPipe) userTwoId: number,
+    //     @getUser('id') userOneId: number
+    //     ): Promise<number> {
+    //     return this.pongService.createGame(userOneId, userTwoId)
+    // }
+
+
+    @Patch('spectate/:id')
+    async addSpectate(
+        @Param('id', ParseIntPipe) userId: number,
+        @Body('userId') spectateId: number,
+    ){
+        return await this.pongGateway.handleSpectate(userId,spectateId)
     }
 
+    @Patch('stopspectate/:id')
+    async addStopSpectate(
+        @Param('id', ParseIntPipe) userId: number,
+        @Body('gameId') gameId: number,
+    ){
+        return await this.pongGateway.handleStopSpectate(userId, gameId)
+    }
+    
+    @Patch('search/:id')
+    async searchForAGame(
+        @Param('id', ParseIntPipe) userId: number,
+        @Body('dif') dif: number,
+    ){
+        return await this.pongGateway.addSearchingPlayer(userId, dif)
+    }
 
-    // // jouer contre quelqu'un
-    // @Post('play/:id')
-    // play(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
-    //     return this.pongService.playGame(user.id, gameId)
-    // }
+    @Patch('stopsearch/:id')
+    async stopSearchForAGame(
+        @Param('id', ParseIntPipe) userId: number
+    ){
+        return await this.pongGateway.handleCancelSearching(userId)
+    }
 
-    // // boutton : jouer 
-    // @Post('play')
-    // async playRandom(@getUser() user: User): Promise<Game>  {
-    //     const game = await this.pongService.playRandomGame(user.id)
-    //     console.log("game : ", game)
-    //     return game
-    // }
-
-    // @Post('watch/:id')
-    // watch(@Param('id', ParseIntPipe) gameId: number, @getUser() user: User): Promise<Game>  {
-    //     return this.pongService.watchGame(user.id, gameId)
-    // }
-
-    // @Get(':id')
-    // getById(@Param('id', ParseIntPipe) gameId: number): Promise<Game>  {
-    //     return this.pongService.getGameById(gameId)
-    // }
-
-
-
-
-
- }
+}

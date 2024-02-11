@@ -1,6 +1,6 @@
 import { useRef, useState, useContext, useEffect } from "react"
 import styled from "styled-components"
-import axios, { AxiosResponse } from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
@@ -8,7 +8,7 @@ import InteractionContext from "../../../contexts/InteractionContext"
 
 
 import Pong from "./Pong"
-import { User } from "../../../utils/types"
+import { ErrorResponse, User } from "../../../utils/types"
 import colors from "../../../utils/colors"
 import Button from "../../../componentsLibrary/Button"
 import Loader from "../../../componentsLibrary/Loader"
@@ -56,6 +56,7 @@ function PongWrapper({social}: any) {
 	const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
 	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongWrapperBackground)
 	const [pongPopupError, displayPongPopupError] = useState<{ display: boolean, message?: string }>({ display: false, message: undefined })
+	const { token, url } = useContext(AuthContext)!
 
 
 
@@ -63,16 +64,50 @@ function PongWrapper({social}: any) {
 		setSearching(true)
 	}
 
-	function handleChooseDifficulty(dif: number){
-		setDifficultyChoose(true)
-		userAuthenticate.socket?.emit('searchGame', userAuthenticate.id, dif)
+	async function handleChooseDifficulty(dif: number){
+		try {
+
+			await axios.patch(`http://${url}:3333/pong/search/${userAuthenticate.id}`, 
+			{ dif: dif},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			setDifficultyChoose(true)
+		}
+		catch (error) {
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError<ErrorResponse>
+                const { statusCode, message } = axiosError.response?.data!
+                if (statusCode === 403)
+                    displayPongPopupError({ display: true, message: message })
+                else
+					displayPongPopupError({ display: true })
+            }
+            else
+				displayPongPopupError({ display: true })
+        }	//userAuthenticate.socket?.emit('searchGame', userAuthenticate.id, dif)
 	}
 
-	function handleCancelButton()
+	async function handleCancelButton()
 	{
-		setSearching(false)
-		setDifficultyChoose(false)
-		userAuthenticate.socket?.emit('cancelSearching', userAuthenticate.id)
+		try{
+			await axios.patch(`http://${url}:3333/pong/stopsearch/${userAuthenticate.id}`,
+			{},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			setSearching(false)
+			setDifficultyChoose(false)
+		}
+		catch(error)
+		{
+			displayPongPopupError({ display: true })
+		}
+		// userAuthenticate.socket?.emit('cancelSearching', userAuthenticate.id)
 	}
 
 	function handleLaunchGame(){
@@ -97,7 +132,7 @@ function PongWrapper({social}: any) {
 	}
 
 	function handleError(error: any){
-		console.log("error: ", error)
+		// console.log("error: ", error)
 		displayPongPopupError({ display: true, message: error })
 	}
 

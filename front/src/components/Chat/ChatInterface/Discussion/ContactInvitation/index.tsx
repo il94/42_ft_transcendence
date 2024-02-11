@@ -31,11 +31,13 @@ import {
 } from "../../../../../utils/status"
 
 import {
+	ErrorResponse,
 	User,
 	UserAuthenticate
 } from "../../../../../utils/types"
 
 import colors from "../../../../../utils/colors"
+import axios, { AxiosError } from "axios"
 
 type PropsContactInvitation = {
 	sender: User,
@@ -52,6 +54,31 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 	const { displayCard, setCardPosition } = useContext(CardContext)!
 	const { setZCardIndex, zMaxIndex, displayPopupError, GameWrapperRef } = useContext(DisplayContext)!
 	const { userTarget, setUserTarget, userAuthenticate, channelTarget, gameState, searching } = useContext(InteractionContext)!
+	
+	async function handleSpectate(userId:Number, targetid : number){
+		try {
+			await axios.patch(`http://${url}:3333/pong/spectate/${userId}`, 
+			{ userId: targetid},
+			{
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		}
+		catch (error) {
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError<ErrorResponse>
+                const { statusCode, message } = axiosError.response?.data!
+                if (statusCode === 403 || statusCode === 404)
+                    displayPopupError({ display: true, message: message })
+                else
+                    displayPopupError({ display: true })
+            }
+            else
+                displayPopupError({ display: true })
+        }
+	}
+
 
 	return (
 		<Style>
@@ -134,7 +161,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 							</ButtonChallengeLocked>
 							: userAuthenticate.status === userStatus.ONLINE ?
 							<ButtonChallenge
-								onClick={() => {userAuthenticate.socket?.emit("spectate", userAuthenticate.id, target.id)}}
+								onClick={() => handleSpectate(userAuthenticate.id, target.id)}
 								color={colors.button}
 								alt="Spectate button" title="Accepted">
 								Spectate
