@@ -171,6 +171,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		{
 			if (spectate){
 				setGameState(false)
+				setSpectate(false)
 				return;
 			}
 			const msg = myScore === 3 ? "Victory !" : "Defeat"

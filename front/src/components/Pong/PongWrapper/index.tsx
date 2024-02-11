@@ -159,13 +159,11 @@ function PongWrapper({social}: any) {
 		<PongContext.Provider value={{ focusPaddle, setFocusPaddle }}>
 			<Style $backgroundColor={backgroundColor} ref={wrapperRef} onClick={() => {if(!spectate) setFocusPaddle(true)}}>
 				{
-				pongPopupError.display ? (
-					<PongPopupError
-						displayPongPopupError={displayPongPopupError}
-						message={pongPopupError.message}/>
-					)
-				:
-				(
+					pongPopupError.display && 
+						<PongPopupError
+							displayPongPopupError={displayPongPopupError}
+							message={pongPopupError.message}/>
+				}
 				<>
 				{
 					!gameState ?
@@ -206,8 +204,6 @@ function PongWrapper({social}: any) {
 							social={social} />
 					}
 				</>
-				)
-			}
 			</Style>
 		</PongContext.Provider>
 		);
