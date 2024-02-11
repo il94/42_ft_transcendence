@@ -14,8 +14,8 @@ import AuthContext from './contexts/AuthContext'
 
 function App() {
 
-	const localToken = localStorage.getItem("access_token")
-	const [token, setToken] = useState<string>(localToken ? localToken : '')
+	// const localToken = localStorage.getItem("access_token")
+	const [token, setToken] = useState<string>('')
 	const url = new URL(window.location.href).hostname
 
 	return (
