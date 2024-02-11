@@ -48,6 +48,7 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 	const { token, url } = useContext(AuthContext)!
 	const { userAuthenticate, channelTarget } = useContext(InteractionContext)!
 	const { displayPopupError } = useContext(DisplayContext)!
+	const { displayChatNotification } = useContext(ChatContext)!
 
 	async function deleteChannelMP() {
 		try {
@@ -136,7 +137,7 @@ function Banner({ bannerName, chatWindowState, setChatWindowState }: PropsBanner
 						<div style={{ width: "24px" }} />
 				}
 				<Icon
-					onClick={() => displayChat(false)}
+					onClick={() => {displayChat(false); displayChatNotification(false)}}
 					src={ReduceIcon} size={24}
 					alt="Reduce button" title="Reduce" />
 			</ButtonsWrapper>

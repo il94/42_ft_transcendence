@@ -44,13 +44,13 @@ type ShowCardProps = {
 	GameWrapperRef: any
 }
 
-export async function showCard(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowCardProps) {
+export async function showCard(event: MouseEvent<HTMLDivElement | HTMLButtonElement>, userId: number, props: ShowCardProps) {
 	try {
 		const gameWrapperContainer = props.GameWrapperRef.current
 
 		if (gameWrapperContainer) {
 
-			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${sender.id}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${props.token}`
 				}
@@ -58,7 +58,7 @@ export async function showCard(event: MouseEvent<HTMLDivElement>, sender: User, 
 
 			props.setUserTarget(userResponse.data)
 
-			const heightCard = 371 // height de la carte
+			const heightCard = 390 // height de la carte
 			const { height: GameWrapperHeight, width: GameWrapperWidth } = gameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
 			const horizontalBorder = window.innerHeight - GameWrapperHeight // height des bordures horizontales autour du jeu
 			const verticalBorder = window.innerWidth - GameWrapperWidth // height des bordures verticales autour du jeu
@@ -97,6 +97,7 @@ type ShowContextualMenuProps = {
 		display: boolean,
 		type: contextualMenuStatus | undefined
 	}>>,
+	displayCard: Dispatch<SetStateAction<boolean>>,
 
 	userAuthenticate: UserAuthenticate,
 	userTarget: User | UserAuthenticate,
@@ -113,13 +114,13 @@ type ShowContextualMenuProps = {
 	GameWrapperRef: any,
 }
 
-export async function showContextualMenu(event: MouseEvent<HTMLDivElement>, sender: User, props: ShowContextualMenuProps) {
+export async function showContextualMenu(event: MouseEvent<HTMLDivElement | HTMLButtonElement>, userId: number, props: ShowContextualMenuProps) {
 	try {
 		const gameWrapperContainer = props.GameWrapperRef.current
 
 		if (gameWrapperContainer && props.channelTarget) {
 
-			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${sender.id}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`https://${props.url}:3333/user/${userId}`, {
 				headers: {
 					'Authorization': `Bearer ${props.token}`
 				}
@@ -140,6 +141,7 @@ export async function showContextualMenu(event: MouseEvent<HTMLDivElement>, send
 
 			props.setContextualMenuPosition({ right: resultX, top: resultY })
 			props.displayContextualMenu({ display: true, type: contextualMenuStatus.CHAT })
+			props.displayCard(false)
 		}
 	}
 	catch (error) {

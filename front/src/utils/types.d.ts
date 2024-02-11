@@ -7,7 +7,8 @@ import {
 	challengeStatus,
 	MatchResultStatus,
 	messageType,
-	ChannelType
+	ChannelType,
+	logType
 } from "./status"
 
 export type User = {
@@ -38,7 +39,7 @@ export type ChannelData = {
 }
 
 export type Channel = ChannelData & {
-	messages: (MessageText | MessageInvitation)[],
+	messages: (MessageText | MessageInvitation | MessageLog)[],
 	members: (User | UserAuthenticate)[],
 	administrators: (User | UserAuthenticate)[],
 	owner: User | UserAuthenticate | undefined,
@@ -60,6 +61,18 @@ export type MessageText = Message & {
 export type MessageInvitation = Message & {
 	target: User | UserAuthenticate,
 	status: challengeStatus
+}
+
+export type MessageLog = {
+	type: logType,
+	user1?: {
+		id: number,
+		username: string
+	},
+	user2?: {
+		id: number,
+		username: string
+	}
 }
 
 export type MatchData = {

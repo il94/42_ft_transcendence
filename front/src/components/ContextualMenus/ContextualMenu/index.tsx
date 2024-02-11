@@ -101,9 +101,16 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		try {
 			const channelMP = findChannelMP(userAuthenticate, userTarget.username)
 			if (channelMP) {
-				setChannelTarget(channelMP)
+
+				const channelMPResponse: AxiosResponse<Channel> = await axios.get(`https://${url}:3333/channel/${channelMP.id}/relations`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				setChannelTarget(channelMPResponse.data)
 				displayChat(true)
-				return (channelMP)
+				return (channelMPResponse.data)
 			}
 			else {
 				const newChannelMPResponse: AxiosResponse<ChannelData> = await axios.post(`https://${url}:3333/channel/mp/${userTarget.id}`, {}, {
@@ -205,13 +212,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	/* ========================== CHALLENGE SECTION ============================= */
 
 	async function handleSpectateEvent() {
-		try {
-			userAuthenticate.socket?.emit("spectate", userAuthenticate.id, userTarget.id)
-		}
-		catch (error) {
-			console.log(error);
-			// displayPopupError(true)
-		}
+		userAuthenticate.socket?.emit("spectate", userAuthenticate.id, userTarget.id)
 	}
 
 	/* ============================ FRIEND SECTION ============================== */
@@ -479,7 +480,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					</Section>
 				}
 				{
-					userTarget.status === userStatus.ONLINE &&
+					(userAuthenticate.status === userStatus.ONLINE &&
+						userTarget.status === userStatus.ONLINE) &&
 					<Section onClick={handleChallengeClickEvent}>
 						<SectionName>
 							Challenge
@@ -487,7 +489,8 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					</Section>
 				}
 				{
-					userTarget.status === userStatus.PLAYING &&
+					(userAuthenticate.status === userStatus.ONLINE &&
+						userTarget.status === userStatus.PLAYING) &&
 					<Section onClick={handleSpectateEvent}>
 						<SectionName>
 							Spectate

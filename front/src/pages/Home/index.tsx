@@ -66,17 +66,19 @@ function Home() {
 				}
 				else
 					setToken('')
-
-				Cookies.remove('access_token')
-				Cookies.remove('usernameId')
-				Cookies.remove('avatar')
-				Cookies.remove('two_FA')
-				Cookies.remove('userId')
 			}
 			catch (error) {
 				setToken('')
 				localStorage.removeItem("access_token")
 				return (false)
+			}
+			finally {
+				Cookies.remove('access_token')
+				Cookies.remove('usernameId')
+				Cookies.remove('avatar')
+				Cookies.remove('two_FA')
+				Cookies.remove('userId')
+				Cookies.remove('error_message')
 			}
 		}
 		getToken()

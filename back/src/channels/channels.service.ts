@@ -7,6 +7,9 @@ import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { Socket } from 'socket.io';
 import { AppService } from 'src/app.service';
 import { PongGateway } from 'src/pong/pong.gateway';
+import { longFormatters } from 'date-fns';
+import { APP_FILTER } from '@nestjs/core';
+
 
 type ChannelMP = {
 	id: number,
@@ -211,7 +214,7 @@ export class ChannelsService {
 	}
 
 	// Ajoute un user dans un channel
-	async joinChannel(channelId: number, userId: number, hash?: string, inviterId?: number) {
+	async joinChannel(channelId: number, userId: number, hash?: string, inviterId?: number, inviterName?: string) {
 		try {
 			// Verifie si le channel existe et le retourne
 			const channelToJoin = await this.prisma.channel.findUnique({
@@ -332,15 +335,45 @@ export class ChannelsService {
 					}
 				}})
 
-				// Si le user a été invité dans le channel, emit à tout les users du channel 
-				if (inviterId)
-					await this.emitOnChannel("joinChannel", channelId, userId, channelToJoin, user)
+			// Log a envoyer au front
+			const newLog = !inviterId ?
+			{
+				type: "JOIN",
+				user1: {
+					id: user.id,
+					username: user.username
+				}
+			}
+			:
+			{
+				type: "INVITE",
+				user1: {
+					id: inviterId,
+					username: inviterName
+				},
+				user2: {
+					id: user.id,
+					username: user.username
+				}
+			}
 
-				// Si le user a rejoint le channel de lui même, emit à tout les users du channel sauf lui
-				else
-					await this.emitOnChannelExceptUser("joinChannel", userId, channelId, userId, null, user)
+			// Si le user a été invité dans le channel, emit à tout les users du channel 
+			if (inviterId)
+				await this.emitOnChannel("joinChannel", channelId, userId, channelToJoin, user, newLog)
 
-				console.log(`User ${userId} joined channel ${channelId}`)
+			// Si le user a rejoint le channel de lui même, emit à tout les users du channel sauf lui
+			else
+				await this.emitOnChannelExceptUser("joinChannel", userId, channelId, userId, null, user, newLog)
+
+			// // Si le user a été invité dans le channel, emit à tout les users du channel 
+			// if (inviterId)
+			// 	await this.emitOnChannel("joinChannel", channelId, userId, channelToJoin, user)
+
+			// // Si le user a rejoint le channel de lui même, emit à tout les users du channel sauf lui
+			// else
+			// 	await this.emitOnChannelExceptUser("joinChannel", userId, channelId, userId, null, user)
+
+			console.log(`User ${userId} joined channel ${channelId}`)
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException || error instanceof ConflictException)
@@ -357,6 +390,8 @@ export class ChannelsService {
 	// Cree un message
 	async addContent(channelId: number, userId: number, msgContent: string, msgStatus: messageStatus) {
 		try {
+			if (msgContent.length > 10000)
+				throw new ForbiddenException("Lenght message too long")
 			// Verifie si le channel existe
 			const channelExist = !!await this.prisma.channel.findUnique({
 				where: {
@@ -364,8 +399,7 @@ export class ChannelsService {
 				}
 			})
 			if (!channelExist)
-				throw new NotFoundException("Channel not found")
-
+				throw new ForbiddenException("You are muted from this channel")
 			// Verifie si le user est dans le channel et retourne ses donnees
 			const userDatas = await this.prisma.usersOnChannels.findUnique({
 				where: {
@@ -768,7 +802,7 @@ export class ChannelsService {
 	}
 
 	// Change le role d'un user du channel
-	async updateUserRole(channelId: number, userAuthId: number, userTargetId: number, newRole: Role) {
+	async updateUserRole(channelId: number, userAuthId: number, userAuthName: string, userTargetId: number, newRole: Role) {
 		try {
 			// Verifie si le channel existe
 			const channelExist = !!await this.prisma.channel.findUnique({
@@ -789,6 +823,7 @@ export class ChannelsService {
 					id: userTargetId
 				},
 				select: {
+					id: true,
 					username: true
 				}
 			})
@@ -862,8 +897,23 @@ export class ChannelsService {
 				})
 			}
 
+			// Log a envoyer au front
+			const newLog = {
+				type: newRole === Role.BANNED ? "BAN" :
+						newRole === Role.UNBANNED ? "UNBAN" :
+						newRole === Role.ADMIN ? "UPGRADE" : "DOWNGRADE",
+				user1: {
+					id: userAuthId,
+					username: userAuthName
+				},
+				user2: {
+					id: userTarget.id,
+					username: userTarget.username
+				}
+			}
+
 			// Emit
-			await this.emitOnChannel("updateUserRole", channelId, userTargetId, newRole)
+			await this.emitOnChannel("updateUserRole", channelId, userTargetId, newRole, newLog)
 
 			console.log(`User ${userTargetId} is now ${newRole} on channel ${channelId}`)
 		}
@@ -878,7 +928,7 @@ export class ChannelsService {
 	}
 
 	// Mute un user du channel
-	async updateUserMute(channelId: number, userTargetId: number, userAuthId: number) {
+	async updateUserMute(channelId: number, userTargetId: number, userAuthId: number, userAuthName: string) {
 		try {
 			// Verifie si le channel existe
 			const channelExist = !!await this.prisma.channel.findUnique({
@@ -895,6 +945,7 @@ export class ChannelsService {
 					id: userTargetId
 				},
 				select: {
+					id: true,
 					username: true
 				}
 			})
@@ -952,9 +1003,21 @@ export class ChannelsService {
 				}
 			})
 
+			// Log a envoyer au front
+			const newLog = {
+				type: "MUTE",
+				user1: {
+					id: userAuthId,
+					username: userAuthName
+				},
+				user2: {
+					id: userTarget.id,
+					username: userTarget.username
+				}
+			}
+
 			// Emit
-			const userTargetSocket: Socket = AppService.connectedUsers.get(userTargetId.toString())
-			userTargetSocket.emit("updateUserMute", channelId, muteDuration.mute.toISOString())
+			await this.emitOnChannel("updateUserMute", channelId, userTargetId, muteDuration.mute.toISOString(), newLog)
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException || error instanceof NotFoundException)
@@ -989,6 +1052,45 @@ export class ChannelsService {
 				throw new ForbiddenException("The provided user data is not allowed")
 			else
 				throw new BadRequestException()
+		}
+	}
+
+	async getAllSocketsChannelExceptUsers(channelId: number, userId: number[]) {
+		try {
+			const usersOnChannels = await this.prisma.usersOnChannels.findMany({
+				where: {
+					channelId: channelId,
+					NOT: {
+						userId: {
+							in: userId
+						}
+					}
+				},
+				select: {
+					userId: true,
+				},
+			});
+			const userIds = usersOnChannels.map((userOnChannel) => userOnChannel.userId);
+			return(userIds)
+		} catch (error) {
+			console.error('Une erreur s\'est produite lors de la récupération des sockets des utilisateurs du canal, sauf ceux des utilisateurs spécifiés :', error);
+			throw error;
+		}
+	}
+
+
+	async emitOnChannelExceptUsers(route: string, userTargetId: number[], ...args: any[]) {
+		try {
+			const channelId = args[0];
+			const emitsId = await this.getAllSocketsChannelExceptUsers(channelId, userTargetId);
+
+			emitsId.forEach((emitId) => {
+				const socket = AppService.connectedUsers.get(emitId.toString())
+				socket.emit(route, ...args);
+			})
+		} catch (error) {
+			console.error('Une erreur s\'est produite lors de l\'émission des données sur le canal, à l\'exception des utilisateurs spécifiés :', error);
+			throw error;
 		}
 	}
 
@@ -1029,11 +1131,12 @@ export class ChannelsService {
 				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Verifie si le nouveau statut est accepte ou refuse
-			else if (newStatus !== challengeStatus.ACCEPTED &&
+			else if (newStatus !== challengeStatus.IN_PROGRESS &&
 				newStatus !== challengeStatus.CANCELLED)
 				throw new ForbiddenException("You dont have permissions for this action")
 
 			// Update l'invitation
+			
 			await this.prisma.message.update({
 				where: {
 					id: messageId
@@ -1043,9 +1146,10 @@ export class ChannelsService {
 				}
 			})
 			// Emit
+			//sofiane
 			await this.emitOnChannel("updateChallenge", channelId, messageId, newStatus)
 
-			if (newStatus === challengeStatus.ACCEPTED)
+			if (newStatus === challengeStatus.IN_PROGRESS)
 			{
 				if ( !(await this.checkIfUserExist(messageDatas.targetId)) || !(await this.checkIfUserExist(messageDatas.authorId)))
 					throw new NotFoundException("user not exist");
@@ -1053,7 +1157,7 @@ export class ChannelsService {
 					throw new ConflictException("There is not ONLINE");
 				if ((await this.checkStatus(messageDatas.authorId, UserStatus.ONLINE)))
 					throw new ConflictException("There is not ONLINE");
-				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId);
+				this.pongGateway.launchGame(messageDatas.targetId, messageDatas.authorId, 2, messageId);
 			}
 		}
 		catch (error) {
@@ -1117,7 +1221,7 @@ export class ChannelsService {
 	// Retire un user d'un channel
 	// Si le user etait owner, set un nouvel owner
 	// Si le user etait le dernier, supprime le channel
-	async leaveChannel(channelId: number, userAuthId: number, userTargetId: number): Promise<{ userId: number }> | undefined {
+	async leaveChannel(channelId: number, userAuthId: number, userAuthName: string, userTargetId: number): Promise<{ userId: number }> | undefined {
 		try {
 			// Verifie si le channel existe
 			const channelExist = !!await this.prisma.channel.findUnique({
@@ -1134,6 +1238,7 @@ export class ChannelsService {
 					id: userTargetId
 				},
 				select: {
+					id: true,
 					username: true
 				}
 			})
@@ -1175,8 +1280,30 @@ export class ChannelsService {
 					&& userAuthRole.role !== Role.ADMIN)))
 				throw new ForbiddenException("You dont have permissions for this action")
 
+			// Log a envoyer au front
+			const newLog = userAuthId === userTargetId ?
+			{
+				type: "LEAVE",
+				user1: {
+					id: userTarget.id,
+					username: userTarget.username
+				}
+			}
+			:
+			{
+				type: "KICK",
+				user1: {
+					id: userAuthId,
+					username: userAuthName
+				},
+				user2: {
+					id: userTarget.id,
+					username: userTarget.username
+				}
+			}
+
 			// Emit
-			await this.emitOnChannel("leaveChannel", channelId, userTargetId)
+			await this.emitOnChannel("leaveChannel", channelId, userTargetId, newLog)
 
 			// Supprime le user target du channel
 			await this.prisma.usersOnChannels.delete({

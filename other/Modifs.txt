@@ -2,25 +2,28 @@
 
 CAS/ :
 
-	(!!!!!)
-	Clavier indisponible quand pong display
-	Gestion d'erreur MatchHistory (attente)
+(===================== SOSO ========================)
+
+Taille des messages dans le back 9999 max
+
+(==================== CLAIRE =======================)
+
+Fix ou supprimer SSL
+
+(==================== EMILIE =======================)
+
+Corriger messages
 
 GLOBAL/ : A faire sur tout les fichiers un par un
 
-	(!!!!!)
-	Fix les erreurs ts
-
 	(!!!)
 	Faire DTO pour verifier les status envoye au back
-	Set corectement tout les titles et alts
 
 	(!!)
 	Fix focus bouton game dans home par navigate
 	Image 42 en blanc pour sign up 42
 
 	(!)
-	Formulaires styles
 	Corriger l'anglais du bled
 	Checker les contextes
 	Checker les noms de routes (s pas s)
@@ -31,4 +34,3 @@ SettingsMenu/ :
 
 Signup42/ :
 	Faire select Avatar si le temps
-

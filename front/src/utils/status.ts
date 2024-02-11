@@ -1,8 +1,8 @@
 export enum userStatus {
 	ONLINE = "ONLINE",
+	WATCHING = "WATCHING",
+	WAITING = "WAITING",
 	PLAYING = "PLAYING",
-	WAITING = "LOOKING FOR A GAME...",
-	WATCHING = "SPECTATOR",
 	OFFLINE = "OFFLINE"
 }
 
@@ -42,6 +42,18 @@ export enum messageType {
 	INVITATION = "INVITATION"
 }
 
+export enum logType {
+	JOIN = "JOIN",
+	INVITE = "INVITE",
+	LEAVE = "LEAVE",
+	UPGRADE = "UPGRADE",
+	DOWNGRADE = "DOWNGRADE",
+	MUTE = "MUTE",
+	KICK = "KICK",
+	BAN = "BAN",
+	UNBAN = "UNBAN"
+}
+
 export enum matchResultStatus {
 	WINNER = "WINNER",
 	DRAW = "DRAW",
@@ -56,4 +68,11 @@ export enum contextualMenuStatus {
 export enum resultSearchBarType {
 	USER = "USER",
 	CHANNEL = "CHANNEL"
+}
+
+export enum ranks {
+	NORANK = "NO RANK",
+	BRONZE = "BRONZE",
+	SILVER = "SILVER",
+	GOLD = "GOLD",
 }

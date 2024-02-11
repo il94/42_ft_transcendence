@@ -7,6 +7,8 @@ import {
 export const ChatContext = createContext<{
 	chat: boolean,
 	displayChat: Dispatch<SetStateAction<boolean>>,
+	chatNotification: boolean,
+	displayChatNotification: Dispatch<SetStateAction<boolean>>,
 	channelListScrollValue: number,
 	setChannelListScrollValue: Dispatch<SetStateAction<number>>,
 	chatScrollValue: number,

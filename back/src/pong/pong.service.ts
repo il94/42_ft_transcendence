@@ -26,10 +26,30 @@ export class PongService {
 		private appService : AppService,
 		//private channelService: ChannelsService
 		) {}
-	
+		
+	async getUserStatus(idUser: number)
+	{
+		try {
+			const userStatus = await this.prisma.user.findUnique({
+				where: {
+					id : idUser
+				},
+				select: {
+					status : true
+				}
+			})
+			if (!userStatus)
+				throw new Error('userstatus not found')
+			return userStatus.status
+		} catch (error) {
+			throw error
+		}
+	}
+
 
 	async updateStatusUser(idUser : number, newStatus: UserStatus)
 	{
+		
 		await this.prisma.user.update({ where: { id: idUser},
 			data: { status: newStatus }
 		 })
@@ -38,6 +58,39 @@ export class PongService {
 		 this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
 		
 	}
+
+
+	async setInvitationAsFinished(messageId: number)
+	{	
+		try {
+			const channelId = await this.prisma.message.findUnique({
+				where: {
+					id: messageId
+				},
+				select: {
+					channelId: true
+				}
+			})
+
+			await this.prisma.message.update({
+				where: {
+					id: messageId
+				},
+				data: {
+					status: challengeStatus.FINISHED
+				}
+
+			})
+
+			// console.log(channelId, messageId, challengeStatus.FINISHED)
+			await this.appService.emitOnChannel("updateChallenge", channelId.channelId, messageId, challengeStatus.FINISHED)
+		} catch (error) {
+			
+		}
+
+
+	}
+
 
 	async createGame(userOneId: number, userTwoId: number): Promise<number> {
 		console.log("create new game")
@@ -121,29 +174,6 @@ export class PongService {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	  async setResult(userId: number, result: MatchResult): Promise<void> {
 		try {
 			const user = await this.prisma.user.findUnique({where: { id: userId }})	
@@ -203,7 +233,8 @@ export class PongService {
 				authorId: userId,
 				isInvit: true,
 				NOT: {
-					status: challengeStatus.CANCELLED,
+					status: {
+						in : [challengeStatus.CANCELLED, challengeStatus.FINISHED, challengeStatus.IN_PROGRESS]}
 				},
 			},
 		});
@@ -212,7 +243,8 @@ export class PongService {
 			where: {
 				targetId: userId,
 				NOT: {
-					status: challengeStatus.CANCELLED,
+					status: {
+						in : [challengeStatus.CANCELLED, challengeStatus.FINISHED, challengeStatus.IN_PROGRESS]}
 				},
 			},
 		});

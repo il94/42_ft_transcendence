@@ -2,14 +2,20 @@ import {
 	Dispatch,
 	SetStateAction,
 	useContext,
-	useEffect
+	useEffect,
+	useState
 } from "react"
 
 import {
 	Avatar,
+	Rank,
 	Style,
 	UserName
 } from "./style"
+
+import {
+	capitalize
+} from "../../utils/functions"
 
 import MatchHistory from "./MatchHistory"
 import ScoreResume from "./ScoreResume"
@@ -17,6 +23,10 @@ import CloseButton from "../../componentsLibrary/CloseButton"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
+
+import {
+	ranks
+} from "../../utils/status"
 
 type PropsCard = {
 	cardPosition: {
@@ -37,6 +47,22 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 		setZCardIndex(zMaxIndex + 1)
 	}, [])
 
+	const [userRank, setUserRank] = useState<ranks>(ranks.NORANK)
+
+	useEffect(() => {
+		const wins: number = userTarget.wins
+
+		if (wins === 0)
+			setUserRank(ranks.NORANK)
+		else if (wins > 0 && wins <= 5)
+			setUserRank(ranks.BRONZE)
+		else if (wins > 5 && wins <= 15)
+			setUserRank(ranks.SILVER)
+		else if (wins > 15 && wins <= 30)
+			setUserRank(ranks.GOLD)
+
+	}, [userTarget])
+
 	return (
 		<Style
 			onClick={() => { setZCardIndex(zMaxIndex + 1) }}
@@ -46,10 +72,15 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
 			<CloseButton closeFunction={displayCard} />
-			<Avatar src={userTarget.avatar} />
+			<Avatar
+				src={userTarget.avatar}
+				$borderColor={userRank} />
 			<UserName>
 				{userTarget.username}
 			</UserName>
+			<Rank $color={userRank}>
+				{capitalize(userRank)}
+			</Rank>
 			<ScoreResume
 				wins={userTarget.wins}
 				draws={userTarget.draws}

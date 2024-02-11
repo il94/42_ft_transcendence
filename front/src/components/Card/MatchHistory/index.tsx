@@ -22,7 +22,7 @@ function MatchHistory() {
 
 	const { token, url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
-	const { loaderMatchsHistory, setLoaderMatchsHistory } = useContext(DisplayContext)!
+	const { loaderMatchsHistory, setLoaderMatchsHistory, displayPopupError } = useContext(DisplayContext)!
 
 	const [matchs, setMatchs] = useState<any[]>([])
 	const [historyHeight, setHistoryHeight] = useState<number>(0)
@@ -31,17 +31,16 @@ function MatchHistory() {
 		async function fetchMatchs() {
 			try {
 				setLoaderMatchsHistory(true)
-				const matchsResponse: AxiosResponse = await axios.get(`https://${url}:3333/user/matchs/${userTarget.id}`, {
+				const matchsResponse: AxiosResponse<[]> = await axios.get(`https://${url}:3333/user/matchs/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				setMatchs(matchsResponse.data)
+				setMatchs(matchsResponse.data.reverse())
 				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
-				// temporaire en attendant gestion d'erreur
-				setMatchs([])
+				displayPopupError({ display: true })
 			}
 		}
 		fetchMatchs()
@@ -77,7 +76,8 @@ function MatchHistory() {
 							<Match
 								key={"match" + match.match.gameId}
 								username={userTarget.username}
-								opponent={match.challengerData.challenger}
+								opponentId={match.challengerData.challengerId}
+								opponentName={match.challengerData.challenger}
 								result={match.match.result}
 								scoreUser={match.match.score}
 								scoreOpponent={match.challengerData.challengerScore}

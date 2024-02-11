@@ -17,7 +17,7 @@ export const VerticalSettingsForm = styled.form`
 
 `
 
-export const VerticalSetting = styled.div<{ fontSize?: number, $alignItems?: string }>`
+export const VerticalSetting = styled.div<{ height?: string, fontSize?: number, $alignItems?: string }>`
 
 	display: flex;
 	flex-direction: column;
@@ -25,6 +25,7 @@ export const VerticalSetting = styled.div<{ fontSize?: number, $alignItems?: str
 	align-items: ${(props) => props.$alignItems ? props.$alignItems : "center" };
 
 	width: 90%;
+	height: ${(props) => props.height && props.height };
 
 	text-align: center;
 	font-size: ${(props) => props.fontSize && props.fontSize }px;
@@ -76,14 +77,14 @@ export const HorizontalSettingWrapper = styled.div<{ width?: number }>`
 
 `
 
-export const ErrorMessage = styled.p<{ width?: number, fontSize?: number }>`
+export const ErrorMessage = styled.p<{ width?: number, fontSize?: number, $textAlign?: string }>`
 
 	width: ${(props) => props.width ? props.width + "px" : "100%" };
 	height: 15px;
 	min-height: 15px;
 
 	font-size: ${(props) => props.fontSize ? props.fontSize : 12 }px;
-	text-align: center;
+	text-align: ${(props) => props.$textAlign ? props.$textAlign : "center" };
 
 	color: ${colors.textError};
 

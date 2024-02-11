@@ -260,7 +260,8 @@ export class UsersService {
 				players: { where: { role: roleInGame.PLAYER, userId: { not: userId } },
 				}}
 		})
-		const res: {challenger: string, challengerScore: number } = {
+		const res: {challenger: string, challengerScore: number, challengerId: number } = {
+			challengerId: -1,
 			challenger: null,
 			challengerScore: 0
 		  };
@@ -271,6 +272,7 @@ export class UsersService {
 					select: { id: true, username: true }	
 				})
 				res.challenger = challenger.username;
+				res.challengerId = challenger.id;
 				const score  = await this.prisma.usersOnGames.findFirst({ 
 					where: { gameId: gameId, userId: challenger.id},
 					select: { score: true, gameId: true }})

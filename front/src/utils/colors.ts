@@ -32,6 +32,12 @@ const colors = {
 	sectionProfileFocus: "#ffc400",
 	navbar: "#C9783C",
 
+	/* Status */
+	statusBorder: "#945f41",
+	online: "#6cff67",
+	busy: "#ffd45d",
+	offline: "#b9b9b9",
+
 	/* Texts */
 	text: "#FFFFFF",
 	textAlt: "#000000",
@@ -55,6 +61,7 @@ const colors = {
 	focusButton: "#ffe600",
 	shadowFocusButton: "#cc8502",
 	focusText: "#ffff52",
+	focusTextAlt: "#e79e00",
 	focusBorderText: "#ffff52",
 	menuTextSelection: "#d38040",
 
@@ -77,6 +84,8 @@ const colors = {
 	messageUser: "#FAD7A3",
 	messageBanner: "#FFCB9A",
 	messageFriend: "#FFD6B0",
+	chatNotification: "#ff0000",
+	chatNotificationEffect: "#ff7230",
 
 	/* History */
 	history: "#D9D9D9",

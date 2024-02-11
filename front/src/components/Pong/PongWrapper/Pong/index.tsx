@@ -3,28 +3,33 @@ import  {useState, useEffect, KeyboardEvent, useRef, useContext, Dispatch, SetSt
 import styled from 'styled-components'
 import Paddle from './Paddle'
 import Ball from './Ball'
-import Score from './Score'
+import ScoreWrapper from './ScoreWrapper'
 import InteractionContext from "../../../../contexts/InteractionContext"
 import { User } from '../../../../utils/types'
 import Button from "../../../../componentsLibrary/Button"
 import effects from '../../../../utils/effects'
 import colors from '../../../../utils/colors'
+import CloseButton from '../../../../componentsLibrary/CloseButton'
+import ChatContext from '../../../../contexts/ChatContext'
 
 
-const Style = styled.div<{ $backgroundColor: string }>`
+const Style = styled.div<{ $backgroundColor: string, $w:number, $h:number}>`
 
-position: absolute;
+	display: flex;
+	justify-content: center;
 
-width: 83.5%; //83.5%
+
+	position: absolute;
+
+	width: ${(props) => props.$w}px; //83.5%
+	height: ${(props) => props.$h}px; //83.5%
+/* max-width: 83.5%; //83.5% */
+
+/* max-height: 100%; */
 
 /* min-width: 95%; */
-/* height: 95%; */
-aspect-ratio: 16/9;
-
-
-
-// ICI
-
+/* height: 56.25%; */
+/* aspect-ratio: 16/9; */
 
 /* border: 5px;
 border-color: white;
@@ -45,25 +50,26 @@ transition: background-color 1s ease;
 // 	ONGAME = "ongame"
 // }
 
-const NameStyle = styled.div<{ $Hpos: number }>`
-	position: absolute;
 
-	font-size:${10}px;
+const ResultStyle = styled.div<{ $height: number }>`
+	/* position: absolute; */
 
-	top: 10%;
-	left: ${(props) => props.$Hpos}%;
+	margin-top: auto;
+	margin-bottom: auto;
 
-	transform: translate(-50%, -50%);
+	font-size: ${(props) => props.$height / 4}px;
 
-	color: white;
+	/* top: 50%; */
+	/* left: ${(props) => props.$Hpos}%; */
 
-`
+	/* transform: translate(-50%, -50%); */
 
-const SpectateButton = styled.div`
-	
+	/* color: white; */
 `
 
 type PongProps = {
+	width: number,
+	height: number,
 	score: {
 		left: number, right: number
 	},
@@ -77,17 +83,14 @@ type PongProps = {
 	social: any;
 }
 
-function Pong({score, setScore, setGameState, setSpectate, spectate, social}: PongProps){
+function Pong({ width, height, score, setScore, setGameState, setSpectate, spectate, social}: PongProps){
 	
-	const user = useContext(InteractionContext)!																// !!!! object pour les sockets
+	const user = useContext(InteractionContext)!
 
 	const PongRef = useRef<HTMLDivElement | null>(null)
-	// const [PongBounds, setPongBounds] = useState<DOMRect | undefined>(undefined)
-	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongBackground)
 	
-	// const [players, setPlayers] = useState<{left: Socket, }>
-
-	// const [gameState, setGameState] = useState<status>(status.SOLO)											// neum moyen ilyes a mieux
+	const [convertionFactor, setConvertionFactor] = useState<number>(0)
+	const [backgroundColor, setBackgroundColor] = useState<string>(colors.pongBackground)
 
 	const [PaddlePos, setPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0}) //en px
 	const [EnemyPaddlePos, setEnemyPaddlePos] = useState<{top: number, bottom: number}>({top: 0, bottom: 0})
@@ -100,43 +103,37 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 	const [gameId, setGameId] = useState(0)
 	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
 
-	// const [score, setScore] = useState<{left: number, right: number}>({left: 0, right: 0})
-
-	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); //tableau de key,    enfoncer = true; else false
+	const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({}); 
 
 	const [endMessage, setEndMesage] = useState<{display: boolean, message: string}>({display: false, message: "hihi"})
 
 	const handleKeyDown = (event: KeyboardEvent) => {
 		
-		event.preventDefault();
+		// console.log("down")
+		// event.preventDefault();
 		event.stopPropagation();
 		
 		setKeysPressed((prevKeys) => ({ ...prevKeys, [event.key]: true }));
 	};
 	
 	const handleKeyUp = (event: KeyboardEvent) => {
-		event.preventDefault();
+		
+		// console.log("up")
+		// event.preventDefault();
 		event.stopPropagation();
 		
 		setKeysPressed((prevKeys) => ({ ...prevKeys, [event.key]: false }));
 	};
 	
 	const updatePositionOnKey = () => {
-	
-		let ConvertionFactor: number = 0;
-		let move: number = 0;
-		
-		if (!PongRef.current?.getBoundingClientRect())
-			return
 
-		ConvertionFactor = PongRef.current.getBoundingClientRect().height / 1080; // 1080 = base of pong in back
-		move = 10.8 * ConvertionFactor
-		
 		if (keysPressed['ArrowUp']) {
 			user.userAuthenticate.socket?.emit("paddlemove", "up")
+			setTimeout(() => {}, 10)
 		}
 		if (keysPressed['ArrowDown']) {
 			user.userAuthenticate.socket?.emit("paddlemove", "down")
+			setTimeout(() => {}, 10)
 		}
 	};
 
@@ -145,18 +142,6 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		setGameState(false)
 		setSpectate(false)
 	}
-
-	const [convertionFactor, setConvertionFactor] = useState<number>(0)
-
-	useEffect(() => {
-
-		const PongContainer = PongRef.current
-		
-		if (PongContainer)
-			setConvertionFactor(PongContainer.getBoundingClientRect().height / 1080)
-
-	}, [window.innerHeight, window.innerWidth, social])
-
 
 	const updatePong = (gameID: number, ballPosition: any, myName: string, myPos: any, enemyName: string, enemyPos: any , myScore: number, enemyScore: number) => {
 		
@@ -182,16 +167,18 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		setScore({left: myScore, right: enemyScore})
 		setName({left: myName, right: enemyName})
 		setGameId(gameID)
-		if ((myScore === 11 || enemyScore === 11) && !spectate)
+		if ((myScore === 3 || enemyScore === 3))
 		{
-			const msg = myScore === 11 ? "Victory !" : "Defeat"
+			if (spectate){
+				setGameState(false)
+				return;
+			}
+			const msg = myScore === 3 ? "Victory !" : "Defeat"
 			setEndMesage({display: true, message: msg})
 			setTimeout(() => {
 				setEndMesage({...endMessage, display: false})
 				setGameState(false);
 			}, 3000)
-			// setTimeout(() => {
-			// }, 1000);
 		}
 	}
 
@@ -204,26 +191,34 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 	}, [BallPos, PaddlePos, EnemyPaddlePos])
 
 	useEffect(() => {
-		
-		if (!spectate)
-		{
-			document.addEventListener('keydown', handleKeyDown, true);
-			document.addEventListener('keyup', handleKeyUp, true);
+
+	// 	const PongContainer = PongRef.current
+
+	// 	if (!spectate && PongContainer)
+	// 	{
+	// 		PongContainer.addEventListener('mousemove', handlemousMove, true)
+	// 		PongContainer.addEventListener('keydown', handleKeyDown, true);
+	// 		PongContainer.addEventListener('keyup', handleKeyUp, true);
 			
 			const animationPaddleId = requestAnimationFrame(updatePositionOnKey);
-			
 			return () => {
-				document.removeEventListener('keydown', handleKeyDown, true);
-				document.removeEventListener('keyup', handleKeyUp, true);
+	// 			PongContainer.removeEventListener('mousemove', handlemousMove, true)
+	// 			PongContainer.removeEventListener('keydown', handleKeyDown, true);
+	// 			PongContainer.removeEventListener('keyup', handleKeyUp, true);
 				cancelAnimationFrame(animationPaddleId);
 			};
-		}
+		// }
 		
 	}, [keysPressed, PaddlePos]);
-
-	useEffect(() => {
-	}, [])		
 	
+	useEffect(() => {
+
+		const PongContainer = PongRef.current
+		if (PongContainer)
+			setConvertionFactor(height / 1080)
+
+	}, [window.innerHeight, window.innerWidth, social, height, width])
+
 	useEffect(() => {
 		if (!spectate)
 		{
@@ -236,28 +231,37 @@ function Pong({score, setScore, setGameState, setSpectate, spectate, social}: Po
 		}
 	}, [score])
 
+	useEffect(() => {
+		console.log("in pong width", width)
+		console.log("in pong height", height)
+	}, [])
 
 	return (
-		<Style $backgroundColor={backgroundColor} ref={PongRef}>
+		<Style $backgroundColor={backgroundColor} $w={width} $h={height} ref={PongRef}>
 			{
-					!endMessage.display && PongRef.current ? (
+				!endMessage.display && PongRef.current ? (
 					<>
-					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)}/>
+					{
+						spectate &&
+						<CloseButton closeFunctionAlt={handleStopSpectate} />
+					}
+					<Paddle Hposition={2} Vposition={(PaddlePos.bottom - (PaddlePos.bottom - PaddlePos.top) / 2)} handleKeyDown={handleKeyDown} handleKeyUp={handleKeyUp} tabIndex={spectate ? -1 : 0} />
 					<Ball X={BallPos.x} Y={BallPos.y} BallSize={ballSize}/>
-					<NameStyle $Hpos={10}>{Name.left}</NameStyle>
-					<NameStyle $Hpos={90}>{Name.right}</NameStyle>
+
+					{/* <NameStyle $Hpos={10} $height={height}>{Name.left}</NameStyle>
+					<NameStyle $Hpos={90} $height={height}>{Name.right}</NameStyle> */}
 					{/* {spectate && <button onClick={handleStopSpectate}>Spectate</button>} */}
-					{spectate && <Button
+					{/* {spectate && <Button
 						onClick={handleStopSpectate}
-						type="button" fontSize={"5.5vw"}
+						type="button" fontSize={"20 px"}
 						style={{width: "5%"}}
-						title="spectate"
+						title=""
 						alt=""
-					>Spectate</Button>}
-					<Score LeftScore={score.left} RightScore={score.right} size={scoreSize}/>
-					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)}/>
+					>Spectate</Button>} */}
+					<ScoreWrapper LeftScore={score.left} RightScore={score.right} leftName={Name.left} rightName={Name.right} height={height}/>
+					<Paddle Hposition={98} Vposition={(EnemyPaddlePos.bottom - (EnemyPaddlePos.bottom - EnemyPaddlePos.top) / 2)} tabIndex={-1} />
 				</> ) :
-				<p style={{fontSize:"10vw", top:"50%", left: "50%"}}>{endMessage.message}</p>
+				<ResultStyle $height={height}>{endMessage.message}</ResultStyle>
 			}
 		</Style>
 	);

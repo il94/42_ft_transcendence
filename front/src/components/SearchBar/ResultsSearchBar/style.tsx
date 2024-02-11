@@ -78,6 +78,8 @@ export const NoResult = styled.div`
 
 	min-height: 35px;
 	
+	text-align: center;
+
 	background-color: ${colors.section};
 
 `
