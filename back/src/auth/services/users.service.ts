@@ -5,16 +5,66 @@ import { PrismaClient, User, Prisma, Role, UserStatus, Game, ChannelStatus, User
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as argon from 'argon2';
 import { authenticator } from "otplib";
+import * as fs from 'fs';
 import { AppGateway } from 'src/app.gateway';
+import { join } from 'path';
+import { mkdir } from 'fs/promises';
+import { Blob } from 'buffer';
+import axios from 'axios';
 
 @Injectable()
 export class UsersService {
 	constructor(private prisma: PrismaService,
 				private appGateway: AppGateway) {}
 
-	// Cree un user
-	async createUser(userDatas: CreateUserDto): Promise<User> {
+	// Upload un avatar
+	async uploadAvatar(link: string) {
 		try {
+			// console.log("00000000000000")
+			// const response = await axios.get(`${link}`, {
+			// 	responseType: 'stream',
+			// });
+			// console.log("11111111111111111111")
+			
+			// console.log("1")
+			// let dest = "uploads/users/test"
+
+			// const writer = fs.createWriteStream(dest);
+			// console.log("2")
+
+			// response.data.pipe(writer);
+			// console.log("3")
+
+			// await new Promise((resolve, reject) => {
+			//   writer.on('finish', resolve);
+			//   writer.on('error', reject);
+			// });
+			// console.log("3")
+	  
+
+			// console.log(avatar)
+			// response.data.pipe(writer);
+
+
+		} catch (error) {
+
+			// console.log("ERROR", error);
+
+			if (error instanceof NotFoundException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided credentials are not allowed")
+			else
+				throw new BadRequestException()
+		}
+	}
+
+	// Cree un user
+	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<User> {
+		try {
+
+			console.log("userdatas", userDatas)
+
 			// Verifie si le username n'est pas deja pris
 			const userExists = await this.prisma.user.findFirst({
 				where: {
@@ -22,7 +72,10 @@ export class UsersService {
 				}
 			})
 			if (userExists)
+			{
+				console.log("DANS LE IF", userExists)
 				throw new ConflictException("Username already exists")
+			}
 
 			// Hashe le mot de passe
 			const hash = await argon.hash(userDatas.hash)
@@ -46,10 +99,29 @@ export class UsersService {
 				},
 			})
 
+			console.log("AVANT IF")
+			if (file)
+			{
+				await this.saveUserAvatar(newUser.id, file)
+				console.log("if")
+
+			}
+			else
+			{
+				console.log("else")
+
+				await this.getRandomAvatar(newUser.id)
+			}
+
+			console.log("APRES IF")
+
 			console.log(`User ${newUser.id} was created`)
 			return newUser
 		}
 		catch (error) {
+
+			console.log(error)
+
 			if (error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
@@ -67,7 +139,7 @@ export class UsersService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true,
+					// avatar: true,
 					status: true,
 					wins: true,
 					draws: true,
@@ -94,7 +166,7 @@ export class UsersService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true,
+					// avatar: true,
 					status: true,
 					wins: true,
 					draws: true,
@@ -162,7 +234,7 @@ export class UsersService {
 								select: {
 									id: true,
 									username: true,
-									avatar: true
+									// avatar: true
 								}
 							},
 						}
@@ -179,7 +251,7 @@ export class UsersService {
 					return {
 						...rest,
 						name: users.find((user) => user.user.id !== userId).user.username,
-						avatar: users.find((user) => user.user.id !== userId).user.avatar
+						// avatar: users.find((user) => user.user.id !== userId).user.avatar
 					}
 				})
 			]
@@ -214,74 +286,39 @@ export class UsersService {
 	}
 
   	// Modifie le user authentifie
-	async updateUser(userId: number, updateUserDto: UpdateUserDto)  {
+	async updateUser(userId: number, updateUserDto: UpdateUserDto, file?: Express.Multer.File)  {
 		try {
-			const hash = updateUserDto.hash ? await argon.hash(updateUserDto.hash) : null
-
-			const userNewDatas = hash ? {
+			const userNewDatas = {
 				...updateUserDto,
-				hash: hash
-			} : updateUserDto
-
-			// const userNewDatas.avatar = avatar
+				hash: updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined,
+			}
 
 			// Modifie le user auth
-			const newDatas = await this.prisma.user.update({
+			await this.prisma.user.update({
 				where: {
 					id: userId
 				},
 				data: {
 					...userNewDatas
-				},
-				select: {
-					username: true,
-					avatar: true
 				}
 			})
-			if (!newDatas)
-				throw new NotFoundException("Failed tu update user")
+
+			if (file)
+				await this.saveUserAvatar(userId, file)
+
+			const newDatasToEmit = {
+				username: updateUserDto.username
+			}
+
 			// Emit
-			this.appGateway.server.emit("updateUserDatas", userId, newDatas)
+			this.appGateway.server.emit("updateUserDatas", userId, newDatasToEmit)
 			console.log(`User ${userId} has been updated`)
 		}
 		catch (error) {
-			if (error instanceof NotFoundException)
-				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided credentials are not allowed")
-			else
-				throw new BadRequestException()
-		}
-	}
 
-	async uploadAvatar(userId: number, file: string): Promise<Partial<User>> {
-		try {
+			console.log(error)
 
-			console.log("ICI");
-
-			const newData = await this.prisma.user.update({
-				where: {
-					id: userId
-				},
-				data: {
-					avatar: file
-				},
-				select: {
-					username: true,
-					avatar: true
-				}
-			})
-			if (!newData)
-				throw new NotFoundException("Failed tu update user")
-
-			return newData
-		} catch (error) {
-
-			console.log("ERROR", error);
-
-			if (error instanceof NotFoundException)
-				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+			if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()
@@ -305,7 +342,7 @@ export class UsersService {
 			for (let i = 0; i < game.players.length; i++) {
 				const challenger = await this.prisma.user.findUnique({ 
 					where: { id: game.players[i].userId },
-					select: { id: true, username: true }	
+					select: { id: true, username: true }
 				})
 				res.challenger = challenger.username;
 				res.challengerId = challenger.id;
@@ -317,6 +354,31 @@ export class UsersService {
 			return res;
 		} 
 		return null;
+	}
+
+	async saveUserAvatar(userId: number, file: Express.Multer.File) {
+	
+		const uploadUserPath = "/app/uploads/users/"
+		if (!fs.existsSync(uploadUserPath))
+            await mkdir(uploadUserPath, { recursive: true })
+
+			await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', file.buffer)
+	}
+
+	async getRandomAvatar(userId: number) {
+	
+		const randomAvatarsPath = "/app/defaultUserAvatars/"
+
+		const avatarsList = await fs.promises.readdir(randomAvatarsPath)
+
+		const randomIndex = Math.floor(Math.random() * avatarsList.length)
+		const randomAvatar = await fs.promises.readFile(randomAvatarsPath + avatarsList[randomIndex])
+
+		const uploadUserPath = "/app/uploads/users/"
+		if (!fs.existsSync(uploadUserPath))
+            await mkdir(uploadUserPath, { recursive: true })
+
+		await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', randomAvatar)
 	}
 
 /* =========================== PAS UTILISEES ================================ */

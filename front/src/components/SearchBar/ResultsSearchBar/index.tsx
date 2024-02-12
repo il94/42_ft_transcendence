@@ -233,7 +233,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 						usersFound.length > 0 &&
 						<>
 							{
-								generateResults(usersFound, resultSearchBarType.USER, littleResults, addUserToFriendList)
+								generateResults(url, usersFound, resultSearchBarType.USER, littleResults, addUserToFriendList)
 							}
 						</>
 					}
@@ -241,7 +241,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 						channelsFound.length > 0 &&
 						<>
 							{
-								generateResults(channelsFound, resultSearchBarType.CHANNEL, littleResults, addChannelToChannelList)
+								generateResults(url, channelsFound, resultSearchBarType.CHANNEL, littleResults, addChannelToChannelList)
 							}
 						</>
 					}

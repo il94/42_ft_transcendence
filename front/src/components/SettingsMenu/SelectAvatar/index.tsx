@@ -1,8 +1,10 @@
 import { Avatar, SettingTtile, Style } from "./style"
 import { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
-import { ChangeEvent, Dispatch, SetStateAction, useContext } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from "react"
 import axios from "axios"
 import AuthContext from "../../../contexts/AuthContext"
+import Button from "../../../componentsLibrary/Button"
+import { SettingAvatar } from "../../../utils/types"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -15,60 +17,35 @@ import AuthContext from "../../../contexts/AuthContext"
 // menu qui permettrait de choisir un avatar parmis ceux par defaut, ou d'en upload un 
 
 type PropsSelectAvatar = {
-	avatar: string,
-	setAvatar: Dispatch<SetStateAction<string>>
+	avatar: SettingAvatar,
+	setAvatar: Dispatch<SetStateAction<SettingAvatar>>
 }
 
 function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 
-	const { token, url } = useContext(AuthContext)!
-
-
-	async function uploadAvatar(avatarr: any) {
-		try {
-							
-			console.log("AVATAR  = ", avatarr)
-
-			const formData = new FormData();
-			formData.append('file', avatarr);
-			
-
-			await axios.post(`http://${url}:3333/user/upload`, formData,
-			{
-				headers: {
-					'Authorization': `Bearer ${token}`,
-					'Content-Type': 'multipart/form-data'
-				}
-			})
-		}
-		catch (error) {
-			console.log(error)
-		}
-	}
-
 	async function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
+		const file = event.target.files?.[0]
+		if (file) {
 
-
-		const avatarr = event.target.files?.[0]
-		if (avatarr) {
 			const reader = new FileReader()
 
 			reader.onloadend = () => {
 				const imageDataUrl = reader.result
 				if (typeof imageDataUrl === 'string')
 				{
-					setAvatar(imageDataUrl);
-					uploadAvatar(avatarr)
+					setAvatar((prevState) => ({
+						...prevState,
+						toDisplay: imageDataUrl,
+						toUpload: file
+					}))
 				}
 			}
 
 			reader.onerror = () => {
-				console.error("error")
-				setAvatar('');
+				// displaypopup
 			}
-			reader.readAsDataURL(avatarr)
+			reader.readAsDataURL(file)
 		}
-
 	}
 
 	return (
@@ -77,7 +54,7 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 				Avatar
 			</SettingTtile>
 			<Avatar
-				src={avatar} htmlFor="uploadAvatarUser" tabIndex={0}
+				src={avatar.toDisplay} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
 			<HiddenInput onChange={handleAvatarUpload}
 				id="uploadAvatarUser" type="file" accept="image/*" />

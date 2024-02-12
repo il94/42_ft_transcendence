@@ -27,10 +27,6 @@ import {
 import AuthContext from '../../contexts/AuthContext'
 
 import {
-	getRandomDefaultAvatar
-} from '../../utils/functions'
-
-import {
 	ErrorResponse,
 	SettingData
 } from '../../utils/types'
@@ -80,16 +76,24 @@ function Signup() {
 			const newUser = {
 				username: username.value,
 				hash: password.value,
-				avatar: getRandomDefaultAvatar()
 			}
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
+			const multiPartBody: FormData = new FormData()
+			multiPartBody.append('newUser', JSON.stringify(newUser))
+
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, multiPartBody,
+			{
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			})
 
 			localStorage.setItem("access_token", signupResponse.data.access_token)
 
 			navigate("/")
 		}
 		catch (error) {
+			console.log("ERROR = ", error)
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!

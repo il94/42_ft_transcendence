@@ -55,7 +55,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 	return (
 		<Style>
 			<Avatar
-				src={sender.avatar}
+				src={`http://${url}:3333/uploads/users/${sender.id}_`}
 				onClick={(event) => showCard(event, sender.id, {
 					displayCard,
 					setZCardIndex,
@@ -126,13 +126,16 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 					<ButtonsWrapper>
 						{
 							target.id === userAuthenticate.id ?
-							<ButtonChallenge
-								color={colors.buttonGreen}>
+							<ButtonChallengeLocked
+								color={colors.buttonGreen}
+								title={"Accepted"}>
 								Accepted !
-							</ButtonChallenge>
+							</ButtonChallengeLocked>
 							:
 							<ButtonChallenge onClick={() => userAuthenticate.socket?.emit("spectate", userAuthenticate.id, target.id)}
-								color={colors.button}>
+								color={colors.button}
+								alt={"SpectateButton"} title={"Accepted"}>
+								
 								Spectate
 							</ButtonChallenge>
 						}

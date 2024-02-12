@@ -91,7 +91,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 			<ProfileWrapper
 				onClick={showCard}
 				tabIndex={0}>
-				<Avatar src={userAuthenticate.avatar} />
+				<Avatar src={`http://${url}:3333/uploads/users/${userAuthenticate.id}_`} />
 				<ProfileName>
 					{userAuthenticate.username}
 				</ProfileName>

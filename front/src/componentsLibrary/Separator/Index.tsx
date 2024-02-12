@@ -23,21 +23,30 @@ const Style = styled.div`
 	justify-content: space-evenly;
 	align-items: center;
 
-	width: 231px;
+	width: 70%;
 	height: 50px;
 
 `
 
-function Separator() {
+type PropsSeparator = {
+	word?: boolean
+}
+
+function Separator({ word }: PropsSeparator) {
 	return (
 		<Style>
 			<Line />
-			<TextSeparator>
-				OR
-			</TextSeparator>
-			<Line />
+			{
+				word &&
+				<>
+					<TextSeparator>
+						{word}
+					</TextSeparator>
+					<Line />
+				</>
+			}
 		</Style>
-)
+	)
 }
 
 export default Separator

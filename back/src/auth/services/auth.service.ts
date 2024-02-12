@@ -12,6 +12,7 @@ import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
 import { Response } from "express";
 import { Socket } from "socket.io";
+import { Multer } from "multer";
 
 type SigninResponse = {
 	access_token: string
@@ -27,9 +28,9 @@ export class AuthService {
 	) {}
 
 	// Cree un user et renvoie un token d'authentification
-	async signup(userDatas: CreateUserDto): Promise<{ access_token: string }>{
+	async signup(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<{ access_token: string }>{
 		try {
-			const newUser = await this.userService.createUser(userDatas)
+			const newUser = await this.userService.createUser(userDatas, file)
 			return this.signToken(newUser.id, newUser.username)
 		}
 		catch (error) {
@@ -132,7 +133,7 @@ export class AuthService {
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | Partial<User> | User> {
+	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | {usernameId: User, avatar: string} | Partial<User>> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { usernameId: profile.usernameId, },
@@ -147,12 +148,9 @@ export class AuthService {
 				return { id: user.id, twoFA: user.twoFA };
 			}
 
-			const partialUser: Partial<User> = {
-				usernameId: profile.usernameId,
-				avatar: profile.avatar,
-			}
-
-			return { usernameId: profile.usernameId, avatar: profile.avatar, isNew: true }
+			return { usernameId: profile.usernameId, 
+				avatar: profile.avatar, 
+				isNew: true }
 		} catch (error) {
             throw new BadRequestException(error.message)
 		}

@@ -32,11 +32,6 @@ export class CreateUserDto implements User {
 	@ContainsSpecialCharacter()
 	hash: string;
 
-	@IsOptional()
-	@IsString()
-	@IsNotEmpty()
-	avatar: string;
-
 	twoFA: boolean;
 	twoFASecret: string; 
 	status: UserStatus;
@@ -64,11 +59,6 @@ export class UpdateUserDto {
 	@ContainsNumber()
 	@ContainsSpecialCharacter()
 	hash: string;
-
-	// @IsOptional()
-	// @IsString()
-	// @IsNotEmpty()
-	// avatar: string;
 	
 	@IsOptional()
 	@IsBoolean()

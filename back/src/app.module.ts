@@ -10,6 +10,9 @@ import { PongModule } from './pong/pong.module';
 import { AppGateway } from './app.gateway';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/prisma.service';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,7 +23,11 @@ import { PrismaService } from './prisma/prisma.service';
     ChatsModule,
     FriendsModule,
     BlockedsModule,
-	  PongModule,
+	PongModule,
+	ServeStaticModule.forRoot({
+		rootPath: join(__dirname, '..', "uploads"),
+		serveRoot: '/uploads',
+	}),
   ],
   providers: [
     AppGateway,

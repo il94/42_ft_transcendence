@@ -18,7 +18,7 @@ import {
 } from "../../../utils/status"
 
 // Génère les résultats à afficher sous forme de sections, inclus une scrollbar si besoin
-export function generateResults(results: User[] | Channel[], type: resultSearchBarType, littleResults: boolean, addFunction: any) {
+export function generateResults(url: string, results: User[] | Channel[], type: resultSearchBarType, littleResults: boolean, addFunction: any) {
 
 	function Results() {
 		return (
@@ -38,7 +38,7 @@ export function generateResults(results: User[] | Channel[], type: resultSearchB
 							$noAvatar={littleResults}>
 							{
 								!littleResults &&
-								<AvatarResult src={result.avatar} />
+								<AvatarResult src={`http://${url}:3333/uploads/users/${result.id}_`} />
 							}
 							{
 								type === resultSearchBarType.USER ?

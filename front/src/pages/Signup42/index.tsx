@@ -10,6 +10,7 @@ import {
 	useNavigate
 } from 'react-router'
 import Cookies from 'js-cookie'
+import fs from 'fs'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'
@@ -29,6 +30,7 @@ import AuthContext from '../../contexts/AuthContext'
 
 import {
 	ErrorResponse,
+	SettingAvatar,
 	SettingData
 } from '../../utils/types'
 
@@ -69,9 +71,34 @@ function SignupFT() {
 	const usernameId = Cookies.get('usernameId')
 	const avatarCookie = Cookies.get('avatar')
 	
+	const [FTAvatar, setFTAvatar] = useState<File | undefined>()
+
 	useEffect(() => {
 		if (!usernameId || !avatarCookie)
 			navigate("/error")
+
+		async function fetch42Avatar() {
+			try {
+				const response42Avatar = await axios.get(`${avatarCookie}`, {
+					responseType: 'blob',
+				})
+
+				
+
+				const blob = response42Avatar.data
+
+				const image42 = new File([blob], '42.jpg', { type: blob.type })
+				setFTAvatar(image42)
+
+			}
+			catch (error) {
+
+				console.log(error)
+
+			}
+		}
+
+		fetch42Avatar()
 	}, [])
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -100,16 +127,38 @@ function SignupFT() {
 				usernameId: usernameId,
 				username: username.value,
 				hash: password.value,
-				avatar: avatar
 			}
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, newUser)
+			const multiPartBody: FormData = new FormData()
+			if (avatar.toUpload)
+			{
+				console.log("IF")
+				multiPartBody.append('file', avatar.toUpload)
+			}
+			else if (FTAvatar)
+			{
+				console.log("ELSE IF")
+				multiPartBody.append('file', FTAvatar)
+				// const image42 = new File([blob], '42.jpg', {})
+			}
+				// multiPartBody.append('file', avatar.toUpload)
+			multiPartBody.append('newUser', JSON.stringify(newUser))
+
+			console.log("NEW USER = ", newUser)
+
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, multiPartBody,
+			{
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			})
 
 			localStorage.setItem("access_token", signupResponse.data.access_token)
 
 			navigate("/")
 		}
 		catch (error) {
+			console.log("ERROR = ", error)
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!
@@ -236,9 +285,13 @@ function SignupFT() {
 
 	const [showPassword, setShowPassword] = useState<boolean>(false)
 
-	/* ================================ AVATAR ================================== */
+	/* =============================== AVATAR ================================== */
 
-	const [avatar, setAvatar] = useState<string>(avatarCookie!)
+	const [avatar, setAvatar] = useState<SettingAvatar>({
+		toDisplay: avatarCookie!,
+		toUpload: undefined,
+		error: false
+	})
 
 	/* ========================================================================== */
 

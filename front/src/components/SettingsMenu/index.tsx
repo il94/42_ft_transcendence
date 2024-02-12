@@ -24,6 +24,7 @@ import AuthContext from "../../contexts/AuthContext"
 
 import {
 	ErrorResponse,
+	SettingAvatar,
 	SettingData
 } from "../../utils/types"
 
@@ -38,6 +39,9 @@ import {
 	VerticalSettingsForm
 } from "../../componentsLibrary/SettingsForm/Index"
 import CloseButton from "../../componentsLibrary/CloseButton"
+import Separator from "../../componentsLibrary/Separator/Index"
+
+import TestIMage from "../../assets/default_black.png"
 
 type PropsSettingsMenu = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
@@ -54,13 +58,11 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 		try {
 			event.preventDefault()
 			if (username.value.length === 0) {
-				if (username.value.length === 0) {
-					setUsername({
-						value: '',
-						error: true,
-						errorMessage: "Insert username",
-					})
-				}
+				setUsername({
+					value: '',
+					error: true,
+					errorMessage: "Insert username",
+				})
 				return
 			}
 
@@ -73,22 +75,31 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 				newDatas.username = username.value
 			if (password.value)
 				newDatas.hash = password.value
-			// if (avatar !== userAuthenticate.avatar)
-			// 	newDatas.avatar = avatar
 
-			if (Object.keys(newDatas).length !== 0)
+			if (Object.keys(newDatas).length !== 0 || avatar.toUpload)
 			{
-				await axios.patch(`https://${url}:3333/user/me`, newDatas,
+				const multiPartBody: FormData = new FormData()
+
+				if (avatar.toUpload)
+					multiPartBody.append('file', avatar.toUpload)
+				if (Object.keys(newDatas).length !== 0)
+					multiPartBody.append('newDatas', JSON.stringify(newDatas))
+				else
+					multiPartBody.append('newDatas', "")
+				await axios.patch(`http://${url}:3333/user/me`, multiPartBody,
 				{
 					headers: {
-						'Authorization': `Bearer ${token}`
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'multipart/form-data'
 					}
 				})
 			}
-
 			displaySettingsMenu(false)
 		}
 		catch (error) {
+
+			console.log(error)
+
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
@@ -230,7 +241,11 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 
 	/* =============================== AVATAR ================================== */
 
-	const [avatar, setAvatar] = useState<string>(userAuthenticate.avatar)
+	const [avatar, setAvatar] = useState<SettingAvatar>({
+		toDisplay: `http://${url}:3333/uploads/users/${userAuthenticate.id}_`,
+		toUpload: undefined,
+		error: false
+	})
 
 	/* ========================================================================== */
 
@@ -335,18 +350,17 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 						</Button>
 						</VerticalSettingWrapper>
 					</VerticalSetting>
-					<VerticalSetting>
-						<SelectAvatar
-							avatar={avatar}
-							setAvatar={setAvatar} />
-					</VerticalSetting>
-						<Button
-							type="submit" fontSize={"19px"}
-							alt="Save button" title="Save changes">
-							Save
-						</Button>
-					<div style={{ height: "5px" }} />
+					<Button
+						type="submit" fontSize={"19px"}
+						alt="Save button" title="Save changes">
+						Save
+					</Button>
 				</VerticalSettingsForm>
+				<Separator />
+				<SelectAvatar
+					avatar={avatar}
+					setAvatar={setAvatar} />
+					<div style={{ height: "5px" }} />
 		</Style>
 	)
 }
