@@ -11,6 +11,7 @@ import { UsersController } from "./controllers/users.controller";
 import { Api42AuthGuard, JwtGuard } from "./guards/auth.guard";
 import { HttpModule } from "@nestjs/axios";
 import { AppGateway } from "src/app.gateway";
+import { APP_GUARD } from '@nestjs/core';
 
 @Module ({
 	imports: [
@@ -30,7 +31,10 @@ import { AppGateway } from "src/app.gateway";
 		UsersService, 
 		SessionSerializer, 
 		Api42AuthGuard,
-		JwtGuard,
+		{
+			provide: APP_GUARD,
+			useClass: JwtGuard,
+		},
 		AppGateway
 	],
 		
