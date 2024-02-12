@@ -5,6 +5,10 @@ import effects from "../../utils/effects"
 
 export const Style = styled.div<{ $zIndex: number }>`
 
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -12,7 +16,7 @@ export const Style = styled.div<{ $zIndex: number }>`
 	transform: translate(-50%, -50%);
 
 	width: 350px;
-	height: 475px;
+	height: 540px;
 
 	clip-path: ${effects.pixelateWindow};
 

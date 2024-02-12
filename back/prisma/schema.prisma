@@ -89,7 +89,6 @@ model User {
   usernameId  String?	@unique
   username    String  @unique
   hash        String
-  avatar      String
   twoFA       Boolean
   twoFASecret String
 	wins        Int

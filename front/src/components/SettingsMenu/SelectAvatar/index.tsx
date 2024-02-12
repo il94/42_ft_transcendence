@@ -1,9 +1,13 @@
+
 import {
 	Dispatch,
 	SetStateAction,
-	useContext
+	useContext,
+    ChangeEvent,
+    useState
 } from "react"
-
+import axios from "axios"
+        
 import {
 	Avatar,
 	SettingTtile,
@@ -19,6 +23,7 @@ import {
 } from "../../../componentsLibrary/IconUploadFile"
 
 import DisplayContext from "../../../contexts/DisplayContext"
+import AuthContext from "../../../contexts/AuthContext"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -31,13 +36,36 @@ import DisplayContext from "../../../contexts/DisplayContext"
 // menu qui permettrait de choisir un avatar parmis ceux par defaut, ou d'en upload un 
 
 type PropsSelectAvatar = {
-	avatar: string,
-	setAvatar: Dispatch<SetStateAction<string>>
+	avatar: SettingAvatar,
+	setAvatar: Dispatch<SetStateAction<SettingAvatar>>
 }
 
 function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 
-	const { displayPopupError } = useContext(DisplayContext)!
+	async function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
+		const file = event.target.files?.[0]
+		if (file) {
+
+			const reader = new FileReader()
+
+			reader.onloadend = () => {
+				const imageDataUrl = reader.result
+				if (typeof imageDataUrl === 'string')
+				{
+					setAvatar((prevState) => ({
+						...prevState,
+						toDisplay: imageDataUrl,
+						toUpload: file
+					}))
+				}
+			}
+
+			reader.onerror = () => {
+				// displaypopup
+			}
+			reader.readAsDataURL(file)
+		}
+	}
 
 	return (
 		<Style>
@@ -45,7 +73,7 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 				Avatar
 			</SettingTtile>
 			<Avatar
-				src={avatar} htmlFor="uploadAvatarUser" tabIndex={0}
+				src={avatar.toDisplay} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
 			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
 				id="uploadAvatarUser" type="file" accept="image/*" />

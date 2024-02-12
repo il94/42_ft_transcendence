@@ -353,8 +353,7 @@ export function refreshUserDatas(props: PropsRefreshUserDatas) {
 		props.setUserAuthenticate((prevState: UserAuthenticate) => {
 			return {
 				...prevState,
-				username: props.newDatas.username,
-				avatar: props.newDatas.avatar
+				...props.newDatas
 			}
 		})
 	}
@@ -366,8 +365,7 @@ export function refreshUserDatas(props: PropsRefreshUserDatas) {
 					if (friend.id === props.userId) {
 						return {
 							...friend,
-							username: props.newDatas.username,
-							avatar: props.newDatas.avatar
+							...props.newDatas
 						}
 					}
 					else

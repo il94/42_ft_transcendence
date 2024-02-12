@@ -27,6 +27,7 @@ import InteractionContext from "../../contexts/InteractionContext"
 import {
 	ranks
 } from "../../utils/status"
+import AuthContext from "../../contexts/AuthContext"
 
 type PropsCard = {
 	cardPosition: {
@@ -40,6 +41,7 @@ type PropsCard = {
 
 function Card({ cardPosition, displayCard }: PropsCard) {
 
+	const { url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
 	const { zCardIndex, setZCardIndex, zMaxIndex } = useContext(DisplayContext)!
 
@@ -73,7 +75,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			$zIndex={zCardIndex}>
 			<CloseButton closeFunction={displayCard} />
 			<Avatar
-				src={userTarget.avatar}
+				src={`http://${url}:3333/uploads/users/${userTarget.id}_`}
 				$borderColor={userRank} />
 			<UserName>
 				{userTarget.username}

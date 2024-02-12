@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param, ConflictException } from "@nestjs/common";
+import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param, ConflictException,
+	UseInterceptors, UploadedFile, ParseFilePipeBuilder, } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 import { AuthDto, CreateUserDto, TwoFaDto } from "../dto/";
@@ -6,6 +7,11 @@ import { getUser } from "../decorators/users.decorator";
 import { UsersService } from "../services/users.service";
 import { Response, Request } from 'express';
 import { User, UserStatus } from '@prisma/client';
+import { FileInterceptor } from "@nestjs/platform-express";
+import { CustomUploadFileTypeValidator } from "../file.validdator";
+
+const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 type SigninResponse = {
 	access_token: string
@@ -25,9 +31,24 @@ export class AuthController {
 
 	// Cree un user et renvoie un token d'authentification
 	@Post('signup')
-	async signup(@Body() userDatas: CreateUserDto): Promise<{ access_token: string }> {
-		return await this.authService.signup(userDatas)
+	@UseInterceptors(FileInterceptor('file'))
+	async signup(@Body('newUser') userDatas,
+	@UploadedFile(
+		new ParseFilePipeBuilder().addValidator(
+			new CustomUploadFileTypeValidator({
+				fileType: VALID_UPLOADS_MIME_TYPES,
+			}),
+		)
+		.addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
+		.build({
+			fileIsRequired: false,
+			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+		})
+	) file?: Express.Multer.File): Promise<{ access_token: string }> {
+		return await this.authService.signup(JSON.parse(userDatas), file)
 	}
+
+	  
 
 	// Verifie le username et le mot de passe
 	// Set le statut du user a connecte

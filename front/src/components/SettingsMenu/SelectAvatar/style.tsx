@@ -8,7 +8,7 @@ export const Style = styled.div`
 	justify-content: space-between;
 	align-items: center;
 
-	height: 145px;
+	min-height: 190px;
 
 `
 

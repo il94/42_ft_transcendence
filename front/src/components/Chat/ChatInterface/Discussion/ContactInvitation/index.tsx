@@ -83,7 +83,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 	return (
 		<Style>
 			<Avatar
-				src={sender.avatar}
+				src={`http://${url}:3333/uploads/users/${sender.id}_`}
 				onClick={(event) => showCard(event, sender.id, {
 					displayCard,
 					setZCardIndex,

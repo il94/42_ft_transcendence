@@ -9,6 +9,9 @@ import { AppService } from 'src/app.service';
 import { PongGateway } from 'src/pong/pong.gateway';
 import { longFormatters } from 'date-fns';
 import { APP_FILTER } from '@nestjs/core';
+import { join } from 'path';
+import * as fs from 'fs';
+import { mkdir } from 'fs/promises';
 
 
 type ChannelMP = {
@@ -115,7 +118,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true
+					// avatar: true
 				}
 			})
 			if (!userTarget)
@@ -178,7 +181,7 @@ export class ChannelsService {
 			const channelMP: ChannelMP = {
 				...newChannelMP,
 				name: userTarget.username,
-				avatar: userTarget.avatar
+				// avatar: userTarget.avatar
 			}
 
 			// Recupere l'id username et avatar du user auth 
@@ -189,7 +192,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true
+					// avatar: true
 				}
 			})
 
@@ -234,7 +237,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true,
+					// avatar: true,
 					wins: true,
 					draws: true,
 					losses: true,
@@ -584,7 +587,7 @@ export class ChannelsService {
 								select: {
 									id: true,
 									username: true,
-									avatar: true,
+									// avatar: true,
 									status: true,
 									wins: true,
 									draws: true,
@@ -602,7 +605,7 @@ export class ChannelsService {
 								select: {
 									id: true,
 									username: true,
-									avatar: true,
+									// avatar: true,
 									status: true,
 									wins: true,
 									draws: true,
@@ -651,7 +654,7 @@ export class ChannelsService {
 			function getMPData() {
 				return {
 					name: channelDatas.users.find((user) => user.user.id !== userId).user.username,
-					avatar: channelDatas.users.find((user) => user.user.id !== userId).user.avatar
+					// avatar: channelDatas.users.find((user) => user.user.id !== userId).user.avatar
 				}
 			}
 
@@ -675,7 +678,7 @@ export class ChannelsService {
 
 				// Données du channel en settant les bonnes si c'est un MP
 				name: rest.type === ChannelStatus.MP ? getMPData().name : rest.name,
-				avatar: rest.type === ChannelStatus.MP ? getMPData().avatar : rest.avatar,
+				// avatar: rest.type === ChannelStatus.MP ? getMPData().avatar : rest.avatar,
 
 				// Messages mappés
 				messages: cleanedMessages,
@@ -1421,7 +1424,15 @@ export class ChannelsService {
 		})
 	  }
   
-  
+	async saveUserAvatar(userId: number, file: Express.Multer.File) {
+		const channelFolderPath = join(__dirname, '..', "uploads/channels")
+
+		if (!fs.existsSync(channelFolderPath))
+            await mkdir(channelFolderPath, { recursive: true })
+
+		await fs.promises.writeFile(`uploads/channels/${userId}_`, file.buffer)
+	}
+
 
     // cherche un channel de type MP qui contient les 2 users
     async findChannelMP(recipientId: number, creatorId: number) {

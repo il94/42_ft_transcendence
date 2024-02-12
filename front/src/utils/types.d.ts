@@ -90,6 +90,13 @@ export type SettingData = {
 	errorMessage?: string | string[]
 }
 
+export type SettingAvatar = {
+	toDisplay: string,
+	toUpload: File | undefined,
+	error: boolean,
+	errorMessage?: string
+}
+
 export type ErrorResponse = {
 	error: string,
 	message: string,
