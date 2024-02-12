@@ -128,7 +128,6 @@ model Channel {
   id          Int  @id @default(autoincrement())
   createdAt   DateTime @default(now())
   name        String
-  avatar      String
   type        ChannelStatus
   hash        String?
   invitation  Invitation[]

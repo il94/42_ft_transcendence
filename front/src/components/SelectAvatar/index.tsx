@@ -1,13 +1,8 @@
-
 import {
 	Dispatch,
-	SetStateAction,
-	useContext,
-    ChangeEvent,
-    useState
+	SetStateAction
 } from "react"
-import axios from "axios"
-        
+
 import {
 	Avatar,
 	SettingTtile,
@@ -16,14 +11,15 @@ import {
 
 import {
 	handleAvatarUpload
-} from "../../../utils/functions"
+} from "../../utils/functions"
 
 import {
 	HiddenInput
-} from "../../../componentsLibrary/IconUploadFile"
+} from "../../componentsLibrary/IconUploadFile"
 
-import DisplayContext from "../../../contexts/DisplayContext"
-import AuthContext from "../../../contexts/AuthContext"
+import {
+	SettingAvatar
+} from "../../utils/types"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -37,35 +33,15 @@ import AuthContext from "../../../contexts/AuthContext"
 
 type PropsSelectAvatar = {
 	avatar: SettingAvatar,
-	setAvatar: Dispatch<SetStateAction<SettingAvatar>>
+	setAvatar: Dispatch<SetStateAction<SettingAvatar>>,
+	displayPopupError?: Dispatch<SetStateAction<{
+		display: boolean,
+		message?: string
+	}>>,
+	navigate?: any
 }
 
-function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
-
-	async function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
-		const file = event.target.files?.[0]
-		if (file) {
-
-			const reader = new FileReader()
-
-			reader.onloadend = () => {
-				const imageDataUrl = reader.result
-				if (typeof imageDataUrl === 'string')
-				{
-					setAvatar((prevState) => ({
-						...prevState,
-						toDisplay: imageDataUrl,
-						toUpload: file
-					}))
-				}
-			}
-
-			reader.onerror = () => {
-				// displaypopup
-			}
-			reader.readAsDataURL(file)
-		}
-	}
+function SelectAvatar({ avatar, setAvatar, displayPopupError, navigate }: PropsSelectAvatar) {
 
 	return (
 		<Style>
@@ -75,7 +51,7 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 			<Avatar
 				src={avatar.toDisplay} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
-			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
+			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError, navigate)}
 				id="uploadAvatarUser" type="file" accept="image/*" />
 		</Style>
 	)

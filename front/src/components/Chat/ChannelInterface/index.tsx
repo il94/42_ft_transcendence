@@ -40,6 +40,7 @@ import {
 import {
 	Channel,
 	ErrorResponse,
+	SettingAvatar,
 	SettingData
 } from "../../../utils/types"
 
@@ -98,13 +99,22 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					newDatas.type = channelType
 				if (password.value && channelType == ChannelType.PROTECTED)
 					newDatas.hash = password.value
-				if (avatar !== channelTarget.avatar)
-					newDatas.avatar = avatar
 
-				if (Object.keys(newDatas).length !== 0) {
-					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, newDatas, {
+				if (Object.keys(newDatas).length !== 0 || avatar.toUpload)
+				{
+					const multiPartBody: FormData = new FormData()
+
+					if (avatar.toUpload)
+						multiPartBody.append('file', avatar.toUpload)
+					if (Object.keys(newDatas).length !== 0)
+						multiPartBody.append('newDatas', JSON.stringify(newDatas))
+					else
+						multiPartBody.append('newDatas', "")
+
+					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, multiPartBody, {
 						headers: {
-							'Authorization': `Bearer ${token}`
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'multipart/form-data'
 						}
 					})
 				}
@@ -279,12 +289,14 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 	/* =============================== AVATAR =================================== */
 
-	const [avatar, setAvatar] = useState<string>(
-		channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
+	const [avatar, setAvatar] = useState<SettingAvatar>({
+		toDisplay: channelTarget && chatWindowState === chatWindowStatus.UPDATE_CHANNEL ?
 			channelTarget.avatar
 			:
-			DefaultChannelIcon
-	)
+			DefaultChannelIcon,
+		toUpload: undefined,
+		error: false
+	})
 
 	/* ========================================================================== */
 
@@ -363,7 +375,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							type="button" src={RemoveIcon} size={23}
 							alt="Remove icon" title="Remove image" />
 						<Avatar
-							src={avatar} htmlFor="uploadAvatarChannel" tabIndex={0}
+							src={avatar.toDisplay} htmlFor="uploadAvatarChannel" tabIndex={0}
 							title="Upload image" />
 						<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
 							id="uploadAvatarChannel" type="file" accept="image/*" />

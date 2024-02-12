@@ -170,7 +170,6 @@ function Game() {
 				return (channels)
 			}
 			catch (error) {
-				
 				throw (error)
 			}
 		}
@@ -200,6 +199,7 @@ function Game() {
 
 				setUserAuthenticate({
 					...meResponse.data,
+					avatar: `http://${url}:3333/uploads/users/${meResponse.data.id}_`,
 					friends: friends,
 					blockeds: blockeds,
 					channels: channels,
@@ -209,9 +209,6 @@ function Game() {
 				setLoaderFriends(false)
 			}
 			catch (error) {
-
-				console.log("GAME", error)
-
 				if (axios.isAxiosError(error)) {
 					const axiosError = error as AxiosError<ErrorResponse>
 					const { statusCode, message } = axiosError.response?.data!

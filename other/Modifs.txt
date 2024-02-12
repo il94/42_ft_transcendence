@@ -2,17 +2,7 @@
 
 CAS/ :
 
-(===================== SOSO ========================)
-
-Taille des messages dans le back 9999 max
-
-(==================== CLAIRE =======================)
-
-Fix ou supprimer SSL
-
-(==================== EMILIE =======================)
-
-Corriger messages
+	Gestion d'erreur full check upload
 
 GLOBAL/ : A faire sur tout les fichiers un par un
 
