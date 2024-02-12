@@ -29,7 +29,7 @@ export class ChannelsService {
 				private pongGateway: PongGateway) {}
 
 	// Cree un channel
-	async createChannel(newChannel: CreateChannelDto, userId: number): Promise<{ id: number }> {
+	async createChannel(newChannel: CreateChannelDto, userId: number, file?: Express.Multer.File): Promise<{ id: number }> {
 		try {
 			// Si le channel est de type protected
 			if (newChannel.type === ChannelStatus.PROTECTED)
@@ -68,6 +68,10 @@ export class ChannelsService {
 					id: true
 				}
 			})
+			if (file)
+				await this.saveChannelAvatar(newChannelId.id, file)
+			else
+				await this.getDefaultChannelAvatar(newChannelId.id)
 
 			console.log(`Channel ${newChannelId.id} was created`, newChannel)
 			return newChannelId
@@ -1422,13 +1426,26 @@ export class ChannelsService {
 		})
 	  }
   
-	async saveUserAvatar(userId: number, file: Express.Multer.File) {
-		const channelFolderPath = join(__dirname, '..', "uploads/channels")
+	async saveChannelAvatar(channelId: number, file: Express.Multer.File) {
+		const uploadChannelPath = "/app/uploads/channels/"
 
-		if (!fs.existsSync(channelFolderPath))
-            await mkdir(channelFolderPath, { recursive: true })
+		if (!fs.existsSync(uploadChannelPath))
+            await mkdir(uploadChannelPath, { recursive: true })
 
-		await fs.promises.writeFile(`uploads/channels/${userId}_`, file.buffer)
+		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', file.buffer)
+	}
+
+	async getDefaultChannelAvatar(channelId: number) {
+		const defaultChannelAvatarPath = "/app/defaultChannelAvatar/default_channel.png"
+		
+		if (!fs.existsSync(defaultChannelAvatarPath))
+			await mkdir(defaultChannelAvatarPath, { recursive: true })
+	
+		const defaultChannelAvatar = await fs.promises.readFile(defaultChannelAvatarPath)
+	
+		const uploadChannelPath = "/app/uploads/channels/"
+
+		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', defaultChannelAvatar)
 	}
 
 
@@ -1599,6 +1616,42 @@ async countMembersInChannel(chanId: number): Promise<number> {
 			else
 				throw new BadRequestException()
 		}
+	}
+
+	async isNotEmpty(value) {
+		if (!value) {
+			throw new BadRequestException('Value must not be empty.');
+		}
+	}
+
+	async isString(value) {
+		if (typeof value !== 'string') {
+			throw new BadRequestException('Value must be a string.');
+		}
+	}
+
+	async maxLength(value, maxLength) {
+		if (value.length > maxLength) {
+			throw new BadRequestException(`Value length must not exceed ${maxLength} characters.`);
+		}
+	}
+	
+	async isChannelStatus(value: any) {
+		if (!(value in ChannelStatus)) {
+			throw new BadRequestException('Invalid channel status.');
+		}
+	}
+	
+	async parseMultiPartCreate({ name, type, hash }: any) {
+		await this.isNotEmpty(name)
+		await this.isString(name)
+		await this.maxLength(name, 8)
+
+		await this.isNotEmpty(type)
+		await this.isChannelStatus(type)
+
+		if (hash)
+			await this.isString(hash)
 	}
 }
 

@@ -171,7 +171,10 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
 			<Status $sectionIndex={sectionIndex} $status={friend.status} />
-			<Avatar src={`http://${url}:3333/uploads/users/${friend.id}_`} />
+			{
+				friend.id &&
+				<Avatar src={`http://${url}:3333/uploads/users/${friend.id}_`} />
+			}
 			{
 				social &&
 				<ProfileInfo $offline={friend.status === userStatus.OFFLINE}>

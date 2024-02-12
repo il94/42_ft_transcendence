@@ -70,6 +70,7 @@ function LockedInterface() {
 			setChannelTarget(() => ({
 				...channelTarget,
 				members: [...channelTarget.members, userAuthenticate],
+				avatar: `http://${url}:3333/uploads/channels/${channelTarget.id}_`
 			}))
 		}
 		catch (error) {

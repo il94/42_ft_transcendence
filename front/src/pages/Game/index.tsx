@@ -158,6 +158,7 @@ function Game() {
 				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => {
 					return {
 						...channel,
+						avatar: `http://${url}:3333/uploads/channels/${channel.id}_`,
 						messages: [],
 						members: [],
 						administrators: [],

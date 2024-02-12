@@ -126,19 +126,28 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 				const newDatas: any = {
 					name: name.value,
 					type: channelType,
-					hash: password.value,
-					avatar: avatar
+					hash: password.value
 				}
 
-				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas, {
+				const multiPartBody: FormData = new FormData()
+
+				if (avatar.toUpload)
+					multiPartBody.append('file', avatar.toUpload)
+
+				multiPartBody.append('newDatas', JSON.stringify(newDatas))
+
+				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, multiPartBody,
+				{
 					headers: {
-						'Authorization': `Bearer ${token}`
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'multipart/form-data'
 					}
 				})
 
 				const newChannel: Channel = {
 					id: postChannelResponse.data.id,
 					...newDatas,
+					avatar: `http://${url}:3333/uploads/channels/${postChannelResponse.data.id}_`,
 					messages: [],
 					members: [],
 					administrators: [],

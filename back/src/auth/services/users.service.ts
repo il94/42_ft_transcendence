@@ -362,7 +362,7 @@ export class UsersService {
 		if (!fs.existsSync(uploadUserPath))
             await mkdir(uploadUserPath, { recursive: true })
 
-			await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', file.buffer)
+		await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', file.buffer)
 	}
 
 	async getRandomAvatar(userId: number) {

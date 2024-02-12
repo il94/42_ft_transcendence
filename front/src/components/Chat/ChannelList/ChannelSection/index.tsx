@@ -40,7 +40,10 @@ function ChannelSection({ channel, sectionIndex }: PropsChannel) {
 				}
 			})
 
-			setChannelTarget(channelWithRelationsResponse.data)
+			setChannelTarget({
+				...channelWithRelationsResponse.data,
+				avatar: `http://${url}:3333/uploads/channels/${channelWithRelationsResponse.data.id}_`,
+			})
 			setLoaderChat(false)
 		}
 		catch (error) {
@@ -62,7 +65,10 @@ function ChannelSection({ channel, sectionIndex }: PropsChannel) {
 			onClick={handleClickEvent}
 			tabIndex={0}
 			$sectionIndex={sectionIndex}>
-			<Avatar src={channel.avatar} />
+			{
+				channel.avatar &&
+				<Avatar src={channel.avatar} />
+			}
 			<ChannelName>
 				{channel.name}
 			</ChannelName>
