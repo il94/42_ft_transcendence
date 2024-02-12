@@ -44,11 +44,11 @@ export class UsersController {
   }
 
   	// Modifie le user authentifie
-	@Patch('me')
-	async update(@getUser('id') userId: number, 
-	@Body() updateUserDto: UpdateUserDto) {
-		return this.usersService.updateUser(userId, updateUserDto)
-	}
+	// @Patch('me')
+	// async update(@getUser('id') userId: number, 
+	// @Body() updateUserDto: UpdateUserDto) {
+	// 	return this.usersService.updateUser(userId, updateUserDto)
+	// }
 }
 
 /* =========================== PAS UTILISEES ================================ */

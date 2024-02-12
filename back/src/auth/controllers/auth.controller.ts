@@ -40,6 +40,13 @@ export class AuthController {
 		return signinResponse
 	}
 
+	// recupere le status dun user
+	// @Get(':id/status')
+    // @UseGuards(JwtGuard)
+    // async getStatus(@getUser('id') userId: number) {
+    //     await this.authService.getStatus(userId)
+    // }
+
 	// Set le statut du user a deconnecte
 	@Get('logout')
 	@UseGuards(JwtGuard)

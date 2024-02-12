@@ -30,7 +30,6 @@ export class AppGateway implements OnModuleInit {
 			})
 			this.server.emit("updateUserStatus", parseInt(userid), UserStatus.ONLINE)
 			AppService.connectedUsers.set(userid, socket);
-	
 			// Écouter le débranchement du socket
 			socket.on('disconnect', async () => {
 				// Emit

@@ -5,12 +5,10 @@ import Paddle from './Paddle'
 import Ball from './Ball'
 import ScoreWrapper from './ScoreWrapper'
 import InteractionContext from "../../../../contexts/InteractionContext"
-import { ErrorResponse, User } from '../../../../utils/types'
-import Button from "../../../../componentsLibrary/Button"
+import { ErrorResponse } from '../../../../utils/types'
 import effects from '../../../../utils/effects'
 import colors from '../../../../utils/colors'
 import CloseButton from '../../../../componentsLibrary/CloseButton'
-import ChatContext from '../../../../contexts/ChatContext'
 import axios, { AxiosError } from 'axios'
 import AuthContext from '../../../../contexts/AuthContext'
 import DisplayContext from '../../../../contexts/DisplayContext'
@@ -97,7 +95,6 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	const [Name, setName] = useState<{left: string, right: string}>({left: "", right: ""})
 	const { token, url } = useContext(AuthContext)!
 	const [ballSize, setBallSize] = useState(25);
-	const [scoreSize, setScoreSize] = useState(75);
 
 	const [gameId, setGameId] = useState(0)
 	const [BallPos, setBallPos] = useState ({x: 0, y: 0});
@@ -184,7 +181,6 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 			bottom: enemyPos.bottom * convertionFactor
 		})
 		setBallSize(25 * convertionFactor)
-		setScoreSize(75 * convertionFactor)
 		setScore({left: myScore, right: enemyScore})
 		setName({left: myName, right: enemyName})
 		setGameId(gameID)
@@ -256,6 +252,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	useEffect(() => {
 		console.log("in pong width", width)
 		console.log("in pong height", height)
+
 	}, [])
 
 	return (

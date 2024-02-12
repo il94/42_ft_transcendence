@@ -95,7 +95,7 @@ model User {
 	wins        Int
 	draws       Int
 	losses      Int
-  status      UserStatus
+  status      UserStatus @default(OFFLINE)
   requests    Invitation[]
 
   games       UsersOnGames[]

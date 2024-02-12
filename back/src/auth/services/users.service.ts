@@ -10,7 +10,8 @@ import { AppGateway } from 'src/app.gateway';
 @Injectable()
 export class UsersService {
 	constructor(private prisma: PrismaService,
-				private appGateway: AppGateway) {}
+				private appGateway: AppGateway
+				) {}
 
 	// Cree un user
 	async createUser(userDatas: CreateUserDto): Promise<User> {

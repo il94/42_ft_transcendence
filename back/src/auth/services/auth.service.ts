@@ -49,10 +49,16 @@ export class AuthService {
 			const user = await this.prisma.user.findUnique({
 				where: {
 					username: userDatas.username
-				}
+				},
+				// select: {
+				// 	status: true
+				// }
 			})
 			if (!user)
 				throw new NotFoundException("User not found")
+
+			if (user.status == UserStatus.ONLINE)
+				throw new ForbiddenException("aleready connected")
 
 			// Verifie si le mot de passe fourni est correct
 			const pwdMatch = await argon.verify(user.hash, userDatas.hash)
