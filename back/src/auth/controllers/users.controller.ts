@@ -13,7 +13,7 @@ import { promisify } from 'util';
 import { join } from 'path';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
 
 @Controller('user')
 export class UsersController {
@@ -75,8 +75,9 @@ export class UsersController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
-
-		return await this.usersService.updateUser(userId, JSON.parse(updateUserDto.toString()), file)
+		if (updateUserDto)
+			return await this.usersService.updateUser(userId, JSON.parse(updateUserDto.toString()), file)
+		return await this.usersService.updateUser(userId, updateUserDto, file)
 	}
 }
 

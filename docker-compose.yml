@@ -30,7 +30,6 @@ services:
       - ./back/prisma:/app/prisma
       - ./back/package.json:/app/package.json
       - ./back/package-lock.json:/app/package-lock.json
-      - ./back/secrets:/app/secrets
 
     networks:
       - transcendence

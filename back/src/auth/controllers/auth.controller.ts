@@ -11,7 +11,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { CustomUploadFileTypeValidator } from "../file.validdator";
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
 
 type SigninResponse = {
 	access_token: string
