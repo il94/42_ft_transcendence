@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException,  UseGuards, UnauthorizedException, Param, ConflictException,
+import { Body, Controller, Get, Post, Patch, HttpCode, ParseIntPipe, HttpStatus, Req, Res, BadRequestException, UseGuards,  Param, 
 	UseInterceptors, UploadedFile, ParseFilePipeBuilder, } from "@nestjs/common";
 import { AuthService } from "../services/auth.service";
 import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
@@ -26,10 +26,8 @@ export class AuthController {
 
 	// Verifie si le token fourni est valide
 	@Post('token')
-	@UseGuards(JwtGuard)
 	async verifyJwt() {}
 
-	// Cree un user et renvoie un token d'authentification
 	@Public()
 	@Post('signup')
 	@UseInterceptors(FileInterceptor('file'))
@@ -49,11 +47,6 @@ export class AuthController {
 		return await this.authService.signup(JSON.parse(userDatas), file)
 	}
 
-	  
-
-	// Verifie le username et le mot de passe
-	// Set le statut du user a connecte
-	// Renvoie un token d'authentification
 	@Public()
 	@Post('signin')
 	async signin(@Body() userDatas: AuthDto, @Res({ passthrough: true }) res: Response): Promise<SigninResponse> {
@@ -65,7 +58,6 @@ export class AuthController {
 
 	// Set le statut du user a deconnecte
 	@Get('logout')
-	@UseGuards(JwtGuard)
 	async logout(@getUser('id') userId: number) {
 		await this.authService.logout(userId)
 	}
@@ -90,7 +82,6 @@ export class AuthController {
 	/*********************** 2FA routes *************************************/
 
 	@Get('2fa/generate')  // cree le service de 2FA en creeant le twoFASecret du user et en generant un QRcode 
-	@UseGuards(JwtGuard)
 	async register(@getUser() user: User): Promise <string> {
 		try {
 			const { otpAuthURL } = await this.authService.generateTwoFASecret(user);	
@@ -104,7 +95,6 @@ export class AuthController {
 	}
 
 	@Patch('2fa/enable') // enable TwoFA attend un code envoye dans le body 
-	@UseGuards(JwtGuard)
 	async turnOnTwoFA(@getUser() user: User, @Body() body: TwoFaDto): Promise <{success: boolean}> {
 		await this.authService.turnOnTwoFA(user, body.twoFACode);
 		return { success: true } 
@@ -119,7 +109,6 @@ export class AuthController {
   	}
 
 	@Patch('2fa/disable')
-	@UseGuards(JwtGuard)
 	async disable(@getUser() user: User, @Body() body: TwoFaDto): Promise <{success: boolean}> {
 		await this.authService.disableTwoFA(user, body.twoFACode)
 		return { success: true }
