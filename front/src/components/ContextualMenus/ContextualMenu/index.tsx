@@ -212,7 +212,27 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 	/* ========================== CHALLENGE SECTION ============================= */
 
 	async function handleSpectateEvent() {
-		userAuthenticate.socket?.emit("spectate", userAuthenticate.id, userTarget.id)
+		try {
+			await axios.patch(`http://${url}:3333/pong/spectate/${userAuthenticate.id}`, 
+			{ userId: userTarget.id},
+			{
+			headers: {
+				'Authorization': `Bearer ${token}`
+			}
+		})
+		}
+		catch (error) {
+            if (axios.isAxiosError(error)) {
+                const axiosError = error as AxiosError<ErrorResponse>
+                const { statusCode, message } = axiosError.response?.data!
+                if (statusCode === 403 || statusCode === 404)
+                    displayPopupError({ display: true, message: message })
+                else
+                    displayPopupError({ display: true })
+            }
+            else
+                displayPopupError({ display: true })
+        }
 	}
 
 	/* ============================ FRIEND SECTION ============================== */
@@ -448,7 +468,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 		else {
 			displayAdminSections(false)
 		}
-	}, [])
+	}, [type])
 
 	// Compte le nombre de channels du user qui ne sont pas des MP
 	const channelToDisplay: number = userAuthenticate.channels.filter((channel) => channel.type !== ChannelType.MP).length

@@ -12,6 +12,7 @@ import { AppService } from "src/app.service";
 
 import { GameStatus, MatchResult, Prisma, UserStatus } from "@prisma/client";
 import { subscribe } from "diagnostics_channel";
+import { PrismaService } from "src/prisma/prisma.service";
 
 
 @WebSocketGateway()
@@ -25,7 +26,8 @@ export class PongGateway {
 	private searchingUsersHard: Map<number, Socket> = new Map();
 	// private watchingUsers: Map<number, Socket> = new Map(); // a teg
 
-	constructor(private  PongService: PongService,
+	constructor(private prisma: PrismaService,
+				private  PongService: PongService,
 				private UserService: UsersService,
 				private appService: AppService
 				) {}
@@ -35,9 +37,6 @@ export class PongGateway {
 	}
 
 	handleDisconnect(client: Socket){
-
-		console.log('HEEEEEEEEEEE disconnectEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE')
-
 		let game: PongGame;
 
 			this.PongService.activeGames.forEach((element) => {
@@ -81,14 +80,23 @@ export class PongGateway {
 		});
 	}
 
-	@SubscribeMessage("cancelSearching")
-		async handleCancelSearching(client: Socket, userId: number)
-		{
-			this.delUserFromSearchingUser(client)
-			await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
+	async handleCancelSearching(userId: number)
+	{
+		try {
+
+			const socketUser = AppService.connectedUsers.get(userId.toString())
+			if(socketUser)
+			{
+				this.delUserFromSearchingUser(socketUser)
+				await this.PongService.updateStatusUser(userId, UserStatus.ONLINE)
+			}
 		}
+		catch (error) {
+			throw error
+		}
+	}
 	
-	async toSearchingArray(client: Socket, userId: number, dif: number){
+	async toSearchingArray(userId: number, dif: number){
 		
 		let array: Map<number, Socket>
 
@@ -102,7 +110,9 @@ export class PongGateway {
 		if (!array)
 			throw new Error("Incorrect value for difficulty")
 
-		array.set(userId, client)
+		const socketUser = AppService.connectedUsers.get(userId.toString())
+		if (socketUser)
+			array.set(userId, socketUser)
 
 		await this.PongService.updateStatusUser(userId, UserStatus.WAITING) // need protect
 	}
@@ -114,7 +124,7 @@ export class PongGateway {
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
 
 		if (leftSocket === undefined || rightSocket === undefined)
-			throw new Error("One of the player is offline")
+			return
 
 		const leftUser = await this.UserService.findById(id)
 		const rightUser = await this.UserService.findById(enemyId)
@@ -122,24 +132,21 @@ export class PongGateway {
 		const newgame = await this.PongService.createGame(id, enemyId);
 		if (leftSocket && rightSocket)
 		{
-		this.server.to(leftSocket.id).emit("launchGame")
-		this.server.to(rightSocket.id).emit("launchGame")
+			this.server.to(leftSocket.id).emit("launchGame")
+			this.server.to(rightSocket.id).emit("launchGame")
 
-		this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
+			if (dif)
+				this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
 
-		this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
+			this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
-		this.delUserFromSearchingUser(leftSocket)
-		this.delUserFromSearchingUser(rightSocket)
-		}
-		else
-		{
-			console.log("error launchGame")
-			return
+			this.delUserFromSearchingUser(leftSocket)
+			this.delUserFromSearchingUser(rightSocket)
+
 		}
 	}
 
-	async checkToLaunchGame(client: Socket, dif: number)
+	async checkToLaunchGame(id: number, dif: number)
 	{
 		let array: Map<number, Socket>
 		if (dif === 1)
@@ -168,29 +175,36 @@ export class PongGateway {
 
 	}
 
-	/*
-		data[0] = id user
-		data[1] = niveau difficulter entre 1 et 3
-	*/
-	
-	@SubscribeMessage('searchGame')
-	async addSearchingPlayer(client: Socket, data: number) {
+	async addSearchingPlayer(userId: number, dif: number) {
 		try {	
-			if( !data || !data[0] || !data[1])
-				throw new Error("an Error occur from the WebSocket")	
 
-			this.toSearchingArray(client, data[0], data[1])
-			await this.checkToLaunchGame(client, data[1])
+			if(!dif || dif < 1 || dif > 3)
+				throw new BadRequestException("an Error occur from the WebSocket")	
+      
+			this.toSearchingArray(userId, dif)
+			await this.checkToLaunchGame(userId, dif)
 
 		}
-		catch (error: any) {
-			this.server.to(client.id).emit("error", error.message)
-		}
+		catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError)
+                throw new ForbiddenException("The provided user data is not allowed")
+            else
+                throw new BadRequestException()
+        }
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){
-		const speed = 30 / game.difficulty
-
+		// const speed = 20 / game.difficulty
+		let speed: number = 0
+		if (game.difficulty == 1)
+			speed = 10
+		else if (game.difficulty == 2)
+			speed = 6
+		else if (game.difficulty == 3) 
+			speed = 3
+		else
+			speed = 12
+		
 		 setTimeout(() =>{
 			game.moveBall()
 			
@@ -262,63 +276,116 @@ export class PongGateway {
 				this.server.to(client.id).emit("error", error.message)
 			}
 		}
+	
+	async handleSpectate(UserId: number, spectateId : number)
+	{
+		try {
+			if(!UserId || !spectateId)
+				throw new BadRequestException()
 
-		@SubscribeMessage("spectate")
-			async handleSpectate(client: Socket, data: any)
-			{
-				try {
-					if(!data || !data[0] || !data[1])
-						throw new Error("Unable to retrive the needed data")
-					let game: PongGame
-					this.PongService.activeGames.forEach((element) => {
-						if (element.isMyPlayerById(data[1])){
-							game = element;
-						}
-					});
-					if(game)
-					{
-            			const oldStatus = await this.PongService.getUserStatus(data[0])
-						if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
-						{
-							console.log("oldStatus2 = ", oldStatus)
-							throw new Error('Unable to process watching')
-							return
-						}
-						const tmp = client
-						game.addWatcher(data[0], tmp)
-						await this.PongService.updateStatusUser(data[0], UserStatus.WATCHING)
-						this.server.to(client.id).emit("spectate")
-					}
+			// Verifie si le user auth est online
+			const userStatus = await this.prisma.user.findUnique({
+				where: {
+					id: UserId
+				},
+				select: {
+					status: true
 				}
-				catch(error: any){
-					this.server.to(client.id).emit("error", error.message)
+			})
+			if (userStatus.status !== UserStatus.ONLINE)
+				throw new ForbiddenException("You can't execute this action")
+
+			// Verifie si le user existe et récupère son role
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: spectateId
+				},
+				select: {
+					status: true
+				}
+			})
+			if (!user)
+				throw new NotFoundException("User not found")
+			else if (user.status !== UserStatus.PLAYING)
+				throw new ForbiddenException("User is not playing")
+
+			let game: PongGame
+			this.PongService.activeGames.forEach((element) => {
+				if (element.isMyPlayerById(spectateId)){
+					game = element;
+				}
+			});
+			if(game)
+			{
+				// const oldStatus = await this.PongService.getUserStatus(UserId)
+				// if (oldStatus == UserStatus.OFFLINE || oldStatus == UserStatus.PLAYING || oldStatus == UserStatus.WATCHING || oldStatus == UserStatus.WAITING)
+				// {
+				// 	console.log("oldStatus2 = ", oldStatus)
+				// 	throw new Error('Unable to process watching')
+				// 	return
+				// }
+				const socketUser = AppService.connectedUsers.get(UserId.toString())
+				if (socketUser)
+				{	
+					game.addWatcher(UserId, socketUser)
+					await this.PongService.updateStatusUser(UserId, UserStatus.WATCHING)
+					console.log(socketUser)
+					this.server.to(socketUser.id).emit("spectate")
 				}
 			}
+			else
+				throw new BadRequestException()
+		}
+		catch(error: any){
+			const socketUser =  AppService.connectedUsers.get(UserId.toString())
+			if (socketUser)
+				this.server.to(socketUser.id).emit("error", error.message)
+		}
+	}
 
-		@SubscribeMessage("stopSpectate")
-			async handleStopSpectate(client: Socket, data: number)
+		//@SubscribeMessage("stopSpectate")
+			async handleStopSpectate(UserId: number, gameId : number)
 			{
 				try {
-					if(!data || !data[0] || !data[1])
-						throw new Error("Unable to retrive the needed data")
-					let game: PongGame
-					this.PongService.activeGames.forEach((element) => {
-						if (element.id === data[0]){
-							game = element;
-						}
-					});
-					if (game)
-					{
-						await this.PongService.updateStatusUser(data[1], UserStatus.ONLINE)
-						// const index = game.watcher.indexOf(client)
-						// if(index != -1)
-						// 	game.watcher.splice(index,1)
-						game.removeWatcher(data[1])
+					if(!UserId || !gameId)
+						throw new BadRequestException()
+	
+				// Verifie si le user auth est online
+				const userStatus = await this.prisma.user.findUnique({
+					where: {
+						id: UserId
+					},
+					select: {
+						status: true
 					}
+				})
+				if (userStatus.status !== UserStatus.WATCHING)
+					throw new ForbiddenException("You can't execute this action")
+	
+				let game: PongGame
+				this.PongService.activeGames.forEach((element) => {
+					if (element.id === gameId){
+						game = element;
+					}
+				});	
+
+				if (game)
+				{
+					await this.PongService.updateStatusUser(UserId, UserStatus.ONLINE)
+					// const index = game.watcher.indexOf(client)
+					// if(index != -1)
+					// 	game.watcher.splice(index,1)
+					game.removeWatcher(UserId)
 				}
-				catch(error: any){
-					this.server.to(client.id).emit("error", error.message)
+				else
+					throw new BadRequestException()
 				}
+				catch (error) {
+					if (error instanceof Prisma.PrismaClientKnownRequestError)
+						throw new ForbiddenException("The provided user data is not allowed")
+					else
+						throw new BadRequestException()
+				}		
 			}
 }
 

@@ -10,7 +10,8 @@ export const Style = styled.div`
 	justify-content: center;
 	align-items: center;
 
-	position: relative;
+	position: absolute;
+	z-index: 9999;
 
 	width: 325.5px;
 	min-height: 55px;

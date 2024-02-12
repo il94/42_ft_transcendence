@@ -26,7 +26,7 @@ const Style = styled.div.attrs<{ $Hposition: number ; $Vposition: number }>((pro
 	z-index: -1;
 
 	width: 1%;
-	height: 10%;
+	height: 9%;
 	
 
 	transform: translate(-50%, -50%);

@@ -143,9 +143,18 @@ export async function refreshJoinChannel(props: PropsRefreshJoinChannel) {
 	// Valide si le user auth est invité dans le channel
 	if (props.userId === props.userAuthenticate.id)
 	{
+		const newChannel: Channel = {
+			...props.channelDatas,
+			messages: [],
+			members: [],
+			administrators: [],
+			owner: undefined,
+			banneds: [],
+			muteInfo: []
+		}
 		props.setUserAuthenticate((prevState: UserAuthenticate) => ({
 			...prevState,
-			channels: [ ...prevState.channels, props.channelDatas ]
+			channels: [ ...prevState.channels, newChannel ]
 		}))
 	}
 
@@ -299,7 +308,7 @@ type PropsRefreshNewOwner = {
 }
 
 export async function refreshNewOwner(props: PropsRefreshNewOwner) {
-	if (props.userId === props.userAuthenticate.id)
+	if (props.userId === props.userAuthenticate.id && props.channelTarget?.id === props.channelId)
 	{
 		props.setUserAuthenticate((prevState: UserAuthenticate) => {
 			return {
@@ -313,7 +322,7 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 			}
 		})
 	}
-	if (props.channelTarget?.id === props.channelId)
+	else if (props.channelTarget?.id === props.channelId)
 	{
 		const userTarget = findUserInChannel(props.channelTarget, props.userId)
 		if (!userTarget)
@@ -561,13 +570,18 @@ type PropsRecieveChannelMP = {
 	
 // Crée un channel MP chez le destinataire
 export async function recieveChannelMP(props: PropsRecieveChannelMP) {
-	const newChannelMP: ChannelData = {
+	const newChannelMP: Channel = {
 		id: props.channelId,
 		name: props.authorDatas.username,
 		avatar: props.authorDatas.avatar,
-		type: ChannelType.MP
+		type: ChannelType.MP,
+		messages: [],
+		members: [],
+		administrators: [],
+		owner: undefined,
+		banneds: [],
+		muteInfo: []
 	}
-
 	if (props.userAuthenticate.id !== props.authorDatas.id)
 	{
 		props.setUserAuthenticate((prevState) => ({

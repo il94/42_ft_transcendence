@@ -1,10 +1,29 @@
-import { Avatar, SettingTtile, Style } from "./style"
-import { HiddenInput } from "../../../componentsLibrary/IconUploadFile"
-import { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from "react"
+
+import {
+	Dispatch,
+	SetStateAction,
+	useContext,
+    ChangeEvent,
+    useState
+} from "react"
 import axios from "axios"
+        
+import {
+	Avatar,
+	SettingTtile,
+	Style
+} from "./style"
+
+import {
+	handleAvatarUpload
+} from "../../../utils/functions"
+
+import {
+	HiddenInput
+} from "../../../componentsLibrary/IconUploadFile"
+
+import DisplayContext from "../../../contexts/DisplayContext"
 import AuthContext from "../../../contexts/AuthContext"
-import Button from "../../../componentsLibrary/Button"
-import { SettingAvatar } from "../../../utils/types"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -56,7 +75,7 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 			<Avatar
 				src={avatar.toDisplay} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
-			<HiddenInput onChange={handleAvatarUpload}
+			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
 				id="uploadAvatarUser" type="file" accept="image/*" />
 		</Style>
 	)

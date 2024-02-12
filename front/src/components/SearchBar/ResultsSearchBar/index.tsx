@@ -132,8 +132,6 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					friends: [...prevState.friends, user]
 				}))
 			}
-			else
-				displayPopupError({ display: true, message: `${user.username} is already your friend` })
 		}
 		catch (error) {
 			if (axios.isAxiosError(error)) {
