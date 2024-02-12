@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,
   UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, ParseFilePipeBuilder, ParseFilePipe,
   HttpStatus, StreamableFile } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
-import { JwtGuard } from '../guards/auth.guard';
+import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 import { UpdateUserDto } from '../dto/users.dto';
 import { getUser, Public } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
@@ -21,6 +21,7 @@ export class UsersController {
 
 	// Upload un avatar
 	@Public()
+	@UseGuards(Api42AuthGuard)
 	@Post('upload')
 	postAvatar(@Body() link: string) {
 		console.log("CONTROLEUR", link)

@@ -171,8 +171,8 @@ export class AuthService {
 				{
 					// Genere un token d'authentification et l'envoie par les cookies
 					const token = await this.signToken(user.id, user.username)
-						res.clearCookie('token', { httpOnly: true })
-						.cookie("access_token", token.access_token)
+						//res.clearCookie('token', { httpOnly: true })
+						res.cookie("access_token", token.access_token)
 						.redirect(`http://${process.env.IP}:5173`)
 				}
 			
