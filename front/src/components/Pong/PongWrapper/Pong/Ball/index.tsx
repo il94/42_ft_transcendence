@@ -1,5 +1,5 @@
  
-import { useEffect, useState, KeyboardEvent, useRef } from 'react';
+import {useRef } from 'react';
 import styled from 'styled-components';
 
 
@@ -34,11 +34,7 @@ type PropsBalls = {
 /* 
 		const getRandom = () => { return (Math.random() * 2 - 1) } */
 		const BallRef = useRef<HTMLDivElement | null>(null)
-		
-		const keyHandler = (e: KeyboardEvent) => {
-			if (e.key === 'Enter')
-				console.log("Enter");
-		}
+
 
 		/* console.log(posX)
 		console.log(PongData.right) */
@@ -63,12 +59,6 @@ type PropsBalls = {
 			}
 		}, [X, Y]) */
 
-		useEffect(() => {
-			document.addEventListener('keydown', keyHandler, true);
-			return () => {
-				document.removeEventListener('keydown', keyHandler, true)
-			}
-		}, []);
 
 	return (
 		<Style $X={X} $Y={Y} $BallSize={BallSize} ref={BallRef} />

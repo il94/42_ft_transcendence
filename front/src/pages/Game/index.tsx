@@ -193,7 +193,7 @@ function Game() {
 					}
 				});
 
-				socket.on('connect_error', (error) => {
+				socket.on('connect_error', () => {
 					throw new Error;
 				});
 

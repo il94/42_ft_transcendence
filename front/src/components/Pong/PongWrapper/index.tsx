@@ -1,6 +1,6 @@
 import { useRef, useState, useContext, useEffect } from "react"
 import styled from "styled-components"
-import axios, { AxiosError, AxiosResponse } from "axios"
+import axios, { AxiosError } from "axios"
 import AuthContext from "../../../contexts/AuthContext"
 import InteractionContext from "../../../contexts/InteractionContext"
 
@@ -8,7 +8,7 @@ import InteractionContext from "../../../contexts/InteractionContext"
 
 
 import Pong from "./Pong"
-import { ErrorResponse, User } from "../../../utils/types"
+import { ErrorResponse } from "../../../utils/types"
 import colors from "../../../utils/colors"
 import Button from "../../../componentsLibrary/Button"
 import Loader from "../../../componentsLibrary/Loader"
