@@ -14,6 +14,7 @@ import {
 	Channel,
 	ChannelData,
 	MessageLog,
+	SettingAvatar,
 	User,
 	UserAuthenticate
 } from "./types"
@@ -30,23 +31,29 @@ export function capitalize(str: string): string {
 	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase())
 }
 
-function endsWithImageExtension(fileName: string): boolean {
+export function endsWithImageExtension(fileName: string): boolean {
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif', '.tiff', '.webp', '.svg', '.heif', '.heic']
     const lowerCaseFileName = fileName.toLowerCase()
     return imageExtensions.some(ext => lowerCaseFileName.endsWith(ext))
 }
 
-export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvatar: Dispatch<SetStateAction<string>>, displayPopupError: Dispatch<SetStateAction<{ display: boolean, message?: string }>>) {
-	const avatar = event.target.files?.[0]
+export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvatar: Dispatch<SetStateAction<SettingAvatar>>, displayPopupError?: Dispatch<SetStateAction<{ display: boolean, message?: string }>>, navigate?: any) {
+	const file = event.target.files?.[0]
 
-	if (!avatar)
+	if (!file)
 	{
-		displayPopupError({ display: true, message: "No image" })
+		if (displayPopupError)
+			displayPopupError({ display: true, message: "No image" })
+		else if (navigate)
+			navigate("/error")
 		return
 	}
-	else if (!endsWithImageExtension(avatar.name))
+	else if (!endsWithImageExtension(file.name))
 	{
-		displayPopupError({ display: true, message: "Bad image extension" })
+		if (displayPopupError)
+			displayPopupError({ display: true, message: "Bad image extension" })
+		else if (navigate)
+			navigate("/error")
 		return
 	}
 
@@ -55,13 +62,23 @@ export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvat
 	reader.onloadend = () => {
 		const imageDataUrl = reader.result
 		if (typeof imageDataUrl === 'string')
-			setAvatar(imageDataUrl)
+			setAvatar((prevState: SettingAvatar) => ({
+				...prevState,
+				toDisplay: imageDataUrl,
+				toUpload: file
+			}))
 	}
 
 	reader.onerror = () => {
-		displayPopupError({ display: true, message: "Invalid image" })
+		if (displayPopupError)
+			displayPopupError({ display: true, message: "Invalid image" })
+		else if (navigate)
+			navigate("/error", {
+				state: {
+					message: "Invalid image"
+		}})
 	}
-	reader.readAsDataURL(avatar)
+	reader.readAsDataURL(file)
 }
 
 export function getRandomDefaultAvatar(): string {

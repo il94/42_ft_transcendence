@@ -56,7 +56,10 @@ export async function showCard(event: MouseEvent<HTMLDivElement | HTMLButtonElem
 				}
 			})
 
-			props.setUserTarget(userResponse.data)
+			props.setUserTarget({
+				...userResponse.data,
+				avatar: `http://${props.url}:3333/uploads/users/${userResponse.data.id}_`,
+			})
 
 			const heightCard = 390 // height de la carte
 			const { height: GameWrapperHeight, width: GameWrapperWidth } = gameWrapperContainer.getBoundingClientRect() // dimensions de la fenetre de jeu
@@ -126,7 +129,10 @@ export async function showContextualMenu(event: MouseEvent<HTMLDivElement | HTML
 				}
 			})
 
-			props.setUserTarget(userResponse.data)
+			props.setUserTarget({
+				...userResponse.data,
+				avatar: `http://${props.url}:3333/uploads/users/${userResponse.data.id}_`,
+			})
 
 			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.CHAT, userResponse.data, props.userAuthenticate, props.channelTarget) // height du menu contextuel du chat
 			const { height: GameWrapperHeight } = gameWrapperContainer.getBoundingClientRect() // height de la fenetre de jeu

@@ -81,7 +81,7 @@ export class UsersController {
 		})
 	) file?: Express.Multer.File) {
 
-		return await this.usersService.updateUser(userId, updateUserDto, file)
+		return await this.usersService.updateUser(userId, JSON.parse(updateUserDto.toString()), file)
 	}
 }
 

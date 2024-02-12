@@ -39,7 +39,7 @@ import {
 } from '../../utils/emptyObjects'
 
 import colors from '../../utils/colors'
-import SelectAvatar from '../../components/SettingsMenu/SelectAvatar'
+import SelectAvatar from '../../components/SelectAvatar'
 import styled from 'styled-components'
 
 import FTIcon from '../../assets/42.png'
@@ -388,7 +388,8 @@ function SignupFT() {
 						<VerticalSetting>
 							<SelectAvatar
 								avatar={avatar}
-								setAvatar={setAvatar} />
+								setAvatar={setAvatar}
+								navigate={navigate} />
 						</VerticalSetting>
 					<div style={{ height: "10px" }} />
 					<Button

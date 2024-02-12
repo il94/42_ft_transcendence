@@ -74,9 +74,12 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 			$bottom={cardPosition.bottom}
 			$zIndex={zCardIndex}>
 			<CloseButton closeFunction={displayCard} />
-			<Avatar
-				src={`http://${url}:3333/uploads/users/${userTarget.id}_`}
-				$borderColor={userRank} />
+			{
+				userTarget.avatar &&
+				<Avatar
+					src={userTarget.avatar}
+					$borderColor={userRank} />
+			}
 			<UserName>
 				{userTarget.username}
 			</UserName>

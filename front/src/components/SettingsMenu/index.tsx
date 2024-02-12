@@ -14,9 +14,10 @@ import {
 	TwoFAValue
 } from "./style"
 
-import SelectAvatar from "./SelectAvatar"
+import SelectAvatar from "../SelectAvatar"
 import Button from "../../componentsLibrary/Button"
 import InputText from "../../componentsLibrary/InputText"
+import CloseButton from "../../componentsLibrary/CloseButton"
 
 import DisplayContext from "../../contexts/DisplayContext"
 import InteractionContext from "../../contexts/InteractionContext"
@@ -38,10 +39,6 @@ import {
 	VerticalSettingWrapper,
 	VerticalSettingsForm
 } from "../../componentsLibrary/SettingsForm/Index"
-import CloseButton from "../../componentsLibrary/CloseButton"
-import Separator from "../../componentsLibrary/Separator/Index"
-
-import TestIMage from "../../assets/default_black.png"
 
 type PropsSettingsMenu = {
 	displaySettingsMenu: Dispatch<SetStateAction<boolean>>,
@@ -97,9 +94,6 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			displaySettingsMenu(false)
 		}
 		catch (error) {
-
-			console.log(error)
-
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
@@ -336,31 +330,31 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 					<VerticalSetting fontSize={15} $alignItems="start">
 						2FA
 						<VerticalSettingWrapper>
-						<TwoFAValue>
-							{ twoFA ? "Enable" : "Disable" }
-						</TwoFAValue>
-						<div style={{ height: "15px" }} />
-						<Button
-							onClick={() => displayTwoFAMenu(true)}
-							type="button" width={200}
-							alt="Set 2FA button"
-							title={ twoFA ? "Disable" : "Enable" }
-							style={{ alignSelf: "center" }}>
-							{ twoFA ? "Disable" : "Enable" }
-						</Button>
+							<TwoFAValue>
+								{ twoFA ? "Enable" : "Disable" }
+							</TwoFAValue>
+							<div style={{ height: "15px" }} />
+							<Button
+								onClick={() => displayTwoFAMenu(true)}
+								type="button" width={200}
+								alt="Set 2FA button"
+								title={ twoFA ? "Disable" : "Enable" }
+								style={{ alignSelf: "center" }}>
+								{ twoFA ? "Disable" : "Enable" }
+							</Button>
 						</VerticalSettingWrapper>
 					</VerticalSetting>
+					<SelectAvatar
+						avatar={avatar}
+						setAvatar={setAvatar}
+						displayPopupError={displayPopupError} />
+						<div style={{ height: "5px" }} />
 					<Button
 						type="submit" fontSize={"19px"}
 						alt="Save button" title="Save changes">
 						Save
 					</Button>
 				</VerticalSettingsForm>
-				<Separator />
-				<SelectAvatar
-					avatar={avatar}
-					setAvatar={setAvatar} />
-					<div style={{ height: "5px" }} />
 		</Style>
 	)
 }

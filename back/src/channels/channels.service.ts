@@ -18,7 +18,6 @@ type ChannelMP = {
 	id: number,
     createdAt: Date,
     name: string,
-    avatar: string,
     type: ChannelStatus,
     hash: string
 }
@@ -152,7 +151,6 @@ export class ChannelsService {
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
 					name: '',
-					avatar: '',
 					type: ChannelStatus.MP,
 					users: { 
 						create: [
