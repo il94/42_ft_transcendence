@@ -1,5 +1,6 @@
-import styled from "styled-components";
-import colors from "../../../utils/colors";
+import styled from "styled-components"
+
+import colors from "../../utils/colors"
 
 export const Style = styled.div`
 
@@ -8,7 +9,7 @@ export const Style = styled.div`
 	justify-content: space-between;
 	align-items: center;
 
-	min-height: 190px;
+	min-height: 150px;
 
 `
 

@@ -16,7 +16,7 @@ export const Style = styled.div<{ $zIndex: number }>`
 	transform: translate(-50%, -50%);
 
 	width: 350px;
-	height: 540px;
+	height: 475px;
 
 	clip-path: ${effects.pixelateWindow};
 

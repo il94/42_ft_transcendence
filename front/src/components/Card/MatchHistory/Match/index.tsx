@@ -50,7 +50,10 @@ function Match({ username, opponentId, opponentName, result, scoreUser, scoreOpp
 				}
 			})
 
-			setUserTarget(userResponse.data)
+			setUserTarget({
+				...userResponse.data,
+				avatar: `http://${url}:3333/uploads/users/${userResponse.data.id}_`,
+			})
 			setLoaderMatchsHistory(false)
 		}
 		catch (error) {
