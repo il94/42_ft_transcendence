@@ -20,7 +20,7 @@ services:
     container_name: api_back
     ports:
       - '3333:3333'
-      - '5555:5555'
+    #  - '5555:5555'
     depends_on:
       - db
     volumes:
@@ -49,6 +49,7 @@ services:
       - ./front/style.css:/app/style.css
       - ./front/package.json:/app/package.json
       - ./front/package-lock.json:/app/package-lock.json
+      - ./front/tsconfig.json:/app/tsconfig.json
     networks:
       - transcendence
 
