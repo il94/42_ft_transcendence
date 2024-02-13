@@ -59,6 +59,8 @@ function Log({ type, user1, user2 }: PropsLog) {
 			setLog("leaved channel")
 		else if (type === logType.UPGRADE)
 			setLog("upgraded")
+		else if (type === logType.NEW_OWNER)
+			setLog("is new owner")
 		else if (type === logType.DOWNGRADE)
 			setLog("downgraded")
 		else if (type === logType.BAN)

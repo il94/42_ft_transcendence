@@ -300,6 +300,7 @@ export async function refreshUserRole(props : PropsRefreshUserRole) {
 type PropsRefreshNewOwner = {
 	channelId: number,
 	userId: number,
+	log: MessageLog,
 
 	userAuthenticate: UserAuthenticate,
 	setUserAuthenticate: Dispatch<SetStateAction<UserAuthenticate>>,
@@ -315,7 +316,7 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 				...prevState,
 				channels: prevState.channels.map((channel: Channel | ChannelData) => {
 					if (channel.id === props.channelId)
-						return (setUserToOwner(channel as Channel, prevState))
+						return (setUserToOwner(channel as Channel, props.userAuthenticate, props.log))
 					else
 						return (channel)
 				})
@@ -329,7 +330,7 @@ export async function refreshNewOwner(props: PropsRefreshNewOwner) {
 			return
 		props.setChannelTarget((prevState: Channel | undefined) => {
 			if (prevState)
-				return (setUserToOwner(prevState, userTarget))
+				return (setUserToOwner(prevState, userTarget, props.log))
 			else
 				return (undefined)
 		})	

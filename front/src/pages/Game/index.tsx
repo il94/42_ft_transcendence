@@ -326,8 +326,8 @@ function Game() {
 			refreshLeaveChannel({ channelId, userId, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any, log: MessageLog) =>
 			refreshUserRole({ channelId, userId, newRole, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
-			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number, log: MessageLog) =>
+			refreshNewOwner({ channelId, userId, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus) => 
 			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string, userTargetId: number, log: MessageLog) => 
@@ -354,15 +354,12 @@ function Game() {
 			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
-			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("createChannelMP", (channelId: number, authorDatas: any) =>
 			recieveChannelMP({ channelId, authorDatas, userAuthenticate, setUserAuthenticate }))
 		
 		return () => {
 			userAuthenticate.socket?.off("updateUserStatus")
 			userAuthenticate.socket?.off("updateChannel")
-			userAuthenticate.socket?.off("deleteChannel")
 			userAuthenticate.socket?.off("createChannelMP")
 		}
 		
