@@ -108,10 +108,7 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 					}
 				})
 
-				setChannelTarget({
-					...channelMPResponse.data,
-					avatar: `http://${url}:3333/uploads/users/${userTarget.id}_`
-				})
+				setChannelTarget(channelMPResponse.data)
 				displayChat(true)
 				return (channelMPResponse.data)
 			}
@@ -124,7 +121,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 				const newChannelMP: Channel = {
 					...newChannelMPResponse.data,
-					avatar: `http://${url}:3333/uploads/users/${userTarget.id}_`,
 					messages: [],
 					members: [
 						userAuthenticate,

@@ -60,7 +60,7 @@ export class UsersService {
 	}
 
 	// Cree un user
-	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<User> {
+	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<Partial<User>> {
 		try {
 
 			console.log("userdatas", userDatas)
@@ -87,22 +87,43 @@ export class UsersService {
 			}
 
 			// Cree le nouvel user
-			const newUser = await this.prisma.user.create({
+			const newUserId = await this.prisma.user.create({
 				data: {
 					...user,
+					avatar: '',
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,
 					wins: 0,
 					draws: 0,
 					losses: 0
+				}
+			})
+
+			// AJoute l'avatar
+			const newUser = await this.prisma.user.update({
+				where: {
+					id: newUserId.id
 				},
+				data: {
+					avatar: `http://${process.env.IP}:${process.env.PORT}/uploads/users/${newUserId.id}_`
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					twoFA: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
+				}
 			})
 
 			console.log("AVANT IF")
 			if (file)
 			{
-				await this.saveUserAvatar(newUser.id, file)
+				await this.saveUserAvatar(newUserId.id, file)
 				console.log("if")
 
 			}
@@ -110,12 +131,12 @@ export class UsersService {
 			{
 				console.log("else")
 
-				await this.getRandomAvatar(newUser.id)
+				await this.getRandomAvatar(newUserId.id)
 			}
 
 			console.log("APRES IF")
 
-			console.log(`User ${newUser.id} was created`)
+			console.log(`User ${newUserId.id} was created`)
 			return newUser
 		}
 		catch (error) {
@@ -139,7 +160,7 @@ export class UsersService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true,
+					avatar: true,
 					status: true,
 					wins: true,
 					draws: true,
@@ -166,7 +187,7 @@ export class UsersService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true,
+					avatar: true,
 					status: true,
 					wins: true,
 					draws: true,
@@ -234,7 +255,7 @@ export class UsersService {
 								select: {
 									id: true,
 									username: true,
-									// avatar: true
+									avatar: true
 								}
 							},
 						}
@@ -251,7 +272,7 @@ export class UsersService {
 					return {
 						...rest,
 						name: users.find((user) => user.user.id !== userId).user.username,
-						// avatar: users.find((user) => user.user.id !== userId).user.avatar
+						avatar: users.find((user) => user.user.id !== userId).user.avatar
 					}
 				})
 			]

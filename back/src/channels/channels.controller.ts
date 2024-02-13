@@ -25,7 +25,7 @@ export class ChannelController {
 	@Post()
 	@UseInterceptors(FileInterceptor('file'))
 	async create(@getUser('id') userId: number,
-	@Body('newDatas') createChannelDto: any,
+	@Body('newDatas') createChannelDto: string,
 	@UploadedFile(
 		new ParseFilePipeBuilder().addValidator(
 			new CustomUploadFileTypeValidator({
@@ -38,10 +38,10 @@ export class ChannelController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
-		const newDatas = JSON.parse(createChannelDto)
+		const newDatas: CreateChannelDto = JSON.parse(createChannelDto)
 
 		await this.channelsService.parseMultiPartCreate(newDatas)
-
+	
 		return this.channelsService.createChannel(newDatas, userId, file)
 	}
 
@@ -101,10 +101,30 @@ export class ChannelController {
 
 	// Modifie un channel
 	@Patch(':id')
+	@UseInterceptors(FileInterceptor('file'))
 	update(@getUser('id') userId: number,
 	@Param('id', ParseIntPipe) channelId: number, 
-	@Body() newChannelDatas: UpdateChannelDto) {
-		return this.channelsService.updateChannel(channelId, newChannelDatas, userId)
+	@Body('newDatas') newChannelDatas: string,
+	@UploadedFile(
+		new ParseFilePipeBuilder().addValidator(
+			new CustomUploadFileTypeValidator({
+				fileType: VALID_UPLOADS_MIME_TYPES,
+			}),
+		)
+		.addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
+		.build({
+			fileIsRequired: false,
+			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+		})
+	) file?: Express.Multer.File) {
+
+		const newDatas: UpdateChannelDto = JSON.parse(newChannelDatas)
+
+		// DTO A faire
+		// await this.channelsService.parseMultiPartCreate(newDatas)
+
+
+		return this.channelsService.updateChannel(channelId, newDatas, userId, file)
 	}
 
 	// Change le role d'un user du channel

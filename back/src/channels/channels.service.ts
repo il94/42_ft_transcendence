@@ -18,6 +18,7 @@ type ChannelMP = {
 	id: number,
     createdAt: Date,
     name: string,
+	avatar: string,
     type: ChannelStatus,
     hash: string
 }
@@ -51,6 +52,7 @@ export class ChannelsService {
 			const newChannelId = await this.prisma.channel.create({
 				data: {
 					...newChannel,
+					avatar: '',
 					users: { 
 						create: [
 							{
@@ -61,20 +63,31 @@ export class ChannelsService {
 									}
 								}
 							}
-						]  
+						],
 					},
 				},
 				select: {
 					id: true
 				}
 			})
+
+			// Ajoute l'avatar
+			const newChannelDatas = await this.prisma.channel.update({
+				where: {
+					id: newChannelId.id
+				},
+				data: {
+					avatar: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${newChannelId.id}_`
+				}
+			})
+
 			if (file)
 				await this.saveChannelAvatar(newChannelId.id, file)
 			else
 				await this.getDefaultChannelAvatar(newChannelId.id)
 
 			console.log(`Channel ${newChannelId.id} was created`, newChannel)
-			return newChannelId
+			return newChannelDatas
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException)
@@ -121,7 +134,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true
+					avatar: true
 				}
 			})
 			if (!userTarget)
@@ -155,6 +168,7 @@ export class ChannelsService {
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
 					name: '',
+					avatar: '',
 					type: ChannelStatus.MP,
 					users: { 
 						create: [
@@ -183,7 +197,7 @@ export class ChannelsService {
 			const channelMP: ChannelMP = {
 				...newChannelMP,
 				name: userTarget.username,
-				// avatar: userTarget.avatar
+				avatar: userTarget.avatar
 			}
 
 			// Recupere l'id username et avatar du user auth 
@@ -194,7 +208,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true
+					avatar: true
 				}
 			})
 
@@ -239,7 +253,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true,
+					avatar: true,
 					wins: true,
 					draws: true,
 					losses: true,
@@ -589,7 +603,7 @@ export class ChannelsService {
 								select: {
 									id: true,
 									username: true,
-									// avatar: true,
+									avatar: true,
 									status: true,
 									wins: true,
 									draws: true,
@@ -607,7 +621,7 @@ export class ChannelsService {
 								select: {
 									id: true,
 									username: true,
-									// avatar: true,
+									avatar: true,
 									status: true,
 									wins: true,
 									draws: true,
@@ -724,8 +738,11 @@ export class ChannelsService {
 	}
 
 	// Modifie un channel
-	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
+	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number, file?: Express.Multer.File) {
 		try {
+
+			console.log(newChannelDatas)
+
 			// Verifie si le channel existe et le retourne
 			const channelToUpdate = await this.prisma.channel.findUnique({
 				where: {
@@ -777,15 +794,26 @@ export class ChannelsService {
 					newChannelDatas.hash = await argon.hash(newChannelDatas.hash)
 			}
 
+			// else
+			// newDatas.avatar = `http://${url}:3333/uploads/channels/${userAuthenticate.id}_`
+
+
 			// Update le channel
 			await this.prisma.channel.update({
 				where: {
 					id: channelToUpdate.id
 				}, 
 				data: {
-					...newChannelDatas
+					...newChannelDatas,
+					avatar: newChannelDatas.avatar ? newChannelDatas.avatar
+						: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${channelId}_`
 				}
 			})
+
+			if (file)
+				await this.saveChannelAvatar(channelId, file)
+			else
+				await this.getDefaultChannelAvatar(channelId)
 
 			// Emit
 			await this.emitOnChannel("updateChannel", channelId, newChannelDatas)
@@ -1436,16 +1464,21 @@ export class ChannelsService {
 	}
 
 	async getDefaultChannelAvatar(channelId: number) {
+
 		const defaultChannelAvatarPath = "/app/defaultChannelAvatar/default_channel.png"
 		
-		if (!fs.existsSync(defaultChannelAvatarPath))
-			await mkdir(defaultChannelAvatarPath, { recursive: true })
-	
 		const defaultChannelAvatar = await fs.promises.readFile(defaultChannelAvatarPath)
 	
 		const uploadChannelPath = "/app/uploads/channels/"
+		if (!fs.existsSync(uploadChannelPath))
+			await mkdir(uploadChannelPath, { recursive: true })
+
+
 
 		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', defaultChannelAvatar)
+
+		console.log("HERE")
+
 	}
 
 

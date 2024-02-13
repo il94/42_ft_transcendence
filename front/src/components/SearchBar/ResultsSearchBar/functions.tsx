@@ -38,7 +38,7 @@ export function generateResults(url: string, results: User[] | Channel[], type: 
 							$noAvatar={littleResults}>
 							{
 								(!littleResults && result.id) &&
-								<AvatarResult src={`http://${url}:3333/uploads/${type === resultSearchBarType.USER ? "users" : "channels"}/${result.id}_`} />
+								<AvatarResult src={result.avatar} />
 							}
 							{
 								type === resultSearchBarType.USER ?

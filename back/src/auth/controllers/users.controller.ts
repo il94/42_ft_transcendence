@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,
   HttpStatus, StreamableFile } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { JwtGuard } from '../guards/auth.guard';
-import { UpdateUserDto } from '../dto/users.dto';
+import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { getUser, Public } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -61,7 +61,7 @@ export class UsersController {
 	@Patch('me')
 	@UseInterceptors(FileInterceptor('file'))
 	async update(@getUser('id') userId: number, 
-	@Body('newDatas') updateUserDto: UpdateUserDto,
+	@Body('newDatas') updateUserDto: string,
 	@UploadedFile(
 		new ParseFilePipeBuilder().addValidator(
 			new CustomUploadFileTypeValidator({
@@ -75,7 +75,12 @@ export class UsersController {
 		})
 	) file?: Express.Multer.File) {
 
-		return await this.usersService.updateUser(userId, JSON.parse(updateUserDto.toString()), file)
+		const newDatas: UpdateUserDto = JSON.parse(updateUserDto)
+
+		// DTO A faire
+		// await this.channelsService.parseMultiPartCreate(newDatas)
+
+		return await this.usersService.updateUser(userId, newDatas, file)
 	}
 }
 

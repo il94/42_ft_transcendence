@@ -40,10 +40,7 @@ function ChannelSection({ channel, sectionIndex }: PropsChannel) {
 				}
 			})
 
-			setChannelTarget({
-				...channelWithRelationsResponse.data,
-				avatar: `http://${url}:3333/uploads/channels/${channelWithRelationsResponse.data.id}_`,
-			})
+			setChannelTarget(channelWithRelationsResponse.data)
 			setLoaderChat(false)
 		}
 		catch (error) {

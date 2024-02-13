@@ -158,7 +158,6 @@ function Game() {
 				const channels: Channel[] = channelsResponse.data.map((channel: Channel) => {
 					return {
 						...channel,
-						avatar: `http://${url}:3333/uploads/channels/${channel.id}_`,
 						messages: [],
 						members: [],
 						administrators: [],
@@ -198,9 +197,10 @@ function Game() {
 					throw new Error;
 				});
 
+				console.log(meResponse)
+
 				setUserAuthenticate({
 					...meResponse.data,
-					avatar: `http://${url}:3333/uploads/users/${meResponse.data.id}_`,
 					friends: friends,
 					blockeds: blockeds,
 					channels: channels,

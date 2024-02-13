@@ -75,10 +75,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 				// Retire le user auth de la liste des résultats et trie par ordre alphabétique
 				setUsers(usersResponse.data.filter((user: User) => (
 					user.username != userAuthenticate.username
-				)).map((user: User) => ({
-					...user,
-					avatar: `http://${url}:3333/uploads/users/${user.id}_`
-				})).sort(sortUserByName))
+				)).sort(sortUserByName))
 
 				const accessiblesChannelsResponse: AxiosResponse<Channel[]> = await axios.get(`http://${url}:3333/channel/accessibles`, {
 					headers: {
@@ -87,10 +84,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 				})
 
 				// Trie les channels par odre alphabétique liste des résultats
-				setChannels(accessiblesChannelsResponse.data.map((channel) => ({
-					...channel,
-					avatar: `http://${url}:3333/uploads/channels/${channel.id}_`,
-				})).sort(sortChannelByName))
+				setChannels(accessiblesChannelsResponse.data.sort(sortChannelByName))
 
 				setLoaderResultsSearchBar(false)
 			}
@@ -165,20 +159,14 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 			})
 
 			if (userIsInChannel(channelWithRelationsResponse.data, userAuthenticate.id)) {
-				setChannelTarget({
-					...channelWithRelationsResponse.data,
-					avatar: `http://${url}:3333/uploads/channels/${channelWithRelationsResponse.data.id}_`
-				})
+				setChannelTarget(channelWithRelationsResponse.data)
 				displayChat(true)
 			}
 			else if (userIsBanned(channelWithRelationsResponse.data, userAuthenticate.id))
 				displayPopupError({ display: true, message: `You are banned from this channel` })
 			else {
 				if (channelWithRelationsResponse.data.type === ChannelType.PROTECTED) {
-					setChannelTarget({
-						...channelWithRelationsResponse.data,
-						avatar: `http://${url}:3333/uploads/channels/${channelWithRelationsResponse.data.id}_`
-					})
+					setChannelTarget(channelWithRelationsResponse.data)
 				}
 				else {
 					await axios.post(`http://${url}:3333/channel/${channelId}/join`, {}, {
@@ -192,7 +180,6 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					}))
 					setChannelTarget(() => ({
 						...channelWithRelationsResponse.data,
-						avatar: `http://${url}:3333/uploads/channels/${channelWithRelationsResponse.data.id}_`,
 						members: [...channelWithRelationsResponse.data.members, userAuthenticate]
 					}))
 				}
