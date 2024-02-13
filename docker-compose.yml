@@ -20,7 +20,7 @@ services:
     container_name: api_back
     ports:
       - '3333:3333'
-    #  - '5555:5555'
+      - '5555:5555'
     depends_on:
       - db
     volumes:

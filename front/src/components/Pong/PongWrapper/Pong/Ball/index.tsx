@@ -60,8 +60,8 @@ type PropsBalls = {
 		}, [X, Y]) */
 		
 
-		useEffect(() => {
-		}, []);
+		// useEffect(() => {
+		// }, []);
 
 	return (
 		<Style $X={X} $Y={Y} $BallSize={BallSize} ref={BallRef} />
