@@ -2,7 +2,6 @@ import { FileValidator, PipeTransform, Injectable, ArgumentMetadata } from '@nes
 import { Express } from 'express'
 import * as fileType from 'file-type-mime';
 
-
 export interface CustomUploadTypeValidatorOptions {
   fileType: string[];
 }
@@ -17,8 +16,12 @@ export class CustomUploadFileTypeValidator extends FileValidator {
 
   public isValid(file?: Express.Multer.File): boolean {
     if (!file)
-		return false;
+      return false
+    
     const response = fileType.parse(file.buffer);
+    if (!response || !response.mime) 
+      return false;
+    
     return this._allowedMimeTypes.includes(response.mime);
   }
 

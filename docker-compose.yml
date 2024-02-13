@@ -30,7 +30,6 @@ services:
       - ./back/prisma:/app/prisma
       - ./back/package.json:/app/package.json
       - ./back/package-lock.json:/app/package-lock.json
-      - ./back/secrets:/app/secrets
 
     networks:
       - transcendence
@@ -50,6 +49,7 @@ services:
       - ./front/style.css:/app/style.css
       - ./front/package.json:/app/package.json
       - ./front/package-lock.json:/app/package-lock.json
+      - ./front/tsconfig.json:/app/tsconfig.json
     networks:
       - transcendence
 

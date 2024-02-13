@@ -42,6 +42,7 @@ import {
 import colors from '../../utils/colors'
 
 import FTButton from "../../assets/42.png"
+import ButtonImage from '../../componentsLibrary/ButtonImage'
 
 const FTRedirectWrapper = styled.div`
 
@@ -64,6 +65,15 @@ type PropsSigninResponse = {
 function Signin() {
 	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
+	const [buttonDisabled, setButtonDisabled] = useState(false);
+
+	const handleClick = () => {
+		setButtonDisabled(true);
+		
+		setTimeout(() => {
+		  setButtonDisabled(false);
+		}, 2000);
+	  };
 
 	useEffect(() => {
 		if (token)
@@ -242,10 +252,19 @@ function Signin() {
 				</div>
 				<Separator />
 				<FTRedirectWrapper>
-					<LinkButtonImage to={`http://${url}:3333/auth/api42`}>
-						<img src={FTButton} style={{ paddingRight: "7px" }} />
-						Continue with 42
-					</LinkButtonImage>
+					{
+						buttonDisabled ?
+						<ButtonImage disabled={buttonDisabled}>
+							<img src={FTButton} style={{ paddingRight: "7px" }} />
+							Loading...
+						</ButtonImage>
+						:
+						<LinkButtonImage to={`http://${url}:3333/auth/api42`} onClick={handleClick} disabled={buttonDisabled}>
+							<img src={FTButton} style={{ paddingRight: "7px" }} />
+							Continue with 42
+						</LinkButtonImage>
+
+					}
 				</FTRedirectWrapper>
 			</CentralWindow>
 		</Page>
