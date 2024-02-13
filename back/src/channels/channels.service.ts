@@ -740,9 +740,6 @@ export class ChannelsService {
 	// Modifie un channel
 	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number, file?: Express.Multer.File) {
 		try {
-
-			console.log(newChannelDatas)
-
 			// Verifie si le channel existe et le retourne
 			const channelToUpdate = await this.prisma.channel.findUnique({
 				where: {
@@ -794,8 +791,9 @@ export class ChannelsService {
 					newChannelDatas.hash = await argon.hash(newChannelDatas.hash)
 			}
 
-			// else
-			// newDatas.avatar = `http://${url}:3333/uploads/channels/${userAuthenticate.id}_`
+			// Si un avatar est fourni, le laisse, sinon set le chemin par defaut de l'avatar
+			newChannelDatas.avatar = newChannelDatas.avatar ? newChannelDatas.avatar
+				: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${channelId}_`
 
 
 			// Update le channel
@@ -805,8 +803,6 @@ export class ChannelsService {
 				}, 
 				data: {
 					...newChannelDatas,
-					avatar: newChannelDatas.avatar ? newChannelDatas.avatar
-						: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${channelId}_`
 				}
 			})
 
@@ -1635,8 +1631,27 @@ async countMembersInChannel(chanId: number): Promise<number> {
 				}
 			})
 
+			// Recupere le username du nouvel owner
+			const usernameNewOwner = await this.prisma.user.findFirst({
+				where: {
+					id: newOwner.userId
+				},
+				select: {
+					username: true
+				}
+			})
+
+			// Log a envoyer au front
+			const newLog = {
+				type: "NEW_OWNER",
+				user1: {
+					id: newOwner.userId,
+					username: usernameNewOwner.username
+				}
+			}
+
 			// Emit
-			await this.emitOnChannel("setNewOwner", channelId, newOwner.userId)
+			await this.emitOnChannel("setNewOwner", channelId, newOwner.userId, newLog)
 
 			console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
 			return (newOwner)
