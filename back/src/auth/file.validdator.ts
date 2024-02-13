@@ -1,8 +1,6 @@
 import { FileValidator, PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 import { Express } from 'express'
 import * as fileType from 'file-type-mime';
-import * as mimeTypes from 'mime-types';
-
 
 export interface CustomUploadTypeValidatorOptions {
   fileType: string[];
