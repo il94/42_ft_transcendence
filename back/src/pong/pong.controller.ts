@@ -56,4 +56,9 @@ export class PongController {
         return await this.pongGateway.handleCancelSearching(userId)
     }
 
+	@Patch('closeGame/')
+    handleDisconnect(){
+        return this.pongGateway.handlePrevArrow()
+    }
+
 }

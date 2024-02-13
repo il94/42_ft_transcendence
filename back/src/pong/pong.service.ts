@@ -46,16 +46,15 @@ export class PongService {
 		}
 	}
 
-
 	async updateStatusUser(idUser : number, newStatus: UserStatus)
 	{
 
 		await this.prisma.user.update({ where: { id: idUser},
 			data: { status: newStatus }
-		 })
-		 if (newStatus !== UserStatus.ONLINE)
-		 	await this.cancelAllInvitation(idUser)
-		 this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
+		})
+		if (newStatus !== UserStatus.ONLINE)
+			await this.cancelAllInvitation(idUser)
+		this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
 		
 	}
 

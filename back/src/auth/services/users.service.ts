@@ -15,7 +15,8 @@ import axios from 'axios';
 @Injectable()
 export class UsersService {
 	constructor(private prisma: PrismaService,
-				private appGateway: AppGateway) {}
+				private appGateway: AppGateway
+				) {}
 
 	// Upload un avatar
 	async uploadAvatar(link: string) {

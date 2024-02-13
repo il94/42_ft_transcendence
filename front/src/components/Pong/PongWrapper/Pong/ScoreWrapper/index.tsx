@@ -1,6 +1,5 @@
 
 import styled from 'styled-components';
-import PlayerScore from './PlayerScore';
 
 const Style = styled.div`
 	
