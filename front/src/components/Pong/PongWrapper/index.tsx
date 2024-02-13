@@ -132,7 +132,7 @@ function PongWrapper({social}: any) {
 
 	async function handleManualDisconnect(){
 		try{
-			console.log("userAuth.id: ", userAuthenticate.id)
+			// console.log("userAuth.id: ", userAuthenticate.id)
 			await axios.patch(`http://${url}:3333/pong/closeGame/`,
 			{},
 			{
@@ -174,7 +174,6 @@ function PongWrapper({social}: any) {
 	})
 
 	useEffect(() => {
-		const Id = userAuthenticate.id
 		return  () => {
 			if (!wrapperRef.current)
 				handleManualDisconnect()
