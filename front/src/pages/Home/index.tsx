@@ -45,6 +45,11 @@ function Home() {
 	const navigate = useNavigate()
 
 	useEffect(() => {
+
+		window.onpopstate = e => {
+			console.log("event ", e)
+		}
+
 		async function getToken() {
 			try {
 				// Recupere le token soit par les cookies, soit en local

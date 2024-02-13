@@ -46,17 +46,28 @@ export class PongService {
 		}
 	}
 
-	async updateStatusUser(idUser : number, newStatus: UserStatus)
-	{
-
-		await this.prisma.user.update({ where: { id: idUser},
-			data: { status: newStatus }
-		})
-		if (newStatus !== UserStatus.ONLINE)
-			await this.cancelAllInvitation(idUser)
-		this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
-		
-	}
+	async updateStatusUser(idUser: number, newStatus: UserStatus) {
+		try {
+		  const oldUserStatus = await this.prisma.user.findUnique({
+			where: {
+			  id: idUser,
+			},
+		  });
+		  if (oldUserStatus.status !== UserStatus.OFFLINE) {
+			await this.prisma.user.update({
+			  where: { id: idUser },
+			  data: { status: newStatus },
+			});
+			if (newStatus !== UserStatus.ONLINE) {
+			  await this.cancelAllInvitation(idUser);
+			}
+			this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
+		  }
+		} catch (error) {
+		  // Gérer l'erreur ici
+		  throw error; // Vous pouvez choisir de relancer l'erreur ou de la gérer différemment selon vos besoins
+		}
+	  }
 
 
 	async setInvitationAsFinished(messageId: number)
