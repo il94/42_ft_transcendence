@@ -134,46 +134,49 @@ export class PongGateway {
 	}
 	
 	async toSearchingArray(userId: number, dif: number){
-		
-		let array: Map<number, Socket>
+		try {
+			let array: Map<number, Socket>
+			if (dif === 1)
+				array = this.searchingUsersEz
+			if (dif === 2)
+				array = this.searchingUsersMedium 
+			if (dif === 3)
+				array = this.searchingUsersHard
 
-		if (dif === 1)
-			array = this.searchingUsersEz
-		if (dif === 2)
-			array = this.searchingUsersMedium 
-		if (dif === 3)
-			array = this.searchingUsersHard
+			if (!array)
+				throw new Error("Incorrect value for difficulty")
 
-		if (!array)
-			throw new Error("Incorrect value for difficulty")
+			const socketUser = AppService.connectedUsers.get(userId.toString())
+			if (socketUser)
+				array.set(userId, socketUser)
 
-		const socketUser = AppService.connectedUsers.get(userId.toString())
-		if (socketUser)
-			array.set(userId, socketUser)
-
-		await this.PongService.updateStatusUser(userId, UserStatus.WAITING) // need protect
+			await this.PongService.updateStatusUser(userId, UserStatus.WAITING) // need protect
+		} catch (error) {
+            if (error instanceof ForbiddenException || error instanceof NotFoundException)
+                throw error
+            else if (error instanceof Prisma.PrismaClientKnownRequestError)
+                throw new ForbiddenException("The provided user data is not allowed")
+            else
+                throw new BadRequestException()
+        }
 	}
 
 
 	async launchGame(id: number, enemyId: number, dif: number,  messageId? :number)
 	{
-		const leftSocket = AppService.connectedUsers.get(id.toString())
+		try {
+			const leftSocket = AppService.connectedUsers.get(id.toString())
 		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
 
 		if (leftSocket === undefined || rightSocket === undefined)
 			return
-
-		const leftUser = await this.UserService.findById(id)
-		const rightUser = await this.UserService.findById(enemyId)
-
-		const newgame = await this.PongService.createGame(id, enemyId);
-
-		console.log("in launch game : ")
-		console.log("fisrtsocket id:", leftSocket.id, " id : ", id )
-		console.log("secondsocket id :", rightSocket.id, " id : ", enemyId )
-
+	
 		if (leftSocket && rightSocket)
 		{
+			const leftUser = await this.UserService.findById(id)
+			const rightUser = await this.UserService.findById(enemyId)
+	
+			const newgame = await this.PongService.createGame(id, enemyId);
 			this.server.to(leftSocket.id).emit("launchGame")
 			this.server.to(rightSocket.id).emit("launchGame")
 
@@ -186,11 +189,21 @@ export class PongGateway {
 			this.delUserFromSearchingUser(rightSocket)
 
 		}
+		}catch (error) {
+			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided credentials are not allowed")
+			else
+				throw new BadRequestException()
+		}
+		
 	}
 
 	async checkToLaunchGame(id: number, dif: number)
 	{
-		let array: Map<number, Socket>
+		try {
+			let array: Map<number, Socket>
 		if (dif === 1)
 			array = this.searchingUsersEz
 		if (dif === 2)
@@ -213,17 +226,34 @@ export class PongGateway {
 			let firstsocket = array.get(firstkey)
 			let secondsocket = array.get(secondkey)
 
-			console.log("fisrtsocket id:", firstsocket.id, " id : ", firstkey )
-			console.log("secondsocket id:", secondsocket.id, " id : ", secondkey )
-
-			this.launchGame(firstkey, secondkey, dif)
+			await this.launchGame(firstkey, secondkey, dif)
 		}
+		} catch (error) {
+            if (error instanceof ForbiddenException || error instanceof NotFoundException)
+                throw error
+            else if (error instanceof Prisma.PrismaClientKnownRequestError)
+                throw new ForbiddenException("The provided user data is not allowed")
+            else
+                throw new BadRequestException()
+        }
+		
 
 	}
 
 	async addSearchingPlayer(userId: number, dif: number) {
 		try {	
-
+			const pendingGamesOne = await this.prisma.game.findMany({
+				where: {
+				  players: {
+					some: {
+					  userId: userId
+					}
+				  },
+				  status: GameStatus.PENDING
+				}
+			  });
+			if (pendingGamesOne.length != 0 )
+			  throw new ForbiddenException("User already in game")
 			if(!dif || dif < 1 || dif > 3)
 				throw new BadRequestException("an Error occur from the WebSocket")	
       
@@ -232,11 +262,14 @@ export class PongGateway {
 
 		}
 		catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError)
-                throw new ForbiddenException("The provided user data is not allowed")
-            else
-                throw new BadRequestException()
-        }
+			console.log("1 addSearchingPlayer")
+			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
+				throw new ForbiddenException("The provided credentials are not allowed")
+			else
+				throw new BadRequestException()
+		}
 	}
 
 	gameLoop(host: Socket, guest: Socket, game: PongGame){

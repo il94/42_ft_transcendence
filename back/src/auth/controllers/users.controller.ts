@@ -1,17 +1,31 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, 
-  UseGuards, ParseIntPipe, Request } from '@nestjs/common';
+  UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, ParseFilePipeBuilder, ParseFilePipe,
+  HttpStatus, StreamableFile } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { JwtGuard } from '../guards/auth.guard';
-import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { getUser } from '../decorators/users.decorator';
+import { UpdateUserDto } from '../dto/users.dto';
+import { getUser, Public } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CustomUploadFileTypeValidator } from '../file.validdator';
+import * as fs from 'fs';
+import { promisify } from 'util';
+import { join } from 'path';
 
-@UseGuards(JwtGuard)
+const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 @Controller('user')
-@ApiTags('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+	// Upload un avatar
+	@Public()
+	@Post('upload')
+	postAvatar(@Body() link: string) {
+		console.log("CONTROLEUR", link)
+		return this.usersService.uploadAvatar(link)
+	}
 
 	// Renvoie les donnees publiaues de tout les users
 	@Get()
@@ -38,17 +52,31 @@ export class UsersController {
 	}
 
   // historique de matches du user (retourne null si aucun matchs joues)
-  @Get('matchs/:id')
-  async getUserMatchs(@Param('id', ParseIntPipe) id: number) {
+  	@Get('matchs/:id')
+	async getUserMatchs(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getMatchHistory(id);
-  }
+  	}
 
   	// Modifie le user authentifie
-	// @Patch('me')
-	// async update(@getUser('id') userId: number, 
-	// @Body() updateUserDto: UpdateUserDto) {
-	// 	return this.usersService.updateUser(userId, updateUserDto)
-	// }
+	@Patch('me')
+	@UseInterceptors(FileInterceptor('file'))
+	async update(@getUser('id') userId: number, 
+	@Body('newDatas') updateUserDto: UpdateUserDto,
+	@UploadedFile(
+		new ParseFilePipeBuilder().addValidator(
+			new CustomUploadFileTypeValidator({
+				fileType: VALID_UPLOADS_MIME_TYPES,
+			}),
+		)
+		.addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
+		.build({
+			fileIsRequired: false,
+			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+		})
+	) file?: Express.Multer.File) {
+
+		return await this.usersService.updateUser(userId, JSON.parse(updateUserDto.toString()), file)
+	}
 }
 
 /* =========================== PAS UTILISEES ================================ */

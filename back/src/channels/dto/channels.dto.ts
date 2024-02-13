@@ -16,10 +16,6 @@ export class CreateChannelDto {
 	@IsOptional()
 	@IsString()
 	hash: string;
-	
-	@IsString()
-	@IsNotEmpty()
-	avatar: string;
 }
 
 export class UpdateChannelDto {
@@ -37,11 +33,6 @@ export class UpdateChannelDto {
 	@IsOptional()
 	@IsString()
 	hash: string;
-  
-	@IsOptional()
-	@IsString()
-	@IsNotEmpty()
-	avatar: string;
 }
 
 export class UpdateRoleDto extends PartialType(CreateChannelDto) {

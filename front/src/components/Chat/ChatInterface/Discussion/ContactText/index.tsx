@@ -67,7 +67,7 @@ function ContactText({ sender, content }: PropsContactText) {
 				showMessage ?
 					<>
 						<Avatar
-							src={sender.avatar}
+							src={`http://${url}:3333/uploads/users/${sender.id}_`}
 							onClick={(event) => showCard(event, sender.id, {
 								displayCard,
 								setZCardIndex,

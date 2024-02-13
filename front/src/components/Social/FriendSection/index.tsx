@@ -82,7 +82,10 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 					}
 				})
 
-				setUserTarget(userResponse.data)
+				setUserTarget({
+					...userResponse.data,
+					avatar: `http://${url}:3333/uploads/users/${userResponse.data.id}_`,
+				})
 
 				const heightCard = 390 // height de la carte
 				const horizontalBorder = window.innerHeight - gameWrapperContainer.getBoundingClientRect().height // height des bordures horizontales autour du jeu
@@ -121,7 +124,10 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 				}
 			})
 
-			setUserTarget(userResponse.data)
+			setUserTarget({
+				...userResponse.data,
+				avatar: `http://${url}:3333/uploads/users/${userResponse.data.id}_`,
+			})
 
 			const heightContextualMenu = await getContextualMenuHeight(contextualMenuStatus.SOCIAL, userTarget, userAuthenticate) // height du menu contextuel de la liste d'amis
 			const horizontalBorder = window.innerHeight * 5 / 100 // height des bordures horizontales autour du jeu
@@ -165,7 +171,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 			$isBlocked={userIsBlocked(userAuthenticate, friend.id)}
 			ref={friendContainerRef}>
 			<Status $sectionIndex={sectionIndex} $status={friend.status} />
-			<Avatar src={friend.avatar} />
+			<Avatar src={`http://${url}:3333/uploads/users/${friend.id}_`} />
 			{
 				social &&
 				<ProfileInfo $offline={friend.status === userStatus.OFFLINE}>

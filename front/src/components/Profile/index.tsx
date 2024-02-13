@@ -48,10 +48,13 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 	const navigate = useNavigate()
 
 	function showCard() {
-		if (card && userTarget === userAuthenticate)
+		if (card && userTarget.id === userAuthenticate.id)
 			displayCard(false)
 		else {
-			setUserTarget(userAuthenticate)
+			setUserTarget({
+				...userAuthenticate,
+				avatar: `http://${url}:3333/uploads/users/${userAuthenticate.id}_`,
+			})
 			setCardPosition({ right: 0, top: 0 })
 			displayCard(true)
 		}
@@ -91,7 +94,10 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 			<ProfileWrapper
 				onClick={showCard}
 				tabIndex={0}>
-				<Avatar src={userAuthenticate.avatar} />
+				{
+					userAuthenticate.avatar &&
+					<Avatar src={userAuthenticate.avatar} />
+				}
 				<ProfileName>
 					{userAuthenticate.username}
 				</ProfileName>

@@ -7,7 +7,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 type UserDatas = {
 	id: number,
     username: string,
-    avatar: string,
+    // avatar: string,
     wins: number,
     draws: number,
     losses: number,
@@ -65,7 +65,7 @@ export class FriendsService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true,
+					// avatar: true,
 					wins: true,
 					draws: true,
 					losses: true,
@@ -118,7 +118,7 @@ export class FriendsService {
 				select: {
 					id: true,
 					username: true,
-					avatar: true,
+					// avatar: true,
 					status: true,
 					wins: true,
 					draws: true,

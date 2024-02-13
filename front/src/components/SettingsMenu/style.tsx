@@ -5,6 +5,10 @@ import effects from "../../utils/effects"
 
 export const Style = styled.div<{ $zIndex: number }>`
 
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
 	position: absolute;
 	top: 50%;
 	left: 50%;

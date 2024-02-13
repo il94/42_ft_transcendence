@@ -204,6 +204,7 @@ function Game() {
 
 				setUserAuthenticate({
 					...meResponse.data,
+					avatar: `http://${url}:3333/uploads/users/${meResponse.data.id}_`,
 					friends: friends,
 					blockeds: blockeds,
 					channels: channels,

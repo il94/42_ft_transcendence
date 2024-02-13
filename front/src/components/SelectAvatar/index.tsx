@@ -1,7 +1,6 @@
 import {
 	Dispatch,
-	SetStateAction,
-	useContext
+	SetStateAction
 } from "react"
 
 import {
@@ -12,13 +11,15 @@ import {
 
 import {
 	handleAvatarUpload
-} from "../../../utils/functions"
+} from "../../utils/functions"
 
 import {
 	HiddenInput
-} from "../../../componentsLibrary/IconUploadFile"
+} from "../../componentsLibrary/IconUploadFile"
 
-import DisplayContext from "../../../contexts/DisplayContext"
+import {
+	SettingAvatar
+} from "../../utils/types"
 
 // import DefaultBlackAvatar from "../assets/default_black.png"
 // import DefaultBlueAvatar from "../assets/default_blue.png"
@@ -31,13 +32,16 @@ import DisplayContext from "../../../contexts/DisplayContext"
 // menu qui permettrait de choisir un avatar parmis ceux par defaut, ou d'en upload un 
 
 type PropsSelectAvatar = {
-	avatar: string,
-	setAvatar: Dispatch<SetStateAction<string>>
+	avatar: SettingAvatar,
+	setAvatar: Dispatch<SetStateAction<SettingAvatar>>,
+	displayPopupError?: Dispatch<SetStateAction<{
+		display: boolean,
+		message?: string
+	}>>,
+	navigate?: any
 }
 
-function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
-
-	const { displayPopupError } = useContext(DisplayContext)!
+function SelectAvatar({ avatar, setAvatar, displayPopupError, navigate }: PropsSelectAvatar) {
 
 	return (
 		<Style>
@@ -45,9 +49,9 @@ function SelectAvatar({ avatar, setAvatar }: PropsSelectAvatar) {
 				Avatar
 			</SettingTtile>
 			<Avatar
-				src={avatar} htmlFor="uploadAvatarUser" tabIndex={0}
+				src={avatar.toDisplay} htmlFor="uploadAvatarUser" tabIndex={0}
 				title="Upload image" />
-			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError)}
+			<HiddenInput onChange={(event) => handleAvatarUpload(event, setAvatar, displayPopupError, navigate)}
 				id="uploadAvatarUser" type="file" accept="image/*" />
 		</Style>
 	)

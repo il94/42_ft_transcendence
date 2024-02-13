@@ -89,7 +89,6 @@ model User {
   usernameId  String?	@unique
   username    String  @unique
   hash        String
-  avatar      String
   twoFA       Boolean
   twoFASecret String
 	wins        Int
@@ -129,7 +128,6 @@ model Channel {
   id          Int  @id @default(autoincrement())
   createdAt   DateTime @default(now())
   name        String
-  avatar      String
   type        ChannelStatus
   hash        String?
   invitation  Invitation[]

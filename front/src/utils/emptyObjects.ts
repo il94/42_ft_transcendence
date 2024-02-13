@@ -1,7 +1,7 @@
 import { userStatus } from "./status";
 
 export const emptyUser = {
-	id: -1,
+	id: 0,
 	username: '',
 	avatar: '',
 	status: userStatus.ONLINE,
@@ -12,7 +12,7 @@ export const emptyUser = {
 }
 
 export const emptyUserAuthenticate = {
-	id: -1,
+	id: 0,
 	username: "",
 	avatar: "",
 	status: userStatus.ONLINE,
