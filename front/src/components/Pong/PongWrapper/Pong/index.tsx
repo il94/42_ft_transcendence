@@ -252,6 +252,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	useEffect(() => {
 		console.log("in pong width", width)
 		console.log("in pong height", height)
+
 	}, [])
 
 	return (

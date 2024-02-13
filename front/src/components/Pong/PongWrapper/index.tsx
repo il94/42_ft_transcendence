@@ -114,9 +114,13 @@ function PongWrapper({social}: any) {
 		setSearching(false)
 		setDifficultyChoose(false)
 		setGameState(true)
+		console.log("handleLaunchGame was call")
 	}
 
 	function handleDisconnect(role: string){
+		console.log("in handle Disconnect")
+		setSearching(false)
+		setDifficultyChoose(false)
 		setGameState(false)
 		if (role === "player")
 			displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
@@ -124,6 +128,26 @@ function PongWrapper({social}: any) {
 			displayPongPopupError({ display: true, message: "A player has Disconnect" })
 
 		setBackgroundColor(colors.pongWrapperBackground)
+	}
+
+	async function handleManualDisconnect(){
+		try{
+			// console.log("userAuth.id: ", userAuthenticate.id)
+			await axios.patch(`http://${url}:3333/pong/closeGame/`,
+			{},
+			{
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+			setSearching(false)
+			setDifficultyChoose(false)
+			setGameState(false)
+		}
+		catch(error)
+		{
+			displayPongPopupError({ display: true })
+		}
 	}
 
 	function handleSpectate(){
@@ -148,6 +172,13 @@ function PongWrapper({social}: any) {
 			userAuthenticate.socket?.off("decoInGame")
 		}
 	})
+
+	useEffect(() => {
+		return  () => {
+			if (!wrapperRef.current)
+				handleManualDisconnect()
+		}
+	}, [wrapperRef])
 
 	const [loaderSize, setLoaderSize] = useState<number>(0)
 

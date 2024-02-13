@@ -11,7 +11,6 @@ import { UsersService } from "src/auth/services/users.service";
 import { AppService } from "src/app.service";
 
 import { GameStatus, MatchResult, Prisma, UserStatus } from "@prisma/client";
-import { subscribe } from "diagnostics_channel";
 import { PrismaService } from "src/prisma/prisma.service";
 
 
@@ -27,13 +26,13 @@ export class PongGateway {
 	// private watchingUsers: Map<number, Socket> = new Map(); // a teg
 
 	constructor(private prisma: PrismaService,
-				private  PongService: PongService,
+				private PongService: PongService,
 				private UserService: UsersService,
 				private appService: AppService
 				) {}
 
 	handleConnection(client: Socket){
-		//console.log("connection of :", client.id)
+		console.log("connection of :", client.id)
 	}
 
 	handleDisconnect(client: Socket){
@@ -56,6 +55,44 @@ export class PongGateway {
 			return
 		}
 		this.delUserFromSearchingUser(client)
+	}
+
+	handlePrevArrow()
+	{
+		// let game: PongGame = null
+		// let map: Map<string, Socket>
+		// let id: number = -1
+		// let l_ok: boolean = false
+		// let r_ok: boolean = false
+
+		// map = AppService.connectedUsers
+		// this.PongService.activeGames.forEach((g) => {
+		// 	map.forEach((socket, key) => {
+		// 		if (g.LeftPlayer.id == parseInt(key))
+		// 			l_ok = true
+		// 		if(g.RightPlayer.id == parseInt(key)){
+		// 			r_ok = true
+		// 		}
+		// 	})
+		// 	if (!l_ok || !r_ok)
+		// 		id = parseInt(key)
+		// });
+		// if (game)
+		// {
+		// 	console.log("je rentre dans le if de la game")
+		// 	const you = game.LeftPlayer.id === id ? game.LeftPlayer : game.RightPlayer
+		// 	const enemy = game.LeftPlayer.id === id ? game.RightPlayer : game.LeftPlayer
+		// 	console.log("your socket id", you.id)
+		// 	console.log("your enemy id", enemy.id)
+		// 	if (you)
+		// 	this.server.to(enemy.getSocket().id).emit("decoInGame", "player")
+		// 	game.watcher.forEach((e) =>{
+		// 		this.server.to(e.id).emit("decoInGame", "watcher")
+		// 	})
+		// 	enemy.setWinner()
+		// 	game.setState(false)
+		// 	this.delUserFromSearchingUser(you.getSocket())
+		// }
 	}
 
 	delUserFromSearchingUser(client: Socket)
@@ -133,7 +170,6 @@ export class PongGateway {
 
 		if (leftSocket === undefined || rightSocket === undefined)
 			return
-
 	
 		if (leftSocket && rightSocket)
 		{
@@ -186,6 +222,7 @@ export class PongGateway {
 		{
 			let secondkey = keysArray[1]
 
+			
 			let firstsocket = array.get(firstkey)
 			let secondsocket = array.get(secondkey)
 
@@ -353,7 +390,7 @@ export class PongGateway {
 
 			let game: PongGame
 			this.PongService.activeGames.forEach((element) => {
-				if (element.isMyPlayerById(spectateId)){
+				if (element.isMyPlayerById(spectateId)){ 
 					game = element;
 				}
 			});
