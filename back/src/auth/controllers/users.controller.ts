@@ -74,11 +74,8 @@ export class UsersController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
-
 		const newDatas: UpdateUserDto = JSON.parse(updateUserDto)
-
-		// DTO A faire
-		// await this.channelsService.parseMultiPartCreate(newDatas)
+		await this.usersService.parseMultiPartCreate(newDatas)
 
 		return await this.usersService.updateUser(userId, newDatas, file)
 	}

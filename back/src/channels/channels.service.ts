@@ -1651,6 +1651,8 @@ async countMembersInChannel(chanId: number): Promise<number> {
 		}
 	}
 
+/* =========================== MULTIPART DTO ================================ */
+
 	async isNotEmpty(value) {
 		if (!value) {
 			throw new BadRequestException('Value must not be empty.');
@@ -1663,18 +1665,18 @@ async countMembersInChannel(chanId: number): Promise<number> {
 		}
 	}
 
-	async maxLength(value, maxLength) {
+	async maxLength(value, maxLength: number) {
 		if (value.length > maxLength) {
 			throw new BadRequestException(`Value length must not exceed ${maxLength} characters.`);
 		}
 	}
 	
-	async isChannelStatus(value: any) {
+	async isChannelStatus(value) {
 		if (!(value in ChannelStatus)) {
 			throw new BadRequestException('Invalid channel status.');
 		}
 	}
-	
+
 	async parseMultiPartCreate({ name, type, hash }: any) {
 		await this.isNotEmpty(name)
 		await this.isString(name)
@@ -1683,6 +1685,22 @@ async countMembersInChannel(chanId: number): Promise<number> {
 		await this.isNotEmpty(type)
 		await this.isChannelStatus(type)
 
+		if (hash)
+			await this.isString(hash)
+	}
+	
+	async parseMultiPartUpdate({ name, type, hash }: any) {
+		if (name)
+		{
+			await this.isNotEmpty(name)
+			await this.isString(name)
+			await this.maxLength(name, 8)
+		}
+		if (type)
+		{
+			await this.isNotEmpty(type)
+			await this.isChannelStatus(type)
+		}
 		if (hash)
 			await this.isString(hash)
 	}

@@ -402,6 +402,127 @@ export class UsersService {
 		await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', randomAvatar)
 	}
 
+/* =========================== MULTIPART DTO ================================ */
+
+	async isNotEmpty(value) {
+		if (!value) {
+			throw new BadRequestException('Value must not be empty.');
+		}
+	}
+
+	async isString(value) {
+		if (typeof value !== 'string') {
+			throw new BadRequestException('Value must be a string.');
+		}
+	}
+
+	async isBoolean(value) {
+		if (typeof value !== 'boolean') {
+			throw new BadRequestException('Value must be a boolean.');
+		}
+	}	
+
+	async isUserStatus(value) {
+		if (!(value in UserStatus)) {
+			throw new BadRequestException('Invalid user status.');
+		}
+	}
+
+	async maxLength(value, maxLength: number) {
+		if (value.length > maxLength) {
+			throw new BadRequestException(`Value length must not exceed ${maxLength} characters.`);
+		}
+	}
+	
+	async minLength(value: string, minLength: number) {
+		if (value.length < minLength) {
+			throw new BadRequestException(`Value length must be at least ${minLength} characters.`);
+		}
+	}
+
+	async isAlphabetic(value) {
+		const alphabeticRegex = /^[A-Za-z]+$/;
+		if (!alphabeticRegex.test(value)) {
+			throw new BadRequestException('Value must contain only alphabetic characters.');
+		}
+	}
+
+	async isLowercase(value) {
+		if (value !== value.toLowerCase()) {
+			throw new BadRequestException('Value must be in lowercase.');
+		}
+	}
+
+	async containsUppercase(value) {
+		if (!/[A-Z]/.test(value)) {
+			throw new BadRequestException('Value must contain at least one uppercase letter.');
+		}
+	}
+	
+	async containsLowercase(value) {
+		if (!/[a-z]/.test(value)) {
+			throw new BadRequestException('Value must contain at least one lowercase letter.');
+		}
+	}
+	
+	async containsNumber(value) {
+		if (!/\d/.test(value)) {
+			throw new BadRequestException('Value must contain at least one number.');
+		}
+	}
+	
+	async containsSpecialCharacter(value) {
+		if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+			throw new BadRequestException('Value must contain at least one special character.');
+		}
+	}
+	
+	async parseMultiPartCreate({ userNameId, username, hash }: any) {
+		if (userNameId)
+			await this.isString(userNameId)
+
+		await this.isNotEmpty(username)
+		await this.isString(username)
+		await this.maxLength(username, 8)
+		await this.isAlphabetic(username)
+		await this.isLowercase(username)
+
+
+		await this.isNotEmpty(hash)
+		await this.isString(hash)
+		await this.minLength(hash, 8)
+		await this.containsUppercase(hash)
+		await this.containsLowercase(hash)
+		await this.containsNumber(hash)
+		await this.containsSpecialCharacter(hash)
+	}
+
+	async parseMultiPartUpdate({ username, hash, twoFA, status }: any) {
+		if (username)
+		{
+			await this.isNotEmpty(username)
+			await this.isString(username)
+			await this.maxLength(username, 8)
+			await this.isAlphabetic(username)
+			await this.isLowercase(username)
+		}
+		if (hash)
+		{
+			await this.isNotEmpty(hash)
+			await this.isString(hash)
+			await this.minLength(hash, 8)
+			await this.containsUppercase(hash)
+			await this.containsLowercase(hash)
+			await this.containsNumber(hash)
+			await this.containsSpecialCharacter(hash)
+		}
+		if (twoFA)
+			await this.isBoolean(twoFA)
+		if (status)
+			await this.isUserStatus(status)
+	}
+
+
 /* =========================== PAS UTILISEES ================================ */
 
 	// async findUser(id: number): Promise<User>  {

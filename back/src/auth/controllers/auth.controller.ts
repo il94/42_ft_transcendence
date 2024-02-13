@@ -44,11 +44,8 @@ export class AuthController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File): Promise<{ access_token: string }> {
-
 		const newUser: CreateUserDto = JSON.parse(createUserDto)
-
-		// DTO A faire
-		// await this.channelsService.parseMultiPartCreate(newDatas)
+		await this.userService.parseMultiPartCreate(newUser)
 
 		return await this.authService.signup(newUser, file)
 	}

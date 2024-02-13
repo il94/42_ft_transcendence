@@ -39,7 +39,6 @@ export class ChannelController {
 		})
 	) file?: Express.Multer.File) {
 		const newDatas: CreateChannelDto = JSON.parse(createChannelDto)
-
 		await this.channelsService.parseMultiPartCreate(newDatas)
 	
 		return this.channelsService.createChannel(newDatas, userId, file)
@@ -102,7 +101,7 @@ export class ChannelController {
 	// Modifie un channel
 	@Patch(':id')
 	@UseInterceptors(FileInterceptor('file'))
-	update(@getUser('id') userId: number,
+	async update(@getUser('id') userId: number,
 	@Param('id', ParseIntPipe) channelId: number, 
 	@Body('newDatas') newChannelDatas: string,
 	@UploadedFile(
@@ -117,12 +116,8 @@ export class ChannelController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
-
 		const newDatas: UpdateChannelDto = JSON.parse(newChannelDatas)
-
-		// DTO A faire
-		// await this.channelsService.parseMultiPartCreate(newDatas)
-
+		await this.channelsService.parseMultiPartUpdate(newDatas)
 
 		return this.channelsService.updateChannel(channelId, newDatas, userId, file)
 	}
