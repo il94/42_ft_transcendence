@@ -55,6 +55,11 @@ export class Player {
 		this.score++
 	}
 
+	setSocket(s: Socket)
+	{
+		this.socket = s
+	}
+
 	getSocket() : Socket{
 		return this.socket;
 	}
@@ -345,6 +350,14 @@ export class PongGame {
 	getState(){
 		return this.state
 	}
+
+	changeSocket(paddle: string, socket: Socket)
+	{
+		if (paddle === "left")
+			this.LeftPlayer.setSocket(socket)
+		if (paddle === "right")
+			this.RightPlayer.setSocket(socket)
+		}
 
 	isMyPlayer(socket: Socket){
 		if(this.LeftPlayer.getSocket() === socket)

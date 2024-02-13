@@ -49,10 +49,13 @@ export class PongGateway {
 			this.server.to(enemy.getSocket().id).emit("decoInGame", "player")
 			game.watcher.forEach((e) =>{
 				this.server.to(e.id).emit("decoInGame", "watcher")
-			})
+			})	
 			enemy.setWinner()
 			game.setState(false)
 			return
+		}
+		else{
+			console.log("cccc")
 		}
 		this.delUserFromSearchingUser(client)
 	}
@@ -166,27 +169,27 @@ export class PongGateway {
 	{
 		try {
 			const leftSocket = AppService.connectedUsers.get(id.toString())
-		const rightSocket = AppService.connectedUsers.get(enemyId.toString())
+			const rightSocket = AppService.connectedUsers.get(enemyId.toString())
 
-		if (leftSocket === undefined || rightSocket === undefined)
-			return
-	
-		if (leftSocket && rightSocket)
-		{
-			const leftUser = await this.UserService.findById(id)
-			const rightUser = await this.UserService.findById(enemyId)
-	
-			const newgame = await this.PongService.createGame(id, enemyId);
-			this.server.to(leftSocket.id).emit("launchGame")
-			this.server.to(rightSocket.id).emit("launchGame")
+			if (leftSocket === undefined || rightSocket === undefined)
+				return
+		
+			if (leftSocket && rightSocket)
+			{
+				const leftUser = await this.UserService.findById(id)
+				const rightUser = await this.UserService.findById(enemyId)
+		
+				const newgame = await this.PongService.createGame(id, enemyId);
+				this.server.to(leftSocket.id).emit("launchGame")
+				this.server.to(rightSocket.id).emit("launchGame")
 
-			if (dif)
-				this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
+				if (dif)
+					this.PongService.activeGames.push(new PongGame(newgame, dif, leftSocket, id, leftUser.username, rightSocket, enemyId, rightUser.username, messageId))
 
-			this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
+				this.gameLoop(leftSocket, rightSocket, this.PongService.activeGames[this.PongService.activeGames.length - 1])
 
-			this.delUserFromSearchingUser(leftSocket)
-			this.delUserFromSearchingUser(rightSocket)
+				this.delUserFromSearchingUser(leftSocket)
+				this.delUserFromSearchingUser(rightSocket)
 
 		}
 		}catch (error) {
@@ -294,12 +297,38 @@ export class PongGateway {
 				y: (ball.y)
 			}
 
-			this.server.to(host.id).emit("pongInfo", game.id, ball, game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.name, game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
-			this.server.to(guest.id).emit("pongInfo", game.id, reverseball, game.RightPlayer.name, game.RightPlayer.getPos(), game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.getScore(), game.LeftPlayer.getScore())
-			game.watcher.forEach((e) =>{
-				this.server.to(e.id).emit("pongInfo", game.id, ball, game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.name, game.RightPlayer.getPos(), game.LeftPlayer.getScore(), game.RightPlayer.getScore())
-			})
-			game.checkScore()
+			if (AppService.connectedUsers.get(game.LeftPlayer.id.toString()) != host &&  AppService.connectedUsers.get(game.LeftPlayer.id.toString()) != undefined)
+			{	
+				const newSocket = AppService.connectedUsers.get(game.LeftPlayer.id.toString())
+				game.LeftPlayer.setSocket(newSocket)
+				host = newSocket
+				console.log("gameLoop Left socket change")
+				console.log("host id", host.id)
+				this.server.to(host.id).emit("launchGame")
+
+			}
+
+			if (AppService.connectedUsers.get(game.RightPlayer.id.toString()) != guest &&  AppService.connectedUsers.get(game.RightPlayer.id.toString()) != undefined)
+			{
+				const newSocket = AppService.connectedUsers.get(game.RightPlayer.id.toString())
+				game.RightPlayer.setSocket(newSocket)
+				guest = newSocket
+				console.log("gameLoop Right socket change")
+				console.log("guest id", guest.id)
+				this.server.to(guest.id).emit("launchGame")
+			}
+			
+
+			if (AppService.connectedUsers.get(game.LeftPlayer.id.toString()) == undefined || AppService.connectedUsers.get(game.RightPlayer.id.toString()) == undefined)
+				game.setState(false)
+			else {
+				this.server.to(host.id).emit("pongInfo", game.id, ball, game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.name, game.RightPlayer.getPos(),game.LeftPlayer.getScore(), game.RightPlayer.getScore())
+				this.server.to(guest.id).emit("pongInfo", game.id, reverseball, game.RightPlayer.name, game.RightPlayer.getPos(), game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.getScore(), game.LeftPlayer.getScore())
+				game.watcher.forEach((e) =>{
+					this.server.to(e.id).emit("pongInfo", game.id, ball, game.LeftPlayer.name, game.LeftPlayer.getPos(), game.RightPlayer.name, game.RightPlayer.getPos(), game.LeftPlayer.getScore(), game.RightPlayer.getScore())
+				})
+				game.checkScore()
+			}
 			if (game.getState())
 				this.gameLoop(host, guest, game)
 			else

@@ -307,6 +307,7 @@ function Game() {
 
 		return () => {
 			window.removeEventListener('resize', closeContextualMenus);
+			userAuthenticate.socket?.close()
 		}
 	}, [])
 
