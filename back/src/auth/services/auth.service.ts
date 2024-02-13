@@ -58,8 +58,8 @@ export class AuthService {
 			if (!user)
 				throw new NotFoundException("User not found")
 
-			if (user.status == UserStatus.ONLINE)
-				throw new ForbiddenException("aleready connected")
+			if (user.status != UserStatus.OFFLINE)
+				throw new ForbiddenException("already connected")
 
 			// Verifie si le mot de passe fourni est correct
 			const pwdMatch = await argon.verify(user.hash, userDatas.hash)
@@ -139,13 +139,19 @@ export class AuthService {
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | {usernameId: User, avatar: string} | Partial<User>> {
+	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | 
+	{usernameId: User, avatar: string} | 
+	Partial<User> | {isCo: boolean }> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { usernameId: profile.usernameId, },
 			});
 			if (user) {
-				if (!user.twoFA) {
+				if (user.status != UserStatus.OFFLINE) {
+					console.log("isCO: ", user)
+					return { isCo: true }
+				}
+				else if (!user.twoFA) {
 					const logUser = await this.prisma.user.update({ 
 						where: { usernameId: profile.usernameId },
 						data: { status: UserStatus.ONLINE }})
@@ -165,10 +171,14 @@ export class AuthService {
 	// Selon la reponse de l'api 42, connecte le user OU le redirige vers le twoFA OU lui cree un compte
 	async return42Response(user: { usernameId: string, avatar: string, isNew: boolean } | Partial<User>, res: Response ) {
 		try {
+	
 			// Verifie si le user possebe bien un compte 42
 			if (!user)
 				throw new BadRequestException("User not found in 42 database")
 			
+			if ('isCo' in user)
+				res.redirect(`http://${process.env.IP}:5173/`)
+					
 			// Si le user possede deja un compte dans l'app
 			if ('id' in user)
 			{
