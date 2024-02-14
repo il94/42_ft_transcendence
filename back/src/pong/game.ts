@@ -188,9 +188,6 @@ export class PongGame {
 				this.Ball.resetPos()
 				this.Ball.setRandomDir()
 				this.RightPlayer.addScore()
-				console.log("               ")
-				console.log("SCORE")
-				console.log("               ")
 
 			}
 		}
@@ -210,9 +207,6 @@ export class PongGame {
 				this.Ball.resetPos()
 				this.Ball.setRandomDir()
 				this.LeftPlayer.addScore()
-				console.log("               ")
-				console.log("SCORE")
-				console.log("               ")
 			}
 		}
 
@@ -360,6 +354,10 @@ export class PongGame {
 		else if (this.RightPlayer.id === n)
 			return true
 		return false
+	}
+
+	isAWatcherById(id: number): boolean{
+		return !! (this.watcher.get(id))
 	}
 
 	addWatcher(id: number, s: Socket)

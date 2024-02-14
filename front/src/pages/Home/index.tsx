@@ -46,8 +46,13 @@ function Home() {
 
 	useEffect(() => {
 
-		window.onpopstate = e => {
-			console.log("event ", e)
+		window.onpopstate = async e => {
+			console.log("fleche retour")
+			await axios.get(`http://${url}:3333/pong/back`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
 		}
 
 		async function getToken() {

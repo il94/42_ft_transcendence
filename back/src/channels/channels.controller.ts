@@ -37,6 +37,7 @@ export class ChannelController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
+
 		const newDatas: CreateChannelDto = JSON.parse(createChannelDto)
 		await this.channelsService.parseMultiPartCreate(newDatas)
 	

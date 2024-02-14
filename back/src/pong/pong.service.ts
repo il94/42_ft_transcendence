@@ -104,8 +104,7 @@ export class PongService {
 
 	async createGame(userOneId: number, userTwoId: number): Promise<number> {
 		
-		try {
-			console.log("create new game")
+		try { 
 			const game = await this.prisma.game.create({
 				data: {
 					level: 1,
@@ -128,7 +127,6 @@ export class PongService {
 			})
 			this.updateStatusUser(userOneId, UserStatus.PLAYING); // change les status des joeuer manque les emit
 			this.updateStatusUser(userTwoId, UserStatus.PLAYING);
-			console.log("NEW game: ", game);
 			return game.id; 
 		}  catch (error) {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)

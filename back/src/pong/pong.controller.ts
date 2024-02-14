@@ -24,6 +24,13 @@ export class PongController {
     //     return this.pongService.createGame(userOneId, userTwoId)
     // }
 
+    // fonction appeler lors du bouton page precedente
+    @Get('back')
+    async catchBackward(
+        @getUser('id') userId: number
+    ) {
+        return await this.pongGateway.handleBack(userId)
+    }
 
     @Patch('spectate/:id')
     async addSpectate(

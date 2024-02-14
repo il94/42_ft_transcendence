@@ -21,6 +21,7 @@ export class UsersService implements OnModuleInit {
 	// Cree un user
 	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<Partial<User>> {
 		try {
+
 			// Verifie si le username n'est pas deja pris
 			const userExists = await this.prisma.user.findFirst({
 				where: {
@@ -28,6 +29,7 @@ export class UsersService implements OnModuleInit {
 				}
 			})
 			if (userExists)
+
 				throw new ConflictException("Username already exists")
 
 			// Hashe le mot de passe
