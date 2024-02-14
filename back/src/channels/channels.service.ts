@@ -18,6 +18,7 @@ type ChannelMP = {
 	id: number,
     createdAt: Date,
     name: string,
+	avatar: string,
     type: ChannelStatus,
     hash: string
 }
@@ -29,7 +30,7 @@ export class ChannelsService {
 				private pongGateway: PongGateway) {}
 
 	// Cree un channel
-	async createChannel(newChannel: CreateChannelDto, userId: number): Promise<{ id: number }> {
+	async createChannel(newChannel: CreateChannelDto, userId: number, file?: Express.Multer.File): Promise<{ id: number }> {
 		try {
 			// Si le channel est de type protected
 			if (newChannel.type === ChannelStatus.PROTECTED)
@@ -51,6 +52,7 @@ export class ChannelsService {
 			const newChannelId = await this.prisma.channel.create({
 				data: {
 					...newChannel,
+					avatar: '',
 					users: { 
 						create: [
 							{
@@ -61,7 +63,7 @@ export class ChannelsService {
 									}
 								}
 							}
-						]  
+						],
 					},
 				},
 				select: {
@@ -69,8 +71,23 @@ export class ChannelsService {
 				}
 			})
 
+			// Ajoute l'avatar
+			const newChannelDatas = await this.prisma.channel.update({
+				where: {
+					id: newChannelId.id
+				},
+				data: {
+					avatar: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${newChannelId.id}_`
+				}
+			})
+
+			if (file)
+				await this.saveChannelAvatar(newChannelId.id, file)
+			else
+				await this.getDefaultChannelAvatar(newChannelId.id)
+
 			console.log(`Channel ${newChannelId.id} was created`, newChannel)
-			return newChannelId
+			return newChannelDatas
 		}
 		catch (error) {
 			if (error instanceof ForbiddenException)
@@ -117,7 +134,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true
+					avatar: true
 				}
 			})
 			if (!userTarget)
@@ -151,6 +168,7 @@ export class ChannelsService {
 			const newChannelMP = await this.prisma.channel.create({
 				data: {
 					name: '',
+					avatar: '',
 					type: ChannelStatus.MP,
 					users: { 
 						create: [
@@ -179,7 +197,7 @@ export class ChannelsService {
 			const channelMP: ChannelMP = {
 				...newChannelMP,
 				name: userTarget.username,
-				// avatar: userTarget.avatar
+				avatar: userTarget.avatar
 			}
 
 			// Recupere l'id username et avatar du user auth 
@@ -190,7 +208,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true
+					avatar: true
 				}
 			})
 
@@ -235,7 +253,7 @@ export class ChannelsService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true,
+					avatar: true,
 					wins: true,
 					draws: true,
 					losses: true,
@@ -585,7 +603,7 @@ export class ChannelsService {
 								select: {
 									id: true,
 									username: true,
-									// avatar: true,
+									avatar: true,
 									status: true,
 									wins: true,
 									draws: true,
@@ -603,7 +621,7 @@ export class ChannelsService {
 								select: {
 									id: true,
 									username: true,
-									// avatar: true,
+									avatar: true,
 									status: true,
 									wins: true,
 									draws: true,
@@ -720,7 +738,7 @@ export class ChannelsService {
 	}
 
 	// Modifie un channel
-	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number) {
+	async updateChannel(channelId: number, newChannelDatas: UpdateChannelDto, userId: number, file?: Express.Multer.File) {
 		try {
 			// Verifie si le channel existe et le retourne
 			const channelToUpdate = await this.prisma.channel.findUnique({
@@ -773,15 +791,25 @@ export class ChannelsService {
 					newChannelDatas.hash = await argon.hash(newChannelDatas.hash)
 			}
 
+			// Si un avatar est fourni, le laisse, sinon set le chemin par defaut de l'avatar
+			newChannelDatas.avatar = newChannelDatas.avatar ? newChannelDatas.avatar
+				: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${channelId}_`
+
+
 			// Update le channel
 			await this.prisma.channel.update({
 				where: {
 					id: channelToUpdate.id
 				}, 
 				data: {
-					...newChannelDatas
+					...newChannelDatas,
 				}
 			})
+
+			if (file)
+				await this.saveChannelAvatar(channelId, file)
+			else
+				await this.getDefaultChannelAvatar(channelId)
 
 			// Emit
 			await this.emitOnChannel("updateChannel", channelId, newChannelDatas)
@@ -1422,13 +1450,31 @@ export class ChannelsService {
 		})
 	  }
   
-	async saveUserAvatar(userId: number, file: Express.Multer.File) {
-		const channelFolderPath = join(__dirname, '..', "uploads/channels")
+	async saveChannelAvatar(channelId: number, file: Express.Multer.File) {
+		const uploadChannelPath = "/app/uploads/channels/"
 
-		if (!fs.existsSync(channelFolderPath))
-            await mkdir(channelFolderPath, { recursive: true })
+		if (!fs.existsSync(uploadChannelPath))
+            await mkdir(uploadChannelPath, { recursive: true })
 
-		await fs.promises.writeFile(`uploads/channels/${userId}_`, file.buffer)
+		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', file.buffer)
+	}
+
+	async getDefaultChannelAvatar(channelId: number) {
+
+		const defaultChannelAvatarPath = "/app/defaultChannelAvatar/default_channel.png"
+		
+		const defaultChannelAvatar = await fs.promises.readFile(defaultChannelAvatarPath)
+	
+		const uploadChannelPath = "/app/uploads/channels/"
+		if (!fs.existsSync(uploadChannelPath))
+			await mkdir(uploadChannelPath, { recursive: true })
+
+
+
+		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', defaultChannelAvatar)
+
+		console.log("HERE")
+
 	}
 
 
@@ -1585,8 +1631,27 @@ async countMembersInChannel(chanId: number): Promise<number> {
 				}
 			})
 
+			// Recupere le username du nouvel owner
+			const usernameNewOwner = await this.prisma.user.findFirst({
+				where: {
+					id: newOwner.userId
+				},
+				select: {
+					username: true
+				}
+			})
+
+			// Log a envoyer au front
+			const newLog = {
+				type: "NEW_OWNER",
+				user1: {
+					id: newOwner.userId,
+					username: usernameNewOwner.username
+				}
+			}
+
 			// Emit
-			await this.emitOnChannel("setNewOwner", channelId, newOwner.userId)
+			await this.emitOnChannel("setNewOwner", channelId, newOwner.userId, newLog)
 
 			console.log(`User ${newOwner.userId} is the new owner of channel ${channelId}`)
 			return (newOwner)
@@ -1599,6 +1664,60 @@ async countMembersInChannel(chanId: number): Promise<number> {
 			else
 				throw new BadRequestException()
 		}
+	}
+
+/* =========================== MULTIPART DTO ================================ */
+
+	async isNotEmpty(value) {
+		if (!value) {
+			throw new BadRequestException('Value must not be empty.');
+		}
+	}
+
+	async isString(value) {
+		if (typeof value !== 'string') {
+			throw new BadRequestException('Value must be a string.');
+		}
+	}
+
+	async maxLength(value, maxLength: number) {
+		if (value.length > maxLength) {
+			throw new BadRequestException(`Value length must not exceed ${maxLength} characters.`);
+		}
+	}
+	
+	async isChannelStatus(value) {
+		if (!(value in ChannelStatus)) {
+			throw new BadRequestException('Invalid channel status.');
+		}
+	}
+
+	async parseMultiPartCreate({ name, type, hash }: any) {
+		await this.isNotEmpty(name)
+		await this.isString(name)
+		await this.maxLength(name, 8)
+
+		await this.isNotEmpty(type)
+		await this.isChannelStatus(type)
+
+		if (hash)
+			await this.isString(hash)
+	}
+	
+	async parseMultiPartUpdate({ name, type, hash }: any) {
+		if (name)
+		{
+			await this.isNotEmpty(name)
+			await this.isString(name)
+			await this.maxLength(name, 8)
+		}
+		if (type)
+		{
+			await this.isNotEmpty(type)
+			await this.isChannelStatus(type)
+		}
+		if (hash)
+			await this.isString(hash)
 	}
 }
 

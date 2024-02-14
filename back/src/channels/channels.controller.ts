@@ -1,4 +1,4 @@
-import { Controller, HttpStatus, UploadedFile, ParseFilePipeBuilder, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
+import { Controller, HttpStatus, UploadedFile, UseInterceptors, ParseFilePipeBuilder, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
 import { CreateChannelDto, UpdateChannelDto, AuthChannelDto, UpdateRoleDto } from './dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
@@ -6,6 +6,12 @@ import { getUser } from '../auth/decorators/users.decorator';
 import { User, challengeStatus, messageStatus } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { CustomUploadFileTypeValidator } from 'src/auth/file.validdator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateUserDto } from 'src/auth/dto';
+
+import { IsString, IsNotEmpty, 
+	IsOptional, MaxLength, MinLength, IsBoolean, IsAlphanumeric, IsLowercase, IsAlpha
+} from "class-validator";
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
 const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -17,8 +23,9 @@ export class ChannelController {
 
 	// Cree un channel
 	@Post()
-	create(@getUser('id') userId: number,
-	@Body('newDatas') newChannel: CreateChannelDto,
+	@UseInterceptors(FileInterceptor('file'))
+	async create(@getUser('id') userId: number,
+	@Body('newDatas') createChannelDto: string,
 	@UploadedFile(
 		new ParseFilePipeBuilder().addValidator(
 			new CustomUploadFileTypeValidator({
@@ -31,11 +38,10 @@ export class ChannelController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
-
-		console.log("NEW DATAS = ", newChannel)
-		console.log("FILE = ", file)
-
-		// return this.channelsService.createChannel(newChannel, userId)
+		const newDatas: CreateChannelDto = JSON.parse(createChannelDto)
+		await this.channelsService.parseMultiPartCreate(newDatas)
+	
+		return this.channelsService.createChannel(newDatas, userId, file)
 	}
 
 	// Cree un channel MP et y ajoute un user
@@ -94,10 +100,26 @@ export class ChannelController {
 
 	// Modifie un channel
 	@Patch(':id')
-	update(@getUser('id') userId: number,
+	@UseInterceptors(FileInterceptor('file'))
+	async update(@getUser('id') userId: number,
 	@Param('id', ParseIntPipe) channelId: number, 
-	@Body() newChannelDatas: UpdateChannelDto) {
-		return this.channelsService.updateChannel(channelId, newChannelDatas, userId)
+	@Body('newDatas') newChannelDatas: string,
+	@UploadedFile(
+		new ParseFilePipeBuilder().addValidator(
+			new CustomUploadFileTypeValidator({
+				fileType: VALID_UPLOADS_MIME_TYPES,
+			}),
+		)
+		.addMaxSizeValidator({ maxSize: MAX_PROFILE_PICTURE_SIZE_IN_BYTES })
+		.build({
+			fileIsRequired: false,
+			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+		})
+	) file?: Express.Multer.File) {
+		const newDatas: UpdateChannelDto = JSON.parse(newChannelDatas)
+		await this.channelsService.parseMultiPartUpdate(newDatas)
+
+		return this.channelsService.updateChannel(channelId, newDatas, userId, file)
 	}
 
 	// Change le role d'un user du channel

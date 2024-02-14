@@ -99,6 +99,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					newDatas.type = channelType
 				if (password.value && channelType == ChannelType.PROTECTED)
 					newDatas.hash = password.value
+				if (avatar.toDisplay === DefaultChannelIcon)
+					newDatas.avatar = `http://${url}:3333/defaultChannelAvatar/default_channel.png`
 
 				if (Object.keys(newDatas).length !== 0 || avatar.toUpload)
 				{
@@ -106,10 +108,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 					if (avatar.toUpload)
 						multiPartBody.append('file', avatar.toUpload)
-					if (Object.keys(newDatas).length !== 0)
-						multiPartBody.append('newDatas', JSON.stringify(newDatas))
-					else
-						multiPartBody.append('newDatas', "")
+					multiPartBody.append('newDatas', JSON.stringify(newDatas))
 
 					await axios.patch(`http://${url}:3333/channel/${channelTarget.id}`, multiPartBody, {
 						headers: {
@@ -126,18 +125,29 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 				const newDatas: any = {
 					name: name.value,
 					type: channelType,
-					hash: password.value,
-					avatar: avatar
+					hash: password.value
 				}
 
-				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, newDatas, {
+				const multiPartBody: FormData = new FormData()
+
+				if (avatar.toUpload)
+					multiPartBody.append('file', avatar.toUpload)
+
+				multiPartBody.append('newDatas', JSON.stringify(newDatas))
+
+				const postChannelResponse = await axios.post(`http://${url}:3333/channel`, multiPartBody,
+				{
 					headers: {
-						'Authorization': `Bearer ${token}`
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'multipart/form-data'
 					}
 				})
 
+				console.log(postChannelResponse)
+
 				const newChannel: Channel = {
 					id: postChannelResponse.data.id,
+					avatar: postChannelResponse.data.avatar,
 					...newDatas,
 					messages: [],
 					members: [],
@@ -156,6 +166,8 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 			}
 		}
 		catch (error) {
+			console.log(error)
+
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!
@@ -371,7 +383,11 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 							&nbsp;Upload&nbsp;
 						</IconUploadFile>
 						<Icon
-							onClick={() => setAvatar(DefaultChannelIcon)}
+							onClick={() => setAvatar({
+								toUpload: null,
+								toDisplay: DefaultChannelIcon,
+								error: false
+							})}
 							type="button" src={RemoveIcon} size={23}
 							alt="Remove icon" title="Remove image" />
 						<Avatar
