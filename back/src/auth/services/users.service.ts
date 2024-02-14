@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ForbiddenException, OnModuleInit, NotFoundException, BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClient, User, Prisma, Role, UserStatus, Game, ChannelStatus, UsersOnGames, MatchResult, roleInGame, GameStatus } from '@prisma/client';
@@ -13,52 +13,10 @@ import { Blob } from 'buffer';
 import axios from 'axios';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
 	constructor(private prisma: PrismaService,
-				private appGateway: AppGateway
+				private appGateway: AppGateway,
 				) {}
-
-	// Upload un avatar
-	async uploadAvatar(link: string) {
-		try {
-			// console.log("00000000000000")
-			// const response = await axios.get(`${link}`, {
-			// 	responseType: 'stream',
-			// });
-			// console.log("11111111111111111111")
-			
-			// console.log("1")
-			// let dest = "uploads/users/test"
-
-			// const writer = fs.createWriteStream(dest);
-			// console.log("2")
-
-			// response.data.pipe(writer);
-			// console.log("3")
-
-			// await new Promise((resolve, reject) => {
-			//   writer.on('finish', resolve);
-			//   writer.on('error', reject);
-			// });
-			// console.log("3")
-	  
-
-			// console.log(avatar)
-			// response.data.pipe(writer);
-
-
-		} catch (error) {
-
-			// console.log("ERROR", error);
-
-			if (error instanceof NotFoundException)
-				throw error
-			else if (error instanceof Prisma.PrismaClientKnownRequestError)
-				throw new ForbiddenException("The provided credentials are not allowed")
-			else
-				throw new BadRequestException()
-		}
-	}
 
 	// Cree un user
 	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<Partial<User>> {
@@ -396,6 +354,11 @@ export class UsersService {
 
 		await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', randomAvatar)
 	}
+
+	async onModuleInit() {
+		await this.prisma.user.updateMany({ data: { status: UserStatus.OFFLINE }})
+	}
+	  
 
 /* =========================== MULTIPART DTO ================================ */
 
