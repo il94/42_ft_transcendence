@@ -4,7 +4,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,
 import { UsersService } from '../services/users.service';
 import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
 
-import { JwtGuard } from '../guards/auth.guard';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { getUser, Public } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
@@ -79,7 +78,7 @@ export class UsersController {
 	) file?: Express.Multer.File) {
 
 		const newDatas: UpdateUserDto = JSON.parse(updateUserDto)
-		await this.usersService.parseMultiPartCreate(newDatas)
+		await this.usersService.parseMultiPartUpdate(newDatas)
 
 		return await this.usersService.updateUser(userId, newDatas, file)
 	}
