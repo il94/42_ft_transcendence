@@ -4,6 +4,10 @@ import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'clas
 
 export class CreateChannelDto implements Channel {
 
+	id: number;
+
+	createdAt: Date;
+
 	@IsString()
 	@IsNotEmpty()
 	@MaxLength(8)

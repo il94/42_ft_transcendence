@@ -9,35 +9,40 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
+	app.enableShutdownHooks();
+	
 	app.use(json({ limit: '5mb' }))
 	
 	app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true,}));
 	app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 	
 	const { httpAdapter } = app.get(HttpAdapterHost);
-  	app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-
+	app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+	
 	app.use(cookieParser());
 	app.use(
 		session({
-		  secret: process.env.SESSION_SECRET,
-		  resave: false,
-		  saveUninitialized: false,
-		  cookie: { maxAge: 60000, 
-					sameSite: 'none',
-		  			secure: true
-				}
+			secret: process.env.SESSION_SECRET,
+			resave: false,
+			saveUninitialized: false,
+			cookie: { maxAge: 60000, 
+				sameSite: 'none',
+				secure: true
+			}
 		}),
-	  );
-	  
-	app.enableCors({
-		origin: '*',
-		credentials: true,
-	})
+		);
+		
+		app.enableCors({
+			origin: '*',
+			credentials: true,
+		})
+		
+		app.use(passport.initialize());
+		app.use(passport.session());
+		
 
-	app.use(passport.initialize());
-	app.use(passport.session());
-	
+		
+		
 	await app.listen(process.env.PORT, () => {
 		console.log(`Server listening on ${process.env.IP}:${process.env.PORT}`)
 	});

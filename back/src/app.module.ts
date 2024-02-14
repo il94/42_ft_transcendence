@@ -13,6 +13,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { UsersService } from './auth/services/users.service';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { join } from 'path';
   providers: [
     AppGateway,
     AppService,
-    PrismaService
+    PrismaService,
+    UsersService
   ]
 })
 export class AppModule {}
