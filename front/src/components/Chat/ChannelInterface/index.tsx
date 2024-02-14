@@ -143,8 +143,6 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 					}
 				})
 
-				console.log(postChannelResponse)
-
 				const newChannel: Channel = {
 					id: postChannelResponse.data.id,
 					avatar: postChannelResponse.data.avatar,
@@ -166,12 +164,10 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 			}
 		}
 		catch (error) {
-			console.log(error)
-
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!
-				if (statusCode === 403 || statusCode === 404)
+				if (statusCode === 403 || statusCode === 404 || statusCode === 422)
 					displayPopupError({ display: true, message: message })
 				else
 					displayPopupError({ display: true })

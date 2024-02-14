@@ -10,8 +10,8 @@ import { User, UserStatus } from '@prisma/client';
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CustomUploadFileTypeValidator } from "../file.validdator";
 
-const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp', 'image/x-icon'];
+import { VALID_UPLOADS_MIME_TYPES, MAX_PROFILE_PICTURE_SIZE_IN_BYTES } from "src/app.service";
+
 
 type SigninResponse = {
 	access_token: string

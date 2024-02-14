@@ -20,6 +20,8 @@ const CentralWindow = styled.div`
 
 	clip-path: ${effects.pixelateWindow};
 
+	text-align: center;
+
 	background-color: ${colors.popup};
 
 `

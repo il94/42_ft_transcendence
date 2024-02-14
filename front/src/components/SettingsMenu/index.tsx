@@ -97,14 +97,19 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 403)
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 409)
 				{
 					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid username"
+						errorMessage: message
 					}))
+				}
+				else if (statusCode === 400 || statusCode === 403 || statusCode === 422)
+				{
+					displayPopupError({ display: true, message: message })
+					displaySettingsMenu(false)
 				}
 				else
 				{
