@@ -46,18 +46,28 @@ export class PongService {
 		}
 	}
 
-
-	async updateStatusUser(idUser : number, newStatus: UserStatus)
-	{
-		
-		await this.prisma.user.update({ where: { id: idUser},
-			data: { status: newStatus }
-		 })
-		 if (newStatus !== UserStatus.ONLINE)
-		 	await this.cancelAllInvitation(idUser)
-		 this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
-		
-	}
+	async updateStatusUser(idUser: number, newStatus: UserStatus) {
+		try {
+		  const oldUserStatus = await this.prisma.user.findUnique({
+			where: {
+			  id: idUser,
+			},
+		  });
+		  if (oldUserStatus.status !== UserStatus.OFFLINE) {
+			await this.prisma.user.update({
+			  where: { id: idUser },
+			  data: { status: newStatus },
+			});
+			if (newStatus !== UserStatus.ONLINE) {
+			  await this.cancelAllInvitation(idUser);
+			}
+			this.appGateway.server.emit("updateUserStatus", idUser, newStatus);
+		  }
+		} catch (error) {
+		  // Gérer l'erreur ici
+		  throw error; // Vous pouvez choisir de relancer l'erreur ou de la gérer différemment selon vos besoins
+		}
+	  }
 
 
 	async setInvitationAsFinished(messageId: number)
@@ -93,31 +103,42 @@ export class PongService {
 
 
 	async createGame(userOneId: number, userTwoId: number): Promise<number> {
-		console.log("create new game")
-		const game = await this.prisma.game.create({
-			data: {
-				level: 1,
-				status: GameStatus.PENDING,
-				players: {
-					create: [{ 
-						score: 0,
-						result: 'DRAW',
-						role: roleInGame.PLAYER,
-						userId: userOneId},
-						{ 
-						  score: 0,
-						  result: 'DRAW',
-						  role: roleInGame.PLAYER,
-						  userId: userTwoId}
-					  
-					  ]
+		
+		try {
+			console.log("create new game")
+			const game = await this.prisma.game.create({
+				data: {
+					level: 1,
+					status: GameStatus.PENDING, 
+					players: {
+						create: [{ 
+							score: 0,
+							result: 'DRAW',
+							role: roleInGame.PLAYER,
+							userId: userOneId},
+							{ 
+							  score: 0,
+							  result: 'DRAW',
+							  role: roleInGame.PLAYER,
+							  userId: userTwoId}
+						  
+						  ]
+					}
 				}
-			}
-		})
-		this.updateStatusUser(userOneId, UserStatus.PLAYING); // change les status des joeuer manque les emit
-		this.updateStatusUser(userTwoId, UserStatus.PLAYING);
-		console.log("NEW game: ", game);
-		return game.id; 
+			})
+			this.updateStatusUser(userOneId, UserStatus.PLAYING); // change les status des joeuer manque les emit
+			this.updateStatusUser(userTwoId, UserStatus.PLAYING);
+			console.log("NEW game: ", game);
+			return game.id; 
+		}  catch (error) {
+            if (error instanceof ForbiddenException || error instanceof NotFoundException)
+                throw error
+            else if (error instanceof Prisma.PrismaClientKnownRequestError)
+                throw new ForbiddenException("The provided user data is not allowed")
+            else
+                throw new BadRequestException()
+        }
+		
 	}
 
 

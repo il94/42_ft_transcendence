@@ -4,7 +4,6 @@
 
 import { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components'
-import colors from '../../../../../utils/colors';
 import PongContext from '../../../../../contexts/PongContext';
 
 type PropsPaddle = {

@@ -50,10 +50,16 @@ export class AuthService {
 			const user = await this.prisma.user.findUnique({
 				where: {
 					username: userDatas.username
-				}
+				},
+				// select: {
+				// 	status: true
+				// }
 			})
 			if (!user)
 				throw new NotFoundException("User not found")
+
+			if (user.status != UserStatus.OFFLINE)
+				throw new ForbiddenException("already connected")
 
 			// Verifie si le mot de passe fourni est correct
 			const pwdMatch = await argon.verify(user.hash, userDatas.hash)
@@ -133,13 +139,19 @@ export class AuthService {
 
 	/*********************** api42 Authentication ******************************************/
 
-	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | {usernameId: User, avatar: string} | Partial<User>> {
+	async validate42User(profile: any): Promise<{user: User, isNew: boolean} | 
+	{usernameId: User, avatar: string} | 
+	Partial<User> | {isCo: boolean }> {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: { usernameId: profile.usernameId, },
 			});
 			if (user) {
-				if (!user.twoFA) {
+				if (user.status != UserStatus.OFFLINE) {
+					console.log("isCO: ", user)
+					return { isCo: true }
+				}
+				else if (!user.twoFA) {
 					const logUser = await this.prisma.user.update({ 
 						where: { usernameId: profile.usernameId },
 						data: { status: UserStatus.ONLINE }})
@@ -159,10 +171,14 @@ export class AuthService {
 	// Selon la reponse de l'api 42, connecte le user OU le redirige vers le twoFA OU lui cree un compte
 	async return42Response(user: { usernameId: string, avatar: string, isNew: boolean } | Partial<User>, res: Response ) {
 		try {
+	
 			// Verifie si le user possebe bien un compte 42
 			if (!user)
 				throw new BadRequestException("User not found in 42 database")
 			
+			if ('isCo' in user)
+				res.redirect(`http://${process.env.IP}:5173/`)
+					
 			// Si le user possede deja un compte dans l'app
 			if ('id' in user)
 			{
@@ -171,8 +187,8 @@ export class AuthService {
 				{
 					// Genere un token d'authentification et l'envoie par les cookies
 					const token = await this.signToken(user.id, user.username)
-						res.clearCookie('token', { httpOnly: true })
-						.cookie("access_token", token.access_token)
+						//res.clearCookie('token', { httpOnly: true })
+						res.cookie("access_token", token.access_token)
 						.redirect(`http://${process.env.IP}:5173`)
 				}
 			
@@ -218,8 +234,8 @@ export class AuthService {
 	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
 		try {
 			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
-			if (!getUser)
-				throw new NotFoundException('User not found');
+			if (!getUser || getUser.status == UserStatus.OFFLINE)
+				throw new NotFoundException('User not found or offline');
 			if (getUser.twoFA)
 				throw new ConflictException('2FA already enabled');
 
@@ -260,8 +276,8 @@ export class AuthService {
 					twoFASecret: true
 				}
 			})
-			if (!user)
-				throw new NotFoundException("User not found")
+			if (!user || user.status != UserStatus.OFFLINE)
+				throw new NotFoundException("User not found or already connected")
 
 			// Verifie si le code fourni est correct avec l'api de google
 			if (!await this.verifyCode(user.twoFASecret, twoFACode))
@@ -293,8 +309,8 @@ export class AuthService {
 	async disableTwoFA(user: User, twoFACode: string): Promise <User> {
 		try {
 			const getUser = await this.prisma.user.findUnique({ where: {id: user.id, twoFA: true }});
-			if (!getUser)
-				throw new NotFoundException('User with 2FA not found');
+			if (!getUser || getUser.status === UserStatus.OFFLINE)
+				throw new NotFoundException('User with 2FA not found or offline');
 		
 			const codevalid = await this.verifyCode(getUser.twoFASecret, twoFACode)
 			if (!codevalid) 

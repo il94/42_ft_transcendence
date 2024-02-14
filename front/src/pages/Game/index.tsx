@@ -74,7 +74,8 @@ import {
 	ChannelType,
 	challengeStatus,
 	chatWindowStatus,
-	contextualMenuStatus
+	contextualMenuStatus,
+	userStatus
 } from '../../utils/status'
 
 import {
@@ -183,17 +184,21 @@ function Game() {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				const friends: User[] = await fetchFriends()
+				
+				
+					const friends: User[] = await fetchFriends()
 				const blockeds: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
+
 				const socket = io(`http://${url}:3333`, {
 					transports: ["websocket"],
 					query: {
 						id: meResponse.data.id,
 					}
 				});
-
+				
 				socket.on('connect_error', (error) => {
+					console.log(error)
 					throw new Error;
 				});
 

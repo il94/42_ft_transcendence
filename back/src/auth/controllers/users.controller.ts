@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,
   UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, ParseFilePipeBuilder, ParseFilePipe,
   HttpStatus, StreamableFile } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
+import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
+
 import { JwtGuard } from '../guards/auth.guard';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { getUser, Public } from '../decorators/users.decorator';
@@ -13,7 +15,7 @@ import { promisify } from 'util';
 import { join } from 'path';
 
 const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
 
 @Controller('user')
 export class UsersController {
@@ -21,6 +23,7 @@ export class UsersController {
 
 	// Upload un avatar
 	@Public()
+	@UseGuards(Api42AuthGuard)
 	@Post('upload')
 	postAvatar(@Body() link: string) {
 		console.log("CONTROLEUR", link)
@@ -74,6 +77,7 @@ export class UsersController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
+
 		const newDatas: UpdateUserDto = JSON.parse(updateUserDto)
 		await this.usersService.parseMultiPartCreate(newDatas)
 

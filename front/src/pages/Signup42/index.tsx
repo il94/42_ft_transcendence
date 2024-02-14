@@ -10,7 +10,6 @@ import {
 	useNavigate
 } from 'react-router'
 import Cookies from 'js-cookie'
-import fs from 'fs'
 
 import StyledLink from '../../componentsLibrary/StyledLink/Index'
 import Button from '../../componentsLibrary/Button'

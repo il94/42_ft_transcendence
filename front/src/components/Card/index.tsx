@@ -27,7 +27,6 @@ import InteractionContext from "../../contexts/InteractionContext"
 import {
 	ranks
 } from "../../utils/status"
-import AuthContext from "../../contexts/AuthContext"
 
 type PropsCard = {
 	cardPosition: {
@@ -41,7 +40,7 @@ type PropsCard = {
 
 function Card({ cardPosition, displayCard }: PropsCard) {
 
-	const { url } = useContext(AuthContext)!
+	//const { url } = useContext(AuthContext)!
 	const { userTarget } = useContext(InteractionContext)!
 	const { zCardIndex, setZCardIndex, zMaxIndex } = useContext(DisplayContext)!
 
