@@ -32,16 +32,13 @@ async function bootstrap() {
 		}),
 		);
 		
-		app.enableCors({
-			origin: '*',
-			credentials: true,
-		})
-		
-		app.use(passport.initialize());
-		app.use(passport.session());
-		
-
-		
+	app.enableCors({
+		origin: '*',
+		credentials: true,
+	})
+	
+	app.use(passport.initialize());
+	app.use(passport.session());
 		
 	await app.listen(process.env.PORT, () => {
 		console.log(`Server listening on ${process.env.IP}:${process.env.PORT}`)

@@ -357,9 +357,8 @@ export class UsersService implements OnModuleInit {
 
 	async onModuleInit() {
 		await this.prisma.user.updateMany({ data: { status: UserStatus.OFFLINE }})
-		console.log("MODULE INIT");
-
-	  }
+	}
+	  
 
 /* =========================== MULTIPART DTO ================================ */
 

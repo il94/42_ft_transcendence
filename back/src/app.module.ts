@@ -24,8 +24,8 @@ import { UsersService } from './auth/services/users.service';
     ChatsModule,
     FriendsModule,
     BlockedsModule,
-	PongModule,
-	ServeStaticModule.forRoot({
+	  PongModule,
+	  ServeStaticModule.forRoot({
 		rootPath: join(__dirname, '..', "/"),
 		serveRoot: '/',
 	}),
