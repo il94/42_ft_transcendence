@@ -24,7 +24,6 @@ export class UsersController {
 	@UseGuards(Api42AuthGuard)
 	@Post('upload')
 	postAvatar(@Body() link: string) {
-		console.log("CONTROLEUR", link)
 		return this.usersService.uploadAvatar(link)
 	}
 

@@ -115,6 +115,7 @@ export class PongGateway {
 				return; 
 			}
 		});
+		
 	}
 
 	async handleCancelSearching(userId: number)
@@ -262,7 +263,6 @@ export class PongGateway {
 
 		}
 		catch (error) {
-			console.log("1 addSearchingPlayer")
 			if (error instanceof ForbiddenException || error instanceof NotFoundException|| error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
@@ -355,6 +355,77 @@ export class PongGateway {
 				this.server.to(client.id).emit("error", error.message)
 			}
 		}
+
+	async	handleBack(userId : number)
+	{
+		try {
+
+			  const user = await this.prisma.user.findUnique({
+				where : {
+					id : userId
+				}
+			  })
+
+			  console.log("user status = ", user.status)
+			  if (user.status === UserStatus.WAITING)
+			  {
+			  	this.delUserFromSearchingUser(AppService.connectedUsers.get(userId.toString()));
+			  	await this.PongService.updateStatusUser(userId, UserStatus.ONLINE);
+				return
+			  }
+			  const pendingGames = await this.prisma.game.findFirst({
+				where: {
+					players: {
+						some: {
+							userId: userId,
+						},
+					},
+					status: GameStatus.PENDING,
+				}
+			});
+			if (user.status === UserStatus.WATCHING)
+			{
+				let game: PongGame
+
+				this.PongService.activeGames.forEach((element) => {
+					if (element.isAWatcherById(userId) === true){
+						game = element
+					}
+				});
+				if (game)
+					this.handleStopSpectate(userId, game.id)
+				await this.PongService.updateStatusUser(userId, UserStatus.ONLINE);
+			  	return
+			}
+
+			  if (pendingGames)
+			  {
+				let game : PongGame = null;
+				this.PongService.activeGames.forEach((element) => {
+					if (element.isMyPlayer(AppService.connectedUsers.get(userId.toString()))){
+						game  = element;
+					}
+				});
+		
+				  const enemy = game.LeftPlayer.getSocket() === AppService.connectedUsers.get(userId.toString())? game.RightPlayer : game.LeftPlayer
+				  this.server.to(enemy.getSocket().id).emit("decoInGame", "player")
+				  game.watcher.forEach((e) =>{
+					  this.server.to(e.id).emit("decoInGame", "watcher")
+				  })
+				  enemy.setWinner()
+				  game.setState(false)
+				  return
+			  }
+		}
+		catch(error: any){
+			const socketUser =  AppService.connectedUsers.get(userId.toString())
+			if (socketUser)
+				this.server.to(socketUser.id).emit("error", error.message)
+		}
+	}
+
+
+	
 	
 	async handleSpectate(UserId: number, spectateId : number)
 	{
@@ -408,7 +479,6 @@ export class PongGateway {
 				{	
 					game.addWatcher(UserId, socketUser)
 					await this.PongService.updateStatusUser(UserId, UserStatus.WATCHING)
-					console.log(socketUser)
 					this.server.to(socketUser.id).emit("spectate")
 				}
 			}

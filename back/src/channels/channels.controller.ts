@@ -32,8 +32,7 @@ export class ChannelController {
 		})
 	) file?: Express.Multer.File) {
 
-		console.log("NEW DATAS = ", newChannel)
-		console.log("FILE = ", file)
+
 
 		// return this.channelsService.createChannel(newChannel, userId)
 	}

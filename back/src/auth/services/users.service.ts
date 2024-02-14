@@ -64,7 +64,6 @@ export class UsersService {
 	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<User> {
 		try {
 
-			console.log("userdatas", userDatas)
 
 			// Verifie si le username n'est pas deja pris
 			const userExists = await this.prisma.user.findFirst({
@@ -74,7 +73,6 @@ export class UsersService {
 			})
 			if (userExists)
 			{
-				console.log("DANS LE IF", userExists)
 				throw new ConflictException("Username already exists")
 			}
 
@@ -99,22 +97,16 @@ export class UsersService {
 					losses: 0
 				},
 			})
-
-			console.log("AVANT IF")
 			if (file)
 			{
 				await this.saveUserAvatar(newUser.id, file)
-				console.log("if")
 
 			}
 			else
 			{
-				console.log("else")
 
 				await this.getRandomAvatar(newUser.id)
 			}
-
-			console.log("APRES IF")
 
 			console.log(`User ${newUser.id} was created`)
 			return newUser
