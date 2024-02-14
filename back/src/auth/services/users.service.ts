@@ -63,9 +63,6 @@ export class UsersService {
 	// Cree un user
 	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<Partial<User>> {
 		try {
-
-			console.log("userdatas", userDatas)
-
 			// Verifie si le username n'est pas deja pris
 			const userExists = await this.prisma.user.findFirst({
 				where: {
@@ -73,10 +70,7 @@ export class UsersService {
 				}
 			})
 			if (userExists)
-			{
-				console.log("DANS LE IF", userExists)
 				throw new ConflictException("Username already exists")
-			}
 
 			// Hashe le mot de passe
 			const hash = await argon.hash(userDatas.hash)
@@ -121,29 +115,15 @@ export class UsersService {
 				}
 			})
 
-			console.log("AVANT IF")
 			if (file)
-			{
 				await this.saveUserAvatar(newUserId.id, file)
-				console.log("if")
-
-			}
 			else
-			{
-				console.log("else")
-
 				await this.getRandomAvatar(newUserId.id)
-			}
-
-			console.log("APRES IF")
 
 			console.log(`User ${newUserId.id} was created`)
 			return newUser
 		}
 		catch (error) {
-
-			console.log(error)
-
 			if (error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)
@@ -310,6 +290,18 @@ export class UsersService {
   	// Modifie le user authentifie
 	async updateUser(userId: number, updateUserDto: UpdateUserDto, file?: Express.Multer.File)  {
 		try {
+			// Verifie si le username n'est pas deja pris
+			if (updateUserDto.username)
+			{
+				const userExists = await this.prisma.user.findFirst({
+					where: {
+						username: updateUserDto.username
+					}
+				})
+				if (userExists)
+					throw new ConflictException("Username already exists")
+			}
+
 			const userNewDatas = {
 				...updateUserDto,
 				hash: updateUserDto.hash ? await argon.hash(updateUserDto.hash) : undefined,
@@ -340,7 +332,9 @@ export class UsersService {
 
 			console.log(error)
 
-			if (error instanceof Prisma.PrismaClientKnownRequestError)
+			if (error instanceof ConflictException)
+				throw error
+			else if (error instanceof Prisma.PrismaClientKnownRequestError)
 				throw new ForbiddenException("The provided credentials are not allowed")
 			else
 				throw new BadRequestException()

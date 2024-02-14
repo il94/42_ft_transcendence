@@ -89,8 +89,6 @@ function SignupFT() {
 					responseType: 'blob',
 				})
 
-				
-
 				const blob = response42Avatar.data
 
 				const image42 = new File([blob], '42.jpg', { type: blob.type })
@@ -137,17 +135,9 @@ function SignupFT() {
 
 			const multiPartBody: FormData = new FormData()
 			if (avatar.toUpload)
-			{
-				console.log("IF")
 				multiPartBody.append('file', avatar.toUpload)
-			}
 			else if (FTAvatar)
-			{
-				console.log("ELSE IF")
 				multiPartBody.append('file', FTAvatar)
-				// const image42 = new File([blob], '42.jpg', {})
-			}
-				// multiPartBody.append('file', avatar.toUpload)
 			multiPartBody.append('newUser', JSON.stringify(newUser))
 
 			console.log("NEW USER = ", newUser)
@@ -175,7 +165,7 @@ function SignupFT() {
 						errorMessage: message
 					}))
 				}
-				else if (statusCode === 403) {
+				else if (statusCode === 403 || statusCode === 422) {
 					navigate("/error", { state: {
 						message: message
 					}})
