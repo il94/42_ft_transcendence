@@ -13,8 +13,7 @@ import { IsString, IsNotEmpty,
 	IsOptional, MaxLength, MinLength, IsBoolean, IsAlphanumeric, IsLowercase, IsAlpha
 } from "class-validator";
 
-const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+import { VALID_UPLOADS_MIME_TYPES, MAX_PROFILE_PICTURE_SIZE_IN_BYTES } from 'src/app.service';
 
 @UseGuards(JwtGuard)
 @Controller('channel')

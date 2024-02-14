@@ -13,8 +13,7 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { join } from 'path';
 
-const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+import { VALID_UPLOADS_MIME_TYPES, MAX_PROFILE_PICTURE_SIZE_IN_BYTES } from 'src/app.service';
 
 @Controller('user')
 export class UsersController {

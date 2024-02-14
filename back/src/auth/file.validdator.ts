@@ -26,7 +26,9 @@ export class CustomUploadFileTypeValidator extends FileValidator {
   }
 
   public buildErrorMessage(): string {
-    return `Upload not allowed. Upload only files of type: ${this._allowedMimeTypes.join(
+    return `Upload not allowed. Upload only files of type: ${this._allowedMimeTypes.map((mime: string) => {
+		return mime.replace("image/", '')
+	}).join(
       ', ',
     )}`;
   }
