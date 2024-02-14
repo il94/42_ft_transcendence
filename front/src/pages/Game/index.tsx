@@ -177,6 +177,7 @@ function Game() {
 
 		async function fetchMe() {
 			try {
+				await verifyToken()
 				setLoaderFriends(true)
 				setLoaderChannels(true)
 				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
@@ -217,23 +218,42 @@ function Game() {
 			catch (error) {
 				if (axios.isAxiosError(error)) {
 					const axiosError = error as AxiosError<ErrorResponse>
-					const { statusCode, message } = axiosError.response?.data!
-					if (statusCode === 403)
-					{
-						navigate("/error", { state: {
-							message: message
-						}})	
-					}
-					else
+					if (!axiosError.response)
 						navigate("/error")
+					else
+					{
+						const { statusCode, message } = axiosError.response?.data!
+						if (statusCode === 403)
+						{
+							navigate("/error", { state: {
+								message: message
+							}})	
+						}
+						else
+							navigate("/error")
+					}
 				}
 				else
 					navigate("/error")
 			}	
 		}
+
+		async function verifyToken() {
+			try {
+				await axios.post(`http://${url}:3333/auth/token`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+			}
+			catch (error) {
+				throw (error)
+			}
+		}
+
 		if (!token)
 			navigate("/error")
-		else
+		else 
 			fetchMe()
 	}, [])
 
