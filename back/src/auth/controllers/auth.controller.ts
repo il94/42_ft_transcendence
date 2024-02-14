@@ -10,8 +10,8 @@ import { User, UserStatus } from '@prisma/client';
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CustomUploadFileTypeValidator } from "../file.validdator";
 
-const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp', 'image/x-icon'];
+import { VALID_UPLOADS_MIME_TYPES, MAX_PROFILE_PICTURE_SIZE_IN_BYTES } from "src/app.service";
+
 
 type SigninResponse = {
 	access_token: string
@@ -31,7 +31,7 @@ export class AuthController {
 	@Public()
 	@Post('signup')
 	@UseInterceptors(FileInterceptor('file'))
-	async signup(@Body('newUser') userDatas,
+	async signup(@Body('newUser') createUserDto: string,
 	@UploadedFile(
 		new ParseFilePipeBuilder().addValidator(
 			new CustomUploadFileTypeValidator({
@@ -44,7 +44,10 @@ export class AuthController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File): Promise<{ access_token: string }> {
-		return await this.authService.signup(JSON.parse(userDatas), file)
+		const newUser: CreateUserDto = JSON.parse(createUserDto)
+		await this.userService.parseMultiPartCreate(newUser)
+
+		return await this.authService.signup(newUser, file)
 	}
 
 	@Public()

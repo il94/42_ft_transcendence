@@ -4,6 +4,19 @@ import { PrismaService } from "./prisma/prisma.service";
 import { UserStatus, challengeStatus } from "@prisma/client";
 import { AppGateway } from "./app.gateway";
 
+export const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
+
+export const VALID_UPLOADS_MIME_TYPES = [
+	'image/jpg',
+	'image/jpeg',
+	'image/png',
+	'image/apng',
+	'image/gif',
+	'image/svg+xml',
+	'image/webp'
+];
+
+
 @Injectable()
 export class AppService {
 	public static connectedUsers: Map<string, Socket> = new Map();

@@ -177,6 +177,7 @@ function Game() {
 
 		async function fetchMe() {
 			try {
+				await verifyToken()
 				setLoaderFriends(true)
 				setLoaderChannels(true)
 				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
@@ -202,9 +203,10 @@ function Game() {
 					throw new Error;
 				});
 
+				console.log(meResponse)
+
 				setUserAuthenticate({
 					...meResponse.data,
-					avatar: `http://${url}:3333/uploads/users/${meResponse.data.id}_`,
 					friends: friends,
 					blockeds: blockeds,
 					channels: channels,
@@ -216,23 +218,42 @@ function Game() {
 			catch (error) {
 				if (axios.isAxiosError(error)) {
 					const axiosError = error as AxiosError<ErrorResponse>
-					const { statusCode, message } = axiosError.response?.data!
-					if (statusCode === 403)
-					{
-						navigate("/error", { state: {
-							message: message
-						}})	
-					}
-					else
+					if (!axiosError.response)
 						navigate("/error")
+					else
+					{
+						const { statusCode, message } = axiosError.response?.data!
+						if (statusCode === 403)
+						{
+							navigate("/error", { state: {
+								message: message
+							}})	
+						}
+						else
+							navigate("/error")
+					}
 				}
 				else
 					navigate("/error")
 			}	
 		}
+
+		async function verifyToken() {
+			try {
+				await axios.post(`http://${url}:3333/auth/token`, {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+			}
+			catch (error) {
+				throw (error)
+			}
+		}
+
 		if (!token)
 			navigate("/error")
-		else
+		else 
 			fetchMe()
 	}, [])
 
@@ -330,8 +351,8 @@ function Game() {
 			refreshLeaveChannel({ channelId, userId, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserRole", (channelId: number, userId: number, newRole: any, log: MessageLog) =>
 			refreshUserRole({ channelId, userId, newRole, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number) =>
-			refreshNewOwner({ channelId, userId, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
+		userAuthenticate.socket?.on("setNewOwner", (channelId: number, userId: number, log: MessageLog) =>
+			refreshNewOwner({ channelId, userId, log, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChallenge", (channelId: number, messageId: number, newStatus: challengeStatus) => 
 			refreshStatusChallenge({ channelId, messageId, newStatus, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateUserMute", (idChan: number, time: string, userTargetId: number, log: MessageLog) => 
@@ -358,15 +379,12 @@ function Game() {
 			refreshUserStatus({ userId, newStatus, userAuthenticate, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("updateChannel", (channelId: number, newDatas: number) => 
 			refreshUpdateChannel({ channelId, newDatas, setUserAuthenticate, channelTarget, setChannelTarget }))
-		userAuthenticate.socket?.on("deleteChannel", (channelId: number) =>
-			refreshDeleteChannel({ channelId, setUserAuthenticate, channelTarget, setChannelTarget }))
 		userAuthenticate.socket?.on("createChannelMP", (channelId: number, authorDatas: any) =>
 			recieveChannelMP({ channelId, authorDatas, userAuthenticate, setUserAuthenticate }))
 		
 		return () => {
 			userAuthenticate.socket?.off("updateUserStatus")
 			userAuthenticate.socket?.off("updateChannel")
-			userAuthenticate.socket?.off("deleteChannel")
 			userAuthenticate.socket?.off("createChannelMP")
 		}
 		

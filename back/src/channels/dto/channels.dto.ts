@@ -2,7 +2,11 @@ import { PartialType } from '@nestjs/mapped-types';
 import { Channel, ChannelStatus, Invitation, UsersOnChannels, Message, Role } from "@prisma/client"
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class CreateChannelDto {
+export class CreateChannelDto implements Channel {
+
+	id: number;
+
+	createdAt: Date;
 
 	@IsString()
 	@IsNotEmpty()
@@ -13,6 +17,8 @@ export class CreateChannelDto {
 	@IsNotEmpty()
 	type: ChannelStatus;
 
+	avatar: string;
+	
 	@IsOptional()
 	@IsString()
 	hash: string;
@@ -29,6 +35,8 @@ export class UpdateChannelDto {
 	@IsEnum(ChannelStatus)
 	@IsNotEmpty()
 	type: ChannelStatus;
+
+	avatar: string;
 
 	@IsOptional()
 	@IsString()

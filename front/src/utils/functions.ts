@@ -32,7 +32,8 @@ export function capitalize(str: string): string {
 }
 
 export function endsWithImageExtension(fileName: string): boolean {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tif', '.tiff', '.webp', '.svg', '.heif', '.heic']
+
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.apng', '.gif', '.svg', '.webp']
     const lowerCaseFileName = fileName.toLowerCase()
     return imageExtensions.some(ext => lowerCaseFileName.endsWith(ext))
 }
@@ -51,7 +52,7 @@ export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvat
 	else if (!endsWithImageExtension(file.name))
 	{
 		if (displayPopupError)
-			displayPopupError({ display: true, message: "Bad image extension" })
+			displayPopupError({ display: true, message: "Invalid image extension .jpg .jpeg .png .apng .gif .svg .webp excepted" })
 		else if (navigate)
 			navigate("/error")
 		return
@@ -78,6 +79,7 @@ export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvat
 					message: "Invalid image"
 		}})
 	}
+
 	reader.readAsDataURL(file)
 }
 
@@ -319,7 +321,7 @@ export function setUserToAdministrator(channel: Channel, user: User | UserAuthen
 	}
 }
 
-export function setUserToOwner(channel: Channel, user: User | UserAuthenticate): Channel {
+export function setUserToOwner(channel: Channel, user: User | UserAuthenticate, log: MessageLog): Channel {
 	const isAlreadyOwner = userIsOwner(channel, user.id)
 	const owner = isAlreadyOwner ? channel.owner : user
 
@@ -327,7 +329,11 @@ export function setUserToOwner(channel: Channel, user: User | UserAuthenticate):
 		...channel,
 		members: channel.members.filter((member) => member.id !== user.id),
 		administrators: channel.administrators.filter((administrator) => administrator.id !== user.id),
-		owner: owner
+		owner: owner,
+		messages: [
+			...channel.messages,
+			log
+		]
 	}
 }
 

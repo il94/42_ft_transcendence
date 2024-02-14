@@ -3,6 +3,8 @@
 CAS/ :
 
 	Gestion d'erreur full check upload
+	route patch channel avatar
+	refaire dtos
 
 GLOBAL/ : A faire sur tout les fichiers un par un
 

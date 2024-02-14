@@ -69,7 +69,7 @@ function LockedInterface() {
 
 			setChannelTarget(() => ({
 				...channelTarget,
-				members: [...channelTarget.members, userAuthenticate],
+				members: [...channelTarget.members, userAuthenticate]
 			}))
 		}
 		catch (error) {

@@ -66,8 +66,10 @@ function ContactText({ sender, content }: PropsContactText) {
 			{
 				showMessage ?
 					<>
+					{
+						sender.id &&
 						<Avatar
-							src={`http://${url}:3333/uploads/users/${sender.id}_`}
+							src={sender.avatar}
 							onClick={(event) => showCard(event, sender.id, {
 								displayCard,
 								setZCardIndex,
@@ -93,6 +95,7 @@ function ContactText({ sender, content }: PropsContactText) {
 								GameWrapperRef
 							})}
 							tabIndex={0} />
+						}
 						<MessageContent
 							onClick={handleClickEvent}>
 							<UserName>

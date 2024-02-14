@@ -3,7 +3,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,
   HttpStatus, StreamableFile } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { Api42AuthGuard, JwtGuard } from '../guards/auth.guard';
-import { UpdateUserDto } from '../dto/users.dto';
+
+import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { getUser, Public } from '../decorators/users.decorator';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -12,8 +13,7 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { join } from 'path';
 
-const MAX_PROFILE_PICTURE_SIZE_IN_BYTES = 2 * 1024 * 1024;
-const VALID_UPLOADS_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+import { VALID_UPLOADS_MIME_TYPES, MAX_PROFILE_PICTURE_SIZE_IN_BYTES } from 'src/app.service';
 
 @Controller('user')
 export class UsersController {
@@ -24,7 +24,10 @@ export class UsersController {
 	@UseGuards(Api42AuthGuard)
 	@Post('upload')
 	postAvatar(@Body() link: string) {
-		return this.usersService.uploadAvatar(link)
+
+		console.log("CONTROLEUR", link)
+		//return this.usersService.uploadAvatar(link)
+
 	}
 
 	// Renvoie les donnees publiaues de tout les users
@@ -61,7 +64,7 @@ export class UsersController {
 	@Patch('me')
 	@UseInterceptors(FileInterceptor('file'))
 	async update(@getUser('id') userId: number, 
-	@Body('newDatas') updateUserDto: UpdateUserDto,
+	@Body('newDatas') updateUserDto: string,
 	@UploadedFile(
 		new ParseFilePipeBuilder().addValidator(
 			new CustomUploadFileTypeValidator({
@@ -74,9 +77,11 @@ export class UsersController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File) {
-		if (updateUserDto)
-			return await this.usersService.updateUser(userId, JSON.parse(updateUserDto.toString()), file)
-		return await this.usersService.updateUser(userId, updateUserDto, file)
+
+		const newDatas: UpdateUserDto = JSON.parse(updateUserDto)
+		await this.usersService.parseMultiPartUpdate(newDatas)
+
+		return await this.usersService.updateUser(userId, newDatas, file)
 	}
 }
 

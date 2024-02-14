@@ -82,7 +82,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 				if (Object.keys(newDatas).length !== 0)
 					multiPartBody.append('newDatas', JSON.stringify(newDatas))
 				else
-					multiPartBody.append('newDatas', "")
+					multiPartBody.append('newDatas', "{}")
 				await axios.patch(`http://${url}:3333/user/me`, multiPartBody,
 				{
 					headers: {
@@ -97,14 +97,19 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 			if (axios.isAxiosError(error))
 			{
 				const axiosError = error as AxiosError<ErrorResponse>
-				const { statusCode } = axiosError.response?.data!
-				if (statusCode === 403)
+				const { statusCode, message } = axiosError.response?.data!
+				if (statusCode === 409)
 				{
 					setUsername((prevState: SettingData) => ({
 						...prevState,
 						error: true,
-						errorMessage: "Invalid username"
+						errorMessage: message
 					}))
+				}
+				else if (statusCode === 400 || statusCode === 403 || statusCode === 422)
+				{
+					displayPopupError({ display: true, message: message })
+					displaySettingsMenu(false)
 				}
 				else
 				{
@@ -236,7 +241,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 	/* =============================== AVATAR ================================== */
 
 	const [avatar, setAvatar] = useState<SettingAvatar>({
-		toDisplay: `http://${url}:3333/uploads/users/${userAuthenticate.id}_`,
+		toDisplay: userAuthenticate.avatar,
 		toUpload: undefined,
 		error: false
 	})

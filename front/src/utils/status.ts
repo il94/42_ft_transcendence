@@ -48,6 +48,7 @@ export enum logType {
 	LEAVE = "LEAVE",
 	UPGRADE = "UPGRADE",
 	DOWNGRADE = "DOWNGRADE",
+	NEW_OWNER = "NEW_OWNER",
 	MUTE = "MUTE",
 	KICK = "KICK",
 	BAN = "BAN",

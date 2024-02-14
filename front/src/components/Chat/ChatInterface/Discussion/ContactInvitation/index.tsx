@@ -82,33 +82,36 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 
 	return (
 		<Style>
-			<Avatar
-				src={`http://${url}:3333/uploads/users/${sender.id}_`}
-				onClick={(event) => showCard(event, sender.id, {
-					displayCard,
-					setZCardIndex,
-					setCardPosition,
-					setUserTarget,
-					url,
-					token,
-					displayPopupError,
-					zMaxIndex,
-					GameWrapperRef
-				})}
-				onAuxClick={(event) => showContextualMenu(event, sender.id, {
-					setContextualMenuPosition,
-					displayContextualMenu,
-					displayCard,
-					userAuthenticate,
-					userTarget,
-					setUserTarget,
-					channelTarget,
-					url,
-					token,
-					displayPopupError,
-					GameWrapperRef
-				})}
-				tabIndex={0} />
+			{
+				sender.id &&
+				<Avatar
+					src={sender.avatar}
+					onClick={(event) => showCard(event, sender.id, {
+						displayCard,
+						setZCardIndex,
+						setCardPosition,
+						setUserTarget,
+						url,
+						token,
+						displayPopupError,
+						zMaxIndex,
+						GameWrapperRef
+					})}
+					onAuxClick={(event) => showContextualMenu(event, sender.id, {
+						setContextualMenuPosition,
+						displayContextualMenu,
+						displayCard,
+						userAuthenticate,
+						userTarget,
+						setUserTarget,
+						channelTarget,
+						url,
+						token,
+						displayPopupError,
+						GameWrapperRef
+					})}
+					tabIndex={0} />
+			}
 			<InvitationContent>
 				<Text>
 					{sender.username} challenge {target.username} to a duel !

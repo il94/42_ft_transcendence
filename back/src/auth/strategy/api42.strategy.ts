@@ -4,6 +4,7 @@ import moduleDefaultExport from "passport-42";
 import { AuthService } from "../services/auth.service";
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, catchError } from "rxjs";
+import { Response } from 'express';
 
 @Injectable() 
 export class Api42Strategy extends PassportStrategy(moduleDefaultExport.Strategy) {

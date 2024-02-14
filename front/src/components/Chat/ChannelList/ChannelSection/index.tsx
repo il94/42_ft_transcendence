@@ -62,7 +62,10 @@ function ChannelSection({ channel, sectionIndex }: PropsChannel) {
 			onClick={handleClickEvent}
 			tabIndex={0}
 			$sectionIndex={sectionIndex}>
-			<Avatar src={channel.avatar} />
+			{
+				channel.avatar &&
+				<Avatar src={channel.avatar} />
+			}
 			<ChannelName>
 				{channel.name}
 			</ChannelName>

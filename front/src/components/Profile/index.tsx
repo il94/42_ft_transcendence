@@ -51,10 +51,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 		if (card && userTarget.id === userAuthenticate.id)
 			displayCard(false)
 		else {
-			setUserTarget({
-				...userAuthenticate,
-				avatar: `http://${url}:3333/uploads/users/${userAuthenticate.id}_`,
-			})
+			setUserTarget(userAuthenticate)
 			setCardPosition({ right: 0, top: 0 })
 			displayCard(true)
 		}
