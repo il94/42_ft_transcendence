@@ -106,7 +106,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 						errorMessage: message
 					}))
 				}
-				else if (statusCode === 403 || statusCode === 422)
+				else if (statusCode === 400 || statusCode === 403 || statusCode === 422)
 				{
 					displayPopupError({ display: true, message: message })
 					displaySettingsMenu(false)

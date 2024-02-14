@@ -467,7 +467,7 @@ export class UsersService {
 	}
 	
 	async containsSpecialCharacter(value) {
-		if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+		if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value)) {
 			throw new BadRequestException('Value must contain at least one special character.');
 		}
 	}
