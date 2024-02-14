@@ -13,6 +13,8 @@ export class CreateChannelDto implements Channel {
 	@IsNotEmpty()
 	type: ChannelStatus;
 
+	avatar: string;
+	
 	@IsOptional()
 	@IsString()
 	hash: string;
@@ -29,6 +31,8 @@ export class UpdateChannelDto {
 	@IsEnum(ChannelStatus)
 	@IsNotEmpty()
 	type: ChannelStatus;
+
+	avatar: string;
 
 	@IsOptional()
 	@IsString()

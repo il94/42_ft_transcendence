@@ -31,7 +31,7 @@ export class AuthController {
 	@Public()
 	@Post('signup')
 	@UseInterceptors(FileInterceptor('file'))
-	async signup(@Body('newUser') userDatas,
+	async signup(@Body('newUser') createUserDto: string,
 	@UploadedFile(
 		new ParseFilePipeBuilder().addValidator(
 			new CustomUploadFileTypeValidator({
@@ -44,7 +44,10 @@ export class AuthController {
 			errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
 		})
 	) file?: Express.Multer.File): Promise<{ access_token: string }> {
-		return await this.authService.signup(JSON.parse(userDatas), file)
+		const newUser: CreateUserDto = JSON.parse(createUserDto)
+		await this.userService.parseMultiPartCreate(newUser)
+
+		return await this.authService.signup(newUser, file)
 	}
 
 	@Public()

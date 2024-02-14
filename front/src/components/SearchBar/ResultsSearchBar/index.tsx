@@ -77,7 +77,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					user.username != userAuthenticate.username
 				)).sort(sortUserByName))
 
-				const accessiblesChannelsResponse = await axios.get(`http://${url}:3333/channel/accessibles`, {
+				const accessiblesChannelsResponse: AxiosResponse<Channel[]> = await axios.get(`http://${url}:3333/channel/accessibles`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}

@@ -61,7 +61,7 @@ export class UsersService {
 	}
 
 	// Cree un user
-	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<User> {
+	async createUser(userDatas: CreateUserDto, file?: Express.Multer.File): Promise<Partial<User>> {
 		try {
 
 			console.log("userdatas", userDatas)
@@ -88,22 +88,43 @@ export class UsersService {
 			}
 
 			// Cree le nouvel user
-			const newUser = await this.prisma.user.create({
+			const newUserId = await this.prisma.user.create({
 				data: {
 					...user,
+					avatar: '',
 					twoFA: false,
 					twoFASecret: "",
 					status: UserStatus.ONLINE,
 					wins: 0,
 					draws: 0,
 					losses: 0
+				}
+			})
+
+			// AJoute l'avatar
+			const newUser = await this.prisma.user.update({
+				where: {
+					id: newUserId.id
 				},
+				data: {
+					avatar: `http://${process.env.IP}:${process.env.PORT}/uploads/users/${newUserId.id}_`
+				},
+				select: {
+					id: true,
+					username: true,
+					avatar: true,
+					twoFA: true,
+					status: true,
+					wins: true,
+					draws: true,
+					losses: true
+				}
 			})
 
 			console.log("AVANT IF")
 			if (file)
 			{
-				await this.saveUserAvatar(newUser.id, file)
+				await this.saveUserAvatar(newUserId.id, file)
 				console.log("if")
 
 			}
@@ -111,12 +132,12 @@ export class UsersService {
 			{
 				console.log("else")
 
-				await this.getRandomAvatar(newUser.id)
+				await this.getRandomAvatar(newUserId.id)
 			}
 
 			console.log("APRES IF")
 
-			console.log(`User ${newUser.id} was created`)
+			console.log(`User ${newUserId.id} was created`)
 			return newUser
 		}
 		catch (error) {
@@ -140,7 +161,7 @@ export class UsersService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true,
+					avatar: true,
 					status: true,
 					wins: true,
 					draws: true,
@@ -167,7 +188,7 @@ export class UsersService {
 				select: {
 					id: true,
 					username: true,
-					// avatar: true,
+					avatar: true,
 					status: true,
 					wins: true,
 					draws: true,
@@ -235,7 +256,7 @@ export class UsersService {
 								select: {
 									id: true,
 									username: true,
-									// avatar: true
+									avatar: true
 								}
 							},
 						}
@@ -252,7 +273,7 @@ export class UsersService {
 					return {
 						...rest,
 						name: users.find((user) => user.user.id !== userId).user.username,
-						// avatar: users.find((user) => user.user.id !== userId).user.avatar
+						avatar: users.find((user) => user.user.id !== userId).user.avatar
 					}
 				})
 			]
@@ -363,7 +384,7 @@ export class UsersService {
 		if (!fs.existsSync(uploadUserPath))
             await mkdir(uploadUserPath, { recursive: true })
 
-			await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', file.buffer)
+		await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', file.buffer)
 	}
 
 	async getRandomAvatar(userId: number) {
@@ -381,6 +402,127 @@ export class UsersService {
 
 		await fs.promises.writeFile(uploadUserPath + userId.toString() + '_', randomAvatar)
 	}
+
+/* =========================== MULTIPART DTO ================================ */
+
+	async isNotEmpty(value) {
+		if (!value) {
+			throw new BadRequestException('Value must not be empty.');
+		}
+	}
+
+	async isString(value) {
+		if (typeof value !== 'string') {
+			throw new BadRequestException('Value must be a string.');
+		}
+	}
+
+	async isBoolean(value) {
+		if (typeof value !== 'boolean') {
+			throw new BadRequestException('Value must be a boolean.');
+		}
+	}	
+
+	async isUserStatus(value) {
+		if (!(value in UserStatus)) {
+			throw new BadRequestException('Invalid user status.');
+		}
+	}
+
+	async maxLength(value, maxLength: number) {
+		if (value.length > maxLength) {
+			throw new BadRequestException(`Value length must not exceed ${maxLength} characters.`);
+		}
+	}
+	
+	async minLength(value: string, minLength: number) {
+		if (value.length < minLength) {
+			throw new BadRequestException(`Value length must be at least ${minLength} characters.`);
+		}
+	}
+
+	async isAlphabetic(value) {
+		const alphabeticRegex = /^[A-Za-z]+$/;
+		if (!alphabeticRegex.test(value)) {
+			throw new BadRequestException('Value must contain only alphabetic characters.');
+		}
+	}
+
+	async isLowercase(value) {
+		if (value !== value.toLowerCase()) {
+			throw new BadRequestException('Value must be in lowercase.');
+		}
+	}
+
+	async containsUppercase(value) {
+		if (!/[A-Z]/.test(value)) {
+			throw new BadRequestException('Value must contain at least one uppercase letter.');
+		}
+	}
+	
+	async containsLowercase(value) {
+		if (!/[a-z]/.test(value)) {
+			throw new BadRequestException('Value must contain at least one lowercase letter.');
+		}
+	}
+	
+	async containsNumber(value) {
+		if (!/\d/.test(value)) {
+			throw new BadRequestException('Value must contain at least one number.');
+		}
+	}
+	
+	async containsSpecialCharacter(value) {
+		if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+			throw new BadRequestException('Value must contain at least one special character.');
+		}
+	}
+	
+	async parseMultiPartCreate({ userNameId, username, hash }: any) {
+		if (userNameId)
+			await this.isString(userNameId)
+
+		await this.isNotEmpty(username)
+		await this.isString(username)
+		await this.maxLength(username, 8)
+		await this.isAlphabetic(username)
+		await this.isLowercase(username)
+
+
+		await this.isNotEmpty(hash)
+		await this.isString(hash)
+		await this.minLength(hash, 8)
+		await this.containsUppercase(hash)
+		await this.containsLowercase(hash)
+		await this.containsNumber(hash)
+		await this.containsSpecialCharacter(hash)
+	}
+
+	async parseMultiPartUpdate({ username, hash, twoFA, status }: any) {
+		if (username)
+		{
+			await this.isNotEmpty(username)
+			await this.isString(username)
+			await this.maxLength(username, 8)
+			await this.isAlphabetic(username)
+			await this.isLowercase(username)
+		}
+		if (hash)
+		{
+			await this.isNotEmpty(hash)
+			await this.isString(hash)
+			await this.minLength(hash, 8)
+			await this.containsUppercase(hash)
+			await this.containsLowercase(hash)
+			await this.containsNumber(hash)
+			await this.containsSpecialCharacter(hash)
+		}
+		if (twoFA)
+			await this.isBoolean(twoFA)
+		if (status)
+			await this.isUserStatus(status)
+	}
+
 
 /* =========================== PAS UTILISEES ================================ */
 

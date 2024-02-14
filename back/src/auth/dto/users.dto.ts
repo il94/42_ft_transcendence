@@ -23,6 +23,8 @@ export class CreateUserDto implements User {
 	@IsLowercase()
 	username: string;
 
+	avatar: string;
+
 	@IsString()
 	@IsNotEmpty()
 	@MinLength(8)

@@ -25,8 +25,8 @@ import { join } from 'path';
     BlockedsModule,
 	PongModule,
 	ServeStaticModule.forRoot({
-		rootPath: join(__dirname, '..', "uploads"),
-		serveRoot: '/uploads',
+		rootPath: join(__dirname, '..', "/"),
+		serveRoot: '/',
 	}),
   ],
   providers: [

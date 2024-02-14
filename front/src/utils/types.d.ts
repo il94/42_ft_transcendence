@@ -92,7 +92,7 @@ export type SettingData = {
 
 export type SettingAvatar = {
 	toDisplay: string,
-	toUpload: File | undefined,
+	toUpload: File | nuull | undefined,
 	error: boolean,
 	errorMessage?: string
 }
