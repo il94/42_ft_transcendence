@@ -234,8 +234,8 @@ export class AuthService {
 	async turnOnTwoFA(user: User, twoFACode: string): Promise<User> {
 		try {
 			const getUser = await this.prisma.user.findUnique({ where: {id: user.id}});
-			if (!getUser)
-				throw new NotFoundException('User not found');
+			if (!getUser || getUser.status == UserStatus.OFFLINE)
+				throw new NotFoundException('User not found or offline');
 			if (getUser.twoFA)
 				throw new ConflictException('2FA already enabled');
 
@@ -276,8 +276,8 @@ export class AuthService {
 					twoFASecret: true
 				}
 			})
-			if (!user)
-				throw new NotFoundException("User not found")
+			if (!user || user.status != UserStatus.OFFLINE)
+				throw new NotFoundException("User not found or already connected")
 
 			// Verifie si le code fourni est correct avec l'api de google
 			if (!await this.verifyCode(user.twoFASecret, twoFACode))
@@ -309,8 +309,8 @@ export class AuthService {
 	async disableTwoFA(user: User, twoFACode: string): Promise <User> {
 		try {
 			const getUser = await this.prisma.user.findUnique({ where: {id: user.id, twoFA: true }});
-			if (!getUser)
-				throw new NotFoundException('User with 2FA not found');
+			if (!getUser || getUser.status === UserStatus.OFFLINE)
+				throw new NotFoundException('User with 2FA not found or offline');
 		
 			const codevalid = await this.verifyCode(getUser.twoFASecret, twoFACode)
 			if (!codevalid) 
