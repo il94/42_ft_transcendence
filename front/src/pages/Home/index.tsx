@@ -46,7 +46,7 @@ function Home() {
 	const navigate = useNavigate()
 
 	window.onpopstate = async () => {
-		console.log("fleche retour")
+		// console.log("fleche retour")
 		await axios.get(`http://${url}:3333/pong/back`, {
 				headers: {
 					'Authorization': `Bearer ${token}`

@@ -98,7 +98,6 @@ function Signup() {
 			navigate("/")
 		}
 		catch (error) {
-			console.log("ERROR = ", error)
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!

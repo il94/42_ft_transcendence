@@ -114,11 +114,11 @@ function PongWrapper({social}: any) {
 		setSearching(false)
 		setDifficultyChoose(false)
 		setGameState(true)
-		console.log("handleLaunchGame was call")
+		// console.log("handleLaunchGame was call")
 	}
 
 	function handleDisconnect(role: string){
-		console.log("in handle Disconnect")
+		// console.log("in handle Disconnect")
 		setSearching(false)
 		setDifficultyChoose(false)
 		setGameState(false)

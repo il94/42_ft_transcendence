@@ -96,9 +96,7 @@ function SignupFT() {
 
 			}
 			catch (error) {
-
-				console.log(error)
-
+				navigate("/error")
 			}
 		}
 
@@ -140,8 +138,6 @@ function SignupFT() {
 				multiPartBody.append('file', FTAvatar)
 			multiPartBody.append('newUser', JSON.stringify(newUser))
 
-			console.log("NEW USER = ", newUser)
-
 			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, multiPartBody,
 			{
 				headers: {
@@ -154,7 +150,6 @@ function SignupFT() {
 			navigate("/")
 		}
 		catch (error) {
-			console.log("ERROR = ", error)
 			if (axios.isAxiosError(error)) {
 				const axiosError = error as AxiosError<ErrorResponse>
 				const { statusCode, message } = axiosError.response?.data!

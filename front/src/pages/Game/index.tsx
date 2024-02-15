@@ -200,11 +200,11 @@ function Game() {
 				});
 				
 				socket.on('connect_error', (error) => {
-					console.log(error)
+					// console.log(error)
 					throw new Error;
 				});
 
-				console.log(meResponse)
+				// console.log(meResponse)
 
 				setUserAuthenticate({
 					...meResponse.data,

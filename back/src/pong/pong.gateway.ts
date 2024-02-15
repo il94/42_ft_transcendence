@@ -32,7 +32,7 @@ export class PongGateway {
 				) {}
 
 	handleConnection(client: Socket){
-		console.log("connection of :", client.id)
+		// console.log("connection of :", client.id)
 	}
 
 	handleDisconnect(client: Socket){
@@ -326,7 +326,7 @@ export class PongGateway {
 				const index = this.PongService.activeGames.indexOf(game)
 				if (index != -1)
 					this.PongService.activeGames.splice(index, 1)
-				console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
+				// console.log("game finsihed, game still active : ", this.PongService.activeGames.length)
 			}
 		 }, speed)
 
@@ -366,7 +366,7 @@ export class PongGateway {
 				}
 			  })
 			  await this.PongService.cancelAllInvitation(user.id);
-			  console.log("user status = ", user.status)
+			//   console.log("user status = ", user.status)
 			  if (user.status === UserStatus.WAITING)
 			  {
 			  	this.delUserFromSearchingUser(AppService.connectedUsers.get(userId.toString()));

@@ -148,7 +148,7 @@ export class AuthService {
 			});
 			if (user) {
 				if (user.status != UserStatus.OFFLINE) {
-					console.log("isCO: ", user)
+					// console.log("isCO: ", user)
 					return { isCo: true }
 				}
 				else if (!user.twoFA) {

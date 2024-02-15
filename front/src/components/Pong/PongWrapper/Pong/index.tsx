@@ -134,7 +134,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 	};
 
 	const handleStopSpectate = async () => {
-		console.log("u =", user.userAuthenticate.id, "gameid = ",  gameId)
+		// console.log("u =", user.userAuthenticate.id, "gameid = ",  gameId)
 		try {
 
 			await axios.patch(`http://${url}:3333/pong/stopspectate/${user.userAuthenticate.id}`, 
@@ -249,11 +249,11 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		}
 	}, [score])
 
-	useEffect(() => {
-		console.log("in pong width", width)
-		console.log("in pong height", height)
+	// useEffect(() => {
+	// 	console.log("in pong width", width)
+	// 	console.log("in pong height", height)
 
-	}, [])
+	// }, [])
 
 	return (
 		<Style $backgroundColor={backgroundColor} $w={width} $h={height} ref={PongRef}>

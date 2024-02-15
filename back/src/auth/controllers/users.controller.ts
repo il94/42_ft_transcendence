@@ -25,7 +25,7 @@ export class UsersController {
 	@Post('upload')
 	postAvatar(@Body() link: string) {
 
-		console.log("CONTROLEUR", link)
+		// console.log("CONTROLEUR", link)
 		//return this.usersService.uploadAvatar(link)
 
 	}

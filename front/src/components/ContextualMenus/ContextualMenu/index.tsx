@@ -165,12 +165,6 @@ function ContextualMenu({ type, contextualMenuPosition, displaySecondaryContextu
 
 	async function handleChallengeClickEvent() {
 		try {
-			console.log(userTarget.id);
-
-			/* ============ Temporaire ============== */
-			// Verifier si une invitation n'existe pas deja
-			/* ====================================== */
-
 			let channel: Channel
 
 			if (type === contextualMenuStatus.SOCIAL) {

@@ -289,9 +289,6 @@ export class UsersService implements OnModuleInit {
 			console.log(`User ${userId} has been updated`)
 		}
 		catch (error) {
-
-			console.log(error)
-
 			if (error instanceof ConflictException)
 				throw error
 			else if (error instanceof Prisma.PrismaClientKnownRequestError)

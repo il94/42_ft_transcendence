@@ -1473,7 +1473,7 @@ export class ChannelsService {
 
 		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', defaultChannelAvatar)
 
-		console.log("HERE")
+		// console.log("HERE")
 
 	}
 

@@ -181,7 +181,7 @@ export class PongService {
 			  result: result
 			} as Prisma.UsersOnGamesUpdateInput
 		  });
-		  console.log(`User ${userId} game stats has been updated successfully.`);
+		//   console.log(`User ${userId} game stats has been updated successfully.`);
 		  this.updateStatusUser(userId, UserStatus.ONLINE);
 		  this.setResult(userId, result); // set user match history  
 		  return updatedUserGame;

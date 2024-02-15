@@ -18,7 +18,7 @@ export class AppGateway implements OnModuleInit {
 			const userid = socket.handshake.query.id;
 	
 		  // Vérifier le type de userid
-		  if (typeof userid === 'string') {
+		//   if (typeof userid === 'string') {
 			// Emit
 			await this.prisma.user.update({
 				where: {
@@ -46,9 +46,9 @@ export class AppGateway implements OnModuleInit {
 			});
 
 
-		  } else {
-			console.log('Invalid userid type:', typeof userid);
-		  }
+		//   } else {
+		// 	console.log('Invalid userid type:', typeof userid);
+		//   }
 		});
 	  } 
 	getSocketByUserId(userid: string): Socket | undefined {
