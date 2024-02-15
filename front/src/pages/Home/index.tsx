@@ -42,21 +42,10 @@ const ButtonsWrapper = styled.div`
 
 function Home() {
 
-	// window.addEventListener('beforeunload', async (e) => {
-	// 	console.log("Rafraîchissement de la page");
-	// 	await axios.get(`http://${url}:3333/pong/back`, {
-	// 		headers: {
-	// 			'Authorization': `Bearer ${token}`
-	// 		}
-	// 	});
-	// });
-
-
-
 	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
-	window.onpopstate = async e => {
+	window.onpopstate = async () => {
 		console.log("fleche retour")
 		await axios.get(`http://${url}:3333/pong/back`, {
 				headers: {
