@@ -33,7 +33,7 @@ export function capitalize(str: string): string {
 
 export function endsWithImageExtension(fileName: string): boolean {
 
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.apng', '.gif', '.svg', '.webp']
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.apng', '.gif', '.webp']
     const lowerCaseFileName = fileName.toLowerCase()
     return imageExtensions.some(ext => lowerCaseFileName.endsWith(ext))
 }
@@ -52,7 +52,7 @@ export function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>, setAvat
 	else if (!endsWithImageExtension(file.name))
 	{
 		if (displayPopupError)
-			displayPopupError({ display: true, message: "Invalid image extension .jpg .jpeg .png .apng .gif .svg .webp excepted" })
+			displayPopupError({ display: true, message: "Invalid image extension .jpg .jpeg .png .apng .gif .webp excepted" })
 		else if (navigate)
 			navigate("/error")
 		return

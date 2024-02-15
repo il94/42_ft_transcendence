@@ -12,7 +12,6 @@ export const VALID_UPLOADS_MIME_TYPES = [
 	'image/png',
 	'image/apng',
 	'image/gif',
-	'image/svg+xml',
 	'image/webp'
 ];
 

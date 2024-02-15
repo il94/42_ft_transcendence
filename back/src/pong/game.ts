@@ -94,18 +94,18 @@ export class Ball {
 	}
 
 	setRandomDir(){
-		// let phi: number; 
-		// 	do {
-		// 		phi = 2*Math.PI*Math.random();
-		// 	} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
-		// this.Dir = {
-		// 	x: Math.cos(phi) * 5,
-		// 	y: Math.sin(phi) * 5
-		// }
+		let phi: number; 
+			do {
+				phi = 2*Math.PI*Math.random();
+			} while ((phi >= Math.PI / 3 && phi <= 2 * Math.PI / 3) || (phi >= 4 * Math.PI / 3 && phi <= 5 * Math.PI / 3))
 		this.Dir = {
-			x: 2,
-			y: 0
+			x: Math.cos(phi) * 2,
+			y: Math.sin(phi) * 2
 		}
+		// this.Dir = {
+		// 	x: 2,
+		// 	y: 0
+		// }
 	}
 
 	move(){
@@ -304,7 +304,7 @@ export class PongGame {
 	
 		if (futureX - (ballSize / 2) <= paddleMargin)
 		{
-			this.Ball.setPos(paddleMargin + ballSize/2 - 2, futureY)
+			this.Ball.setPos(paddleMargin + ballSize/2 - 1, futureY)
 			return
 		}
 		if(futureX + (ballSize / 2) >= 1920 - paddleMargin){
