@@ -21,6 +21,8 @@ import {
 
 import HomeIcon from "../../assets/home.png"
 import YellowHomeIcon from "../../assets/yellow_home.png"
+import axios from "axios"
+import AuthContext from "../../contexts/AuthContext"
 
 type PropsLogo = {
 	social: boolean
@@ -28,16 +30,24 @@ type PropsLogo = {
 
 function Logo({ social }: PropsLogo) {
 
-	const { userAuthenticate } = useContext(InteractionContext)!
+	const { userAuthenticate} = useContext(InteractionContext)!
 	const { displayPopupError } = useContext(DisplayContext)!
-
+	const { token, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 	const [homeIcon, setHomeIcon] = useState<string>(HomeIcon)
 
 	return (
-		<Style onClick={() => {
+		<Style onClick={async () => {
+			
 			if (userAuthenticate.status === userStatus.ONLINE)
+			{
+				await axios.patch(`http://${url}:3333/pong/${userAuthenticate.id}/cancel`, {}, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+				})
 				navigate("/")
+			}
 			else
 				displayPopupError({ display: true, message: "You can't go to Home when you are busy" })
 			}}>

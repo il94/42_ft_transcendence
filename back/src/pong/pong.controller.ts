@@ -32,6 +32,13 @@ export class PongController {
         return await this.pongGateway.handleBack(userId)
     }
 
+    @Patch(':id/cancel')
+    async cancelAllInvitationBack(
+        @Param('id', ParseIntPipe) userId: number,
+    ){
+        return await this.pongService.cancelAllInvitation(userId)
+    }
+
     @Patch('spectate/:id')
     async addSpectate(
         @Param('id', ParseIntPipe) userId: number,

@@ -39,21 +39,34 @@ const ButtonsWrapper = styled.div`
 
 `
 
+
 function Home() {
+
+	// window.addEventListener('beforeunload', async (e) => {
+	// 	console.log("Rafraîchissement de la page");
+	// 	await axios.get(`http://${url}:3333/pong/back`, {
+	// 		headers: {
+	// 			'Authorization': `Bearer ${token}`
+	// 		}
+	// 	});
+	// });
+
+
 
 	const { token, setToken, url } = useContext(AuthContext)!
 	const navigate = useNavigate()
 
-	useEffect(() => {
+	window.onpopstate = async e => {
+		console.log("fleche retour")
+		await axios.get(`http://${url}:3333/pong/back`, {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			})
+	}
 
-		window.onpopstate = async () => {
-			console.log("fleche retour")
-			await axios.get(`http://${url}:3333/pong/back`, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				})
-		}
+
+	useEffect(() => {
 
 		async function getToken() {
 			try {
