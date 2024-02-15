@@ -200,6 +200,8 @@ function PongWrapper({social}: any) {
 	useEffect(() => {
 		if(!gameState)
 			setBackgroundColor(colors.pongWrapperBackgroundDraw)
+		setSearching(false)
+		setDifficultyChoose(false)
 	}, [gameState])
 
 	useEffect(() => {
