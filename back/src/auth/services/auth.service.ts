@@ -177,7 +177,7 @@ export class AuthService {
 				throw new BadRequestException("User not found in 42 database")
 			
 			if ('isCo' in user)
-				res.redirect(`http://${process.env.IP}:5173/`)
+				res.redirect(`http://${process.env.IP}:5173/error`)
 					
 			// Si le user possede deja un compte dans l'app
 			if ('id' in user)
