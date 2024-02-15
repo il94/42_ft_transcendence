@@ -122,6 +122,7 @@ function PongWrapper({social}: any) {
 		setSearching(false)
 		setDifficultyChoose(false)
 		setGameState(false)
+		setSpectate(false)
 		if (role === "player")
 			displayPongPopupError({ display: true, message: "Your enemy has Disconnect" })
 		else if(role === "watcher")
