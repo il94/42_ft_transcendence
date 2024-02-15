@@ -47,7 +47,8 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 	const { userAuthenticate, userTarget, setUserTarget } = useContext(InteractionContext)!
 	const navigate = useNavigate()
 
-	function showCard() {
+	function showCard(event) {
+		event.stopPropagation()
 		if (card && userTarget.id === userAuthenticate.id)
 			displayCard(false)
 		else {

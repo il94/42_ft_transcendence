@@ -98,13 +98,15 @@ function Game() {
 			setSecondaryContextualMenuHeight(maxHeight) // height max
 	}
 
-	function closeContextualMenus() {
+	function closeContextualMenus(event) {
+		displayCard(false)
 		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)
 		if (popupError.display)
 			displayPopupError({ display: false, message: undefined })
 		if (searchBarResults)
 			displaySearchBarResults(false)
+		event.stopPropagation()
 	}
 
 	/* ============================== AUTH STATES =============================== */

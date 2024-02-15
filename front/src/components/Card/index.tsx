@@ -66,7 +66,7 @@ function Card({ cardPosition, displayCard }: PropsCard) {
 
 	return (
 		<Style
-			onClick={() => { setZCardIndex(zMaxIndex + 1) }}
+			onClick={(event) => { setZCardIndex(zMaxIndex + 1); event.stopPropagation() }}
 			$left={cardPosition.left}
 			$right={cardPosition.right}
 			$top={cardPosition.top}
