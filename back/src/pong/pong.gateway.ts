@@ -365,7 +365,7 @@ export class PongGateway {
 					id : userId
 				}
 			  })
-
+			  await this.PongService.cancelAllInvitation(user.id);
 			  console.log("user status = ", user.status)
 			  if (user.status === UserStatus.WAITING)
 			  {
