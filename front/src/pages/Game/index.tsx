@@ -74,8 +74,7 @@ import {
 	ChannelType,
 	challengeStatus,
 	chatWindowStatus,
-	contextualMenuStatus,
-	userStatus
+	contextualMenuStatus
 } from '../../utils/status'
 
 import {
@@ -98,7 +97,7 @@ function Game() {
 			setSecondaryContextualMenuHeight(maxHeight) // height max
 	}
 
-	function closeContextualMenus(event) {
+	function closeContextualMenus(event: any) {
 		displayCard(false)
 		displayContextualMenu({ display: false, type: undefined })
 		displaySecondaryContextualMenu(false)

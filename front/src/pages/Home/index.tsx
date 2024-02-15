@@ -65,6 +65,7 @@ function Home() {
 			})
 	}
 
+
 	useEffect(() => {
 
 		async function getToken() {

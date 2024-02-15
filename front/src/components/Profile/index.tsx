@@ -1,7 +1,8 @@
 import {
 	SetStateAction,
 	Dispatch,
-	useContext
+	useContext,
+	MouseEvent
 } from "react"
 import {
 	useNavigate
@@ -47,7 +48,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 	const { userAuthenticate, userTarget, setUserTarget } = useContext(InteractionContext)!
 	const navigate = useNavigate()
 
-	function showCard(event) {
+	function showCard(event: MouseEvent<HTMLDivElement>) {
 		event.stopPropagation()
 		if (card && userTarget.id === userAuthenticate.id)
 			displayCard(false)
@@ -90,7 +91,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 	return (
 		<Style>
 			<ProfileWrapper
-				onClick={showCard}
+				onClick={(event) => showCard(event)}
 				tabIndex={0}>
 				{
 					userAuthenticate.avatar &&

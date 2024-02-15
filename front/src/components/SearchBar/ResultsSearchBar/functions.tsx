@@ -18,7 +18,7 @@ import {
 } from "../../../utils/status"
 
 // Génère les résultats à afficher sous forme de sections, inclus une scrollbar si besoin
-export function generateResults(url: string, results: User[] | Channel[], type: resultSearchBarType, littleResults: boolean, addFunction: any) {
+export function generateResults(results: User[] | Channel[], type: resultSearchBarType, littleResults: boolean, addFunction: any) {
 
 	function Results() {
 		return (
