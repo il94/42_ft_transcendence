@@ -254,12 +254,13 @@ function Signin() {
 				<FTRedirectWrapper>
 					{
 						buttonDisabled ?
-						<ButtonImage disabled={buttonDisabled}>
+						<ButtonImage alt="Loading button" title="Loading">
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Loading...
 						</ButtonImage>
 						:
-						<LinkButtonImage to={`http://${url}:3333/auth/api42`} onClick={handleClick} disabled={buttonDisabled}>
+						<LinkButtonImage to={`http://${url}:3333/auth/api42`} onClick={handleClick}
+							alt="42 auth button" title="Auth with 42">
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42
 						</LinkButtonImage>

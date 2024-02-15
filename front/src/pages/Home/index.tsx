@@ -46,7 +46,7 @@ function Home() {
 
 	useEffect(() => {
 
-		window.onpopstate = async e => {
+		window.onpopstate = async () => {
 			console.log("fleche retour")
 			await axios.get(`http://${url}:3333/pong/back`, {
 					headers: {
