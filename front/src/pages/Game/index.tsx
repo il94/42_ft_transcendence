@@ -199,7 +199,7 @@ function Game() {
 					}
 				});
 				
-				socket.on('connect_error', (error) => {
+				socket.on('connect_error', () => {
 					// console.log(error)
 					throw new Error;
 				});
