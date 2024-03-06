@@ -40,8 +40,6 @@ async function bootstrap() {
 	app.use(passport.initialize());
 	app.use(passport.session());
 		
-	await app.listen(process.env.PORT, () => {
-		console.log(`Server listening on ${process.env.IP}:${process.env.PORT}`)
-	});
+	await app.listen(process.env.PORT || 3333);
 }
 bootstrap();
