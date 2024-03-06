@@ -76,7 +76,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 			if (friendContainer && gameWrapperContainer) {
 
-				const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${friend.id}`, {
+				const userResponse: AxiosResponse<User> = await axios.get(`http://${url}/user/${friend.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -115,7 +115,7 @@ function FriendSection({ friend, social, displayContextualMenu, setContextualMen
 
 	async function showContextualMenu(event: MouseEvent<HTMLDivElement>) {
 		try {
-			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${friend.id}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}/user/${friend.id}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

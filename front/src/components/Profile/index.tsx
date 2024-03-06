@@ -61,7 +61,7 @@ function Profile({ card, displayCard, setCardPosition, settings, displaySettings
 
 	async function handleDeconnexionClickButton() {
 		try {
-			await axios.get(`http://${url}:3333/auth/logout`, {
+			await axios.get(`http://${url}/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

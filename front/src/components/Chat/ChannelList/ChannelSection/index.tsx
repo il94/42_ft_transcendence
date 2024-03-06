@@ -34,7 +34,7 @@ function ChannelSection({ channel, sectionIndex }: PropsChannel) {
 		try {
 			setLoaderChat(true)
 			
-			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}:3333/channel/${channel.id}/relations`, {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}/channel/${channel.id}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

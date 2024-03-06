@@ -122,7 +122,7 @@ function Game() {
 
 		async function fetchFriends(): Promise<User[]> {
 			try {
-				const friendsResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/friends`, {
+				const friendsResponse: AxiosResponse<User[]> = await axios.get(`http://${url}/friends`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -136,7 +136,7 @@ function Game() {
 
 		async function fetchBlockedUsers(): Promise<User[]> {
 			try {
-				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}:3333/blockeds`, {
+				const blockedUsersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}/blockeds`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -151,7 +151,7 @@ function Game() {
 
 		async function fetchChannels(): Promise<Channel[]> {
 			try {
-				const channelsResponse: AxiosResponse<[]> = await axios.get(`http://${url}:3333/user/channels`, {
+				const channelsResponse: AxiosResponse<[]> = await axios.get(`http://${url}/user/channels`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -181,7 +181,7 @@ function Game() {
 				await verifyToken()
 				setLoaderFriends(true)
 				setLoaderChannels(true)
-				const meResponse: AxiosResponse = await axios.get(`http://${url}:3333/user/me`, {
+				const meResponse: AxiosResponse = await axios.get(`http://${url}/user/me`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -192,7 +192,7 @@ function Game() {
 				const blockeds: User[] = await fetchBlockedUsers()
 				const channels: Channel[] = await fetchChannels()
 
-				const socket = io(`http://${url}:3333`, {
+				const socket = io(`http://${url}`, {
 					transports: ["websocket"],
 					query: {
 						id: meResponse.data.id,
@@ -241,7 +241,7 @@ function Game() {
 
 		async function verifyToken() {
 			try {
-				await axios.post(`http://${url}:3333/auth/token`, {}, {
+				await axios.post(`http://${url}/auth/token`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
