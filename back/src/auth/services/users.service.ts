@@ -331,7 +331,9 @@ export class UsersService implements OnModuleInit {
 
 	async saveUserAvatar(userId: number, file: Express.Multer.File) {
 	
-		const uploadUserPath = "/app/uploads/users/"
+		const currentDirectory = process.cwd()
+
+		const uploadUserPath = currentDirectory + "/uploads/users/"
 		if (!fs.existsSync(uploadUserPath))
             await mkdir(uploadUserPath, { recursive: true })
 
@@ -340,14 +342,16 @@ export class UsersService implements OnModuleInit {
 
 	async getRandomAvatar(userId: number) {
 	
-		const randomAvatarsPath = "/app/defaultUserAvatars/"
+		const currentDirectory = process.cwd()
+	
+		const randomAvatarsPath = currentDirectory + "/defaultUserAvatars/"
 
 		const avatarsList = await fs.promises.readdir(randomAvatarsPath)
 
 		const randomIndex = Math.floor(Math.random() * avatarsList.length)
 		const randomAvatar = await fs.promises.readFile(randomAvatarsPath + avatarsList[randomIndex])
 
-		const uploadUserPath = "/app/uploads/users/"
+		const uploadUserPath = currentDirectory + "/uploads/users/"
 		if (!fs.existsSync(uploadUserPath))
             await mkdir(uploadUserPath, { recursive: true })
 

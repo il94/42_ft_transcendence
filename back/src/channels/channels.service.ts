@@ -1451,7 +1451,10 @@ export class ChannelsService {
 	  }
   
 	async saveChannelAvatar(channelId: number, file: Express.Multer.File) {
-		const uploadChannelPath = "/app/uploads/channels/"
+
+		const currentDirectory = process.cwd()
+
+		const uploadChannelPath = currentDirectory + "/uploads/channels/"
 
 		if (!fs.existsSync(uploadChannelPath))
             await mkdir(uploadChannelPath, { recursive: true })
@@ -1461,15 +1464,15 @@ export class ChannelsService {
 
 	async getDefaultChannelAvatar(channelId: number) {
 
-		const defaultChannelAvatarPath = "/app/defaultChannelAvatar/default_channel.png"
+		const currentDirectory = process.cwd()
+	
+		const defaultChannelAvatarPath = currentDirectory + "/defaultChannelAvatar/default_channel.png"
 		
 		const defaultChannelAvatar = await fs.promises.readFile(defaultChannelAvatarPath)
 	
-		const uploadChannelPath = "/app/uploads/channels/"
+		const uploadChannelPath = currentDirectory + "/uploads/channels/"
 		if (!fs.existsSync(uploadChannelPath))
 			await mkdir(uploadChannelPath, { recursive: true })
-
-
 
 		await fs.promises.writeFile(uploadChannelPath + channelId.toString() + '_', defaultChannelAvatar)
 
