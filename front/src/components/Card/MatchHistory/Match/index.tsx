@@ -44,7 +44,7 @@ function Match({ username, opponentId, opponentName, result, scoreUser, scoreOpp
 	async function showOpponentCard() {
 		try {
 			setLoaderMatchsHistory(true)
-			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}:3333/user/${opponentId}`, {
+			const userResponse: AxiosResponse<User> = await axios.get(`http://${url}/user/${opponentId}`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

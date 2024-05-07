@@ -31,7 +31,7 @@ function MatchHistory() {
 		async function fetchMatchs() {
 			try {
 				setLoaderMatchsHistory(true)
-				const matchsResponse: AxiosResponse<[]> = await axios.get(`http://${url}:3333/user/matchs/${userTarget.id}`, {
+				const matchsResponse: AxiosResponse<[]> = await axios.get(`http://${url}/user/matchs/${userTarget.id}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}

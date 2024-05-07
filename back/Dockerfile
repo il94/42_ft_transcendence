@@ -8,8 +8,6 @@ RUN npm install
 
 RUN npm install -g npm@10.4.0 prisma
 
-RUN npm update
-
 COPY . .
 
 COPY ./start.sh /usr/local/bin

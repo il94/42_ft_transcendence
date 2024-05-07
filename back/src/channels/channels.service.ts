@@ -77,7 +77,7 @@ export class ChannelsService {
 					id: newChannelId.id
 				},
 				data: {
-					avatar: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${newChannelId.id}_`
+					avatar: `http://${process.env.IP}/uploads/channels/${newChannelId.id}_`
 				}
 			})
 
@@ -793,7 +793,7 @@ export class ChannelsService {
 
 			// Si un avatar est fourni, le laisse, sinon set le chemin par defaut de l'avatar
 			newChannelDatas.avatar = newChannelDatas.avatar ? newChannelDatas.avatar
-				: `http://${process.env.IP}:${process.env.PORT}/uploads/channels/${channelId}_`
+				: `http://${process.env.IP}:${process.env.PORT || 3333}/uploads/channels/${channelId}_`
 
 
 			// Update le channel

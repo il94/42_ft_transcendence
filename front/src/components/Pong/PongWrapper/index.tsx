@@ -67,7 +67,7 @@ function PongWrapper({social}: any) {
 	async function handleChooseDifficulty(dif: number){
 		try {
 
-			await axios.patch(`http://${url}:3333/pong/search/${userAuthenticate.id}`, 
+			await axios.patch(`http://${url}/pong/search/${userAuthenticate.id}`, 
 			{ dif: dif},
 			{
 				headers: {
@@ -93,7 +93,7 @@ function PongWrapper({social}: any) {
 	async function handleCancelButton()
 	{
 		try{
-			await axios.patch(`http://${url}:3333/pong/stopsearch/${userAuthenticate.id}`,
+			await axios.patch(`http://${url}/pong/stopsearch/${userAuthenticate.id}`,
 			{},
 			{
 				headers: {
@@ -134,13 +134,13 @@ function PongWrapper({social}: any) {
 	async function handleManualDisconnect(){
 		try{
 			// console.log("userAuth.id: ", userAuthenticate.id)
-			await axios.patch(`http://${url}:3333/pong/closeGame/`,
-			{},
-			{
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			})
+			// await axios.patch(`http://${url}/pong/closeGame/`,
+			// {},
+			// {
+			// 	headers: {
+			// 		'Authorization': `Bearer ${token}`
+			// 	}
+			// })
 			setSearching(false)
 			setDifficultyChoose(false)
 			setGameState(false)

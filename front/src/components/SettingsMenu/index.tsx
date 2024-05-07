@@ -83,7 +83,7 @@ function SettingsMenu({ displaySettingsMenu, displayTwoFAMenu }: PropsSettingsMe
 					multiPartBody.append('newDatas', JSON.stringify(newDatas))
 				else
 					multiPartBody.append('newDatas', "{}")
-				await axios.patch(`http://${url}:3333/user/me`, multiPartBody,
+				await axios.patch(`http://${url}/user/me`, multiPartBody,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`,

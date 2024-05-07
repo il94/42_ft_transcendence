@@ -86,7 +86,7 @@ function Signup() {
 			const multiPartBody: FormData = new FormData()
 			multiPartBody.append('newUser', JSON.stringify(newUser))
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}:3333/auth/signup`, multiPartBody,
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}/auth/signup`, multiPartBody,
 			{
 				headers: {
 					'Content-Type': 'multipart/form-data'

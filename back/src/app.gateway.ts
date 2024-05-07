@@ -22,27 +22,27 @@ export class AppGateway implements OnModuleInit {
 			// Emit
 			await this.prisma.user.update({
 				where: {
-					id: parseInt(userid)
+					id: parseInt(userid as string)
 				},
 				data: {
 					status: UserStatus.ONLINE
 				}
 			})
-			this.server.emit("updateUserStatus", parseInt(userid), UserStatus.ONLINE)
-			AppService.connectedUsers.set(userid, socket);
+			this.server.emit("updateUserStatus", parseInt(userid as string), UserStatus.ONLINE)
+			AppService.connectedUsers.set(userid as string, socket);
 			// Écouter le débranchement du socket
 			socket.on('disconnect', async () => {
 				// Emit
 				await this.prisma.user.update({
 					where: {
-						id: parseInt(userid)
+						id: parseInt(userid as string)
 					},
 					data: {
 						status: UserStatus.OFFLINE
 					}
 				})
-				this.server.emit("updateUserStatus", parseInt(userid), UserStatus.OFFLINE)
-				AppService.connectedUsers.delete(userid);
+				this.server.emit("updateUserStatus", parseInt(userid as string), UserStatus.OFFLINE)
+				AppService.connectedUsers.delete(userid as string);
 			});
 
 
