@@ -53,7 +53,7 @@ function LockedInterface() {
 			if (password.error)
 				return
 
-			await axios.post(`http://${url}/channel/${channelTarget.id}/join`, {
+			await axios.post(`${url}/channel/${channelTarget.id}/join`, {
 				hash: password.value
 			},
 			{

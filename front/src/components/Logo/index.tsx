@@ -41,7 +41,7 @@ function Logo({ social }: PropsLogo) {
 			
 			if (userAuthenticate.status === userStatus.ONLINE)
 			{
-				await axios.patch(`http://${url}/pong/${userAuthenticate.id}/cancel`, {}, {
+				await axios.patch(`${url}/pong/${userAuthenticate.id}/cancel`, {}, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

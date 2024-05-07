@@ -100,7 +100,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 				if (password.value && channelType == ChannelType.PROTECTED)
 					newDatas.hash = password.value
 				if (avatar.toDisplay === DefaultChannelIcon)
-					newDatas.avatar = `http://${url}/defaultChannelAvatar/default_channel.png`
+					newDatas.avatar = `${url}/defaultChannelAvatar/default_channel.png`
 
 				if (Object.keys(newDatas).length !== 0 || avatar.toUpload)
 				{
@@ -110,7 +110,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 						multiPartBody.append('file', avatar.toUpload)
 					multiPartBody.append('newDatas', JSON.stringify(newDatas))
 
-					await axios.patch(`http://${url}/channel/${channelTarget.id}`, multiPartBody, {
+					await axios.patch(`${url}/channel/${channelTarget.id}`, multiPartBody, {
 						headers: {
 							'Authorization': `Bearer ${token}`,
 							'Content-Type': 'multipart/form-data'
@@ -135,7 +135,7 @@ function ChannelInterface({ setBannerName, chatWindowState, setChatWindowState }
 
 				multiPartBody.append('newDatas', JSON.stringify(newDatas))
 
-				const postChannelResponse = await axios.post(`http://${url}/channel`, multiPartBody,
+				const postChannelResponse = await axios.post(`${url}/channel`, multiPartBody,
 				{
 					headers: {
 						'Authorization': `Bearer ${token}`,

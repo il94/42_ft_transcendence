@@ -66,7 +66,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 			try {
 				setLoaderResultsSearchBar(true)
 
-				const usersResponse: AxiosResponse<User[]> = await axios.get(`http://${url}/user`, {
+				const usersResponse: AxiosResponse<User[]> = await axios.get(`${url}/user`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -77,7 +77,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					user.username != userAuthenticate.username
 				)).sort(sortUserByName))
 
-				const accessiblesChannelsResponse: AxiosResponse<Channel[]> = await axios.get(`http://${url}/channel/accessibles`, {
+				const accessiblesChannelsResponse: AxiosResponse<Channel[]> = await axios.get(`${url}/channel/accessibles`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -122,7 +122,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 	async function addUserToFriendList(user: User) {
 		try {
 			if (!userIsFriend(userAuthenticate, user.id)) {
-				await axios.post(`http://${url}/friends/${user.id}`, {}, {
+				await axios.post(`${url}/friends/${user.id}`, {}, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -152,7 +152,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 	// Si le user est déjà dans le channel, ouvre le channel dans le chat
 	async function addChannelToChannelList(channelId: number) {
 		try {
-			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`http://${url}/channel/${channelId}/relations`, {
+			const channelWithRelationsResponse: AxiosResponse<Channel> = await axios.get(`${url}/channel/${channelId}/relations`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -169,7 +169,7 @@ function ResultsSearchBar({ value, displayChat }: PropsSearchBar) {
 					setChannelTarget(channelWithRelationsResponse.data)
 				}
 				else {
-					await axios.post(`http://${url}/channel/${channelId}/join`, {}, {
+					await axios.post(`${url}/channel/${channelId}/join`, {}, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}

@@ -47,7 +47,7 @@ function Home() {
 
 	window.onpopstate = async () => {
 		// console.log("fleche retour")
-		await axios.get(`http://${url}/pong/back`, {
+		await axios.get(`${url}/pong/back`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}
@@ -68,7 +68,7 @@ function Home() {
 				// Si un token est trouve, verifie si'il est valide et le set
 				if (access_token)
 				{
-					await axios.post(`http://${url}/auth/token`, {}, {
+					await axios.post(`${url}/auth/token`, {}, {
 						headers: {
 							'Authorization': `Bearer ${access_token}`
 						}
@@ -104,7 +104,7 @@ function Home() {
 	// Déconnecte le user en supprimant son token des cookies et en local
 	async function handleDeconnexionClickText() {
 		try {
-			await axios.get(`http://${url}/auth/logout`, {
+			await axios.get(`${url}/auth/logout`, {
 				headers: {
 					'Authorization': `Bearer ${token}`
 				}

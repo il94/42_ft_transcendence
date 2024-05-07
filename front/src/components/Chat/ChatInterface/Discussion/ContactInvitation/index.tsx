@@ -57,7 +57,7 @@ function ContactInvitation({ sender, target, initialStatus, idMsg, idChan }: Pro
 	
 	async function handleSpectate(userId:Number, targetid : number){
 		try {
-			await axios.patch(`http://${url}/pong/spectate/${userId}`, 
+			await axios.patch(`${url}/pong/spectate/${userId}`, 
 			{ userId: targetid},
 			{
 			headers: {

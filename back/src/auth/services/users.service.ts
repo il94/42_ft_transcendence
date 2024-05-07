@@ -61,7 +61,7 @@ export class UsersService implements OnModuleInit {
 					id: newUserId.id
 				},
 				data: {
-					avatar: `http://${process.env.IP}/uploads/users/${newUserId.id}_`
+					avatar: `${process.env.URL_BACK}/uploads/users/${newUserId.id}_`
 				},
 				select: {
 					id: true,

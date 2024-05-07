@@ -112,7 +112,7 @@ function Signin() {
 				hash: password.value
 			}
 
-			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`http://${url}/auth/signin`, user)
+			const signinResponse: AxiosResponse<PropsSigninResponse> = await axios.post(`${url}/auth/signin`, user)
 
 			if ('twoFA' in signinResponse.data) {
 				navigate("/twofa", {
@@ -259,7 +259,7 @@ function Signin() {
 							Loading...
 						</ButtonImage>
 						:
-						<LinkButtonImage to={`http://${url}/auth/api42`} onClick={handleClick}
+						<LinkButtonImage to={`${url}/auth/api42`} onClick={handleClick}
 							alt="42 auth button" title="Auth with 42">
 							<img src={FTButton} style={{ paddingRight: "7px" }} />
 							Continue with 42

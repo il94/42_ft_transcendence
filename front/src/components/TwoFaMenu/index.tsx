@@ -77,7 +77,7 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 				return
 
 			if (!userAuthenticate.twoFA) {
-				await axios.patch(`http://${url}/auth/2fa/enable`, {
+				await axios.patch(`${url}/auth/2fa/enable`, {
 					twoFACode: code.value
 				},
 				{
@@ -91,7 +91,7 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 				}))
 			}
 			else {
-				await axios.patch(`http://${url}/auth/2fa/disable`, {
+				await axios.patch(`${url}/auth/2fa/disable`, {
 					twoFACode: code.value
 				},
 				{
@@ -146,7 +146,7 @@ function TwoFaMenu({ displayTwoFAMenu }: PropsTwoFaMenu) {
 		async function fetchTwoFAQRCode() {
 			try {
 				setLoader(true)
-				const generateQRCodeResponse: AxiosResponse<string> = await axios.get(`http://${url}/auth/2fa/generate`, {
+				const generateQRCodeResponse: AxiosResponse<string> = await axios.get(`${url}/auth/2fa/generate`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}

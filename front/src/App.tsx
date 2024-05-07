@@ -16,7 +16,7 @@ function App() {
 
 	const localToken = localStorage.getItem("access_token")
 	const [token, setToken] = useState<string>(localToken ? localToken : '')
-	const url = new URL(window.location.href).hostname
+	const url = import.meta.env.VITE_URL_BACK
 
 	return (
 		<AuthContext.Provider value={{ token, setToken, url }}>

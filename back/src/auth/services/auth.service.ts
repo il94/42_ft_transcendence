@@ -177,7 +177,7 @@ export class AuthService {
 				throw new BadRequestException("User not found in 42 database")
 			
 			if ('isCo' in user)
-				res.redirect(`http://${process.env.IP}:5173/error`)
+				res.redirect(`${process.env.URL_FRONT}/error`)
 					
 			// Si le user possede deja un compte dans l'app
 			if ('id' in user)
@@ -189,7 +189,7 @@ export class AuthService {
 					const token = await this.signToken(user.id, user.username)
 						//res.clearCookie('token', { httpOnly: true })
 						res.cookie("access_token", token.access_token)
-						.redirect(`http://${process.env.IP}:5173`)
+						.redirect(`${process.env.URL_FRONT}`)
 				}
 			
 				// Si le user a active la twoFA
@@ -198,7 +198,7 @@ export class AuthService {
 					// Redirige vers la page twoFA avec les infos necessaires pour le front
 					res.cookie('two_FA', true)
 					.cookie('userId', user.id)
-					.redirect(`http://${process.env.IP}:5173/twofa`)	
+					.redirect(`${process.env.URL_FRONT}/twofa`)	
 				}
 			}
 			// Si le user ne possede pas de compte dans l'app
@@ -209,12 +209,12 @@ export class AuthService {
 				const fiveMin = Date.now() + 5 * 60 * 1000;
 				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin) })
 				.cookie("avatar", user.avatar, { expires: new Date(fiveMin)})
-				.redirect(`http://${process.env.IP}:5173/signup42`)
+				.redirect(`${process.env.URL_FRONT}/signup42`)
 			}
 		}
 		catch (error) {
 			res.cookie("error_message", error.message)
-			.redirect(`http://${process.env.IP}:5173/error`)
+			.redirect(`${process.env.URL_FRONT}/error`)
 		}
 	}
 

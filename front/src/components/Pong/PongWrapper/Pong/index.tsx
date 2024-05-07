@@ -137,7 +137,7 @@ function Pong({ width, height, score, setScore, setGameState, setSpectate, spect
 		// console.log("u =", user.userAuthenticate.id, "gameid = ",  gameId)
 		try {
 
-			await axios.patch(`http://${url}/pong/stopspectate/${user.userAuthenticate.id}`, 
+			await axios.patch(`${url}/pong/stopspectate/${user.userAuthenticate.id}`, 
 				{ gameId: gameId},
 				{
 				headers: {

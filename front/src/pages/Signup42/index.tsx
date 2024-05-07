@@ -138,7 +138,7 @@ function SignupFT() {
 				multiPartBody.append('file', FTAvatar)
 			multiPartBody.append('newUser', JSON.stringify(newUser))
 
-			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`http://${url}/auth/signup`, multiPartBody,
+			const signupResponse: AxiosResponse<PropsSignupResponse> = await axios.post(`${url}/auth/signup`, multiPartBody,
 			{
 				headers: {
 					'Content-Type': 'multipart/form-data'
