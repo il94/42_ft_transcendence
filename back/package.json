@@ -17,7 +17,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+	"cpFolders": "cp -r uploads ./dist && cp -r defaultChannelAvatar ./dist cp -r defaultUserAvatars ./dist",
+    "setDatabase": "npx prisma generate && npx prisma migrate deploy",
+    "deploy": "npm install && npm run setDatabase && npm run build && && npm run cpFolders && npm run start:prod"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.1",
