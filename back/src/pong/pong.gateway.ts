@@ -276,13 +276,13 @@ export class PongGateway {
 		// const speed = 20 / game.difficulty
 		let speed: number = 0
 		if (game.difficulty == 1)
-			speed = 10
+			speed = 5
 		else if (game.difficulty == 2)
-			speed = 6
-		else if (game.difficulty == 3) 
 			speed = 3
+		else if (game.difficulty == 3) 
+			speed = 1.5
 		else
-			speed = 12
+			speed = 6
 		
 		 setTimeout(() =>{
 			game.moveBall()
