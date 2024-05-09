@@ -1,6 +1,4 @@
-<div align="center">
-	<img src="https://i.postimg.cc/nrQ60yzM/Screen-Recording2024-05-09at16-55-41-ezgif-com-video-to-gif-converter.gif">
-</div>
+
 
 <h1 align="center">
 	Link
