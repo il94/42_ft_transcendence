@@ -36,7 +36,7 @@ function MatchHistory() {
 						'Authorization': `Bearer ${token}`
 					}
 				})
-				setMatchs(matchsResponse.data.reverse())
+				setMatchs(matchsResponse.data)
 				setLoaderMatchsHistory(false)
 			}
 			catch (error) {
