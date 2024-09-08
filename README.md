@@ -45,7 +45,7 @@ docker compose up --build
 </div>
 
 <p align="center">
-	After signing up, you'll be all set to play Pong, the famously timeless game from the 70's. You can either add friends to challenge them or play against random players using the matchmaking feature. The first one to reach 11 points wins the game !
+	After signing up and / or logging in, you'll be all set to play Pong, the famously timeless game from the 70's. You can either add friends to challenge them or play against random players using the matchmaking feature. The first one to reach 11 points wins the game !
 </p>
 
 ## Chat
