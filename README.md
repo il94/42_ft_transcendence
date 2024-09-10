@@ -22,7 +22,7 @@
 
 - Step 1 : Install and run Docker [Documentation](https://docs.docker.com/engine/install/)
 
-- Step 2 : Clone the project and replace the two ".env-example" file extensions with ".env". You can find them located in the "front" and "back" folders. Variables are already filled, but it's recommanded to replace them with your own values.
+- Step 2 : Clone the project and replace the two ".env-example" file extensions with ".env". You can find them located in the "front" and "back" folders. Variables are already filled, but it's recommended to replace them with your own values.
 
 - Step 3 : On a terminal, go to the project folder and execute :
 ```bash
