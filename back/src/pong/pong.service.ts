@@ -5,7 +5,6 @@ import { CreatePongDto } from './pong.dto'
 import { Game, User, GameStatus, Role, Prisma, messageStatus, challengeStatus, roleInGame, UserStatus, MatchResult  } from '@prisma/client';
 import { Socket } from 'socket.io';
 import { AppService } from 'src/app.service';
-import { ESLint } from 'eslint';
 import { PongGame } from './game'
 import { AppGateway } from 'src/app.gateway';
 import { UsersService } from 'src/auth/services/users.service';

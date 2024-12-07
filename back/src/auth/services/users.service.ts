@@ -1,16 +1,11 @@
 import { Injectable, ForbiddenException, OnModuleInit, NotFoundException, BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from '../dto/users.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClient, User, Prisma, Role, UserStatus, Game, ChannelStatus, UsersOnGames, MatchResult, roleInGame, GameStatus } from '@prisma/client';
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { User, Prisma, Role, UserStatus, ChannelStatus, UsersOnGames, MatchResult, roleInGame, GameStatus } from '@prisma/client';
 import * as argon from 'argon2';
-import { authenticator } from "otplib";
 import * as fs from 'fs';
 import { AppGateway } from 'src/app.gateway';
-import { join } from 'path';
 import { mkdir } from 'fs/promises';
-import { Blob } from 'buffer';
-import axios from 'axios';
 
 @Injectable()
 export class UsersService implements OnModuleInit {

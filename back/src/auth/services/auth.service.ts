@@ -7,7 +7,6 @@ import * as argon from 'argon2';
 import { AuthDto } from "../dto/auth.dto";
 import { CreateUserDto } from "../dto/users.dto";
 import { authenticator } from "otplib";
-import { generate } from "generate-password";
 import { AppGateway } from 'src/app.gateway';
 import { toDataURL } from 'qrcode';
 import { Response } from "express";

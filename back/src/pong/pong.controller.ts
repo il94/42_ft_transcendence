@@ -1,10 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Request } from '@nestjs/common';
-import { CreatePongDto} from './pong.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PongService } from './pong.service';
 import { getUser } from '../auth/decorators/users.decorator';
 
-import { User, challengeStatus, messageStatus, Game } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards/auth.guard';
 import { PongGateway } from './pong.gateway';
 

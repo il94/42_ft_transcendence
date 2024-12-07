@@ -1,5 +1,4 @@
 import { User, UserStatus } from "@prisma/client"
-import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, 
 	 IsOptional, MaxLength, MinLength, IsBoolean, IsAlphanumeric, IsLowercase, IsAlpha
  } from "class-validator";
