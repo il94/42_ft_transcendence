@@ -21,7 +21,7 @@
     "cpFolders": "cp -r uploads ./dist && cp -r defaultChannelAvatar ./dist && cp -r defaultUserAvatars ./dist",
     "setDatabase": "npx prisma generate && npx prisma migrate deploy &",
     "deploy": "npm install && npm run setDatabase && npm run build && npm run cpFolders && npm run start:prod",
-		"studio": "npx prisma studio"
+    "studio": "npx prisma studio"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.1",
@@ -44,6 +44,7 @@
     "passport": "^0.6.0",
     "passport-42": "^1.2.6",
     "passport-jwt": "^4.0.1",
+    "pm2": "^5.4.3",
     "qrcode": "^1.5.3",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.3"
