@@ -6,7 +6,7 @@
 	Link
 </h1>
 <p align="center">
-	https://transcendence.transcendons.fr/
+	https://transcendance.ilandols.com
 </p>
 
 
