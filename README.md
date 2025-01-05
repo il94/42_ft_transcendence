@@ -13,7 +13,7 @@
 ## Description
 <p align="center">
 	Are you the best Pong player out there ? It's time to find out ! <br>
-	This project has been completed in collaboration with <a href="https://github.com/Clachp" target="_blank">@Clachp</a>, <a href="https://github.com/Numedios" 		target="_blank">@Numedios</a> and <a href="https://github.com/AntoineDouay" target="_blank">@AntoineDouay</a>.
+	This project, originally ft_transcendence, has been completed in collaboration with <a href="https://github.com/Clachp" target="_blank">@Clachp</a>, <a href="https://github.com/Numedios" 		target="_blank">@Numedios</a> and <a href="https://github.com/AntoineDouay" target="_blank">@AntoineDouay</a> as part of the 42 School curriculum.
 </p>
 
 
