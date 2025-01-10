@@ -169,6 +169,12 @@ export class AuthService {
 
 	// Selon la reponse de l'api 42, connecte le user OU le redirige vers le twoFA OU lui cree un compte
 	async return42Response(user: { usernameId: string, avatar: string, isNew: boolean } | Partial<User>, res: Response ) {
+
+		const cookieData = {
+			secure: process.env.NODE_ENV === 'production',
+			domain: process.env.NODE_ENV === 'production' ? process.env.DOMAIN : undefined,
+		}
+
 		try {
 	
 			// Verifie si le user possebe bien un compte 42
@@ -187,7 +193,9 @@ export class AuthService {
 					// Genere un token d'authentification et l'envoie par les cookies
 					const token = await this.signToken(user.id, user.username)
 						//res.clearCookie('token', { httpOnly: true })
-						res.cookie("access_token", token.access_token)
+						res.cookie("access_token", token.access_token, {
+							...cookieData
+						})
 						.redirect(`${process.env.URL_FRONT}`)
 				}
 			
@@ -195,8 +203,12 @@ export class AuthService {
 				else
 				{
 					// Redirige vers la page twoFA avec les infos necessaires pour le front
-					res.cookie('two_FA', true)
-					.cookie('userId', user.id)
+					res.cookie('two_FA', true, {
+						...cookieData
+					})
+					.cookie('userId', user.id, {
+						...cookieData
+					})
 					.redirect(`${process.env.URL_FRONT}/twofa`)	
 				}
 			}
@@ -206,13 +218,23 @@ export class AuthService {
 				// Stocke les donnees necessaires a l'authentification dans des
 				// cookies de 5 mins  et redirige vers la page de creation de compte
 				const fiveMin = Date.now() + 5 * 60 * 1000;
-				res.cookie('usernameId', user.usernameId, { expires: new Date(fiveMin) })
-				.cookie("avatar", user.avatar, { expires: new Date(fiveMin)})
+				res.cookie('usernameId', user.usernameId, {
+					expires: new Date(fiveMin),
+					sameSite: 'lax',
+					...cookieData
+				})
+				.cookie("avatar", user.avatar, {
+					expires: new Date(fiveMin),
+					sameSite: 'lax',
+					...cookieData
+				})
 				.redirect(`${process.env.URL_FRONT}/signup42`)
 			}
 		}
 		catch (error) {
-			res.cookie("error_message", error.message)
+			res.cookie("error_message", error.message, {
+				...cookieData
+			})
 			.redirect(`${process.env.URL_FRONT}/error`)
 		}
 	}
