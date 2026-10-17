@@ -7,6 +7,7 @@ import { ChatsModule } from './channels/channels.module';
 import { FriendsModule } from './friends/friends.module';
 import { BlockedsModule } from './blockeds/blockeds.module';
 import { PongModule } from './pong/pong.module';
+import { AppController } from './app.controller';
 import { AppGateway } from './app.gateway';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/prisma.service';
@@ -17,23 +18,24 @@ import { UsersService } from './auth/services/users.service';
 @Module({
   imports: [
     AuthModule,
-    PrismaModule, 
-    ConfigModule.forRoot({ isGlobal: true}),
+    PrismaModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     PassportModule.register({ session: true }),
     ChatsModule,
     FriendsModule,
     BlockedsModule,
-	  PongModule,
-	  ServeStaticModule.forRoot({
-		rootPath: join(process.cwd(), "/"),
-		serveRoot: '/',
-	}),
+    PongModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), '/'),
+      serveRoot: '/',
+    }),
   ],
+  controllers: [AppController],
   providers: [
     AppGateway,
     AppService,
     PrismaService,
-    UsersService
-  ]
+    UsersService,
+  ],
 })
 export class AppModule {}
